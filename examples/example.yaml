@@ -1,0 +1,50 @@
+prog: "example"
+help: "Example program"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+  - option_strings: ["--version"]
+    help: "show program's version number and exit"
+    takes_args: false
+
+---
+prog: "example start"
+aliases: ["launch"]
+help: "Start a process"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+  - option_strings: ["--change-dir"]
+    metavar: "change_dir"
+    help: "Change to directory"
+    complete: ["directory"]
+
+  - option_strings: ["--mode", "-m"]
+    metavar: "mode"
+    help: "Specify mode"
+    complete: ["choices", ["auto", "manual", "debug"]]
+
+positionals:
+  - number: 1
+    metavar: "command"
+    help: "Specify a command that shall be run"
+    complete: ["command"]
+
+---
+prog: "example stop"
+aliases: ["kill"]
+help: "Stop a process"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+  - option_strings: ["--force", "-f"]
+    help: "Force stopping the process"
+    takes_args: false
+
+

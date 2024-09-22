@@ -1,0 +1,179 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import argparse
+
+from crazy_complete import zsh, bash, fish
+from crazy_complete import argparse_source, json_source, yaml_source
+from crazy_complete import argparse_mod # .complete() etc.
+from crazy_complete import config
+
+
+def parse_bool(s):
+    try:
+        return {'true': True, 'false': False}[s.lower()]
+    except KeyError:
+        raise ValueError("Not a bool: %r" % s)
+
+
+p = argparse.ArgumentParser('crazy-complete',
+    description='Generate shell auto completion files')
+
+p.add_argument('shell', choices=('bash', 'fish', 'zsh', 'json', 'yaml'),
+    help='Specify the shell type for the completion script')
+
+p.add_argument('source_file',
+    help='The file containing the command line definitions').complete('file')
+
+p.add_argument('--parser-variable', default=None,
+    help='Specify the variable name of the ArgumentParser object')
+
+p.add_argument('--input-type', choices=['yaml', 'json', 'python', 'auto'], default='auto',
+    help='Specify input file type')
+
+p.add_argument('--program-name', default=None,
+    help='Specify program name')
+
+p.add_argument('--abbreviate-commands', default=False, type=parse_bool,
+    help='Sets whether commands can be abbreviated')
+
+p.add_argument('--abbreviate-options', default=False, type=parse_bool,
+    help='Sets whether options can be abbreviated')
+
+p.add_argument('--multiple-options', default=False, type=parse_bool,
+    help='Sets whether options are suggested multiple times during completion')
+
+p.add_argument('--inherit-options', default=False, type=parse_bool,
+    help='Sets whether parent options are visible to subcommands')
+
+p.add_argument('--vim-modeline', default=True, type=parse_bool,
+    help='Sets whether a vim modeline comment shall be appended to the generated code')
+
+p.add_argument('--zsh-compdef', default=True, type=parse_bool,
+    help='Sets whether #compdef is used in zsh scripts')
+
+p.add_argument('--fish-fast', default=False, type=parse_bool,
+    help='Use faster commandline parsing at the cost of correctness')
+
+p.add_argument('--fish-inline-conditions', default=False, type=parse_bool,
+    help="Don't store conditions in a variable")
+
+p.add_argument('--include-file', action='append',
+    help='Include file in output').complete('file')
+
+p.add_argument('--debug', action='store_true',
+    help='Enable debug mode')
+
+grp = p.add_mutually_exclusive_group()
+
+grp.add_argument('-o', '--output', default=None,
+    help='Write output to destination file [default: stdout]').complete('file')
+
+grp.add_argument('-i', '--install-system-wide', default=False, action='store_true',
+    help='Write output to the system wide completions dir of shell')
+
+grp.add_argument('-u', '--uninstall-system-wide', default=False, action='store_true',
+    help='Uninstall the system wide completion file for program')
+
+# We use a unique object name for avoiding name clashes when
+# importing/executing the foreign python script
+_crazy_complete_argument_parser = p
+del p
+
+def load_definitions_file(opts):
+    if opts.input_type == 'auto':
+        basename = os.path.basename(opts.source_file)
+        extension = os.path.splitext(basename)[1].lower().strip('.')
+        if extension == 'json':
+            return json_source.load_from_file(opts.source_file)
+        elif extension in ('yaml', 'yml'):
+            return yaml_source.load_from_file(opts.source_file)
+        elif extension == 'py':
+            raise Exception('Reading Python files must be enabled by --input-type=python')
+        elif extension == '':
+            raise Exception('File has no extension. Please supply --input-type=json|yaml|python')
+        else:
+            raise Exception('Unknown file extension `%s`. Please supply --input-type=json|yaml|python' % extension)
+
+    elif opts.input_type == 'json':
+        return json_source.load_from_file(opts.source_file)
+    elif opts.input_type == 'yaml':
+        return yaml_source.load_from_file(opts.source_file)
+    elif opts.input_type == 'python':
+        return argparse_source.load_from_file(opts.source_file,
+            opts.parser_variable,
+            parser_blacklist=[_crazy_complete_argument_parser])
+
+def generate(opts):
+    if not os.path.exists(opts.source_file):
+        raise FileNotFoundError(opts.source_file)
+
+    cmdline = load_definitions_file(opts)
+
+    if opts.shell == 'json':
+        r = json_source.CommandLine_To_JSON(cmdline)
+        fh = open(opts.output, 'w') if opts.output else sys.stdout
+        print(r, file=fh)
+        return
+
+    if opts.shell == 'yaml':
+        r = yaml_source.CommandLine_To_YAML(cmdline)
+        fh = open(opts.output, 'w') if opts.output else sys.stdout
+        print(r, file=fh)
+        return
+
+    if opts.program_name is None:
+        opts.program_name = cmdline.prog
+
+    conf = config.Config()
+    conf.set_abbreviate_commands(opts.abbreviate_commands)
+    conf.set_abbreviate_options(opts.abbreviate_options)
+    conf.set_multiple_options(opts.multiple_options)
+    conf.set_inherit_options(opts.inherit_options)
+    conf.set_vim_modeline(opts.vim_modeline)
+    conf.set_zsh_compdef(opts.zsh_compdef)
+    conf.set_fish_fast(opts.fish_fast)
+    conf.set_fish_inline_conditions(opts.fish_inline_conditions)
+    conf.include_many_files(opts.include_file or [])
+
+    r = {
+        'bash': bash.generate_completion,
+        'fish': fish.generate_completion,
+        'zsh':  zsh.generate_completion
+    }[opts.shell](cmdline, opts.program_name, conf)
+
+    if opts.install_system_wide is True or opts.uninstall_system_wide is True:
+        file = {
+            'bash': bash.get_completions_file,
+            'fish': fish.get_completions_file,
+            'zsh':  zsh.get_completions_file,
+        }[opts.shell](opts.program_name)
+
+        if opts.install_system_wide:
+            print('Installing to %s' % file, file=sys.stderr)
+            with open(file, 'w') as fh:
+                fh.write(r)
+        else:
+            print('Removing %s' % file, file=sys.stderr)
+            os.remove(file)
+
+    elif opts.output is not None:
+        with open(opts.output, 'w') as fh:
+            fh.write(r)
+
+    else:
+        print(r)
+
+
+if __name__ == '__main__':
+    opts = _crazy_complete_argument_parser.parse_args()
+    try:
+        generate(opts)
+    except Exception as e:
+        print('%s: %s' % (type(e).__name__, e), file=sys.stderr)
+        if opts.debug:
+            raise
+        else:
+            print('Pass --debug to see full stack trace', file=sys.stderr)
+            sys.exit(1)

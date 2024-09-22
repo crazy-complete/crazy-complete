@@ -1,0 +1,104 @@
+#!/usr/bin/python3
+
+import argparse
+
+from crazy_complete import argparse_mod
+
+argp = argparse.ArgumentParser(prog='crazy-complete-test',
+    description='Test argument parser for shell completion')
+
+argp.add_argument('--version',    action='version')
+
+# =============================================================================
+# SUBCOMMANDS
+# =============================================================================
+subp = argp.add_subparsers(description='commands')
+
+# =============================================================================
+# Command 'complete'
+# =============================================================================
+cmdp = subp.add_parser('complete', help='Test complete commands')
+
+cmdp.add_argument('--exec',             help='Parse output').complete('exec', 'printf "%s\\t%s\\n" "Item 1" "Description 1" "Item 2" "Description 2"')
+cmdp.add_argument('--file',             help='Complete a file').complete('file')
+cmdp.add_argument('--directory',        help='Complete a directory').complete('directory')
+cmdp.add_argument('--file-tmp',         help='Complete a file in /tmp').complete('file', {'directory': '/tmp'})
+cmdp.add_argument('--directory-tmp',    help='Complete a directory in /tmp').complete('directory', {'directory': '/tmp'})
+cmdp.add_argument('--user',             help='Complete a user').complete('user')
+cmdp.add_argument('--group',            help='Complete a group').complete('group')
+cmdp.add_argument('--command',          help='Complete a command').complete('command')
+cmdp.add_argument('--process',          help='Complete a process').complete('process')
+cmdp.add_argument('--pid',              help='Complete a pid').complete('pid')
+cmdp.add_argument('--signal',           help='Complete a signal').complete('signal')
+cmdp.add_argument('--hostname',         help='Complete a hostname').complete('hostname')
+cmdp.add_argument('--variable',         help='Complete a variable').complete('variable')
+cmdp.add_argument('--variable-exported',help='Complete a variable').complete('variable', '-x')
+cmdp.add_argument('--service',          help='Complete a service').complete('service')
+cmdp.add_argument('--choices',          help='Complete from choices', choices={'foo:bar': 'Description for foo:bar', 1:'one', 2:'two'})
+cmdp.add_argument('--value-list',       help='Complete a list').complete('value_list', {'values': ['foo', 'bar', 'baz']})
+cmdp.add_argument('--range-1',          help='Complete a range', type=int, choices=range(1,9))
+cmdp.add_argument('--range-2',          help='Complete a range', type=int, choices=range(1,9,2))
+
+# =============================================================================
+# Command 'when'
+# =============================================================================
+cmdp = subp.add_parser('when', help='Test the "when"-feature')
+
+cmdp.add_argument('--var', '-var', '-V',           help='Conditional variable')
+cmdp.add_argument('--optional', '-optional', '-O', help='Conditional variable', nargs='?')
+cmdp.add_argument('--if-var', help='Only show option if --var is given').when('has_option --var -var -V')
+cmdp.add_argument('--if-var-is-foo', help='Only show option if --var is foo or bar').when('option_is --var -var -V -- foo bar')
+cmdp.add_argument('--if-optional', help='Only show option if --optional is given').when('has_option --optional -optional -O')
+cmdp.add_argument('--if-optional-is-foo', help='Only show option if --optional is foo').when('option_is --optional -optional -O -- foo')
+
+#cmdp.add_argument('--if-var-or-optional-is-foo').when('option_is --var --optional -- foo')
+#cmdp.add_argument('--if-not-var', help='Only show option if --var is not given').when('not_has_option --var -v')
+
+# =============================================================================
+# Command 'argparse-actions'
+# =============================================================================
+cmdp = subp.add_parser('argparse-actions', help='argparse tool actions')
+
+cmdp.add_argument('--store-true',           help='A option flag', action='store_true')
+cmdp.add_argument('--store-false',          help='A option flag', action='store_false')
+cmdp.add_argument('--store-const',          help='A option flag', action='store_const', const='bar')
+cmdp.add_argument('--append-const',         help='A option flag', action='append_const', const='bar')
+cmdp.add_argument('--append',               help='A option flag', action='append')
+cmdp.add_argument('--count',                help='A option flag', action='count')
+cmdp.add_argument('--extend',               help='A option flag', action='extend')
+
+# =============================================================================
+# Command 'subcommand'
+# =============================================================================
+cmdp = subp.add_parser('subcommand', help='Test nested subcommands')
+
+cmdp.add_argument('--subcommand-choices',    help='Complete from choices', choices=(1,'two and a half',3))
+
+subp1 = cmdp.add_subparsers(description='commands')
+
+cmdp1 = subp1.add_parser('sub-subcommand', help='Nested subcommand')
+
+cmdp1.add_argument('--sub-subcommand-choices',    help='Complete from choices', choices=(1,'two and a half',3))
+
+# =============================================================================
+# Command 'test'
+# =============================================================================
+cmdp = subp.add_parser('test',  help='For testing the completer').aliases(['alias1', 'alias2'])
+
+cmdp.add_argument('-F', '-flag',     '--flag',       help='A option flag', action='store_true')
+cmdp.add_argument('-O', '-optional', '--optional',   help='Option with optional arg', nargs='?', choices=(1,2,3))
+cmdp.add_argument('-A', '-arg',      '--arg',        help='Option with arg', choices=(1,2,3))
+cmdp.add_argument('--special-chars-in-description',  help='Here are some special chars: $"\'\\[]*`)')
+cmdp.add_argument('--multiple-flag', action='store_true').set_multiple_option()
+cmdp.add_argument('--multiple-arg').set_multiple_option()
+
+group = cmdp.add_mutually_exclusive_group()
+group.add_argument('--exclusive-1', action='store_true')
+group.add_argument('--exclusive-2', action='store_true')
+
+cmdp.add_argument('positional_1', help='First positional', choices=('first1', 'first2', 'first3'))
+cmdp.add_argument('positional_2', help='Second positional', choices=('second1', 'second2'))
+cmdp.add_argument('positional_3', help='Repeated positional', choices=('repeated1', 'repeated2'), nargs='+')
+
+if __name__ == '__main__':
+    argp.parse_args()

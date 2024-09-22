@@ -1,0 +1,160 @@
+prog: "amixer"
+help: "command-line mixer for ALSA soundcard driver"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+  - option_strings: ["-c", "--card"]
+    metavar: "NUMBER"
+    help: "sound card number or id"
+    complete: ["exec", "_amixer_list_devices"]
+
+  - option_strings: ["-D", "--device"]
+    metavar: "DEVICE"
+    help: "mixer device name"
+
+  - option_strings: ["-d", "--debug"]
+    help: "debug mode"
+    takes_args: false
+
+  - option_strings: ["-n", "--no-check"]
+    help: "do not perform range checking"
+    takes_args: false
+
+  - option_strings: ["-q", "--quiet"]
+    help: "quiet mode, do not show results of changes."
+    takes_args: false
+
+  - option_strings: ["-a", "--abstraction"]
+    metavar: "abstraction"
+    help: "mixer abstraction level"
+    complete: ["choices", ["none", "basic"]]
+
+  - option_strings: ["-s", "--stdin"]
+    help: "read commands from stdout"
+    takes_args: false
+
+  - option_strings: ["-R", "--raw-volume"]
+    help: "Use the raw value (default)"
+    takes_args: false
+
+  - option_strings: ["-M", "--mapped-volumen"]
+    help: "Use the mapped volume"
+    takes_args: false
+
+---
+prog: "amixer info"
+help: "Shows the information about a mixer device"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+---
+prog: "amixer scontrols"
+help: "Show all mixer simple controls"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+---
+prog: "amixer scontents"
+help: "Show contents of all mixer simple controls (default command)"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+---
+prog: "amixer sset"
+help: "Set contents for one mixer simple control"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+positionals:
+  - number: 1
+    metavar: "SCONTROL"
+    complete: ["exec", "_amixer_list_simple_mixer_control"]
+
+  - number: 2
+    metavar: "PARAMETER"
+
+---
+prog: "amixer sget"
+help: "Get contents for one mixer simple control"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+positionals:
+  - number: 1
+    metavar: "SCONTROL"
+    complete: ["exec", "_amixer_list_simple_mixer_control"]
+
+---
+prog: "amixer controls"
+help: "Show all controls for given card"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+---
+prog: "amixer contents"
+help: "Show contents of all controls for given card"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+---
+prog: "amixer cset"
+help: "Set control contents for one control"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+positionals:
+  - number: 1
+    metavar: "CONTROL"
+    complete: ["exec", "_amixer_list_mixer_control"]
+
+  - number: 2
+    metavar: "PARAMETER"
+
+---
+prog: "amixer cget"
+help: "Get control contents for one control"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+positionals:
+  - number: 1
+    metavar: "CONTROL"
+    complete: ["exec", "_amixer_list_mixer_control"]
+
+---
+prog: "amixer sevents"
+help: "Show the mixer events for simple controls"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+---
+prog: "amixer events"
+help: "Show contents of all mixer controls"
+options:
+  - option_strings: ["-h", "--help"]
+    help: "show this help message and exit"
+    takes_args: false
+
+

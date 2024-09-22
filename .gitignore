@@ -1,0 +1,14 @@
+cracy_complete.egg-info/
+build/
+dist/
+pkg/
+src/
+python-cracy-complete/
+python-cracy-complete-*.pkg.*
+__pycache__
+test/out.bash
+test/out.fish
+test/out.zsh
+test/tests.new.py
+test/tests.new.yaml
+.idea
