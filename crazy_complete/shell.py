@@ -111,7 +111,7 @@ class ShellCompleter:
         return getattr(self, completion)(ctxt, *a)
 
     def fallback(self, ctxt, from_, to, *a):
-        utils.warn("Warning: ShellCompleter: Falling back from `%s` to `%s`" % (from_, to))
+        utils.warn("ShellCompleter: Falling back from `%s` to `%s`" % (from_, to))
         return self.complete(ctxt, to, *a)
 
     def none(self, ctxt, *a):
