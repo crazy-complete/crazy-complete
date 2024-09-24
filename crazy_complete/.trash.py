@@ -449,3 +449,12 @@ for var in $(declare -p -x | sed 's/=.*//; s/.* //'); do
   [[ "$var" == "$cur"* ]] && COMPREPLY+=("$var")
 done
 ''')
+
+# =============================================================================
+
+def get_subcommands_choices(subcommands_option):
+    r = OrderedDict()
+    for commandline in subcommands_option.subcommands:
+        for command in get_all_command_variations(commandline):
+            r[command] = commandline.help
+    return r

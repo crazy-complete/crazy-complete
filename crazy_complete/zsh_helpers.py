@@ -1,4 +1,6 @@
-#!/usr/bin/python3
+'''
+This module contains helper functions for Zsh.
+'''
 
 from . import helpers
 
@@ -12,10 +14,10 @@ _ZSH_HELPER_FUNC = helpers.ShellFunction('zsh_helper', r'''
 #     This is the first call you have to make, otherwise the other commands
 #     won't (successfully) work.
 #
-#     It parses <ARGS> accordings to <OPTIONS> and stores results in the
+#     It parses <ARGS> according to <OPTIONS> and stores results in the
 #     variables POSITIONALS, HAVING_OPTIONS and OPTION_VALUES.
 #
-#     The first argument is a comma-seperated list of options that the parser
+#     The first argument is a comma-separated list of options that the parser
 #     should know about. Short options (-o), long options (--option), and
 #     old-style options (-option) are supported.
 #
@@ -48,8 +50,8 @@ local FUNC="zsh_helper"
 local CONTAINS="${FUNC}_contains"
 
 $CONTAINS() {
-  local ARG KEY="$1"; shift
-  for ARG; do [[ "$KEY" == "$ARG" ]] && return 0; done
+  local arg key="$1"; shift
+  for arg; do [[ "$key" == "$arg" ]] && return 0; done
   return 1
 }
 
@@ -58,10 +60,10 @@ if [[ $# == 0 ]]; then
   return 1;
 fi
 
-local CMD=$1
+local cmd=$1
 shift
 
-case "$CMD" in
+case "$cmd" in
   get_positional)
     if test $# -ne 1; then
       echo "$FUNC: get_positional: takes exactly one argument" >&2
@@ -82,45 +84,45 @@ case "$CMD" in
       return 1;
     fi
 
-    local OPTION=''
-    for OPTION in "${HAVING_OPTIONS[@]}"; do
-      $CONTAINS "$OPTION" "$@" && return 0
+    local option=''
+    for option in "${HAVING_OPTIONS[@]}"; do
+      $CONTAINS "$option" "$@" && return 0
     done
 
     return 1
     ;;
   option_is)
-    local -a CMD_OPTION_IS_OPTIONS CMD_OPTION_IS_VALUES
-    local END_OF_OPTIONS_NUM=0
+    local -a CMD_option_IS_optionS CMD_option_IS_VALUES
+    local END_OF_optionS_NUM=0
 
     while test $# -ge 1; do
       if [[ "$1" == "--" ]]; then
-        (( ++END_OF_OPTIONS_NUM ))
-      elif test $END_OF_OPTIONS_NUM -eq 0; then
-        CMD_OPTION_IS_OPTIONS+=("$1")
-      elif test $END_OF_OPTIONS_NUM -eq 1; then
-        CMD_OPTION_IS_VALUES+=("$1")
+        (( ++END_OF_optionS_NUM ))
+      elif test $END_OF_optionS_NUM -eq 0; then
+        CMD_option_IS_optionS+=("$1")
+      elif test $END_OF_optionS_NUM -eq 1; then
+        CMD_option_IS_VALUES+=("$1")
       fi
 
       shift
     done
 
-    if test ${#CMD_OPTION_IS_OPTIONS[@]} -eq 0; then
+    if test ${#CMD_option_IS_optionS[@]} -eq 0; then
       echo "$FUNC: option_is: missing options" >&2
       return 1
     fi
 
-    if test ${#CMD_OPTION_IS_VALUES[@]} -eq 0; then
+    if test ${#CMD_option_IS_VALUES[@]} -eq 0; then
       echo "$FUNC: option_is: missing values" >&2
       return 1
     fi
 
     local I=${#HAVING_OPTIONS[@]}
     while test $I -ge 1; do
-      local OPTION="${HAVING_OPTIONS[$I]}"
-      if $CONTAINS "$OPTION" "${CMD_OPTION_IS_OPTIONS[@]}"; then
+      local option="${HAVING_OPTIONS[$I]}"
+      if $CONTAINS "$option" "${CMD_option_IS_optionS[@]}"; then
         local VALUE="${OPTION_VALUES[$I]}"
-        $CONTAINS "$VALUE" "${CMD_OPTION_IS_VALUES[@]}" && return 0
+        $CONTAINS "$VALUE" "${CMD_option_IS_VALUES[@]}" && return 0
       fi
 
       (( --I ))
@@ -130,7 +132,7 @@ case "$CMD" in
     ;;
   setup)
     local IFS=','
-    local -a OPTIONS=(${=1})
+    local -a options=(${=1})
     unset IFS
     shift
     ;;
@@ -146,26 +148,26 @@ esac
 # Parsing of available options
 # ===========================================================================
 
-local -a   OLD_OPTS_WITH_ARG   OLD_OPTS_WITH_OPTIONAL_ARG   OLD_OPTS_WITHOUT_ARG
-local -a  LONG_OPTS_WITH_ARG  LONG_OPTS_WITH_OPTIONAL_ARG  LONG_OPTS_WITHOUT_ARG
-local -a SHORT_OPTS_WITH_ARG SHORT_OPTS_WITH_OPTIONAL_ARG SHORT_OPTS_WITHOUT_ARG
+local -a   old_opts_with_arg=()   old_opts_with_optional_arg=()   old_opts_without_arg=()
+local -a  long_opts_with_arg=()  long_opts_with_optional_arg=()  long_opts_without_arg=()
+local -a short_opts_with_arg=() short_opts_with_optional_arg=() short_opts_without_arg=()
 
-local OPTION
-for OPTION in "${OPTIONS[@]}"; do
-  case "$OPTION" in
-    --?*=)    LONG_OPTS_WITH_ARG+=("${OPTION%=}");;
-    --?*=\?)  LONG_OPTS_WITH_OPTIONAL_ARG+=("${OPTION%=?}");;
-    --?*)     LONG_OPTS_WITHOUT_ARG+=("$OPTION");;
+local option=''
+for option in "${options[@]}"; do
+  case "$option" in
+    --?*=)    long_opts_with_arg+=("${option%=}");;
+    --?*=\?)  long_opts_with_optional_arg+=("${option%=?}");;
+    --?*)     long_opts_without_arg+=("$option");;
 
-    -?=)      SHORT_OPTS_WITH_ARG+=("${OPTION%=}");;
-    -?=\?)    SHORT_OPTS_WITH_OPTIONAL_ARG+=("${OPTION%=?}");;
-    -?)       SHORT_OPTS_WITHOUT_ARG+=("$OPTION");;
+    -?=)      short_opts_with_arg+=("${option%=}");;
+    -?=\?)    short_opts_with_optional_arg+=("${option%=?}");;
+    -?)       short_opts_without_arg+=("$option");;
 
-    -??*=)    OLD_OPTS_WITH_ARG+=("${OPTION%=}");;
-    -??*=\?)  OLD_OPTS_WITH_OPTIONAL_ARG+=("${OPTION%=?}");;
-    -??*)     OLD_OPTS_WITHOUT_ARG+=("$OPTION");;
+    -??*=)    old_opts_with_arg+=("${option%=}");;
+    -??*=\?)  old_opts_with_optional_arg+=("${option%=?}");;
+    -??*)     old_opts_without_arg+=("$option");;
 
-    *) echo "$FUNC: $OPTION: not a valid short, long or oldstyle option" >&2; return 1;;
+    *) echo "$FUNC: $option: not a valid short, long or oldstyle option" >&2; return 1;;
   esac
 done
 
@@ -177,99 +179,99 @@ POSITIONALS=()
 HAVING_OPTIONS=()
 OPTION_VALUES=()
 
-local ARGI=2 # ARGI[1] is program name
-while [[ $ARGI -le $# ]]; do
-  local ARG="${@[$ARGI]}"
-  local HAVE_TRAILING_ARG=$(test $ARGI -lt $# && echo true || echo false)
+local argi=2 # argi[1] is program name
+while [[ $argi -le $# ]]; do
+  local arg="${@[$argi]}"
+  local have_trailing_arg=$(test $argi -lt $# && echo true || echo false)
 
-  case "$ARG" in
+  case "$arg" in
     (-)
       POSITIONALS+=(-);;
     (--)
-      for ARGI in $(seq $((ARGI + 1)) $#); do
-        POSITIONALS+=("${@[$ARGI]}")
+      for argi in $(seq $((argi + 1)) $#); do
+        POSITIONALS+=("${@[$argi]}")
       done
       break;;
     (--*)
-      for OPTION in $LONG_OPTS_WITH_ARG $LONG_OPTS_WITHOUT_ARG $LONG_OPTS_WITH_OPTIONAL_ARG; do
-        if [[ "$ARG" == "$OPTION="* ]]; then
-          HAVING_OPTIONS+=("$OPTION")
-          OPTION_VALUES+=("${ARG#$OPTION=}")
+      for option in $long_opts_with_arg $long_opts_without_arg $long_opts_with_optional_arg; do
+        if [[ "$arg" == "$option="* ]]; then
+          HAVING_OPTIONS+=("$option")
+          OPTION_VALUES+=("${arg#$option=}")
           break
-        elif [[ "$ARG" == "$OPTION" ]]; then
-          if $CONTAINS "$OPTION" "${LONG_OPTS_WITH_ARG[@]}"; then
-            if $HAVE_TRAILING_ARG; then
-              HAVING_OPTIONS+=("$OPTION")
-              OPTION_VALUES+=("${@[$((ARGI + 1))]}")
-              (( ARGI++ ))
+        elif [[ "$arg" == "$option" ]]; then
+          if $CONTAINS "$option" "${long_opts_with_arg[@]}"; then
+            if $have_trailing_arg; then
+              HAVING_OPTIONS+=("$option")
+              OPTION_VALUES+=("${@[$((argi + 1))]}")
+              (( argi++ ))
             fi
           else
-            HAVING_OPTIONS+=("$OPTION")
+            HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("")
           fi
           break
         fi
       done;;
     (-*)
-      local HAVE_MATCH=false
+      local have_match=false
 
-      for OPTION in $OLD_OPTS_WITH_ARG $OLD_OPTS_WITHOUT_ARG $OLD_OPTS_WITH_OPTIONAL_ARG; do
-        if [[ "$ARG" == "$OPTION="* ]]; then
-          HAVING_OPTIONS+=("$OPTION")
-          OPTION_VALUES+=("${ARG#$OPTION=}")
-          HAVE_MATCH=true
+      for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg; do
+        if [[ "$arg" == "$option="* ]]; then
+          HAVING_OPTIONS+=("$option")
+          OPTION_VALUES+=("${arg#$option=}")
+          have_match=true
           break
-        elif [[ "$ARG" == "$OPTION" ]]; then
-          if $CONTAINS "$OPTION" "${OLD_OPTS_WITH_ARG[@]}"; then
-            if $HAVE_TRAILING_ARG; then
-              HAVING_OPTIONS+=("$OPTION")
-              OPTION_VALUES+=("${@[$((ARGI + 1))]}")
-              (( ARGI++ ))
+        elif [[ "$arg" == "$option" ]]; then
+          if $CONTAINS "$option" "${old_opts_with_arg[@]}"; then
+            if $have_trailing_arg; then
+              HAVING_OPTIONS+=("$option")
+              OPTION_VALUES+=("${@[$((argi + 1))]}")
+              (( argi++ ))
             fi
           else
-            HAVING_OPTIONS+=("$OPTION")
+            HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("")
           fi
 
-          HAVE_MATCH=true
+          have_match=true
           break
         fi
       done
 
-      if ! $HAVE_MATCH; then
-        local ARG_LENGTH=${#ARG}
-        local I=1
-        local IS_END=false
-        while ! $IS_END && test $I -lt $ARG_LENGTH; do
-          local ARG_CHAR="${ARG:$I:1}"
-          local HAVE_TRAILING_CHARS=$(test $((I+1)) -lt $ARG_LENGTH && echo true || echo false)
+      if ! $have_match; then
+        local arg_length=${#arg}
+        local i=1
+        local is_end=false
+        while ! $is_end && test $i -lt $arg_length; do
+          local arg_char="${arg:$i:1}"
+          local have_trailing_chars=$(test $((i+1)) -lt $arg_length && echo true || echo false)
 
-          for OPTION in $SHORT_OPTS_WITH_ARG $SHORT_OPTS_WITHOUT_ARG $SHORT_OPTS_WITH_OPTIONAL_ARG; do
-            local OPTION_CHAR="${OPTION:1:1}"
+          for option in $short_opts_with_arg $short_opts_without_arg $short_opts_with_optional_arg; do
+            local option_char="${option:1:1}"
 
-            if test "$ARG_CHAR" = "$OPTION_CHAR"; then
-              if $CONTAINS "$OPTION" "${SHORT_OPTS_WITH_ARG[@]}"; then
-                if $HAVE_TRAILING_CHARS; then
-                  HAVING_OPTIONS+=("$OPTION")
-                  OPTION_VALUES+=("${ARG:$((I+1))}")
-                  IS_END=true
-                elif $HAVE_TRAILING_ARG; then
-                  HAVING_OPTIONS+=("$OPTION")
-                  OPTION_VALUES+=("${@[$((ARGI + 1))]}")
-                  (( ARGI++ ))
-                  IS_END=true
+            if test "$arg_char" = "$option_char"; then
+              if $CONTAINS "$option" "${short_opts_with_arg[@]}"; then
+                if $have_trailing_chars; then
+                  HAVING_OPTIONS+=("$option")
+                  OPTION_VALUES+=("${arg:$((i+1))}")
+                  is_end=true
+                elif $have_trailing_arg; then
+                  HAVING_OPTIONS+=("$option")
+                  OPTION_VALUES+=("${@[$((argi + 1))]}")
+                  (( argi++ ))
+                  is_end=true
                 fi
-              elif $CONTAINS "$OPTION" "${SHORT_OPTS_WITH_OPTIONAL_ARG[@]}"; then
-                HAVING_OPTIONS+=("$OPTION")
+              elif $CONTAINS "$option" "${short_opts_with_optional_arg[@]}"; then
+                HAVING_OPTIONS+=("$option")
 
-                if $HAVE_TRAILING_CHARS; then
-                  IS_END=true
-                  OPTION_VALUES+=("${ARG:$((I+1))}")
+                if $have_trailing_chars; then
+                  is_end=true
+                  OPTION_VALUES+=("${arg:$((i+1))}")
                 else
                   OPTION_VALUES+=("")
                 fi
               else
-                HAVING_OPTIONS+=("$OPTION")
+                HAVING_OPTIONS+=("$option")
                 OPTION_VALUES+=("")
               fi
 
@@ -277,28 +279,27 @@ while [[ $ARGI -le $# ]]; do
             fi
           done
 
-          (( I++ ))
+          (( i++ ))
         done
       fi;;
     (*)
-      POSITIONALS+=("$ARG");;
+      POSITIONALS+=("$arg");;
   esac
 
-  (( ARGI++ ))
+  (( argi++ ))
 done
 ''')
 
 _EXEC = helpers.ShellFunction('exec', r'''
-local -a DESCRIBE=()
-local LINE=''
+local -a describe=()
+local item='' desc=''
 
-while IFS='' read -r LINE; do
-  LINE="${LINE/:/\\:/}"
-  LINE="${LINE/$'\t'/:}"
-  DESCRIBE+=("$LINE")
+while IFS=$'\t' read -r item desc; do
+  item="${item/:/\\:/}"
+  describe+=("$item:$desc")
 done < <(eval "$1")
 
-_describe '' DESCRIBE
+_describe '' describe
 ''')
 
 class ZSH_Helpers(helpers.GeneralHelpers):

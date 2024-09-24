@@ -1,51 +1,63 @@
-#!/usr/bin/python3
+"""
+This module provides functions for creating CommandLine objects from
+Python's argparse.ArgumentParser.
+"""
 
-import sys
 import argparse
+from collections import OrderedDict
 
 from . import file_loader
 from . import utils
-from .commandline import *
+from .commandline import CommandLine, MutuallyExclusiveGroup
+
+# We have to use implementation details of the argparse module...
+# pylint: disable=protected-access
 
 def get_complete(action):
-    if isinstance(action, argparse._HelpAction):
-        return None
-    elif isinstance(action, argparse._VersionAction):
-        return None
-    elif isinstance(action, argparse._StoreTrueAction) or \
-         isinstance(action, argparse._StoreFalseAction) or \
-         isinstance(action, argparse._StoreConstAction) or \
-         isinstance(action, argparse._AppendConstAction) or \
-         isinstance(action, argparse._CountAction):
+    '''
+    Get the `complete` attribute of `action` if it is set.
+    Otherwise determine `complete` from action type.
+    '''
+    complete = action.get_complete()
 
-        if action.get_complete():
-            raise Exception('Action has complete but takes no arguments', action)
+    if isinstance(action, (
+        argparse._HelpAction,
+        argparse._VersionAction,
+        argparse._StoreTrueAction,
+        argparse._StoreFalseAction,
+        argparse._StoreConstAction,
+        argparse._AppendConstAction,
+        argparse._CountAction)):
+
+        if complete:
+            utils.warn(f"Action has .complete() set but takes no arguments: {action}")
 
         return None
-    elif isinstance(action, argparse._StoreAction) or \
-         isinstance(action, argparse._ExtendAction) or \
-         isinstance(action, argparse._AppendAction):
 
-        if action.choices and action.get_complete():
-            raise Exception('Action has both choices and complete set', action)
+    if isinstance(action, (
+        argparse._StoreAction,
+        argparse._ExtendAction,
+        argparse._AppendAction)):
+
+        if complete:
+            if action.choices:
+                utils.warn(f"Action's choices overridden by .complete(): {action}")
+            return complete
 
         if action.choices:
             if isinstance(action.choices, range):
                 if action.choices.step == 1:
-                    complete = ('range', action.choices.start, action.choices.stop)
+                    return ('range', action.choices.start, action.choices.stop)
                 else:
-                    complete = ('range', action.choices.start, action.choices.stop, action.choices.step)
-            else:
-                complete = ('choices', action.choices)
-        else:
-            complete = action.get_complete()
+                    return ('range', action.choices.start, action.choices.stop, action.choices.step)
+            return ('choices', action.choices)
 
-        return complete
+        return None
 
-    elif isinstance(action, argparse.BooleanOptionalAction):
-        raise Exception("not supported")
+    if isinstance(action, argparse.BooleanOptionalAction):
+        raise Exception("argparse.BooleanOptionalAction is not supported yet")
 
-    raise Exception('Unknown action: %r' % action)
+    raise Exception(f'Unknown action type: {action}')
 
 def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
     '''
@@ -67,14 +79,14 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
         prog = parser.prog
 
     commandline = CommandLine(prog, help=description, aliases=parser.get_aliases())
-    number = 0
+    positional_number = 0
 
     for action in parser._actions:
         if isinstance(action, argparse._SubParsersAction):
             subparsers  = OrderedDict()
 
             for name, subparser in action.choices.items():
-                subparsers[name] = {'parser': subparser, 'help': ''}
+                subparsers[name] = {'parser': subparser, 'help': None}
 
             for action in action._get_subactions():
                 subparsers[action.dest]['help'] = action.help
@@ -90,16 +102,17 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
             elif action.nargs in (1, None, '?'):
                 is_repeatable = False
             else:
-                raise Exception("Invalid nargs: %r" % action)
+                is_repeatable = True
+                utils.warn(f'Truncating nargs={action.nargs} of {action}')
 
-            number += 1
+            positional_number += 1
             commandline.add_positional(
-                number,
-                metavar=action.metavar or action.dest,
-                complete=get_complete(action),
-                help=action.help,
-                repeatable=is_repeatable,
-                when=action.get_when()
+                positional_number,
+                metavar    = action.metavar or action.dest,
+                complete   = get_complete(action),
+                help       = action.help,
+                repeatable = is_repeatable,
+                when       = action.get_when()
             )
         else:
             if action.nargs is None or action.nargs == 1:
@@ -109,7 +122,8 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
             elif action.nargs == 0:
                 takes_args = False
             else:
-                utils.warn('Truncating %r nargs' % action)
+                takes_args = True
+                utils.warn(f'Truncating nargs={action.nargs} of {action}')
 
             metavar = None
             if takes_args:
@@ -117,18 +131,18 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
 
             commandline.add_option(
                 action.option_strings,
-                metavar=metavar,
-                complete=get_complete(action),
-                help=action.help,
-                takes_args=takes_args,
-                multiple_option=action.get_multiple_option(),
-                when=action.get_when()
+                metavar         = metavar,
+                complete        = get_complete(action),
+                help            = action.help,
+                takes_args      = takes_args,
+                multiple_option = action.get_multiple_option(),
+                when            = action.get_when()
             )
 
     group_counter = 0
     for group in parser._mutually_exclusive_groups:
         group_counter += 1
-        group_name = 'group%d' % group_counter
+        group_name = f'group{group_counter}'
 
         exclusive_group = MutuallyExclusiveGroup(commandline, group_name)
         for action in group._group_actions:
@@ -140,52 +154,63 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
 
     return commandline
 
-def find_objects_by_type(module, type):
+def find_objects_by_type(module, types):
+    '''
+    Search for objects in the specified module that match the given types.
+    '''
     r = []
 
     for obj_name in dir(module):
         obj = getattr(module, obj_name)
-        if isinstance(obj, type):
+        if isinstance(obj, types):
             r.append(obj)
 
     return r
 
-def find_RootArgumentParsers(module):
-    ArgumentParsers = find_objects_by_type(module, argparse.ArgumentParser)
-    SubParsersActions  = find_objects_by_type(module, argparse._SubParsersAction)
+def find_root_argument_parsers(module):
+    '''
+    Return a list of all ArgumentParser objects that have no parent.
+    '''
+    parsers = find_objects_by_type(module, argparse.ArgumentParser)
+    actions = find_objects_by_type(module, argparse._SubParsersAction)
 
-    for action in SubParsersActions:
+    for action in actions:
         for parser in action.choices.values():
             try:
-                ArgumentParsers.remove(parser)
+                parsers.remove(parser)
             except:
                 pass
 
-    return ArgumentParsers
+    return parsers
 
 def load_from_file(file, parser_variable=None, parser_blacklist=[]):
+    '''
+    Load a Python file, search for the ArgumentParser object and convert
+    it to a CommandLine object.
+    '''
     try:
         module = file_loader.import_file(file)
     except Exception as e:
         utils.warn(e)
-        utils.warn("Failed to load `%s` using importlib, falling back to `exec`" % file, file=sys.stderr)
+        utils.warn(f"Failed to load `{file}` using importlib, falling back to `exec`")
         module = file_loader.execute_file(file)
 
     if parser_variable is not None:
         try:
             parser = getattr(module, parser_variable)
         except:
-            raise Exception("No variable named `%s` found in `%s`" % (parser_variable, file))
+            raise Exception(f"No variable named `{parser_variable}` found in `{file}`")
     else:
-        parsers = find_RootArgumentParsers(module)
+        parsers = find_root_argument_parsers(module)
         for blacklisted in parser_blacklist:
-            try:    parsers.remove(blacklisted)
-            except: pass
+            try:
+                parsers.remove(blacklisted)
+            except:
+                pass
         if len(parsers) == 0:
-            raise Exception("Could not find any ArgumentParser object in `%s`" % file)
-        elif len(parsers) > 1:
-            raise Exception("Found too many ArgumentParser objects in `%s`" % file)
+            raise Exception(f"Could not find any ArgumentParser object in `{file}`")
+        if len(parsers) > 1:
+            raise Exception(f"Found too many ArgumentParser objects in `{file}`")
         parser = parsers[0]
 
     return ArgumentParser_to_CommandLine(parser)
-

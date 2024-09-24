@@ -84,16 +84,16 @@ Options
 
 **-i|--install-system-wide**
 
-> Write output to the system wide completions dir of shell.
+> Write output to the system-wide completions dir of shell.
 
 **-u|--uninstall-system-wide**
 
-> Uninstall the system wide completion file for program.
+> Uninstall the system-wide completion file for program.
 
 Completions for crazy-complete
 ==============================
 
-To install system wide completion files for crazy-complete, execute the following:
+To install system-wide completion files for crazy-complete, execute the following:
 
 ```
 sudo crazy-complete --input-type=python -i bash "$(which crazy-complete)"

@@ -1,7 +1,4 @@
-#!/usr/bin/python3
-
 import re
-import sys
 import collections
 
 from . import completion_validator
@@ -46,7 +43,7 @@ def escape(string, escape_empty_string=True):
     '''
     assert isinstance(string, str), "escape: s: expected str, got %r" % string
 
-    if not string and escape_empty_string is False:
+    if not string and not escape_empty_string:
         return ''
 
     if re.fullmatch('[a-zA-Z0-9_@%+=:,./-]+', string):
@@ -99,7 +96,7 @@ def make_completion_funcname_for_context(ctxt):
 
     if isinstance(ctxt.option, _commandline.Option):
         return '%s_%s' % (funcname, ctxt.option.option_strings[0])
-    elif isinstance(ctxt.option, _commandline.Positional):
+    if isinstance(ctxt.option, _commandline.Positional):
         return '%s_%s' % (funcname, ctxt.option.metavar)
 
 class ShellCompleter:
@@ -178,7 +175,7 @@ class ShellCompleter:
     def group(self, ctxt):
         return self.fallback(ctxt, 'group', 'none')
 
-class GenerationContext():
+class GenerationContext:
     def __init__(self, config, helpers):
         self.config = config
         self.helpers = helpers

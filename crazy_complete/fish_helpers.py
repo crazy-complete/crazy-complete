@@ -1,4 +1,6 @@
-#!/usr/bin/python
+'''
+This module contains helper functions for Fish.
+'''
 
 from . import helpers
 
@@ -10,7 +12,7 @@ _FISH_HELPER = helpers.FishFunction('fish_helper', r'''
 #
 # Usage: __fish_helper <OPTIONS> <COMMAND> [ARGS...]
 #
-# The first argument is a comma-seperated list of options that the parser should know about.
+# The first argument is a comma-separated list of options that the parser should know about.
 # Short options (-o), long options (--option), and old-style options (-option) are supported.
 #
 # If an option takes an argument, it is suffixed by '='.

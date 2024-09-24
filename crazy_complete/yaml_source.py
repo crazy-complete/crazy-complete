@@ -1,10 +1,9 @@
 import json
-
 import yaml
 
 from . import utils
-from .json_source import *
-from .commandline import *
+from . import dictionary_source
+from .commandline import ExtendedBool
 
 def str_to_yaml(s):
     return json.dumps(s)
@@ -13,8 +12,7 @@ def bool_to_yaml(b):
     return {True: 'true', False: 'false'}[b]
 
 def option_to_yaml(obj):
-    r = ''
-    r += '- option_strings: %s\n' % json.dumps(obj['option_strings'])
+    r = '- option_strings: %s\n' % json.dumps(obj['option_strings'])
 
     if 'metavar' in obj:
         r += '  metavar: %s\n' % str_to_yaml(obj['metavar'])
@@ -22,7 +20,7 @@ def option_to_yaml(obj):
     if 'help' in obj:
         r += '  help: %s\n' % str_to_yaml(obj['help'])
 
-    if obj.get('takes_args', True) != True:
+    if obj.get('takes_args', True) is not True:
         try:
             r += '  takes_args: %s\n' % bool_to_yaml(obj['takes_args'])
         except: # takes_args may be "?"
@@ -43,8 +41,7 @@ def option_to_yaml(obj):
     return r
 
 def positional_to_yaml(obj):
-    r = ''
-    r += '- number: %d\n' % obj['number']
+    r = '- number: %d\n' % obj['number']
 
     if 'metavar' in obj:
         r += '  metavar: %s\n' % str_to_yaml(obj['metavar'])
@@ -52,7 +49,7 @@ def positional_to_yaml(obj):
     if 'help' in obj:
         r += '  help: %s\n' % str_to_yaml(obj['help'])
 
-    if obj.get('repeatable', False) != False:
+    if obj.get('repeatable', False) is not False:
         r += '  repeatable: %s\n' % bool_to_yaml(obj['repeatable'])
 
     if 'complete' in obj:
@@ -97,7 +94,7 @@ def to_yaml(obj):
     return r
 
 def CommandLine_To_YAML(commandline):
-    dictionaries = CommandLine_To_Dictionaries(commandline)
+    dictionaries = dictionary_source.CommandLine_To_Dictionaries(commandline)
     r = []
 
     for dictionary in dictionaries:
@@ -107,5 +104,5 @@ def CommandLine_To_YAML(commandline):
 
 def load_from_file(file):
     with open(file, 'r') as fh:
-        return Dictionaries_To_Commandline(list(yaml.safe_load_all(fh)))
-
+        dictionaries = list(yaml.safe_load_all(fh))
+        return dictionary_source.Dictionaries_To_Commandline(dictionaries)

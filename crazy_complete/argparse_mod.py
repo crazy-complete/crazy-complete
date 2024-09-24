@@ -1,9 +1,14 @@
-#!/usr/bin/python3
+"""
+This module extends Python's built-in argparse library by adding several
+custom methods.
+"""
 
 import argparse
 
-from .commandline import *
+from .commandline import ExtendedBool
 
+# We have to use implementation details of the argparse module...
+# pylint: disable=protected-access
 
 def _action_complete(self, command, *args):
     setattr(self, '_complete', (command, *args))
@@ -38,7 +43,7 @@ def _parser_alias(self, alias):
 
 
 def _parser_aliases(self, aliases):
-    setattr(self, '_aliases', aliases)
+    setattr(self, '_aliases', list(aliases))
     return self
 
 
@@ -58,7 +63,7 @@ argparse.Action.when = _action_when
 argparse.Action.get_when = _action_get_when
 argparse.Action.set_multiple_option = _action_set_multiple_option
 argparse.Action.get_multiple_option = _action_get_multiple_option
-argparse.ArgumentParser.aliases = _parser_aliases
 argparse.ArgumentParser.alias = _parser_alias
+argparse.ArgumentParser.aliases = _parser_aliases
 argparse.ArgumentParser.get_aliases = _parser_get_aliases
 argparse.ArgumentParser.remove_help = _parser_remove_help

@@ -1,73 +1,79 @@
-#!/usr/bin/python3
-
 def get_required_arg(l, name):
     try:
         return l.pop(0)
     except:
         raise Exception('Missing argument: %s' % name)
 
+def get_optional_arg(l, default=None):
+    try:
+        return l.pop(0)
+    except:
+        return default
+
 def require_no_more(l):
-    if len(l):
+    if l:
         raise Exception('Too many arguments')
 
 class CompletionValidator:
-    def _validate_commandline(self, cmdline):
+    @staticmethod
+    def validate_complete(complete):
+        if complete:
+            complete = list(complete)
+            command  = complete.pop(0)
+
+            if not hasattr(CompletionValidator, command):
+                raise Exception("Unknown completion command: %r" % command)
+
+            getattr(CompletionValidator, command)(complete)
+
+    @staticmethod
+    def validate_commandline(cmdline):
         for option in cmdline.get_options():
-            if option.complete:
-                complete = list(option.complete)
-                command  = complete.pop(0)
-
-                try:
-                    if not hasattr(self, command):
-                        raise Exception("Unknown completion command: %r" % command)
-
-                    getattr(self, command)(complete)
-                except Exception as e:
-                    raise Exception("%s: %s: %s" % (
-                        cmdline.prog,
-                        ' '.join(option.option_strings),
-                        e))
+            try:
+                CompletionValidator.validate_complete(option.complete)
+            except Exception as e:
+                raise Exception("%s: %s: %s" % (
+                    cmdline.prog,
+                    ' '.join(option.option_strings),
+                    e))
 
         for positional in cmdline.get_positionals():
-            if positional.complete:
-                complete = list(positional.complete)
-                command  = complete.pop(0)
+            try:
+                CompletionValidator.validate_complete(positional.complete)
+            except Exception as e:
+                raise Exception("%s: %d (%s): %s" % (
+                    cmdline.prog,
+                    positional.number,
+                    positional.metavar,
+                    e))
 
-                try:
-                    if not hasattr(self, command):
-                        raise Exception("Unknown completion command: %r" % command)
+    @staticmethod
+    def validate_commandlines(cmdline):
+        cmdline.visit_commandlines(lambda o: CompletionValidator.validate_commandline(o))
 
-                    getattr(self, command)(complete)
-                except Exception as e:
-                    raise Exception("%s: %s: %s" % (cmdline.prog, positional.metavar, e))
+    @staticmethod
+    def none(args):
+        return args
 
-
-    def validate_commandlines(self, cmdline):
-        self._validate_commandline(cmdline)
-        if cmdline.get_subcommands_option():
-            for subcommand in cmdline.get_subcommands_option().subcommands:
-                self.validate_commandlines(subcommand)
-
-    def none(self, a):
-        return a
-
-    def choices(self, a):
-        choices = get_required_arg(a, 'VALUES')
-        require_no_more(a)
+    @staticmethod
+    def choices(args):
+        choices = get_required_arg(args, 'VALUES')
+        require_no_more(args)
 
         if hasattr(choices, 'items'):
             new_choices = {}
-            for item, descr in choices.items():
+            for item, desc in choices.items():
                 if not isinstance(item, (str, int, float)):
                     raise Exception('Item not a str/int/float: %r' % item)
 
-                if not isinstance(descr, (str, int, float)):
-                    raise Exception('Description not a str/int/float: %r' % descr)
+                if not isinstance(desc, (str, int, float)):
+                    raise Exception('Description not a str/int/float: %r' % desc)
 
-                new_choices[str(item)] = str(descr)
+                new_choices[str(item)] = str(desc)
 
             return (new_choices,)
-        elif isinstance(choices, (list, tuple)):
+
+        if isinstance(choices, (list, tuple)):
             new_choices = []
             for item in choices:
                 if not isinstance(item, (str, int, float)):
@@ -75,17 +81,18 @@ class CompletionValidator:
 
                 new_choices.append(item)
             return (new_choices,)
-        else:
-            raise Exception('VALUES: Not a list')
 
-    def command(self, a):
-        require_no_more(a)
+        raise Exception('VALUES: Not a list, tuple or dictionary')
+
+    @staticmethod
+    def command(args):
+        require_no_more(args)
         return ()
-            
-    def directory(self, a):
-        try:    opts = a.pop(0)
-        except: opts = {}
-        require_no_more(a)
+
+    @staticmethod
+    def directory(args):
+        opts = get_optional_arg(args, {})
+        require_no_more(args)
 
         directory = None
         for name, value in opts.items():
@@ -99,10 +106,10 @@ class CompletionValidator:
 
         return ({'directory': directory},)
 
-    def file(self, a):
-        try:    opts = a.pop(0)
-        except: opts = {}
-        require_no_more(a)
+    @staticmethod
+    def file(args):
+        opts = get_optional_arg(args, {})
+        require_no_more(args)
 
         directory = None
         for name, value in opts.items():
@@ -116,92 +123,106 @@ class CompletionValidator:
 
         return ({'directory': directory},)
 
-    def group(self, a):
-        require_no_more(a)
+    @staticmethod
+    def group(args):
+        require_no_more(args)
         return ()
 
-    def hostname(self, a):
-        require_no_more(a)
+    @staticmethod
+    def hostname(args):
+        require_no_more(args)
         return ()
 
-    def pid(self, a):
-        require_no_more(a)
+    @staticmethod
+    def pid(args):
+        require_no_more(args)
         return ()
 
-    def process(self, a):
-        require_no_more(a)
+    @staticmethod
+    def process(args):
+        require_no_more(args)
         return ()
 
-    def range(self, a):
-        for arg in a:
+    @staticmethod
+    def range(args):
+        for arg in args:
             if not isinstance(arg, int):
                 raise Exception("Not an int: %r" % arg)
 
-        if len(a) == 2:
-            start, stop = a
+        if len(args) == 2:
+            start, stop = args
             if start > stop:
                 raise Exception("Start > stop: %r > %r" % (start, stop))
 
             return (start, stop, 1)
-        elif len(a) == 3:
+
+        if len(args) == 3:
             # TODO: check
-            return a
+            return args
 
-    def user(self, a):
-        require_no_more(a)
+        raise Exception('Invalid number of arguments')
+
+    @staticmethod
+    def user(args):
+        require_no_more(args)
         return ()
 
-    def signal(self, a):
-        require_no_more(a)
+    @staticmethod
+    def signal(args):
+        require_no_more(args)
         return ()
 
-    def service(self, a):
-        require_no_more(a)
+    @staticmethod
+    def service(args):
+        require_no_more(args)
         return ()
 
-    def variable(self, a):
-        try:    option = a.pop(0)
+    @staticmethod
+    def variable(args):
+        try:    option = args.pop(0)
         except: option = None
-        require_no_more(a)
+        require_no_more(args)
         if option not in (None, '-x'):
             raise Exception('Invalid option: %r' % option)
         return ()
 
-    def exec(self, a):
-        cmd = get_required_arg(a, 'COMMAND')
-        require_no_more(a)
+    @staticmethod
+    def exec(args):
+        cmd = get_required_arg(args, 'COMMAND')
+        require_no_more(args)
 
         if not isinstance(cmd, str):
-            raise Exception("Cmd is not a str: %r" % cmd)
+            raise Exception("Command is not a str: %r" % cmd)
 
         return (cmd,)
 
-    def value_list(self, a):
-        opts = get_required_arg(a, 'OPTIONS')
-        require_no_more(a)
+    @staticmethod
+    def value_list(args):
+        opts = get_required_arg(args, 'OPTIONS')
+        require_no_more(args)
 
-        values = None
-        separator = None
+        values    = None
+        separator = ','
 
         for key, value in opts.items():
-            if key == 'values':      values = value
-            elif key == 'separator': separator = value
-            else: raise Exception('Invalid key: %r' % key)
+            if key == 'values':
+                values = value
+            elif key == 'separator':
+                separator = value
+            else:
+                raise Exception('Invalid key: %r' % key)
 
         if values is None:
             raise Exception('Missing `values` key: %r' % opts)
 
         if not isinstance(values, (list, tuple)):
-            raise Exception('Values: not a list' % values)
+            raise Exception('Values: not a list: %r' % values)
 
         for value in values:
             if not isinstance(value, (str, int, float)):
                 raise Exception('Invalid value: %r' % value)
 
-        if separator is not None:
-            if len(separator) != 1:
-                raise Exception('Invalid value for separator: %r' % separator)
-        else:
-            separator = ','
+        if len(separator) != 1:
+            raise Exception('Invalid value for separator: %r' % separator)
 
         return ({'values': values, 'separator': separator},)

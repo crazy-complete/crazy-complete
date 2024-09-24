@@ -33,12 +33,12 @@ class BashCompletionCommand(BashCompletionBase):
         r = []
 
         if append:
-            r += ['local -a COMPREPLY_BACK=("${COMPREPLY[@]}")']
+            r.append('local -a COMPREPLY_BACK=("${COMPREPLY[@]}")')
 
-        r += [self.cmd]
+        r.append(self.cmd)
 
         if append:
-            r += ['COMPREPLY=("${COMPREPLY_BACK[@]}" "${COMPREPLY[@]}")']
+            r.append('COMPREPLY=("${COMPREPLY_BACK[@]}" "${COMPREPLY[@]}")')
 
         return '\n'.join(r)
 
@@ -81,22 +81,22 @@ class BashCompleter(shell.ShellCompleter):
     def directory(self, ctxt, opts={}):
         directory = opts.get('directory', None)
         if directory:
-            cmd =  'pushd %s &>/dev/null && {\n'
+            cmd =  'pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  _filedir -d\n'
             cmd += '  popd &>/dev/null\n'
             cmd += '}'
-            return BashCompletionCommand(ctxt, cmd % shell.escape(directory))
+            return BashCompletionCommand(ctxt, cmd)
         else:
             return BashCompletionCommand(ctxt, '_filedir -d')
 
     def file(self, ctxt, opts={}):
         directory = opts.get('directory', None)
         if directory:
-            cmd =  'pushd %s &>/dev/null && {\n'
+            cmd =  'pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  _filedir\n'
             cmd += '  popd &>/dev/null\n'
             cmd += '}'
-            return BashCompletionCommand(ctxt, cmd % shell.escape(directory))
+            return BashCompletionCommand(ctxt, cmd)
         else:
             return BashCompletionCommand(ctxt, '_filedir')
 
@@ -140,4 +140,3 @@ class BashCompleter(shell.ShellCompleter):
             funcname,
             shell.escape(opts.get('separator', ',')),
             ' '.join(shell.escape(v) for v in opts['values'])))
-

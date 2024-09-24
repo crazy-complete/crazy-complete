@@ -1,39 +1,24 @@
-#!/usr/bin/python3
+'''
+Code for generating a bash auto completion file
+'''
 
-import subprocess
 from collections import OrderedDict
 
-from . import shell, utils
-from . import bash_helpers, helpers
-from . import modeline
 from . import generation_notice
+from . import modeline
+from . import shell
+from . import utils
 from . import when
+from . import helpers
+from . import bash_helpers
 from . import bash_complete
 from . import bash_parser
 from .bash_utils import *
 
-def get_completions_file(program_name):
-    command = ['pkg-config', '--variable=completionsdir', 'bash-completion']
-    directory = '/usr/share/bash-completion/completions'
-    try:
-        result = subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-        if result.returncode == 0:
-            directory = result.stdout.strip()
-        else:
-            utils.warn('%s failed: %s' % (' '.join(command), result.stderr.strip()))
-    except FileNotFoundError:
-        utils.warn('program `pkg-config` not found')
-
-    return '%s/%s' % (directory, program_name)
-
-# =============================================================================
-# Code for generating BASH auto completion scripts
-# =============================================================================
-
 class VariableUsageTracer:
     def __init__(self):
-        self.have = list()
-        self.values = list()
+        self.have = []
+        self.values = []
 
     def make_have_variable(self, option):
         if option not in self.have:
@@ -230,6 +215,7 @@ class BashCompletionGenerator:
         r  = complete_option.get()
         r += '\n\n'
 
+        # pylint: disable=invalid-name
         LR = False # Long with required argument
         LO = False # Long with optional argument
         SR = False # Short with required argument
@@ -239,19 +225,19 @@ class BashCompletionGenerator:
 
         for option in options:
             if option.get_long_option_strings():
-                if option.takes_args == True:
+                if option.takes_args is True:
                     LR = True
                 elif option.takes_args == '?':
                     LO = True
 
             if option.get_old_option_strings():
-                if option.takes_args:
+                if option.takes_args is True:
                     OR = True
                 elif option.takes_args == '?':
                     OO = True
 
             if option.get_short_option_strings():
-                if option.takes_args:
+                if option.takes_args is True:
                     SR = True
                 elif option.takes_args == '?':
                     SO = True
@@ -342,7 +328,7 @@ __is_oldstyle_option() {
             r += '%s\n\n' % make_block(self._complete_action(positional))
 
         if self.subcommands:
-            cmds = self.subcommands.get_all_subcommands().keys()
+            cmds = self.subcommands.get_choices().keys()
             complete = self.completer.choices(self.ctxt, cmds).get_code()
             r += 'test "$POSITIONAL_NUM" -eq %d && ' % self.subcommands.get_positional_num()
             r += '%s\n\n' % make_block(complete)
@@ -351,19 +337,10 @@ __is_oldstyle_option() {
     def _generate_subcommand_call(self):
         # This code is used to call subcommand functions
 
-        if self.commandline.abbreviate_commands:
-            abbrevs = utils.CommandAbbreviationGenerator(
-                self.subcommands.get_all_subcommands(with_aliases=False).keys())
-        else:
-            abbrevs = utils.DummyAbbreviationGenerator()
-
         r  = 'if (( %i < POSITIONAL_NUM )); then\n' % (self.subcommands.get_positional_num() - 1)
         r += '  case "${POSITIONALS[%i]}" in\n' % (self.subcommands.get_positional_num() - 1)
         for subcommand in self.subcommands.subcommands:
-            cmds = abbrevs.get_abbreviations(subcommand.prog)
-            for alias in subcommand.aliases:
-                cmds.append(alias)
-
+            cmds = utils.get_all_command_variations(subcommand)
             pattern = '|'.join(shell.escape(s) for s in cmds)
             if self.commandline.inherit_options:
                 r += '    %s) %s && return 0;;\n' % (pattern, shell.make_completion_funcname(subcommand))

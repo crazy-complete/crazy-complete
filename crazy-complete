@@ -4,7 +4,7 @@ import os
 import sys
 import argparse
 
-from crazy_complete import zsh, bash, fish
+from crazy_complete import zsh, bash, fish, paths
 from crazy_complete import argparse_source, json_source, yaml_source
 from crazy_complete import argparse_mod # .complete() etc.
 from crazy_complete import config
@@ -14,7 +14,7 @@ def parse_bool(s):
     try:
         return {'true': True, 'false': False}[s.lower()]
     except KeyError:
-        raise ValueError("Not a bool: %r" % s)
+        raise ValueError(f"Not a bool: {s}")
 
 
 p = argparse.ArgumentParser('crazy-complete',
@@ -67,14 +67,14 @@ p.add_argument('--debug', action='store_true',
 
 grp = p.add_mutually_exclusive_group()
 
-grp.add_argument('-o', '--output', default=None,
+grp.add_argument('-o', '--output', default=None, dest='output_file',
     help='Write output to destination file [default: stdout]').complete('file')
 
 grp.add_argument('-i', '--install-system-wide', default=False, action='store_true',
-    help='Write output to the system wide completions dir of shell')
+    help='Write output to the system-wide completions dir of shell')
 
 grp.add_argument('-u', '--uninstall-system-wide', default=False, action='store_true',
-    help='Uninstall the system wide completion file for program')
+    help='Uninstall the system-wide completion file for program')
 
 # We use a unique object name for avoiding name clashes when
 # importing/executing the foreign python script
@@ -87,23 +87,30 @@ def load_definitions_file(opts):
         extension = os.path.splitext(basename)[1].lower().strip('.')
         if extension == 'json':
             return json_source.load_from_file(opts.source_file)
-        elif extension in ('yaml', 'yml'):
+        if extension in ('yaml', 'yml'):
             return yaml_source.load_from_file(opts.source_file)
-        elif extension == 'py':
+        if extension == 'py':
             raise Exception('Reading Python files must be enabled by --input-type=python')
-        elif extension == '':
+        if extension == '':
             raise Exception('File has no extension. Please supply --input-type=json|yaml|python')
-        else:
-            raise Exception('Unknown file extension `%s`. Please supply --input-type=json|yaml|python' % extension)
-
-    elif opts.input_type == 'json':
+        raise Exception(f'Unknown file extension `{extension}`. Please supply --input-type=json|yaml|python')
+    if opts.input_type == 'json':
         return json_source.load_from_file(opts.source_file)
-    elif opts.input_type == 'yaml':
+    if opts.input_type == 'yaml':
         return yaml_source.load_from_file(opts.source_file)
-    elif opts.input_type == 'python':
+    if opts.input_type == 'python':
         return argparse_source.load_from_file(opts.source_file,
             opts.parser_variable,
             parser_blacklist=[_crazy_complete_argument_parser])
+
+    raise AssertionError("Should not be reached")
+
+def write_string_to_file(string, file):
+    if file:
+        with open(file, 'w', encoding='utf-8') as fh:
+            print(string, file=fh)
+    else:
+        print(string)
 
 def generate(opts):
     if not os.path.exists(opts.source_file):
@@ -112,15 +119,13 @@ def generate(opts):
     cmdline = load_definitions_file(opts)
 
     if opts.shell == 'json':
-        r = json_source.CommandLine_To_JSON(cmdline)
-        fh = open(opts.output, 'w') if opts.output else sys.stdout
-        print(r, file=fh)
+        output = json_source.CommandLine_To_JSON(cmdline)
+        write_string_to_file(output, opts.output_file)
         return
 
     if opts.shell == 'yaml':
-        r = yaml_source.CommandLine_To_YAML(cmdline)
-        fh = open(opts.output, 'w') if opts.output else sys.stdout
-        print(r, file=fh)
+        output = yaml_source.CommandLine_To_YAML(cmdline)
+        write_string_to_file(output, opts.output_file)
         return
 
     if opts.program_name is None:
@@ -137,33 +142,27 @@ def generate(opts):
     conf.set_fish_inline_conditions(opts.fish_inline_conditions)
     conf.include_many_files(opts.include_file or [])
 
-    r = {
+    output = {
         'bash': bash.generate_completion,
         'fish': fish.generate_completion,
         'zsh':  zsh.generate_completion
     }[opts.shell](cmdline, opts.program_name, conf)
 
-    if opts.install_system_wide is True or opts.uninstall_system_wide is True:
+    if opts.install_system_wide or opts.uninstall_system_wide:
         file = {
-            'bash': bash.get_completions_file,
-            'fish': fish.get_completions_file,
-            'zsh':  zsh.get_completions_file,
+            'bash': paths.get_bash_completion_file,
+            'fish': paths.get_fish_completion_file,
+            'zsh':  paths.get_zsh_completion_file,
         }[opts.shell](opts.program_name)
 
         if opts.install_system_wide:
-            print('Installing to %s' % file, file=sys.stderr)
-            with open(file, 'w') as fh:
-                fh.write(r)
+            print(f'Installing to {file}', file=sys.stderr)
+            write_string_to_file(output, file)
         else:
-            print('Removing %s' % file, file=sys.stderr)
+            print(f'Removing {file}', file=sys.stderr)
             os.remove(file)
-
-    elif opts.output is not None:
-        with open(opts.output, 'w') as fh:
-            fh.write(r)
-
     else:
-        print(r)
+        write_string_to_file(output, opts.output_file)
 
 
 if __name__ == '__main__':
@@ -174,6 +173,5 @@ if __name__ == '__main__':
         print('%s: %s' % (type(e).__name__, e), file=sys.stderr)
         if opts.debug:
             raise
-        else:
-            print('Pass --debug to see full stack trace', file=sys.stderr)
-            sys.exit(1)
+        print('Pass --debug to see full stack trace', file=sys.stderr)
+        sys.exit(1)

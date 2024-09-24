@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from collections import OrderedDict
 
 from . import config as _config
@@ -170,7 +168,7 @@ class CommandLine:
             commandlines = commandline.get_parents(include_self=True) if with_parent_options else [commandline]
             for commandline in reversed(commandlines):
                 for option in commandline.options:
-                    if only_with_arguments is False or option.takes_args:
+                    if not only_with_arguments or option.takes_args:
                         self.add(option, commandline)
 
         def add(self, option, commandline):
@@ -304,7 +302,7 @@ class CommandLine:
 
     def get_all_commands(self, with_aliases=True):
         r = [self.prog]
-        if with_aliases is True:
+        if with_aliases:
             r.extend(self.aliases)
         return r
 
@@ -320,33 +318,33 @@ class CommandLine:
         '''
         copy = CommandLine(
             self.prog,
-            parent=None,
-            help=self.help,
-            aliases=self.aliases,
-            abbreviate_commands=self.abbreviate_commands,
-            abbreviate_options=self.abbreviate_options,
-            inherit_options=self.inherit_options)
+            parent              = None,
+            help                = self.help,
+            aliases             = self.aliases,
+            abbreviate_commands = self.abbreviate_commands,
+            abbreviate_options  = self.abbreviate_options,
+            inherit_options     = self.inherit_options)
 
         for option in self.options:
             copy.add_option(
                 option.option_strings,
-                metavar = option.metavar,
-                help = option.help,
-                complete = option.complete,
-                takes_args = option.takes_args,
-                group = option.group,
+                metavar         = option.metavar,
+                help            = option.help,
+                complete        = option.complete,
+                takes_args      = option.takes_args,
+                group           = option.group,
                 multiple_option = option.multiple_option,
-                when = option.when
+                when            = option.when
             )
 
         for positional in self.positionals:
             copy.add_positional(
                 positional.number,
-                metavar = positional.metavar,
-                help = positional.help,
-                repeatable = positional.repeatable,
-                complete = positional.complete,
-                when = positional.when
+                metavar         = positional.metavar,
+                help            = positional.help,
+                repeatable      = positional.repeatable,
+                complete        = positional.complete,
+                when            = positional.when
             )
 
         if self.subcommands is not None:
@@ -573,7 +571,7 @@ class SubCommandsOption(Positional):
         self.subcommands.append(commandline)
         return commandline
 
-    def get_all_subcommands(self, with_aliases=True):
+    def get_choices(self, with_aliases=True):
         r = OrderedDict()
         for subcommand in self.subcommands:
             r[subcommand.prog] = subcommand.help

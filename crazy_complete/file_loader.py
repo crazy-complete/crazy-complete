@@ -1,35 +1,27 @@
-#!/usr/bin/python3
-
 import os
 import sys
 import importlib
 import tempfile
-
-DEV_NULL_FH = open(os.devnull, 'w')
-
-def close_output_streams():
-    sys.stdout = sys.stderr = DEV_NULL_FH
-
-def restore_output_streams():
-    sys.stdout = sys.__stdout__
-    sys.stderr = sys.__stderr__
+import __main__
 
 def execute_file(file):
     ''' Import file using exec '''
 
-    import __main__
+    with open(os.devnull, 'w') as null_fh:
+        sys.stdout = null_fh
+        sys.stderr = null_fh
 
-    close_output_streams()
+        with open(file, 'r') as fh:
+            source = fh.read()
+            compiled = compile(source, file, 'exec')
+            try:
+                # pylint: disable=exec-used
+                exec(compiled, globals())
+            except SystemExit:
+                pass
 
-    with open(file, 'r') as fh:
-        source = fh.read()
-        compiled = compile(source, file, 'exec')
-        try:
-            exec(compiled, globals())
-        except SystemExit:
-            pass
-
-    restore_output_streams()
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
 
     return __main__
 
@@ -55,4 +47,3 @@ def import_file(file):
         sys.path.append(directory)
 
     return importlib.import_module(module_name)
-

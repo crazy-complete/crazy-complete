@@ -30,7 +30,7 @@ class FishCompletionCommand(FishCompletionBase):
         return ['-f', '-a', '(%s)' % self.command]
 
 class FishCompleter(shell.ShellCompleter):
-    def none(self, ctxt):
+    def none(self, ctxt, *a):
         return FishCompletionFromArgs(['-f'])
 
     def choices(self, ctxt, choices):
@@ -111,4 +111,3 @@ class FishCompleter(shell.ShellCompleter):
 
         cmd = '__fish_complete_list %s %s' % (shell.escape(separator), funcname)
         return FishCompletionCommand(cmd)
-

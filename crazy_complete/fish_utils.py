@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from . import shell
 
 class FishString:
@@ -7,9 +5,9 @@ class FishString:
     A utility class for handling command-line strings that may or may not require escaping.
 
     When building command-line commands, it's important to ensure that strings are properly
-    escaped to prevent shell injection vulnerabilities or syntax errors. However, in some 
-    cases, the string may already be escaped, and applying escaping again would result in 
-    incorrect behavior. The `FishString` class provides an abstraction to manage both 
+    escaped to prevent shell injection vulnerabilities or syntax errors. However, in some
+    cases, the string may already be escaped, and applying escaping again would result in
+    incorrect behavior. The `FishString` class provides an abstraction to manage both
     escaped and unescaped strings.
 
     Attributes:
@@ -149,7 +147,7 @@ class FishCompleteCommand:
             self.flags.discard('r')
             self.flags.discard('f')
 
-        if len(self.flags):
+        if self.flags:
             r.append('-%s' % ''.join(self.flags))
 
         if self.arguments is not None:
@@ -177,4 +175,3 @@ class VariableManager:
         for value, variable in self.value_to_variable.items():
             r.append('set -l %s %s' % (variable, value))
         return r
-

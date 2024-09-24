@@ -1,14 +1,13 @@
-#!/usr/bin/python3
+'''
+Code for generating a zsh auto completion file
+'''
 
-from . import shell, utils
-from . import zsh_helpers, helpers
-from . import modeline
 from . import generation_notice
+from . import modeline
+from . import shell
+from . import utils
 from . import zsh_complete
-
-def get_completions_file(program_name):
-    dir = '/usr/share/zsh/site-functions'
-    return '%s/_%s' % (dir, program_name)
+from . import zsh_helpers
 
 def escape_colon(s):
     return s.replace(':', '\\:')
@@ -25,8 +24,10 @@ def make_argument_option_spec(
         metavar = None,
         action = None
     ):
-    # Return something like this:
-    #   (--option -o){--option=,-o+}[Option description]:Metavar:Action
+    '''
+    Return something like this:
+        (--option -o){--option=,-o+}[Option description]:Metavar:Action
+    '''
 
     result = []
 
@@ -72,7 +73,7 @@ def make_argument_option_spec(
 
     return ''.join(result)
 
-class ZshCompletionGenerator():
+class ZshCompletionGenerator:
     def __init__(self, ctxt, commandline):
         self.commandline = commandline
         self.ctxt = ctxt
@@ -112,7 +113,7 @@ class ZshCompletionGenerator():
         return (option.when, option_spec)
 
     def complete_subcommands(self, option):
-        choices = option.get_all_subcommands()
+        choices = option.get_choices()
         self.command_counter += 1
 
         option_spec = "%d:command%d:%s" % (
@@ -164,21 +165,12 @@ class ZshCompletionGenerator():
         if not self.subcommands:
             return ''
 
-        if self.commandline.abbreviate_commands:
-            # TODO?
-            commands = [p.prog for p in self.subcommands.subcommands]
-            abbrevs = utils.CommandAbbreviationGenerator(commands)
-        else:
-            abbrevs = utils.DummyAbbreviationGenerator()
-
         self.helper_used = True
         zsh_helper = self.ctxt.helpers.use_function('zsh_helper')
         r =  'case "$(%s get_positional %d)" in\n' % (zsh_helper, self.subcommands.get_positional_num())
         for subcommand in self.subcommands.subcommands:
             sub_funcname = shell.make_completion_funcname(subcommand)
-            cmds = abbrevs.get_abbreviations(subcommand.prog)
-            for alias in subcommand.aliases:
-                cmds.append(alias)
+            cmds = utils.get_all_command_variations(subcommand)
             pattern = '|'.join(shell.escape(s) for s in cmds)
             r += f'  ({pattern}) {sub_funcname}; return $?;;\n'
         r += 'esac'
@@ -210,7 +202,7 @@ class ZshCompletionGenerator():
         if self.subcommands:
             args.append(self.complete_subcommands(self.subcommands))
 
-        if not len(args):
+        if not args:
             return ''
 
         args_with_when = []

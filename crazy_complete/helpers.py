@@ -1,8 +1,6 @@
-#!/usr/bin/python3
-
 from . import utils
 
-class FunctionBase():
+class FunctionBase:
     def __init__(self, funcname, code):
         self.funcname = funcname
         self.code = code.strip()
@@ -30,11 +28,11 @@ class FishFunction(FunctionBase):
         r += 'end'
         return r
 
-class GeneralHelpers():
+class GeneralHelpers:
     def __init__(self, function_prefix):
         self.function_prefix = function_prefix
-        self.functions = dict()
-        self.used_functions = list()
+        self.functions = {}
+        self.used_functions = []
 
     def get_real_function_name(self, function_name):
         return '_%s_%s' % (self.function_prefix, function_name)

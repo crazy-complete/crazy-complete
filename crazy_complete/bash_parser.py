@@ -183,4 +183,3 @@ def generate_option_cases(commandline):
                 option_cases.short_options.append(r)
 
     return option_cases
-

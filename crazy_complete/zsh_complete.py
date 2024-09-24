@@ -11,11 +11,11 @@ class ZshCompleter(shell.ShellCompleter):
     def choices(self, ctxt, choices):
         if hasattr(choices, 'items'):
             funcname = shell.make_completion_funcname_for_context(ctxt)
-            code  = 'local -a DESCRIBE=(\n'
+            code  = 'local -a describe=(\n'
             for item, description in choices.items():
                 code += '  %s:%s\n' % (shell.escape(escape_colon(str(item))), shell.escape(str(description)))
             code += ')\n\n'
-            code += '_describe -- %s DESCRIBE' % shell.escape(ctxt.option.metavar or '') # TODO
+            code += '_describe -- %s describe' % shell.escape(ctxt.option.metavar or '') # TODO
 
             ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
             funcname = ctxt.helpers.use_function(funcname)
@@ -70,8 +70,10 @@ class ZshCompleter(shell.ShellCompleter):
         return shell.escape('{%s %s}' % (funcname, shell.escape(command)))
 
     def value_list(self, ctxt, opts):
-        values = ' '.join(shell.escape(i) for i in opts['values'])
-        descr = ctxt.option.metavar or ''
-        cmd = '_values -s %s %s %s' % (shell.escape(opts.get('separator', ',')), descr, values)
+        desc = ctxt.option.metavar or ''
+        cmd = '_values -s %s %s %s' % (
+            shell.escape(opts.get('separator', ',')),
+            shell.escape(desc),
+            ' '.join(shell.escape(i) for i in opts['values'])
+        )
         return shell.escape(cmd)
-

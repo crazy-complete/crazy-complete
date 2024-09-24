@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import sys
 
 # =============================================================================
@@ -116,7 +114,7 @@ class CommandAbbreviationGenerator(GeneralAbbreviationGenerator):
     def __init__(self, words):
         super().__init__(1, words)
 
-class DummyAbbreviationGenerator():
+class DummyAbbreviationGenerator:
     '''
     A dummy abbreviation generator that returns the original word as the abbreviation.
 
@@ -137,7 +135,7 @@ class DummyAbbreviationGenerator():
 
 def get_all_command_variations(commandline):
     '''
-    Returns all possible names of this command.
+    Return all possible names for this command.
 
     If `commandline.abbreviate_commands` is True, also return abbreviated
     forms.

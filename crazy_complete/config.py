@@ -1,7 +1,6 @@
-#!/usr/bin/python3
-
-def _is_bool(obj):
-    return isinstance(obj, bool)
+def _assert_is_bool(obj, func, param):
+    if not isinstance(obj, bool):
+        raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")
 
 class Config:
     '''
@@ -43,7 +42,7 @@ class Config:
         See also:
             commandline.CommandLine(..., abbreviate_commands=BOOL, ...)
         '''
-        assert _is_bool(enable), "Config.set_abbreviate_commands: enable: expected bool, got %r" % enable
+        _assert_is_bool(enable, "set_abbreviate_commands", "enable")
 
         self.abbreviate_commands = enable
 
@@ -71,7 +70,7 @@ class Config:
         See also:
             commandline.CommandLine(..., abbreviate_options=BOOL, ...)
         '''
-        assert _is_bool(enable), "Config.set_abbreviate_options: enable: expected bool, got %r" % enable
+        _assert_is_bool(enable, "set_abbreviate_options", "enable")
 
         self.abbreviate_options = enable
 
@@ -100,7 +99,7 @@ class Config:
         See also:
             CommandLine.add(..., multiple_option=BOOL, ...)
         '''
-        assert _is_bool(enable), "Config.set_multiple_options: enable: expected bool, got %r" % enable
+        _assert_is_bool(enable, "set_multiple_options", "enable")
 
         self.multiple_options = enable
 
@@ -129,7 +128,7 @@ class Config:
         See also:
             commandline.CommandLine(..., inherit_options=BOOL, ...)
         '''
-        assert _is_bool(enable), "Config.set_inherit_options: enable: expected bool, got %r" % enable
+        _assert_is_bool(enable, "set_inherit_options", "enable")
 
         self.inherit_options = enable
 
@@ -147,26 +146,52 @@ class Config:
         Notes:
             This feature defaults to `True`.
         '''
-        assert _is_bool(enable), "Config.set_vim_modeline: enable: expected bool, got %r" % enable
+        _assert_is_bool(enable, "set_vim_modeline", "enable")
 
         self.vim_modeline = enable
 
     def set_zsh_compdef(self, enable):
-        assert _is_bool(enable), "Config.set_zsh_compdef: enable: expected bool, got %r" % enable
+        '''
+        Sets whether a `#compdef` comment is written at the top of the generated
+        zsh script.
+
+        The `#compdef` directive is used by Zsh to automatically associate the
+        generated completion file with a command, enabling autoload functionality.
+
+        If you plan to load the Zsh completion file manually by sourcing it,
+        omitting this line may be necessary.
+
+        Args:
+            enable (bool): If true, add a `#compdef` line on top of the file;
+                           If false, don't add a `#compdef` line.
+
+        Notes:
+            This feature defaults to `True`
+        '''
+        _assert_is_bool(enable, "set_zsh_compdef", "enable")
 
         self.zsh_compdef = enable
 
-    def include_file(self, file):
-        # TODO: docstring
-        self.include_files.append(file)
-
-    def include_many_files(self, files):
-        # TODO: docstring
-        self.include_files.extend(files)
-
     def set_fish_fast(self, enable):
+        _assert_is_bool(enable, "set_fish_fast", "enable")
+
         self.fish_fast = enable
 
     def set_fish_inline_conditions(self, enable):
+        _assert_is_bool(enable, "set_fish_inline_conditions", "enable")
+
         self.fish_inline_conditions = enable
 
+    def include_file(self, file):
+        '''
+        Add a file which should be included to the generated code.
+        '''
+        assert isinstance(file, str), f"Config.include_file: file: expected str, got `{file}`"
+
+        self.include_files.append(file)
+
+    def include_many_files(self, files):
+        '''
+        Add files which should be included to the generated code.
+        '''
+        self.include_files.extend(files)
