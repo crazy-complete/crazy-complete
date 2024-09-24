@@ -30,19 +30,19 @@ install-completions() {
   for SHELL_ in ${SHELLS[@]}; do
     case "$SHELL_" in
       bash)
-        $crazy_complete -i --allow-python --include-file include.bash \
+        $crazy_complete -i --input-type=python --include-file include.bash \
           bash crazy-complete-test || {
           echo "$crazy_complete bash failed" >&2
           exit 1
         };;
       fish)
-        $crazy_complete -i --allow-python --include-file include.fish \
+        $crazy_complete -i --input-type=python --include-file include.fish \
           fish crazy-complete-test || {
           echo "$crazy_complete fish failed" >&2
           exit 1
         };;
       zsh)
-        $crazy_complete -i --allow-python --include-file include.zsh \
+        $crazy_complete -i --input-type=python --include-file include.zsh \
           zsh  crazy-complete-test || {
           echo "$crazy_complete zsh failed" >&2
           exit 1
@@ -56,9 +56,9 @@ uninstall-completions() {
 
   for SHELL_ in ${SHELLS[@]}; do
     case "$SHELL_" in
-      bash) $crazy_complete -u --allow-python bash crazy-complete-test;;
-      fish) $crazy_complete -u --allow-python fish crazy-complete-test;;
-      zsh)  $crazy_complete -u --allow-python zsh  crazy-complete-test;;
+      bash) $crazy_complete -u --input-type=python bash crazy-complete-test;;
+      fish) $crazy_complete -u --input-type=python fish crazy-complete-test;;
+      zsh)  $crazy_complete -u --input-type=python zsh  crazy-complete-test;;
     esac
   done
 }
