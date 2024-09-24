@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import os
 import time
 import subprocess
@@ -8,7 +6,7 @@ def run(args, env=None):
     result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
 
     if result.returncode != 0:
-        raise Exception("Cmd %r failed: %s" % (args, result.stderr))
+        raise Exception("Command %r failed: %s" % (args, result.stderr))
 
     return result.stdout
 
@@ -35,6 +33,15 @@ class TmuxClient:
 
     def resize_window(self, x, y):
         self.run(['resize-window', '-t', self.session, '-x', str(x), '-y', str(y)])
+
+    def wait_for_text(self, expected, timeout, poll_interval):
+        while timeout > 0.0:
+            result = self.capture_pane().strip()
+            if result == expected:
+                return result
+            timeout -= poll_interval
+            time.sleep(poll_interval)
+        return self.capture_pane().strip()
 
 class ShellBase:
     def __init__(self, tmux):
@@ -83,13 +90,18 @@ class ZshShell(ShellBase):
     def load_completion(self, file):
         self.tmux.send_keys('source %s\n' % file)
 
-def complete(tmux, commandline, num_tabs=1):
-    # Clear screen
+def clear_screen(tmux):
     tmux.send_keys('C-c')
     tmux.send_keys('clear')
     tmux.send_keys('Enter')
 
-    time.sleep(0.3)
+    result = tmux.wait_for_text('>', 1, 0.01)
+    if result != '>':
+        # Idk why, but sometime we have to try again
+        clear_screen(tmux)
+
+def complete(tmux, commandline, num_tabs=1, expected=None, fast=False):
+    clear_screen(tmux)
 
     # Write commandline
     tmux.send_keys(commandline)
@@ -98,8 +110,8 @@ def complete(tmux, commandline, num_tabs=1):
     for i in range(num_tabs):
         tmux.send_keys('Tab')
 
-    time.sleep(1)
-
-    result = tmux.capture_pane()
-    result = result.rstrip()
-    return result
+    if fast:
+        return tmux.wait_for_text(expected, 1, 0.01)
+    else:
+        time.sleep(1)
+        return tmux.capture_pane().strip()
