@@ -1,0 +1,1799 @@
+[{
+  "prog": "fpm",
+  "help": "Effing package management",
+  "positionals": [
+    {
+      "number": 1,
+      "complete": ["file"],
+      "repeatable": true
+    }
+  ],
+  "options": [
+{
+  "option_strings": ["-t", "--output-type"],
+  "metavar": "OUTPUT_TYPE",
+  "help": "the type of package you want to create (deb, rpm, solaris, etc)",
+  "complete": ["choices", ["apk", "cpan", "deb", "dir", "empty", "freebsd", "gem", "npm", "osxpkg", "p5p", "pacman", "pear", "pkgin", "pleaserun", "puppet", "python", "rpm", "sh", "snap", "solaris", "tar", "virtualenv", "zip"]]
+},
+
+{
+  "option_strings": ["-s", "--input-type"],
+  "metavar": "INPUT_TYPE",
+  "help": "the package type to use as input (gem, rpm, python, etc)",
+  "complete": ["choices", ["apk", "cpan", "deb", "dir", "empty", "freebsd", "gem", "npm", "osxpkg", "p5p", "pacman", "pear", "pkgin", "pleaserun", "puppet", "python", "rpm", "sh", "snap", "solaris", "tar", "virtualenv", "zip"]]
+},
+
+{
+  "option_strings": ["-C", "--chdir"],
+  "metavar": "CHDIR",
+  "help": "Change directory to here before searching for files",
+  "complete": ["directory"]
+},
+
+{
+  "option_strings": ["--prefix"],
+  "metavar": "PREFIX",
+  "help": "A path to prefix files with when building the target package. This may not be necessary for all input packages. For example, the 'gem' type will prefix with your gem directory automatically."
+},
+
+{
+  "option_strings": ["-p", "--package"],
+  "metavar": "OUTPUT",
+  "help": "The package file path to output."
+},
+
+{
+  "option_strings": ["-f", "--force"],
+  "takes_args": false,
+  "help": "Force output even if it will overwrite an existing file (default: false)"
+},
+
+{
+  "option_strings": ["-n", "--name"],
+  "metavar": "NAME",
+  "help": "The name to give to the package"
+},
+
+{
+  "option_strings": ["--log"],
+  "metavar": "LEVEL",
+  "help": "Set the log level. Values: error, warn, info, debug.",
+  "complete": ["choices", ["error", "warn", "info", "debug"]]
+},
+
+{
+  "option_strings": ["--verbose"],
+  "takes_args": false,
+  "help": "Enable verbose output"
+},
+
+{
+  "option_strings": ["--debug"],
+  "takes_args": false,
+  "help": "Enable debug output"
+},
+
+{
+  "option_strings": ["--debug-workspace"],
+  "takes_args": false,
+  "help": "Keep any file workspaces around for debugging. This will disable automatic cleanup of package staging and build paths. It will also print which directories are available."
+},
+
+{
+  "option_strings": ["-v", "--version"],
+  "metavar": "VERSION",
+  "help": "The version to give to the package (default: 1.0)"
+},
+
+{
+  "option_strings": ["--iteration"],
+  "metavar": "ITERATION",
+  "help": "The iteration to give to the package. RPM calls this the 'release'. FreeBSD calls it 'PORTREVISION'. Debian calls this 'debian_revision'"
+},
+
+{
+  "option_strings": ["--epoch"],
+  "metavar": "EPOCH",
+  "help": "The epoch value for this package. RPM and Debian calls this 'epoch'. FreeBSD calls this 'PORTEPOCH'"
+},
+
+{
+  "option_strings": ["--license"],
+  "metavar": "LICENSE",
+  "help": "(optional) license name for this package"
+},
+
+{
+  "option_strings": ["--vendor"],
+  "metavar": "VENDOR",
+  "help": "(optional) vendor name for this package"
+},
+
+{
+  "option_strings": ["--category"],
+  "metavar": "CATEGORY",
+  "help": "(optional) category this package belongs to (default: \"none\")"
+},
+
+{
+  "option_strings": ["-d", "--depends"],
+  "metavar": "DEPENDENCY",
+  "help": "A dependency. This flag can be specified multiple times. Value is usually in the form of: -d 'name' or -d 'name > version'",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["--no-depends"],
+  "takes_args": false,
+  "help": "Do not list any dependencies in this package (default: false)"
+},
+
+{
+  "option_strings": ["--no-auto-depends"],
+  "takes_args": false,
+  "help": "Do not list any dependencies in this package automatically (default: false)"
+},
+
+{
+  "option_strings": ["--provides"],
+  "metavar": "PROVIDES",
+  "help": "What this package provides (usually a name). This flag can be specified multiple times.",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["--conflicts"],
+  "metavar": "CONFLICTS",
+  "help": "Other packages/versions this package conflicts with. This flag can be specified multiple times.",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["--replaces"],
+  "metavar": "REPLACES",
+  "help": "Other packages/versions this package replaces. Equivalent of rpm's 'Obsoletes'. This flag can be specified multiple times.",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["--config-files"],
+  "metavar": "CONFIG_FILES",
+  "help": "Mark a file in the package as being a config file. This uses 'conffiles' in debs and %config in rpm. If you have multiple files to mark as configuration files, specify this flag multiple times.  If argument is directory all files inside it will be recursively marked as config files.",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["--directories"],
+  "metavar": "DIRECTORIES",
+  "help": "Recursively mark a directory as being owned by the package. Use this flag multiple times if you have multiple directories and they are not under the same parent directory",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["-a", "--architecture"],
+  "metavar": "ARCHITECTURE",
+  "help": "The architecture name. Usually matches 'uname -m'. For automatic values, you can use '-a all' or '-a native'. These two strings will be translated into the correct value for your platform and target package type."
+},
+
+{
+  "option_strings": ["-m", "--maintainer"],
+  "metavar": "MAINTAINER",
+  "help": "The maintainer of this package. (default: \"<user@host>\")"
+},
+
+{
+  "option_strings": ["-S", "--package-name-suffix"],
+  "metavar": "PACKAGE_NAME_SUFFIX",
+  "help": "a name suffix to append to package and dependencies."
+},
+
+{
+  "option_strings": ["-e", "--edit"],
+  "takes_args": false,
+  "help": "Edit the package spec before building. (default: false)"
+},
+
+{
+  "option_strings": ["-x", "--exclude"],
+  "metavar": "EXCLUDE_PATTERN",
+  "help": "Exclude paths matching pattern (shell wildcard globs valid here). If you have multiple file patterns to exclude, specify this flag multiple times.",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["--exclude-file"],
+  "metavar": "EXCLUDE_PATH",
+  "help": "The path to a file containing a newline-sparated list of patterns to exclude from input.",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--description"],
+  "metavar": "DESCRIPTION",
+  "help": "Add a description for this package. You can include '\\n' sequences to indicate newline breaks. (default: \"no description\")"
+},
+
+{
+  "option_strings": ["--url"],
+  "metavar": "URI",
+  "help": "Add a url for this package. (default: \"http://example.com/no-uri-given\")"
+},
+
+{
+  "option_strings": ["--inputs"],
+  "metavar": "INPUTS_PATH",
+  "help": "The path to a file containing a newline-separated list of files and dirs to use as input.",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--post-install"],
+  "metavar": "FILE",
+  "help": "(DEPRECATED, use --after-install) A script to be run after package installation",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--pre-install"],
+  "metavar": "FILE",
+  "help": "(DEPRECATED, use --before-install) A script to be run before package installation",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--post-uninstall"],
+  "metavar": "FILE",
+  "help": "(DEPRECATED, use --after-remove) A script to be run after package removal",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--pre-uninstall"],
+  "metavar": "FILE",
+  "help": "(DEPRECATED, use --before-remove) A script to be run before package removal",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--after-install"],
+  "metavar": "FILE",
+  "help": "A script to be run after package installation",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--before-install"],
+  "metavar": "FILE",
+  "help": "A script to be run before package installation",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--after-remove"],
+  "metavar": "FILE",
+  "help": "A script to be run after package removal",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--before-remove"],
+  "metavar": "FILE",
+  "help": "A script to be run before package removal",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--after-upgrade"],
+  "metavar": "FILE",
+  "help": "A script to be run after package upgrade",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--before-upgrade"],
+  "metavar": "FILE",
+  "help": "A script to be run before package upgrade",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--template-scripts"],
+  "takes_args": false,
+  "help": "Allow scripts to be templated. This lets you use ERB to template your packaging scripts (for --after-install, etc). For example, you can do things like <%= name %> to get the package name. For more information, see the fpm wiki: https://github.com/jordansissel/fpm/wiki/Script-Templates"
+},
+
+{
+  "option_strings": ["--template-value"],
+  "metavar": "KEY=VALUE",
+  "help": "Make 'key' available in script templates, so <%= key %> given will be the provided value. Implies --template-scripts"
+},
+
+{
+  "option_strings": ["--workdir"],
+  "metavar": "WORKDIR",
+  "help": "The directory you want fpm to do its work in, where 'work' is any file copying, downloading, etc. Roughly any scratch space fpm needs to build your package. (default: \"/tmp\")",
+  "complete": ["directory"]
+},
+
+{
+  "option_strings": ["--source-date-epoch-from-changelog"],
+  "takes_args": false,
+  "help": "Use release date from changelog as timestamp on generated files to reduce nondeterminism. Experimental; only implemented for gem so far.  (default: false)"
+},
+
+{
+  "option_strings": ["--source-date-epoch-default"],
+  "metavar": "SOURCE_DATE_EPOCH_DEFAULT",
+  "help": "If no release date otherwise specified, use this value as timestamp on generated files to reduce nondeterminism. Reproducible build environments such as dpkg-dev and rpmbuild set this via envionment variable SOURCE_DATE_EPOCH variable to the integer unix timestamp to use in generated archives, and expect tools like fpm to use it as a hint to avoid nondeterministic output. This is a Unix timestamp, i.e. number of seconds since 1 Jan 1970 UTC. See https://reproducible-builds.org/specs/source-date-epoch  (default: $SOURCE_DATE_EPOCH)"
+},
+
+{
+  "option_strings": ["--fpm-options-file"],
+  "metavar": "FPM_OPTIONS_FILE",
+  "help": "A file that contains additional fpm options. Any fpm flag format is valid in this file. This can be useful on build servers where you want to use a common configuration or inject other parameters from a file instead of from a command-line flag..",
+  "complete": ["file"]
+},
+
+{
+  "option_strings": ["--gem-bin-path"],
+  "metavar": "DIRECTORY",
+  "help": "The directory to install gem executables",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-package-prefix"],
+  "metavar": "NAMEPREFIX",
+  "help": "(DEPRECATED, use --package-name-prefix) Name to prefix the package name with.",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-package-name-prefix"],
+  "metavar": "PREFIX",
+  "help": "Name to prefix the package name with. (default: \"rubygem\")",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-gem"],
+  "metavar": "PATH_TO_GEM",
+  "help": "The path to the 'gem' tool (defaults to 'gem' and searches your $PATH) (default: \"gem\")",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-shebang"],
+  "metavar": "SHEBANG",
+  "help": "Replace the shebang in the executables in the bin path with a custom string (default: nil)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-fix-name"],
+  "takes_args": false,
+  "help": "Should the target package name be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--no-gem-fix-name"],
+  "takes_args": false,
+  "help": "Should the target package name be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-fix-dependencies"],
+  "takes_args": false,
+  "help": "Should the package dependencies be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--no-gem-fix-dependencies"],
+  "takes_args": false,
+  "help": "Should the package dependencies be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-env-shebang"],
+  "takes_args": false,
+  "help": "Should the target package have the shebang rewritten to use env? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--no-gem-env-shebang"],
+  "takes_args": false,
+  "help": "Should the target package have the shebang rewritten to use env? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-prerelease"],
+  "takes_args": false,
+  "help": "Allow prerelease versions of a gem (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--no-gem-prerelease"],
+  "takes_args": false,
+  "help": "Allow prerelease versions of a gem (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-disable-dependency"],
+  "metavar": "GEM_NAME",
+  "help": "The gem name to remove from dependency list",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-embed-dependencies"],
+  "takes_args": false,
+  "help": "Should the gem dependencies be installed? (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--no-gem-embed-dependencies"],
+  "takes_args": false,
+  "help": "Should the gem dependencies be installed? (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-version-bins"],
+  "takes_args": false,
+  "help": "Append the version to the bins (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--no-gem-version-bins"],
+  "takes_args": false,
+  "help": "Append the version to the bins (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-stagingdir"],
+  "metavar": "STAGINGDIR",
+  "help": "The directory where fpm installs the gem temporarily before conversion. Normally a random subdirectory of workdir.",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-git-repo"],
+  "metavar": "GIT_REPO",
+  "help": "Use this git repo address as the source of the gem instead of rubygems.org. (default: nil)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--gem-git-branch"],
+  "metavar": "GIT_BRANCH",
+  "help": "When using a git repo as the source of the gem instead of rubygems.org, use this git branch. (default: nil)",
+  "when": "option_is -t --output-type -s --input-type -- gem"
+},
+
+{
+  "option_strings": ["--cpan-perl-bin"],
+  "metavar": "PERL_EXECUTABLE",
+  "help": "The path to the perl executable you wish to run. (default: \"perl\")",
+  "complete": ["command"],
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-cpanm-bin"],
+  "metavar": "CPANM_EXECUTABLE",
+  "help": "The path to the cpanm executable you wish to run. (default: \"cpanm\")",
+  "complete": ["command"],
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-mirror"],
+  "metavar": "CPAN_MIRROR",
+  "help": "The CPAN mirror to use instead of the default.",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-mirror-only"],
+  "takes_args": false,
+  "help": "Only use the specified mirror for metadata. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--no-cpan-mirror-only"],
+  "takes_args": false,
+  "help": "Only use the specified mirror for metadata. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-package-name-prefix"],
+  "metavar": "NAME_PREFIX",
+  "help": "Name to prefix the package name with. (default: \"perl\")",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-test"],
+  "takes_args": false,
+  "help": "Run the tests before packaging? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--no-cpan-test"],
+  "takes_args": false,
+  "help": "Run the tests before packaging? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-verbose"],
+  "takes_args": false,
+  "help": "Produce verbose output from cpanm? (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--no-cpan-verbose"],
+  "takes_args": false,
+  "help": "Produce verbose output from cpanm? (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-perl-lib-path"],
+  "metavar": "PERL_LIB_PATH",
+  "help": "Path of target Perl Libraries",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-sandbox-non-core"],
+  "takes_args": false,
+  "help": "Sandbox all non-core modules, even if they're already installed (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--no-cpan-sandbox-non-core"],
+  "takes_args": false,
+  "help": "Sandbox all non-core modules, even if they're already installed (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--cpan-cpanm-force"],
+  "takes_args": false,
+  "help": "Pass the --force parameter to cpanm (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--no-cpan-cpanm-force"],
+  "takes_args": false,
+  "help": "Pass the --force parameter to cpanm (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- cpan"
+},
+
+{
+  "option_strings": ["--deb-ignore-iteration-in-dependencies"],
+  "takes_args": false,
+  "help": "For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-ignore-iteration-in-dependencies"],
+  "takes_args": false,
+  "help": "For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-build-depends"],
+  "metavar": "DEPENDENCY",
+  "help": "Add DEPENDENCY as a Build-Depends",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-pre-depends"],
+  "metavar": "DEPENDENCY",
+  "help": "Add DEPENDENCY as a Pre-Depends",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-compression"],
+  "metavar": "COMPRESSION",
+  "help": "The compression type to use, must be one of gz, bzip2, xz, none. (default: \"gz\")",
+  "complete": ["choices", ["gz", "bzip2", "xz", "none"]],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-dist"],
+  "metavar": "DIST-TAG",
+  "help": "Set the deb distribution. (default: \"unstable\")",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-custom-control"],
+  "metavar": "FILEPATH",
+  "help": "Custom version of the Debian control file.",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-config"],
+  "metavar": "SCRIPTPATH",
+  "help": "Add SCRIPTPATH as debconf config file.",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-templates"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as debconf templates file.",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-installed-size"],
+  "metavar": "KILOBYTES",
+  "help": "The installed size, in kilobytes. If omitted, this will be calculated automatically",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-priority"],
+  "metavar": "PRIORITY",
+  "help": "The debian package 'priority' value. (default: \"optional\")",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-use-file-permissions"],
+  "takes_args": false,
+  "help": "Use existing file permissions when defining ownership and modes",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-use-file-permissions"],
+  "takes_args": false,
+  "help": "Use existing file permissions when defining ownership and modes",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-user"],
+  "metavar": "USER",
+  "help": "The owner of files in this package (default: \"root\")",
+  "complete": ["user"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-group"],
+  "metavar": "GROUP",
+  "help": "The group owner of files in this package (default: \"root\")",
+  "complete": ["group"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-changelog"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as debian changelog",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-generate-changes"],
+  "takes_args": false,
+  "help": "Generate PACKAGENAME.changes file. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-generate-changes"],
+  "takes_args": false,
+  "help": "Generate PACKAGENAME.changes file. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-upstream-changelog"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as upstream changelog",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-recommends"],
+  "metavar": "PACKAGE",
+  "help": "Add PACKAGE to Recommends",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-suggests"],
+  "metavar": "PACKAGE",
+  "help": "Add PACKAGE to Suggests",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-meta-file"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH to DEBIAN directory",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-interest"],
+  "metavar": "EVENT",
+  "help": "Package is interested in EVENT trigger",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-activate"],
+  "metavar": "EVENT",
+  "help": "Package activates EVENT trigger",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-interest-noawait"],
+  "metavar": "EVENT",
+  "help": "Package is interested in EVENT trigger without awaiting",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-activate-noawait"],
+  "metavar": "EVENT",
+  "help": "Package activates EVENT trigger",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-field"],
+  "metavar": "FIELD_AND_VALUE",
+  "help": "'FIELD: VALUE' Add custom field to the control file",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-no-default-config-files"],
+  "takes_args": false,
+  "help": "Do not add all files in /etc as configuration files by default for Debian packages. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-no-default-config-files"],
+  "takes_args": false,
+  "help": "Do not add all files in /etc as configuration files by default for Debian packages. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-auto-config-files"],
+  "takes_args": false,
+  "help": "Init script and default configuration files will be labeled as configuration files for Debian packages. (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-auto-config-files"],
+  "takes_args": false,
+  "help": "Init script and default configuration files will be labeled as configuration files for Debian packages. (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-shlibs"],
+  "metavar": "SHLIBS",
+  "help": "Include control/shlibs content. This flag expects a string that is used as the contents of the shlibs file. See the following url for a description of this file and its format: http://www.debian.org/doc/debian-policy/ch-sharedlibs.html#s-shlibs",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-init"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as an init script",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-default"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as /etc/default configuration",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-upstart"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as an upstart script",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-systemd"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as a systemd script",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-systemd-enable"],
+  "takes_args": false,
+  "help": "Enable service on install or upgrade (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-systemd-enable"],
+  "takes_args": false,
+  "help": "Enable service on install or upgrade (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-systemd-auto-start"],
+  "takes_args": false,
+  "help": "Start service after install or upgrade (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-systemd-auto-start"],
+  "takes_args": false,
+  "help": "Start service after install or upgrade (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-systemd-restart-after-upgrade"],
+  "takes_args": false,
+  "help": "Restart service after upgrade (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-systemd-restart-after-upgrade"],
+  "takes_args": false,
+  "help": "Restart service after upgrade (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-after-purge"],
+  "metavar": "FILE",
+  "help": "A script to be run after package removal to purge remaining (config) files (a.k.a. postrm purge within apt-get purge)",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--deb-maintainerscripts-force-errorchecks"],
+  "takes_args": false,
+  "help": "Activate errexit shell option according to lintian. https://lintian.debian.org/tags/maintainer-script-ignores-errors.html (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--no-deb-maintainerscripts-force-errorchecks"],
+  "takes_args": false,
+  "help": "Activate errexit shell option according to lintian. https://lintian.debian.org/tags/maintainer-script-ignores-errors.html (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- deb"
+},
+
+{
+  "option_strings": ["--npm-bin"],
+  "metavar": "NPM_EXECUTABLE",
+  "help": "The path to the npm executable you wish to run. (default: \"npm\")",
+  "complete": ["command"],
+  "when": "option_is -t --output-type -s --input-type -- npm"
+},
+
+{
+  "option_strings": ["--npm-package-name-prefix"],
+  "metavar": "PREFIX",
+  "help": "Name to prefix the package name with. (default: \"node\")",
+  "when": "option_is -t --output-type -s --input-type -- npm"
+},
+
+{
+  "option_strings": ["--npm-registry"],
+  "metavar": "NPM_REGISTRY",
+  "help": "The npm registry to use instead of the default.",
+  "when": "option_is -t --output-type -s --input-type -- npm"
+},
+
+{
+  "option_strings": ["--rpm-use-file-permissions"],
+  "takes_args": false,
+  "help": "Use existing file permissions when defining ownership and modes.",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-use-file-permissions"],
+  "takes_args": false,
+  "help": "Use existing file permissions when defining ownership and modes.",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-user"],
+  "metavar": "USER",
+  "help": "Set the user to USER in the %files section. Overrides the user when used with use-file-permissions setting.",
+  "complete": ["user"],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-group"],
+  "metavar": "GROUP",
+  "help": "Set the group to GROUP in the %files section. Overrides the group when used with use-file-permissions setting.",
+  "complete": ["group"],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-defattrfile"],
+  "metavar": "ATTR",
+  "help": "Set the default file mode (%defattr). (default: \"-\")",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-defattrdir"],
+  "metavar": "ATTR",
+  "help": "Set the default dir mode (%defattr). (default: \"-\")",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-rpmbuild-define"],
+  "metavar": "DEFINITION",
+  "help": "Pass a --define argument to rpmbuild.",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-dist"],
+  "metavar": "DIST-TAG",
+  "help": "Set the rpm distribution.",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-digest"],
+  "metavar": "RPPM_DIGEST",
+  "help": "Select a digest algorithm. md5 works on the most platforms. md5|sha1|sha256|sha384|sha512 (default: \"md5\")",
+  "complete": ["choices", ["md5", "sha1", "sha256", "sha384", "sha512"]],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-compression-level"],
+  "metavar": "LEVEL",
+  "help": "Select a compression level. 0 is store-only. 9 is max compression. (default: \"9\")",
+  "complete": ["range", 0, 9],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-compression"],
+  "metavar": "COMPRESSION",
+  "help": "Select a compression method. gzip works on the most platforms. none|xz|xzmt|gzip|bzip2 (default: \"gzip\")",
+  "complete": ["choices", ["none", "xz", "xzmt", "gzip", "bzip2"]],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-os"],
+  "metavar": "OS",
+  "help": "The operating system to target this rpm for. You want to set this to 'linux' if you are using fpm on OS X, for example",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-changelog"],
+  "metavar": "FILEPATH",
+  "help": "Add changelog from FILEPATH contents",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-summary"],
+  "metavar": "SUMMARY",
+  "help": "Set the RPM summary. Overrides the first line on the description if set",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-sign"],
+  "takes_args": false,
+  "help": "Pass --sign to rpmbuild",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-sign"],
+  "takes_args": false,
+  "help": "Pass --sign to rpmbuild",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-auto-add-directories"],
+  "takes_args": false,
+  "help": "Auto add directories not part of filesystem",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-auto-add-directories"],
+  "takes_args": false,
+  "help": "Auto add directories not part of filesystem",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-auto-add-exclude-directories"],
+  "metavar": "DIRECTORIES",
+  "help": "Additional directories ignored by '--rpm-auto-add-directories' flag",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-autoreqprov"],
+  "takes_args": false,
+  "help": "Enable RPM's AutoReqProv option",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-autoreqprov"],
+  "takes_args": false,
+  "help": "Enable RPM's AutoReqProv option",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-autoreq"],
+  "takes_args": false,
+  "help": "Enable RPM's AutoReq option",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-autoreq"],
+  "takes_args": false,
+  "help": "Enable RPM's AutoReq option",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-autoprov"],
+  "takes_args": false,
+  "help": "Enable RPM's AutoProv option",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-autoprov"],
+  "takes_args": false,
+  "help": "Enable RPM's AutoProv option",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-attr"],
+  "metavar": "ATTRFILE",
+  "help": "Set the attribute for a file (%attr), e.g. --rpm-attr 750,user1,group1:/some/file",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-init"],
+  "metavar": "FILEPATH",
+  "help": "Add FILEPATH as an init script",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-filter-from-provides"],
+  "metavar": "REGEX",
+  "help": "Set %filter_from_provides to the supplied REGEX.",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-filter-from-requires"],
+  "metavar": "REGEX",
+  "help": "Set %filter_from_requires to the supplied REGEX.",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-tag"],
+  "metavar": "TAG",
+  "help": "Adds a custom tag in the spec file as is. Example: --rpm-tag 'Requires(post): /usr/sbin/alternatives'",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-ignore-iteration-in-dependencies"],
+  "takes_args": false,
+  "help": "For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-ignore-iteration-in-dependencies"],
+  "takes_args": false,
+  "help": "For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-verbatim-gem-dependencies"],
+  "takes_args": false,
+  "help": "When converting from a gem, leave the old (fpm 0.4.x) style dependency names. This flag will use the old 'rubygem-foo' names in rpm requires instead of the redhat style rubygem(foo). (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-verbatim-gem-dependencies"],
+  "takes_args": false,
+  "help": "When converting from a gem, leave the old (fpm 0.4.x) style dependency names. This flag will use the old 'rubygem-foo' names in rpm requires instead of the redhat style rubygem(foo). (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-macro-expansion"],
+  "takes_args": false,
+  "help": "install-time macro expansion in %pre %post %preun %postun scripts (see: https://rpm.org/user_doc/scriptlet_expansion.html) (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--no-rpm-macro-expansion"],
+  "takes_args": false,
+  "help": "install-time macro expansion in %pre %post %preun %postun scripts (see: https://rpm.org/user_doc/scriptlet_expansion.html) (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-verifyscript"],
+  "metavar": "FILE",
+  "help": "a script to be run on verification",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-pretrans"],
+  "metavar": "FILE",
+  "help": "pretrans script",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-posttrans"],
+  "metavar": "FILE",
+  "help": "posttrans script",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-trigger-before-install"],
+  "metavar": "PACKAGE",
+  "help": "'[OPT]PACKAGE: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See: http://rpm.org/api/4.4.2.2/triggers.html",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-trigger-after-install"],
+  "metavar": "PACKAGE",
+  "help": "'[OPT]PACKAGE: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See: http://rpm.org/api/4.4.2.2/triggers.html",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-trigger-before-uninstall"],
+  "metavar": "PACKAGE",
+  "help": "'[OPT]PACKAGE: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See: http://rpm.org/api/4.4.2.2/triggers.html",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--rpm-trigger-after-target-uninstall"],
+  "metavar": "PACKAGE",
+  "help": "'[OPT]PACKAGE: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See: http://rpm.org/api/4.4.2.2/triggers.html",
+  "when": "option_is -t --output-type -s --input-type -- rpm"
+},
+
+{
+  "option_strings": ["--pear-package-name-prefix"],
+  "metavar": "PREFIX",
+  "help": "Name prefix for pear package (default: \"php-pear\")",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--pear-channel"],
+  "metavar": "CHANNEL_URL",
+  "help": "The pear channel url to use instead of the default.",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--pear-channel-update"],
+  "takes_args": false,
+  "help": "call 'pear channel-update' prior to installation",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--no-pear-channel-update"],
+  "takes_args": false,
+  "help": "call 'pear channel-update' prior to installation",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--pear-bin-dir"],
+  "metavar": "BIN_DIR",
+  "help": "Directory to put binaries in",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--pear-php-bin"],
+  "metavar": "PHP_BIN",
+  "help": "Specify php executable path if differs from the os used for packaging",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--pear-php-dir"],
+  "metavar": "PHP_DIR",
+  "help": "Specify php dir relative to prefix if differs from pear default (pear/php)",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--pear-data-dir"],
+  "metavar": "DATA_DIR",
+  "help": "Specify php dir relative to prefix if differs from pear default (pear/data)",
+  "when": "option_is -t --output-type -s --input-type -- pear"
+},
+
+{
+  "option_strings": ["--python-bin"],
+  "metavar": "PYTHON_EXECUTABLE",
+  "help": "The path to the python executable you wish to run. (default: \"python\")",
+  "complete": ["command"],
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-easyinstall"],
+  "metavar": "EASYINSTALL_EXECUTABLE",
+  "help": "The path to the easy_install executable tool (default: \"easy_install\")",
+  "complete": ["command"],
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-pip"],
+  "metavar": "PIP_EXECUTABLE",
+  "help": "The path to the pip executable tool. If not specified, easy_install is used instead (default: nil)",
+  "complete": ["command"],
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-pypi"],
+  "metavar": "PYPI_URL",
+  "help": "PyPi Server uri for retrieving packages. (default: \"https://pypi.python.org/simple\")",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-trusted-host"],
+  "metavar": "PYPI_TRUSTED",
+  "help": "Mark this host or host:port pair as trusted for pip (default: nil)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-package-prefix"],
+  "metavar": "NAMEPREFIX",
+  "help": "(DEPRECATED, use --package-name-prefix) Name to prefix the package name with.",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-package-name-prefix"],
+  "metavar": "PREFIX",
+  "help": "Name to prefix the package name with. (default: \"python\")",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-fix-name"],
+  "takes_args": false,
+  "help": "Should the target package name be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--no-python-fix-name"],
+  "takes_args": false,
+  "help": "Should the target package name be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-fix-dependencies"],
+  "takes_args": false,
+  "help": "Should the package dependencies be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--no-python-fix-dependencies"],
+  "takes_args": false,
+  "help": "Should the package dependencies be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-downcase-name"],
+  "takes_args": false,
+  "help": "Should the target package name be in lowercase? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--no-python-downcase-name"],
+  "takes_args": false,
+  "help": "Should the target package name be in lowercase? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-downcase-dependencies"],
+  "takes_args": false,
+  "help": "Should the package dependencies be in lowercase? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--no-python-downcase-dependencies"],
+  "takes_args": false,
+  "help": "Should the package dependencies be in lowercase? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-install-bin"],
+  "metavar": "BIN_PATH",
+  "help": "The path to where python scripts should be installed to.",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-install-lib"],
+  "metavar": "LIB_PATH",
+  "help": "The path to where python libs should be installed to (default depends on your python installation). Want to find out what your target platform is using? Run this: python -c 'from distutils.sysconfig import get_python_lib; print get_python_lib()'",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-install-data"],
+  "metavar": "DATA_PATH",
+  "help": "The path to where data should be installed to. This is equivalent to 'python setup.py --install-data DATA_PATH",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-dependencies"],
+  "takes_args": false,
+  "help": "Include requirements defined in setup.py as dependencies. (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--no-python-dependencies"],
+  "takes_args": false,
+  "help": "Include requirements defined in setup.py as dependencies. (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-obey-requirements-txt"],
+  "takes_args": false,
+  "help": "Use a requirements.txt file in the top-level directory of the python package for dependency detection. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--no-python-obey-requirements-txt"],
+  "takes_args": false,
+  "help": "Use a requirements.txt file in the top-level directory of the python package for dependency detection. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-scripts-executable"],
+  "metavar": "PYTHON_EXECUTABLE",
+  "help": "Set custom python interpreter in installing scripts. By default distutils will replace python interpreter in installing scripts (specified by shebang) with current python interpreter (sys.executable). This option is equivalent to appending 'build_scripts --executable PYTHON_EXECUTABLE' arguments to 'setup.py install' command.",
+  "complete": ["command"],
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-disable-dependency"],
+  "metavar": "PYTHON_PACKAGE_NAME",
+  "help": "The python package name to remove from dependency list (default: [])",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-setup-py-arguments"],
+  "metavar": "SETUP_PY_ARGUMENT",
+  "help": "Arbitrary argument(s) to be passed to setup.py (default: [])",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--python-internal-pip"],
+  "takes_args": false,
+  "help": "Use the pip module within python to install modules - aka 'python -m pip'. This is the recommended usage since Python 3.4 (2014) instead of invoking the 'pip' script (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--no-python-internal-pip"],
+  "takes_args": false,
+  "help": "Use the pip module within python to install modules - aka 'python -m pip'. This is the recommended usage since Python 3.4 (2014) instead of invoking the 'pip' script (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- python"
+},
+
+{
+  "option_strings": ["--osxpkg-identifier-prefix"],
+  "metavar": "IDENTIFIER_PREFIX",
+  "help": "Reverse domain prefix prepended to package identifier, ie. 'org.great.my'. If this is omitted, the identifer will be the package name.",
+  "when": "option_is -t --output-type -s --input-type -- osxpkg"
+},
+
+{
+  "option_strings": ["--osxpkg-payload-free"],
+  "takes_args": false,
+  "help": "Define no payload, assumes use of script options. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- osxpkg"
+},
+
+{
+  "option_strings": ["--no-osxpkg-payload-free"],
+  "takes_args": false,
+  "help": "Define no payload, assumes use of script options. (default: false)",
+  "when": "option_is -t --output-type -s --input-type -- osxpkg"
+},
+
+{
+  "option_strings": ["--osxpkg-ownership"],
+  "metavar": "OWNERSHIP",
+  "help": "--ownership option passed to pkgbuild. Defaults to 'recommended'. See pkgbuild(1). (default: \"recommended\")",
+  "when": "option_is -t --output-type -s --input-type -- osxpkg"
+},
+
+{
+  "option_strings": ["--osxpkg-postinstall-action"],
+  "metavar": "POSTINSTALL_ACTION",
+  "help": "Post-install action provided in package metadata. Optionally one of 'logout', 'restart', 'shutdown'.",
+  "complete": ["choices", ["logout", "restart", "shutdown"]],
+  "when": "option_is -t --output-type -s --input-type -- osxpkg"
+},
+
+{
+  "option_strings": ["--osxpkg-dont-obsolete"],
+  "metavar": "DONT_OBSOLETE_PATH",
+  "help": "A file path for which to 'dont-obsolete' in the built PackageInfo. Can be specified multiple times.",
+  "when": "option_is -t --output-type -s --input-type -- osxpkg",
+  "multiple_option": true
+},
+
+{
+  "option_strings": ["--solaris-user"],
+  "metavar": "USER",
+  "help": "Set the user to USER in the prototype files. (default: \"root\")",
+  "complete": ["user"],
+  "when": "option_is -t --output-type -s --input-type -- solaris"
+},
+
+{
+  "option_strings": ["--solaris-group"],
+  "metavar": "GROUP",
+  "help": "Set the group to GROUP in the prototype file. (default: \"root\")",
+  "complete": ["group"],
+  "when": "option_is -t --output-type -s --input-type -- solaris"
+},
+
+{
+  "option_strings": ["--p5p-user"],
+  "metavar": "USER",
+  "help": "Set the user to USER in the prototype files. (default: \"root\")",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--p5p-group"],
+  "metavar": "GROUP",
+  "help": "Set the group to GROUP in the prototype file. (default: \"root\")",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--p5p-zonetype"],
+  "metavar": "ZONETYPE",
+  "help": "Set the allowed zone types (global, nonglobal, both) (default: \"value=global value=nonglobal\")",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--p5p-publisher"],
+  "metavar": "PUBLISHER",
+  "help": "Set the publisher name for the repository (default: \"FPM\")",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--p5p-lint"],
+  "takes_args": false,
+  "help": "Check manifest with pkglint (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--no-p5p-lint"],
+  "takes_args": false,
+  "help": "Check manifest with pkglint (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--p5p-validate"],
+  "takes_args": false,
+  "help": "Validate with pkg install (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--no-p5p-validate"],
+  "takes_args": false,
+  "help": "Validate with pkg install (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- p5p"
+},
+
+{
+  "option_strings": ["--freebsd-origin"],
+  "metavar": "ABI",
+  "help": "Sets the FreeBSD 'origin' pkg field (default: \"fpm/<name>\")",
+  "when": "option_is -t --output-type -s --input-type -- freebsd"
+},
+
+{
+  "option_strings": ["--snap-yaml"],
+  "metavar": "FILEPATH",
+  "help": "Custom version of the snap.yaml file.",
+  "complete": ["file"],
+  "when": "option_is -t --output-type -s --input-type -- snap"
+},
+
+{
+  "option_strings": ["--snap-confinement"],
+  "metavar": "CONFINEMENT",
+  "help": "Type of confinement to use for this snap. (default: \"devmode\")",
+  "when": "option_is -t --output-type -s --input-type -- snap"
+},
+
+{
+  "option_strings": ["--snap-grade"],
+  "metavar": "GRADE",
+  "help": "Grade of this snap. (default: \"devel\")",
+  "when": "option_is -t --output-type -s --input-type -- snap"
+},
+
+{
+  "option_strings": ["--pacman-optional-depends"],
+  "metavar": "PACKAGE",
+  "help": "Add an optional dependency to the pacman package.",
+  "when": "option_is -t --output-type -s --input-type -- pacman"
+},
+
+{
+  "option_strings": ["--pacman-use-file-permissions"],
+  "takes_args": false,
+  "help": "Use existing file permissions when defining ownership and modes",
+  "when": "option_is -t --output-type -s --input-type -- pacman"
+},
+
+{
+  "option_strings": ["--no-pacman-use-file-permissions"],
+  "takes_args": false,
+  "help": "Use existing file permissions when defining ownership and modes",
+  "when": "option_is -t --output-type -s --input-type -- pacman"
+},
+
+{
+  "option_strings": ["--pacman-user"],
+  "metavar": "USER",
+  "help": "The owner of files in this package (default: \"root\")",
+  "complete": ["user"],
+  "when": "option_is -t --output-type -s --input-type -- pacman"
+},
+
+{
+  "option_strings": ["--pacman-group"],
+  "metavar": "GROUP",
+  "help": "The group owner of files in this package (default: \"root\")",
+  "complete": ["group"],
+  "when": "option_is -t --output-type -s --input-type -- pacman"
+},
+
+{
+  "option_strings": ["--pacman-compression"],
+  "metavar": "COMPRESSION",
+  "help": "The compression type to use, must be one of gz, bzip2, xz, zstd, none. (default: \"zstd\")",
+  "complete": ["choices", ["gz", "bzip2", "xz", "zstd", "none"]],
+  "when": "option_is -t --output-type -s --input-type -- pacman"
+},
+
+{
+  "option_strings": ["--pleaserun-name"],
+  "metavar": "SERVICE_NAME",
+  "help": "The name of the service you are creating",
+  "when": "option_is -t --output-type -s --input-type -- pleaserun"
+},
+
+{
+  "option_strings": ["--pleaserun-chdir"],
+  "metavar": "CHDIR",
+  "help": "The working directory used by the service",
+  "complete": ["directory"],
+  "when": "option_is -t --output-type -s --input-type -- pleaserun"
+},
+
+{
+  "option_strings": ["--pleaserun-user"],
+  "metavar": "USER",
+  "help": "The user to use for executing this program.",
+  "when": "option_is -t --output-type -s --input-type -- pleaserun"
+},
+
+{
+  "option_strings": ["--virtualenv-pypi"],
+  "metavar": "PYPI_URL",
+  "help": "PyPi Server uri for retrieving packages. (default: \"https://pypi.python.org/simple\")",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-package-name-prefix"],
+  "metavar": "PREFIX",
+  "help": "Name to prefix the package name with. (default: \"virtualenv\")",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-install-location"],
+  "metavar": "DIRECTORY",
+  "help": "DEPRECATED: Use --prefix instead.  Location to which to install the virtualenv by default. (default: \"/usr/share/python\")",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-fix-name"],
+  "takes_args": false,
+  "help": "Should the target package name be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--no-virtualenv-fix-name"],
+  "takes_args": false,
+  "help": "Should the target package name be prefixed? (default: true)",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-other-files-dir"],
+  "metavar": "DIRECTORY",
+  "help": "Optionally, the contents of the specified directory may be added to the package. This is useful if the virtualenv needs configuration files, etc. (default: nil)",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-pypi-extra-url"],
+  "metavar": "PYPI_EXTRA_URL",
+  "help": "PyPi extra-index-url for pointing to your priviate PyPi (default: nil)",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-setup-install"],
+  "takes_args": false,
+  "help": "After building virtualenv run setup.py install useful when building a virtualenv for packages and including their requirements from",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--no-virtualenv-setup-install"],
+  "takes_args": false,
+  "help": "After building virtualenv run setup.py install useful when building a virtualenv for packages and including their requirements from",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-system-site-packages"],
+  "takes_args": false,
+  "help": "Give the virtual environment access to the global site-packages",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--no-virtualenv-system-site-packages"],
+  "takes_args": false,
+  "help": "Give the virtual environment access to the global site-packages",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+},
+
+{
+  "option_strings": ["--virtualenv-find-links"],
+  "metavar": "PIP_FIND_LINKS",
+  "help": "If a url or path to an html file, then parse for links to archives. If a local path or file:// url that's a directory, then look for archives in the directory listing. (default: nil)",
+  "when": "option_is -t --output-type -s --input-type -- virtualenv"
+}
+  ]
+}]
+
