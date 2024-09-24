@@ -451,15 +451,15 @@ class Option:
         self.multiple_option = multiple_option
         self.when = when
 
-        if not len(option_strings):
+        if not option_strings:
             raise Exception('Empty option strings')
 
         for option_string in option_strings:
             if ' ' in option_string:
-                raise Exception("Invalid option: %r" % option_string)
+                raise Exception(f"Invalid option: {option_string}")
 
             if not option_string.startswith('-'):
-                raise Exception("Invalid option: %r" % option_string)
+                raise Exception(f"Invalid option: {option_string}")
 
         if complete:
             self.complete = complete

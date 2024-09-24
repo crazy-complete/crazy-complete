@@ -99,16 +99,18 @@ def make_completion_funcname_for_context(ctxt):
     if isinstance(ctxt.option, _commandline.Positional):
         return '%s_%s' % (funcname, ctxt.option.metavar)
 
+    raise AssertionError('make_completion_funcname_for_context: Should not be reached')
+
 class ShellCompleter:
     def complete(self, ctxt, completion, *a):
         if not hasattr(self, completion):
-            utils.warn("ShellCompleter: Falling back from `%s` to `none`" % (completion,))
+            utils.warn(f"ShellCompleter: Falling back from `{completion}` to `none`")
             completion = 'none'
 
         return getattr(self, completion)(ctxt, *a)
 
     def fallback(self, ctxt, from_, to, *a):
-        utils.warn("ShellCompleter: Falling back from `%s` to `%s`" % (from_, to))
+        utils.warn(f"ShellCompleter: Falling back from `{from_}` to `{to}`")
         return self.complete(ctxt, to, *a)
 
     def none(self, ctxt, *a):
@@ -209,7 +211,7 @@ class CompletionGenerator:
 
         self.include_files_content = []
         for file in config.include_files:
-            with open(file, 'r') as fh:
+            with open(file, 'r', encoding='utf-8') as fh:
                 self.include_files_content.append(fh.read().strip())
 
         self.completion_klass = completion_klass

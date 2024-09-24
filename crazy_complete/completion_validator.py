@@ -2,7 +2,7 @@ def get_required_arg(l, name):
     try:
         return l.pop(0)
     except:
-        raise Exception('Missing argument: %s' % name)
+        raise Exception(f'Missing argument: {name}')
 
 def get_optional_arg(l, default=None):
     try:
@@ -22,7 +22,7 @@ class CompletionValidator:
             command  = complete.pop(0)
 
             if not hasattr(CompletionValidator, command):
-                raise Exception("Unknown completion command: %r" % command)
+                raise Exception(f"Unknown completion command: {command}")
 
             getattr(CompletionValidator, command)(complete)
 
@@ -64,10 +64,10 @@ class CompletionValidator:
             new_choices = {}
             for item, desc in choices.items():
                 if not isinstance(item, (str, int, float)):
-                    raise Exception('Item not a str/int/float: %r' % item)
+                    raise Exception(f'Item not a str/int/float: {item}')
 
                 if not isinstance(desc, (str, int, float)):
-                    raise Exception('Description not a str/int/float: %r' % desc)
+                    raise Exception(f'Description not a str/int/float: {desc}')
 
                 new_choices[str(item)] = str(desc)
 
@@ -77,7 +77,7 @@ class CompletionValidator:
             new_choices = []
             for item in choices:
                 if not isinstance(item, (str, int, float)):
-                    raise Exception('Item not a str/int/float: %r' % item)
+                    raise Exception(f'Item not a str/int/float: {item}')
 
                 new_choices.append(item)
             return (new_choices,)
@@ -98,11 +98,11 @@ class CompletionValidator:
         for name, value in opts.items():
             if name == 'directory':
                 if not isinstance(value, str):
-                    raise Exception("Not a str: %r" % value)
+                    raise Exception(f"directory: Not a str: {value}")
 
                 directory = value
             else:
-                raise Exception('Unknown option: %s' % name)
+                raise Exception(f'Unknown option: {name}')
 
         return ({'directory': directory},)
 
@@ -115,11 +115,11 @@ class CompletionValidator:
         for name, value in opts.items():
             if name == 'directory':
                 if not isinstance(value, str):
-                    raise Exception("Not a str: %r" % value)
+                    raise Exception(f"directory: Not a str: {value}")
 
                 directory = value
             else:
-                raise Exception('Unknown option: %s' % name)
+                raise Exception(f'Unknown option: {name}')
 
         return ({'directory': directory},)
 
@@ -147,12 +147,12 @@ class CompletionValidator:
     def range(args):
         for arg in args:
             if not isinstance(arg, int):
-                raise Exception("Not an int: %r" % arg)
+                raise Exception(f"Not an int: {arg}")
 
         if len(args) == 2:
             start, stop = args
             if start > stop:
-                raise Exception("Start > stop: %r > %r" % (start, stop))
+                raise Exception(f"start > stop: {start} > {stop}")
 
             return (start, stop, 1)
 
@@ -183,7 +183,7 @@ class CompletionValidator:
         except: option = None
         require_no_more(args)
         if option not in (None, '-x'):
-            raise Exception('Invalid option: %r' % option)
+            raise Exception(f'Invalid option: {option}')
         return ()
 
     @staticmethod
@@ -192,7 +192,7 @@ class CompletionValidator:
         require_no_more(args)
 
         if not isinstance(cmd, str):
-            raise Exception("Command is not a str: %r" % cmd)
+            raise Exception(f"Command is not a str: {cmd}")
 
         return (cmd,)
 
@@ -210,19 +210,19 @@ class CompletionValidator:
             elif key == 'separator':
                 separator = value
             else:
-                raise Exception('Invalid key: %r' % key)
+                raise Exception(f'Invalid key: {key}')
 
         if values is None:
-            raise Exception('Missing `values` key: %r' % opts)
+            raise Exception(f'Missing `values` key: {opts}')
 
         if not isinstance(values, (list, tuple)):
-            raise Exception('Values: not a list: %r' % values)
+            raise Exception(f'Values: not a list: {values}')
 
         for value in values:
             if not isinstance(value, (str, int, float)):
-                raise Exception('Invalid value: %r' % value)
+                raise Exception(f'Invalid value: {value}')
 
         if len(separator) != 1:
-            raise Exception('Invalid value for separator: %r' % separator)
+            raise Exception(f'Invalid length for separator: {separator}')
 
         return ({'values': values, 'separator': separator},)

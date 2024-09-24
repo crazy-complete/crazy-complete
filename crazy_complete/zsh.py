@@ -41,7 +41,7 @@ def make_argument_option_spec(
         for o in sorted(option_strings):
             not_options.append(escape_colon(o))
 
-    if len(not_options):
+    if not_options:
         result.append(shell.escape('(%s)' % ' '.join(not_options)))
 
     # Multiple option =========================================================

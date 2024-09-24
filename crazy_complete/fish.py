@@ -31,7 +31,7 @@ class Conditions:
                 guard = "$helper '$options' positional_contains %d %s" % (num, ' '.join(words))
             conditions += [guard]
 
-        if len(self.not_has_option):
+        if self.not_has_option:
             use_helper = False
             if unsafe:
                 guard = "__fish_not_contain_opt"

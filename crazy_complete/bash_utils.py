@@ -12,15 +12,15 @@ def make_option_variable_name(option, prefix=''):
 
     short_options = option.get_short_option_strings()
     if short_options:
-        return prefix + ('%s' % short_options[0][1])
+        return prefix + short_options[0][1]
 
-    assert False, "make_option_variable_name: Should not be reached"
+    raise AssertionError("make_option_variable_name: Should not be reached")
 
 def make_long_options_case_without_arg(options):
     return '|'.join(options)
 
 def make_long_options_case_with_arg(options):
-    return '|'.join('%s=*' % o for o in options)
+    return '|'.join(f'{o}=*' for o in options)
 
 def make_short_options_case(options):
     return '|'.join(o[1] for o in options)

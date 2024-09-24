@@ -7,11 +7,11 @@ import __main__
 def execute_file(file):
     ''' Import file using exec '''
 
-    with open(os.devnull, 'w') as null_fh:
+    with open(os.devnull, 'w', encoding='utf-8') as null_fh:
         sys.stdout = null_fh
         sys.stderr = null_fh
 
-        with open(file, 'r') as fh:
+        with open(file, 'r', encoding='utf-8') as fh:
             source = fh.read()
             compiled = compile(source, file, 'exec')
             try:
@@ -33,7 +33,7 @@ def import_file(file):
         module_name = filename[:-3]
     else:
         temp = tempfile.NamedTemporaryFile(mode='w', suffix='.py')
-        with open(file, 'r') as fh:
+        with open(file, 'r', encoding='utf-8') as fh:
             temp.file.write(fh.read())
             temp.flush()
 

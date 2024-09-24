@@ -103,6 +103,6 @@ def CommandLine_To_YAML(commandline):
     return '---\n'.join(r)
 
 def load_from_file(file):
-    with open(file, 'r') as fh:
+    with open(file, 'r', encoding='utf-8') as fh:
         dictionaries = list(yaml.safe_load_all(fh))
         return dictionary_source.Dictionaries_To_Commandline(dictionaries)
