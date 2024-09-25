@@ -84,18 +84,16 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
     for action in parser._actions:
         if isinstance(action, argparse._SubParsersAction):
             subparsers  = OrderedDict()
-
             for name, subparser in action.choices.items():
                 subparsers[name] = {'parser': subparser, 'help': None}
 
             for action in action._get_subactions():
                 subparsers[action.dest]['help'] = action.help
 
-            subp = commandline.add_subcommands(name='command', help='Subcommands')
-
+            subcommands = commandline.add_subcommands()
             for name, data in subparsers.items():
-                suboptions = ArgumentParser_to_CommandLine(data['parser'], name, data['help'])
-                subp.add_commandline_object(suboptions)
+                subcmd = ArgumentParser_to_CommandLine(data['parser'], name, data['help'])
+                subcommands.add_commandline_object(subcmd)
         elif not action.option_strings:
             if action.nargs in ('+', '*'):
                 is_repeatable = True
@@ -178,7 +176,7 @@ def find_root_argument_parsers(module):
         for parser in action.choices.values():
             try:
                 parsers.remove(parser)
-            except:
+            except ValueError:
                 pass
 
     return parsers
@@ -198,7 +196,7 @@ def load_from_file(file, parser_variable=None, parser_blacklist=[]):
     if parser_variable is not None:
         try:
             parser = getattr(module, parser_variable)
-        except:
+        except AttributeError:
             raise Exception(f"No variable named `{parser_variable}` found in `{file}`")
     else:
         parsers = find_root_argument_parsers(module)

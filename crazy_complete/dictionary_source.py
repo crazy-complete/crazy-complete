@@ -1,3 +1,8 @@
+"""
+This module provides functions for creating CommandLine objects from
+dictionaries and vice versa.
+"""
+
 from collections import OrderedDict
 
 from .commandline import CommandLine, ExtendedBool

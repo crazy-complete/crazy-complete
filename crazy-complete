@@ -4,10 +4,11 @@ import os
 import sys
 import argparse
 
-from crazy_complete import zsh, bash, fish, paths
+from crazy_complete import bash, fish, zsh
 from crazy_complete import argparse_source, json_source, yaml_source
 from crazy_complete import argparse_mod # .complete() etc.
 from crazy_complete import config
+from crazy_complete import paths
 
 
 def parse_bool(s):
@@ -23,7 +24,7 @@ p = argparse.ArgumentParser('crazy-complete',
 p.add_argument('shell', choices=('bash', 'fish', 'zsh', 'json', 'yaml'),
     help='Specify the shell type for the completion script')
 
-p.add_argument('source_file',
+p.add_argument('definition_file',
     help='The file containing the command line definitions').complete('file')
 
 p.add_argument('--parser-variable', default=None,
@@ -83,38 +84,38 @@ del p
 
 def load_definitions_file(opts):
     if opts.input_type == 'auto':
-        basename = os.path.basename(opts.source_file)
+        basename = os.path.basename(opts.definition_file)
         extension = os.path.splitext(basename)[1].lower().strip('.')
         if extension == 'json':
-            return json_source.load_from_file(opts.source_file)
+            return json_source.load_from_file(opts.definition_file)
         if extension in ('yaml', 'yml'):
-            return yaml_source.load_from_file(opts.source_file)
+            return yaml_source.load_from_file(opts.definition_file)
         if extension == 'py':
             raise Exception('Reading Python files must be enabled by --input-type=python')
         if extension == '':
             raise Exception('File has no extension. Please supply --input-type=json|yaml|python')
         raise Exception(f'Unknown file extension `{extension}`. Please supply --input-type=json|yaml|python')
     if opts.input_type == 'json':
-        return json_source.load_from_file(opts.source_file)
+        return json_source.load_from_file(opts.definition_file)
     if opts.input_type == 'yaml':
-        return yaml_source.load_from_file(opts.source_file)
+        return yaml_source.load_from_file(opts.definition_file)
     if opts.input_type == 'python':
-        return argparse_source.load_from_file(opts.source_file,
+        return argparse_source.load_from_file(opts.definition_file,
             opts.parser_variable,
             parser_blacklist=[_crazy_complete_argument_parser])
 
     raise AssertionError("Should not be reached")
 
 def write_string_to_file(string, file):
-    if file:
+    if file is not None:
         with open(file, 'w', encoding='utf-8') as fh:
-            print(string, file=fh)
+            fh.write(string)
     else:
         print(string)
 
 def generate(opts):
-    if not os.path.exists(opts.source_file):
-        raise FileNotFoundError(opts.source_file)
+    if not os.path.exists(opts.definition_file):
+        raise FileNotFoundError(opts.definition_file)
 
     cmdline = load_definitions_file(opts)
 

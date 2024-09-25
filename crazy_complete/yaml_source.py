@@ -1,3 +1,8 @@
+"""
+This module provides functions for creating CommandLine objects from YAML
+and vice versa.
+"""
+
 import json
 import yaml
 
@@ -14,10 +19,10 @@ def bool_to_yaml(b):
 def option_to_yaml(obj):
     r = '- option_strings: %s\n' % json.dumps(obj['option_strings'])
 
-    if 'metavar' in obj:
+    if obj.get('metavar', None):
         r += '  metavar: %s\n' % str_to_yaml(obj['metavar'])
 
-    if 'help' in obj:
+    if obj.get('help', None):
         r += '  help: %s\n' % str_to_yaml(obj['help'])
 
     if obj.get('takes_args', True) is not True:
@@ -26,16 +31,16 @@ def option_to_yaml(obj):
         except: # takes_args may be "?"
             r += '  takes_args: %s\n' % str_to_yaml(obj['takes_args'])
 
-    if 'group' in obj:
+    if obj.get('group', None):
         r += '  group: %s\n' % str_to_yaml(obj['group'])
 
     if obj.get('multiple_option', ExtendedBool.INHERIT) !=  ExtendedBool.INHERIT:
         r += '  multiple_option: %s\n' % bool_to_yaml(obj['multiple_option'])
 
-    if 'complete' in obj:
+    if obj.get('complete', None):
         r += '  complete: %s\n' % json.dumps(obj['complete'])
 
-    if 'when' in obj:
+    if obj.get('when', None):
         r += '  when: %s\n' % str_to_yaml(obj['when'])
 
     return r
@@ -43,31 +48,30 @@ def option_to_yaml(obj):
 def positional_to_yaml(obj):
     r = '- number: %d\n' % obj['number']
 
-    if 'metavar' in obj:
+    if obj.get('metavar', None):
         r += '  metavar: %s\n' % str_to_yaml(obj['metavar'])
 
-    if 'help' in obj:
+    if obj.get('help', None):
         r += '  help: %s\n' % str_to_yaml(obj['help'])
 
     if obj.get('repeatable', False) is not False:
         r += '  repeatable: %s\n' % bool_to_yaml(obj['repeatable'])
 
-    if 'complete' in obj:
+    if obj.get('complete', None):
         r += '  complete: %s\n' % json.dumps(obj['complete'])
 
-    if 'when' in obj:
+    if obj.get('when', None):
         r += '  when: %s\n' % str_to_yaml(obj['when'])
 
     return r
 
 def to_yaml(obj):
-    r = ''
-    r += 'prog: %s\n' % str_to_yaml(obj['prog'])
+    r = 'prog: %s\n' % str_to_yaml(obj['prog'])
 
-    if obj.get('aliases', []):
+    if obj.get('aliases', None):
         r += 'aliases: %s\n' % json.dumps(obj['aliases'])
 
-    if 'help' in obj:
+    if obj.get('help', None):
         r += 'help: %s\n' % str_to_yaml(obj['help'])
 
     if obj.get('abbreviate_commands', ExtendedBool.INHERIT) != ExtendedBool.INHERIT:
@@ -79,19 +83,19 @@ def to_yaml(obj):
     if obj.get('inherit_options', ExtendedBool.INHERIT) != ExtendedBool.INHERIT:
         r += 'inherit_options: %s\n' % bool_to_yaml(obj['inherit_options'])
 
-    if 'options' in obj:
+    if obj.get('options', None):
         r += 'options:\n'
         for option in obj['options']:
             r += utils.indent(option_to_yaml(option), 2)
             r += '\n'
 
-    if 'positionals' in obj:
+    if obj.get('positionals', None):
         r += 'positionals:\n'
         for positional in obj['positionals']:
             r += utils.indent(positional_to_yaml(positional), 2)
             r += '\n'
 
-    return r
+    return r.rstrip()
 
 def CommandLine_To_YAML(commandline):
     dictionaries = dictionary_source.CommandLine_To_Dictionaries(commandline)
@@ -100,7 +104,7 @@ def CommandLine_To_YAML(commandline):
     for dictionary in dictionaries:
         r.append(to_yaml(dictionary))
 
-    return '---\n'.join(r)
+    return '\n---\n'.join(r)
 
 def load_from_file(file):
     with open(file, 'r', encoding='utf-8') as fh:

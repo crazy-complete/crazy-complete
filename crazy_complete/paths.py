@@ -8,6 +8,10 @@ import subprocess
 from . import utils
 
 def _pkg_config(args):
+    '''
+    Call the `pkg-config` program with `args` and check the return code.
+    If everything is fine, return the output as string.
+    '''
     command = ['pkg-config'] + args
     try:
         result = subprocess.run(
@@ -17,12 +21,12 @@ def _pkg_config(args):
             text=True,
             check=False)
     except FileNotFoundError:
-        raise Exception('program `pkg-config` not found')
+        raise Exception('Program `pkg-config` not found')
 
     if result.returncode == 0:
         return result.stdout.strip()
 
-    raise Exception('%s failed: %s' % (' '.join(command), result.stderr.strip()))
+    raise Exception('Command `%s` failed: %s' % (' '.join(command), result.stderr.strip()))
 
 def get_bash_completion_file(program_name):
     directory = '/usr/share/bash-completion/completions'
@@ -43,5 +47,7 @@ def get_fish_completion_file(program_name):
     return f'{directory}/{program_name}.fish'
 
 def get_zsh_completion_file(program_name):
+    # There is '/usr/share/zsh/vendor-completions', but that directory is not
+    # in the default $fpath of zsh.
     directory = '/usr/share/zsh/site-functions'
     return f'{directory}/_{program_name}'

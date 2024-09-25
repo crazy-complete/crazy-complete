@@ -1,3 +1,8 @@
+"""
+This module provides functions for creating CommandLine objects from JSON
+and vice versa.
+"""
+
 import json
 
 from . import dictionary_source
