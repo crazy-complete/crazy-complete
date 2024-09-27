@@ -118,6 +118,15 @@ Converting a Python script to YAML:
 crazy-complete --input-type=python yaml my_program.py
 ```
 
+Generate a YAML file from help text:
+
+```
+grep --help > help_file
+crazy-complete --input-type=help yaml help_file
+- or -
+grep --help | crazy-complete --input-type=help yaml /dev/stdin
+```
+
 Generate shell auto completions for BASH:
 
 ```
@@ -132,6 +141,11 @@ See [examples](https://github.com/crazy-complete/crazy-complete/tree/main/exampl
 See [completions](https://github.com/crazy-complete/crazy-complete/tree/main/completions) for real world applications of crazy-complete.
 
 You can even have a look at the [tests](https://github.com/crazy-complete/crazy-complete/tree/main/test).
+
+Comparision with other auto-complete generators
+===============================================
+
+See [comparision](https://github.com/crazy-complete/crazy-complete/blob/main/comparision.md) for a comparision with other tools.
 
 Questions or problems
 =====================

@@ -7,6 +7,7 @@ import argparse
 from crazy_complete import bash, fish, zsh
 from crazy_complete import argparse_source, json_source, yaml_source
 from crazy_complete import argparse_mod # .complete() etc.
+from crazy_complete import help_converter
 from crazy_complete import config
 from crazy_complete import paths
 
@@ -30,7 +31,7 @@ p.add_argument('definition_file',
 p.add_argument('--parser-variable', default=None,
     help='Specify the variable name of the ArgumentParser object')
 
-p.add_argument('--input-type', choices=['yaml', 'json', 'python', 'auto'], default='auto',
+p.add_argument('--input-type', choices=['yaml', 'json', 'python', 'help', 'auto'], default='auto',
     help='Specify input file type')
 
 p.add_argument('--program-name', default=None,
@@ -116,6 +117,13 @@ def write_string_to_file(string, file):
 def generate(opts):
     if not os.path.exists(opts.definition_file):
         raise FileNotFoundError(opts.definition_file)
+
+    if opts.input_type == 'help':
+        if opts.shell != 'yaml':
+            raise Exception('The `help` input-type currently only supports YAML generation')
+        output = help_converter.from_file_to_yaml(opts.definition_file)
+        write_string_to_file(output, opts.output_file)
+        return
 
     cmdline = load_definitions_file(opts)
 
