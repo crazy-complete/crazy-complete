@@ -1,3 +1,8 @@
+"""
+This module contains functions to parse the --help output of a program.
+"""
+
+import re
 from collections import namedtuple
 
 # Characters that should not be considered option chars
@@ -92,7 +97,7 @@ def parse_option_string(s):
     while not p.is_end() and p.peek() not in OPTION_BREAK_CHARS:
         option += p.get()
 
-    if option == '-' or option == '--':
+    if option in ('-', '--'):
         return None
 
     s.pos = p.pos
@@ -242,7 +247,7 @@ def parse_option_with_metavar(s):
             s.get()
             metavar = parse_metavar(s)
 
-        # Two spaces after --option means the descriptoin follows
+        # Two spaces after --option means the description follows
         elif s.peek_str(2).isspace():
             return OptionWithMetavar(opt, metavar, optional)
 
@@ -291,6 +296,13 @@ def parse_options_with_description(s):
         description = parse_description(s)
 
     return OptionsWithDescription(options, description)
+
+def get_program_name_from_help(s):
+    m = re.match('usage:[\n\t ]+([^\n\t ]+)', s, re.I)
+    if m:
+        return m[1]
+    else:
+        return s.split()[0]
 
 def parse(s):
     r = []

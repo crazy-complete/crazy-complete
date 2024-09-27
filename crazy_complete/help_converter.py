@@ -18,12 +18,13 @@ def from_file_to_yaml(file):
     with open(file, 'r', encoding='utf-8') as fh:
         content = fh.read()
 
+    prog = help_parser.get_program_name_from_help(content)
     char_stream = help_parser.CharStream(content)
     parsed = help_parser.parse(char_stream)
 
     output = []
 
-    output.append('prog: <Program name here>\nhelp: <Program description here>\noptions:')
+    output.append(f'prog: "{prog}"\nhelp: <Program description here>\noptions:')
 
     for obj in parsed:
         if isinstance(obj, help_parser.Unparsed):
@@ -56,6 +57,3 @@ def from_file_to_yaml(file):
             )
 
     return '\n'.join(output)
-
-
-            

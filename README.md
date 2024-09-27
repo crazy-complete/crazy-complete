@@ -43,12 +43,12 @@ Installation
 Synopsis
 ========
 
-> `crazy-complete [OPTIONS] {bash,fish,zsh,yaml,json} <PARSER_FILE>`
+> `crazy-complete [OPTIONS] {bash,fish,zsh,yaml,json} <DEFINITION_FILE>`
 
 Options
 =======
 
-**--input-type={yaml,json,python,auto}**
+**--input-type={yaml,json,python,help,auto}**
 
 > Specify input file type. With 'auto' the file extension will be used
 > to determine the input type.
