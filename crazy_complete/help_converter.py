@@ -24,7 +24,7 @@ def from_file_to_yaml(file):
 
     output = []
 
-    output.append(f'prog: "{prog}"\nhelp: <Program description here>\noptions:')
+    output.append(f'prog: "{prog}"\nhelp: "<Program description here>"\noptions:')
 
     for obj in parsed:
         if isinstance(obj, help_parser.Unparsed):
