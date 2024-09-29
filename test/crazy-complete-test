@@ -36,8 +36,8 @@ cmdp.add_argument('--variable-exported',help='Complete a variable').complete('va
 cmdp.add_argument('--service',          help='Complete a service').complete('service')
 cmdp.add_argument('--choices',          help='Complete from choices', choices={'foo:bar': 'Description for foo:bar', 1:'one', 2:'two'})
 cmdp.add_argument('--value-list',       help='Complete a list').complete('value_list', {'values': ['foo', 'bar', 'baz']})
-cmdp.add_argument('--range-1',          help='Complete a range', type=int, choices=range(1,9))
-cmdp.add_argument('--range-2',          help='Complete a range', type=int, choices=range(1,9,2))
+cmdp.add_argument('--range-1',          help='Complete a range', type=int, choices=range(1,10))
+cmdp.add_argument('--range-2',          help='Complete a range', type=int, choices=range(1,10,2))
 
 # =============================================================================
 # Command 'when'

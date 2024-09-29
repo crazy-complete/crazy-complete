@@ -13,6 +13,20 @@ from .commandline import CommandLine, MutuallyExclusiveGroup
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access
 
+def range_to_complete(r):
+    '''
+    Convert a Python range object to a range complete format.
+    '''
+
+    start = r.start
+    step = r.step
+    end = r.stop - 1 if step > 0 else r.stop + 1
+
+    if step == 1:
+        return ('range', start, end)
+    else:
+        return ('range', start, end, step)
+
 def get_complete(action):
     '''
     Get the `complete` attribute of `action` if it is set.
@@ -46,10 +60,7 @@ def get_complete(action):
 
         if action.choices:
             if isinstance(action.choices, range):
-                if action.choices.step == 1:
-                    return ('range', action.choices.start, action.choices.stop)
-                else:
-                    return ('range', action.choices.start, action.choices.stop, action.choices.step)
+                return range_to_complete(action.choices)
             return ('choices', action.choices)
 
         return None

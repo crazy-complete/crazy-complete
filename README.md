@@ -142,6 +142,11 @@ See [completions](https://github.com/crazy-complete/crazy-complete/tree/main/com
 
 You can even have a look at the [tests](https://github.com/crazy-complete/crazy-complete/tree/main/test).
 
+Documentation
+=============
+
+For now, there is only [commands.md](https://github.com/crazy-complete/crazy-complete/blob/main/commands.md).
+
 Comparision with other auto-complete generators
 ===============================================
 

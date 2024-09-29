@@ -33,7 +33,7 @@ def indent(string, num_spaces):
     return '\n'.join(indented_lines)
 
 def make_yaml_block_string(s):
-    return "|\n%s\n" % indent(s, 2)
+    return "|\n%s" % indent(s, 2)
 
 def test_to_yaml(test):
     r = OrderedDict()

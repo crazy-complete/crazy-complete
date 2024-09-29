@@ -1,73 +1,77 @@
-Commands
-========
+Completion commands
+===================
 
-**Note**
-
-> All code examples start with:
-
-```
-import argparse
-
-from crazy_complete import argparse_mod
-```
-
-**none()**
+**none**
 
 > Do not add any completion code.
-> Note: This is the default.
+> This is the default.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--none').complete('none')
-# This line is the same as above:
-argp.add_argument('--none2')
+prog: "example"
+options:
+  - option_strings: ["--none"]
+    complete: ["none"]
 ```
 
-**file(opts={})**
+**file**
 
 > Complete a file.
-> If opts['directory'] is given, list files in opts['directory'].
+> A directory can be supplied by adding {"directory": ...}
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--file').complete('file')
-argp.add_argument('--file-tmp').complete('file', {'directory': '/tmp'})
+prog: "example"
+options:
+  - option_strings: ["--file"]
+    complete: ["file"]
+  - option_strings: ["--file-tmp"]
+    complete: ["file", {"directory": "/tmp"}]
+```
 
- ~ > foo --file=<TAB>
+```
+ ~ > example --file=<TAB>
  dir1/  dir2/  file1  file2
 ```
 
-**directory(opts={})**
+**directory**
 
 > Complete a directory.
-> If opts['directory'] is given, list directories in opts['directory'].
+> A directory can be supplied by adding {"directory": ...}
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--directory').complete('directory')
-argp.add_argument('--directory-tmp').complete('directory', {'directory': '/tmp'})
+prog: "example"
+options:
+  - option_strings: ["--directory"]
+    complete: ["directory"]
+  - option_strings: ["--directory-tmp"]
+    complete: ["directory", {"directory": "/tmp"}]
+```
 
- ~ > foo --directory=<TAB>
+```
+ ~ > example --directory=<TAB>
  dir1/  dir2/
 ```
 
-**choices(items)**
+**choices**
 
-> Complete a list of items or a dictionary in the form `{item: description}`.
+> Complete a list of items. Items can be a list or a dictionary.
+> If a dictionary is supplied, the keys are used as items and the values are used
+> as description.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--choices1').complete('choices', ['Item 1', 'Item 2'])
-argp.add_argument('--choices2').complete('choices', {'Item 1': 'Description 1', 'Item 2': 'Description 2'})
-# These lines produce the same
-argp.add_argument('--choices1', choices=['Item 1', 'Item 2'])
-argp.add_argument('--choices2', choices={'Item 1': 'Description 1', 'Item 2': 'Description 2'})
+prog: "example"
+options:
+  - option_strings: ["--choices1"]
+    complete: ["choices", ["Item 1", "Item 2"]]
+  - option_strings: ["--choices2"]
+    complete: ["choices", {"Item 1": "Description 1", "Item 2": "Description 2"}]
+```
 
- ~ > foo --choices2=<TAB>
+```
+ ~ > example --choices2=<TAB>
 Item 1  (Description 1)  Item 2  (Description 2)
 ```
 
-**exec(commandline)**
+**exec**
 
 > Execute commandline and parse the output.
 > The output must be in form of:
@@ -80,34 +84,50 @@ Item 1  (Description 1)  Item 2  (Description 2)
 > These pairs are delimited by a newline.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--exec').complete('exec', 'printf "%s\\t%s\\n" "Item 1" "Description 1" "Item 2" "Description 2"')
+prog: "example"
+options:
+  - option_strings: ["--exec"]
+    complete: ["exec", "printf '%s\\t%s\\n' 'Item 1' 'Description 2' 'Item 2' 'Description 2'"]
+```
 
- ~ > foo --exec=<TAB>
+```
+ ~ > example --exec=<TAB>
 Item 1  (Description 1)  Item 2  (Description 2)
 ```
 
-**range(start, stop, step=1)**
+**range**
 
 > Complete a range of integers.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--range').complete('range', 1, 9, 2)
+prog: "example"
+options:
+  - option_strings: ["--range-1"]
+    complete: ["range", 1, 9]
+  - option_strings: ["--range-2"]
+    complete: ["range", 1, 9]
+```
 
- ~ > foo --range=<TAB>
+```
+ ~ > example --range-1=<TAB>
+1  2  3  4  5  6  7  8  9
+ ~ > example --range-2=<TAB>
 1  3  5  7  9
 ```
 
-**signal()**
+**signal**
 
 > Complete signal names (INT, KILL, TERM, etc.).
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--signal').complete('signal')
+prog: "example"
+options:
+  - option_strings: ["--signal"]
+    complete: ["signal"]
+```
 
- ~ > foo --signal=<TAB>
+```
+ ~ > example --signal=<TAB>
 ABRT    -- Process abort signal
 ALRM    -- Alarm clock
 BUS     -- Access to an undefined portion of a memory object
@@ -120,70 +140,90 @@ INT     -- Terminal interrupt signal
 [...]
 ```
 
-**process()**
+**process**
 
 > List process names.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--process').complete('process')
+prog: "example"
+options:
+  - option_strings: ["--process"]
+    complete: ["process"]
+```
 
- ~ > foo --process=s<TAB>
+```
+ ~ > example --process=s<TAB>
 scsi_eh_0         scsi_eh_1       scsi_eh_2      scsi_eh_3  scsi_eh_4
 scsi_eh_5         sh              sudo           syndaemon  systemd
 systemd-journald  systemd-logind  systemd-udevd
 ```
 
-**pid()**
+**pid**
 
 > List PIDs.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--pid').complete('pid')
+prog: "example"
+options:
+  - option_strings: ["--pid"]
+    complete: ["pid"]
+```
 
- ~ > foo --pid=<TAB>
+```
+ ~ > example --pid=<TAB>
 1       13      166     19      254     31      45
 1006    133315  166441  19042   26      32      46
 10150   1392    166442  195962  27      33      4609
 ```
 
-**command()**
+**command**
 
 > Complete a command.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--command').complete('command')
+prog: "example"
+options:
+  - option_strings: ["--command"]
+    complete: ["command"]
+```
 
- ~ > foo --command=bas<TAB>
+```
+ ~ > example --command=bas<TAB>
 base32    base64    basename  basenc    bash      bashbug
 ```
 
-**user()**
+**user**
 
 > Complete a username.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--user').complete('user')
+prog: "example"
+options:
+  - option_strings: ["--user"]
+    complete: ["user"]
+```
 
- ~ > foo --user=<TAB>
+```
+ ~ > example --user=<TAB>
 avahi                   bin                     braph
 colord                  daemon                  dbus
 dhcpcd                  ftp                     git
 [...]
 ```
 
-**group()**
+**group**
 
 > Complete a group.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--group').complete('group')
+prog: "example"
+options:
+  - option_strings: ["--group"]
+    complete: ["group"]
+```
 
- ~ > foo --group=<TAB>
+```
+ ~ > example --group=<TAB>
 adm                     audio                   avahi
 bin                     braph                   colord
 daemon                  dbus                    dhcpcd
@@ -192,27 +232,41 @@ games                   git                     groups
 [...]
 ```
 
-**service()**
+**service**
 
 > Complete a SystemD service.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--service').complete('service')
+prog: "example"
+options:
+  - option_strings: ["--service"]
+    complete: ["service"]
+```
 
- ~ > foo --service=<TAB>
+```
+ ~ > example --service=<TAB>
 TODO
 [...]
 ```
 
-**variable()**
+**variable**
 
 > Complete a shell variable name.
+> If "-x" is passed as an argument, only complete environment variables.
 
 ```
-argp = argparse.ArgumentParser('foo')
-argp.add_argument('--variable').complete('variable')
+prog: "example"
+options:
+  - option_strings: ["--variable"]
+    complete: ["variable"]
+  - option_strings: ["--environment"]
+    complete: ["variable", "-x"]
+```
 
- ~ > foo --variable=HO<TAB>
+```
+ ~ > example --variable=HO<TAB>
 HOME      HOSTNAME  HOSTTYPE
+ ~ > example --environment=X<TAB>
+XDG_RUNTIME_DIR  XDG_SEAT  XDG_SESSION_CLASS  XDG_SESSION_ID
+XDG_SESSION_TYPE XDG_VTNR
 ```
