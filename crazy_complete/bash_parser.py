@@ -114,6 +114,65 @@ def generate(commandline):
 
     return s
 
+def make_long_option_case(
+        long_options,
+        takes_args,
+        have_variable,
+        value_variable):
+    r = ''
+
+    if takes_args == '?':
+        r += '%s)\n'              % CasePatterns.for_long_without_arg(long_options)
+        r += '  %s=1;\n'          % have_variable
+        r += '  continue;;\n'
+        r += '%s)\n'              % CasePatterns.for_long_with_arg(long_options)
+        r += '  %s=1\n'           % have_variable
+        r += '  %s="${arg#*=}"\n' % value_variable
+        r += '  continue;;'
+    elif takes_args:
+        r += '%s)\n'                     % CasePatterns.for_long_without_arg(long_options)
+        r += '  %s=1\n'                  % have_variable
+        r += '  %s="${words[++argi]}"\n' % value_variable
+        r += '  continue;;\n'
+        r += '%s)\n'                     % CasePatterns.for_long_with_arg(long_options)
+        r += '  %s=1\n'                  % have_variable
+        r += '  %s="${arg#*=}"\n'        % value_variable
+        r += '  continue;;'
+    else:
+        r += '%s)\n'    % CasePatterns.for_long_without_arg(long_options)
+        r += '  %s=1\n' % have_variable
+        r += '  continue;;'
+
+    return r
+
+def make_short_option_case(
+        short_options,
+        takes_args,
+        have_variable,
+        value_variable):
+    r = ''
+
+    if takes_args == '?':
+        r += '%s)\n'    % CasePatterns.for_short(short_options)
+        r += '  %s=1\n' % have_variable
+        r += '  if $has_trailing_chars; then\n'
+        r += '    %s="${arg:$((i + 1))}"\n' % value_variable
+        r += '  fi\n'
+        r += '  continue 2;;'
+    elif takes_args:
+        r += '%s)\n'    % CasePatterns.for_short(short_options)
+        r += '  %s=1\n' % have_variable
+        r += '  if $has_trailing_chars\n'
+        r += '  then %s="${arg:$((i + 1))}"\n' % value_variable
+        r += '  else %s="${words[++argi]}"\n'  % value_variable
+        r += '  fi\n'
+        r += '  continue 2;;'
+    else:
+        r += '%s)\n'    % CasePatterns.for_short(short_options)
+        r += '  %s=1;;' % have_variable
+
+    return r
+
 def generate_option_cases(commandline):
     OptionCases = namedtuple('OptionCases', ['long_options', 'short_options'])
     options = commandline.get_options()
@@ -134,52 +193,11 @@ def generate_option_cases(commandline):
         value_variable = make_option_variable_name(option, prefix='VALUE_')
 
         if long_options:
-            if option.takes_args == '?':
-                r  = '%s)\n'              % make_long_options_case_without_arg(long_options)
-                r += '  %s=1;\n'          % have_variable
-                r += '  continue;;\n'
-                r += '%s)\n'              % make_long_options_case_with_arg(long_options)
-                r += '  %s=1\n'           % have_variable
-                r += '  %s="${arg#*=}"\n' % value_variable
-                r += '  continue;;'
-                option_cases.long_options.append(r)
-            elif option.takes_args:
-                r  = '%s)\n'                     % make_long_options_case_without_arg(long_options)
-                r += '  %s=1\n'                  % have_variable
-                r += '  %s="${words[++argi]}"\n' % value_variable
-                r += '  continue;;\n'
-                r += '%s)\n'                     % make_long_options_case_with_arg(long_options)
-                r += '  %s=1\n'                  % have_variable
-                r += '  %s="${arg#*=}"\n'        % value_variable
-                r += '  continue;;'
-                option_cases.long_options.append(r)
-            else:
-                r  = '%s)\n'    % make_long_options_case_without_arg(long_options)
-                r += '  %s=1\n' % have_variable
-                r += '  continue;;'
-                option_cases.long_options.append(r)
+            option_cases.long_options.append(
+                make_long_option_case(long_options, option.takes_args, have_variable, value_variable))
 
         if short_options:
-            if option.takes_args == '?':
-                r  = '%s)\n'    % make_short_options_case(short_options)
-                r += '  %s=1\n' % have_variable
-                r += '  if $has_trailing_chars; then\n'
-                r += '    %s="${arg:$((i + 1))}"\n' % value_variable
-                r += '  fi\n'
-                r += '  continue 2;;'
-                option_cases.short_options.append(r)
-            elif option.takes_args:
-                r  = '%s)\n'    % make_short_options_case(short_options)
-                r += '  %s=1\n' % have_variable
-                r += '  if $has_trailing_chars\n'
-                r += '  then %s="${arg:$((i + 1))}"\n' % value_variable
-                r += '  else %s="${words[++argi]}"\n'  % value_variable
-                r += '  fi\n'
-                r += '  continue 2;;'
-                option_cases.short_options.append(r)
-            else:
-                r  = '%s)\n'    % make_short_options_case(short_options)
-                r += '  %s=1;;' % have_variable
-                option_cases.short_options.append(r)
+            option_cases.short_options.append(
+                make_short_option_case(short_options, option.takes_args, have_variable, value_variable))
 
     return option_cases

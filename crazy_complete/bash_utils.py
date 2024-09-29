@@ -16,14 +16,18 @@ def make_option_variable_name(option, prefix=''):
 
     raise AssertionError("make_option_variable_name: Should not be reached")
 
-def make_long_options_case_without_arg(options):
-    return '|'.join(options)
+class CasePatterns:
+    @staticmethod
+    def for_long_without_arg(option_strings):
+        return '|'.join(option_strings)
 
-def make_long_options_case_with_arg(options):
-    return '|'.join(f'{o}=*' for o in options)
+    @staticmethod
+    def for_long_with_arg(option_strings):
+        return '|'.join(f'{o}=*' for o in option_strings)
 
-def make_short_options_case(options):
-    return '|'.join(o[1] for o in options)
+    @staticmethod
+    def for_short(option_strings):
+        return '|'.join(o[1] for o in option_strings)
 
 def get_OptionAbbreviationGenerator(options):
     all_option_strings = []

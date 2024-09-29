@@ -97,7 +97,7 @@ class BashCompletionGenerator:
         context = self.ctxt.getOptionGenerationContext(self.commandline, action)
         return self.completer.complete(context, *action.complete).get_code(append)
 
-    def _generate_options_parsing(self):
+    def _generate_commandline_parsing(self):
         options = self.commandline.get_options(with_parent_options=True)
 
         local_have_vars = ['%s=0' % make_option_variable_name(o, 'HAVE_') for o in options]
@@ -392,7 +392,7 @@ __is_oldstyle_option() {
             code['positional_completion'] = self._generate_positionals_completion()
 
         # This sets up END_OF_OPTIONS, POSITIONALS, POSITIONAL_NUM and the HAVE_* variables.
-        code['command_line_parsing'] = self._generate_options_parsing()
+        code['command_line_parsing'] = self._generate_commandline_parsing()
 
         r  = '%s() {\n' % shell.make_completion_funcname(self.commandline)
         r += '%s\n\n'   % utils.indent('\n\n'.join(c for c in code.values() if c), 2)
