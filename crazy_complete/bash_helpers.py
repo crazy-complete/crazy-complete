@@ -35,15 +35,14 @@ done < <(eval "$1")
 _VALUE_LIST = helpers.ShellFunction('value_list', r'''
 local separator="$1"; shift
 local -a values=("$@")
+local -a having_values
 
 if [[ -z "$cur" ]]; then
   COMPREPLY=("${values[@]}")
   return
 fi
 
-local IFS="$separator"
-local -a having_values=($cur)
-unset IFS
+IFS="$separator" read -r -a having_values <<< "$cur"
 
 local -a remaining_values=()
 local value having_value found_value
