@@ -85,7 +85,7 @@ def generate(commandline):
             short_option_cases.append(r)
 
         if commandline.get_subcommands_option():
-            r =  'if test $POSITIONAL_NUM -eq %d; then\n' % commandline.get_subcommands_option().get_positional_num()
+            r =  'if (( POSITIONAL_NUM == %d )); then\n' % commandline.get_subcommands_option().get_positional_num()
             r += '  case "$arg" in\n'
             for subcommand in commandline.get_subcommands_option().subcommands:
                 r += '    %s)\n' % '|'.join(utils.get_all_command_variations(subcommand))
