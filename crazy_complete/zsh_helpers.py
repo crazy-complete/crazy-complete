@@ -92,27 +92,27 @@ case "$cmd" in
     return 1
     ;;
   option_is)
-    local -a CMD_option_IS_optionS CMD_option_IS_VALUES
-    local END_OF_optionS_NUM=0
+    local -a cmd_option_is_options cmd_option_is_values
+    local end_of_options_num=0
 
     while test $# -ge 1; do
       if [[ "$1" == "--" ]]; then
-        (( ++END_OF_optionS_NUM ))
-      elif test $END_OF_optionS_NUM -eq 0; then
-        CMD_option_IS_optionS+=("$1")
-      elif test $END_OF_optionS_NUM -eq 1; then
-        CMD_option_IS_VALUES+=("$1")
+        (( ++end_of_options_num ))
+      elif test $end_of_options_num -eq 0; then
+        cmd_option_is_options+=("$1")
+      elif test $end_of_options_num -eq 1; then
+        cmd_option_is_values+=("$1")
       fi
 
       shift
     done
 
-    if test ${#CMD_option_IS_optionS[@]} -eq 0; then
+    if test ${#cmd_option_is_options[@]} -eq 0; then
       echo "$FUNC: option_is: missing options" >&2
       return 1
     fi
 
-    if test ${#CMD_option_IS_VALUES[@]} -eq 0; then
+    if test ${#cmd_option_is_values[@]} -eq 0; then
       echo "$FUNC: option_is: missing values" >&2
       return 1
     fi
@@ -120,9 +120,9 @@ case "$cmd" in
     local I=${#HAVING_OPTIONS[@]}
     while test $I -ge 1; do
       local option="${HAVING_OPTIONS[$I]}"
-      if $CONTAINS "$option" "${CMD_option_IS_optionS[@]}"; then
+      if $CONTAINS "$option" "${cmd_option_is_options[@]}"; then
         local VALUE="${OPTION_VALUES[$I]}"
-        $CONTAINS "$VALUE" "${CMD_option_IS_VALUES[@]}" && return 0
+        $CONTAINS "$VALUE" "${cmd_option_is_values[@]}" && return 0
       fi
 
       (( --I ))
