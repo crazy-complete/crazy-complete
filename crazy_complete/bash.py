@@ -80,7 +80,7 @@ class MasterCompletionFunction:
             r += '}'
             return r
         else:
-            return '%s() { return 1; }' % self.name
+            return None
 
 class BashCompletionGenerator:
     def __init__(self, ctxt, commandline):
@@ -200,6 +200,7 @@ class BashCompletionGenerator:
         return r
 
     def _generate_option_completion(self):
+        r = ''
         options = self.commandline.get_options(only_with_arguments=True)
 
         if self.commandline.abbreviate_options:
@@ -211,9 +212,10 @@ class BashCompletionGenerator:
             abbreviations = utils.DummyAbbreviationGenerator()
 
         complete_option = MasterCompletionFunction('__complete_option', options, abbreviations, self._complete_action, self)
+        code = complete_option.get()
 
-        r  = complete_option.get()
-        r += '\n\n'
+        if code:
+            r += '%s\n\n' % code
 
         # pylint: disable=invalid-name
         LR = False # Long with required argument
@@ -299,7 +301,10 @@ __is_oldstyle_option() {
           (G2        , '      local i\n'),
           (G2        , '      for ((i=2; i <= ${#cur}; ++i)); do\n'),
           (G2        , '        local pre="${cur:0:$i}" value="${cur:$i}"\n'),
-          (SR|SO     , '        __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && %s "$pre" && return 0\n' % prefix_compreply_func),
+          (SR|SO     , '        __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {\n'),
+          (SR|SO     , '          %s "$pre"\n' % prefix_compreply_func),
+          (SR|SO     , '          return 0\n'),
+          (SR|SO     , '        }\n'),
           (G2        , '      done\n'),
           (G2 and OLD, '    fi\n'),
           (G1        , '    ;;\n'),
@@ -325,7 +330,7 @@ __is_oldstyle_option() {
             r += 'test "$POSITIONAL_NUM" %s %d && ' % (operator, positional.get_positional_num())
             if positional.when:
                 r += '%s && ' % self._generate_when_conditions(positional.when)
-            r += '%s\n\n' % make_block(self._complete_action(positional))
+            r += '%s\n\n' % make_block(self._complete_action(positional, False))
 
         if self.subcommands:
             cmds = self.subcommands.get_choices().keys()
