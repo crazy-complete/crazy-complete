@@ -37,28 +37,28 @@ p.add_argument('--input-type', choices=['yaml', 'json', 'python', 'help', 'auto'
 p.add_argument('--program-name', default=None,
     help='Specify program name')
 
-p.add_argument('--abbreviate-commands', default=False, type=parse_bool,
+p.add_argument('--abbreviate-commands', metavar='BOOL', default=False, type=parse_bool,
     help='Sets whether commands can be abbreviated')
 
-p.add_argument('--abbreviate-options', default=False, type=parse_bool,
+p.add_argument('--abbreviate-options', metavar='BOOL', default=False, type=parse_bool,
     help='Sets whether options can be abbreviated')
 
-p.add_argument('--multiple-options', default=False, type=parse_bool,
+p.add_argument('--multiple-options', metavar='BOOL', default=False, type=parse_bool,
     help='Sets whether options are suggested multiple times during completion')
 
-p.add_argument('--inherit-options', default=False, type=parse_bool,
+p.add_argument('--inherit-options', metavar='BOOL', default=False, type=parse_bool,
     help='Sets whether parent options are visible to subcommands')
 
-p.add_argument('--vim-modeline', default=True, type=parse_bool,
+p.add_argument('--vim-modeline', metavar='BOOL', default=True, type=parse_bool,
     help='Sets whether a vim modeline comment shall be appended to the generated code')
 
-p.add_argument('--zsh-compdef', default=True, type=parse_bool,
+p.add_argument('--zsh-compdef', metavar='BOOL', default=True, type=parse_bool,
     help='Sets whether #compdef is used in zsh scripts')
 
-p.add_argument('--fish-fast', default=False, type=parse_bool,
+p.add_argument('--fish-fast', metavar='BOOL', default=False, type=parse_bool,
     help='Use faster commandline parsing at the cost of correctness')
 
-p.add_argument('--fish-inline-conditions', default=False, type=parse_bool,
+p.add_argument('--fish-inline-conditions', metavar='BOOL', default=False, type=parse_bool,
     help="Don't store conditions in a variable")
 
 p.add_argument('--include-file', action='append',
