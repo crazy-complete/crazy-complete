@@ -9,7 +9,7 @@ POSITIONALS=()
 END_OF_OPTIONS=0
 POSITIONAL_NUM=0
 
-local command="${words[0]}" argi arg i char has_trailing_chars
+local command="${words[0]}" argi arg i char trailing_chars
 
 for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
   arg="${words[argi]}"
@@ -27,7 +27,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
 %LONG_OPTION_CASES%
       for ((i=1; i < ${#arg}; ++i)); do
         char="${arg:$i:1}"
-        has_trailing_chars=$( (( i + 1 < ${#arg} )) && echo true || echo false)
+        trailing_chars="${arg:$((i + 1))}"
 %SHORT_OPTION_CASES%
       done;;
     *)
@@ -72,7 +72,7 @@ def generate(commandline):
             for case in option_cases.long_options:
                 r += '%s\n' % utils.indent(case, 4)
             r += '  esac\n'
-            r += 'esac\n'
+            r += 'esac'
             long_option_cases.append(r)
 
         if option_cases.short_options:
@@ -81,7 +81,7 @@ def generate(commandline):
             for case in option_cases.short_options:
                 r += '%s\n' % utils.indent(case, 4)
             r += '  esac\n'
-            r += 'esac\n'
+            r += 'esac'
             short_option_cases.append(r)
 
         if commandline.get_subcommands_option():
@@ -98,12 +98,12 @@ def generate(commandline):
     s = _PARSER_CODE
 
     if long_option_cases:
-        s = s.replace('%LONG_OPTION_CASES%', utils.indent('\n'.join(long_option_cases), 6))
+        s = s.replace('%LONG_OPTION_CASES%', utils.indent('\n\n'.join(long_option_cases), 6))
     else:
         s = s.replace('%LONG_OPTION_CASES%\n', '')
 
     if short_option_cases:
-        s = s.replace('%SHORT_OPTION_CASES%', utils.indent('\n'.join(short_option_cases), 8))
+        s = s.replace('%SHORT_OPTION_CASES%', utils.indent('\n\n'.join(short_option_cases), 8))
     else:
         s = s.replace('%SHORT_OPTION_CASES%\n', '')
 
@@ -155,15 +155,13 @@ def make_short_option_case(
     if takes_args == '?':
         r += '%s)\n'    % CasePatterns.for_short(short_options)
         r += '  %s=1\n' % have_variable
-        r += '  if $has_trailing_chars; then\n'
-        r += '    %s="${arg:$((i + 1))}"\n' % value_variable
-        r += '  fi\n'
+        r += '  [[ -n "$trailing_chars" ]] && %s="$trailing_chars"\n' % value_variable
         r += '  continue 2;;'
     elif takes_args:
         r += '%s)\n'    % CasePatterns.for_short(short_options)
         r += '  %s=1\n' % have_variable
-        r += '  if $has_trailing_chars\n'
-        r += '  then %s="${arg:$((i + 1))}"\n' % value_variable
+        r += '  if [[ -n "$trailing_chars" ]]\n'
+        r += '  then %s="$trailing_chars"\n' % value_variable
         r += '  else %s="${words[++argi]}"\n'  % value_variable
         r += '  fi\n'
         r += '  continue 2;;'
