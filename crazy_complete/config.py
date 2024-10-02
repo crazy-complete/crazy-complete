@@ -1,3 +1,5 @@
+''' This module contains the configuration class '''
+
 def _assert_is_bool(obj, func, param):
     if not isinstance(obj, bool):
         raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")

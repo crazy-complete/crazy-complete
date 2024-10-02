@@ -1,3 +1,5 @@
+''' This module contains functions for generating a YAML file from help texts '''
+
 from . import help_parser
 from . import yaml_source
 from . import utils

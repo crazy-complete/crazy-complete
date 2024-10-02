@@ -1,3 +1,5 @@
+''' Shell utility functions '''
+
 import re
 import collections
 
@@ -76,7 +78,8 @@ def make_completion_funcname(cmdline, prefix='_', suffix=''):
         For a program with the name 'my_program' and a subcommand with the name 'subcommand',
         the generated function name is '_my_program_subcommand'.
     '''
-    assert isinstance(cmdline, _commandline.CommandLine), "make_completion_funcname: cmdline: expected CommandLine, got %r" % cmdline
+    assert isinstance(cmdline, _commandline.CommandLine), \
+        "make_completion_funcname: cmdline: expected CommandLine, got %r" % cmdline
 
     commandlines = cmdline.get_parents(include_self=True)
 

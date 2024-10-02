@@ -407,7 +407,13 @@ __is_oldstyle_option() {
         self.result = r
 
 def generate_completion(commandline, program_name=None, config=None):
-    result = shell.CompletionGenerator(BashCompletionGenerator, bash_helpers.BASH_Helpers, commandline, program_name, config)
+    result = shell.CompletionGenerator(
+        BashCompletionGenerator,
+        bash_helpers.BASH_Helpers,
+        commandline,
+        program_name,
+        config)
+
     commandline = result.result[0].commandline
 
     output = []

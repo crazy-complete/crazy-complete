@@ -1,3 +1,5 @@
+''' Code for parsing a command line in Bash '''
+
 from collections import namedtuple
 
 from . import utils
@@ -98,17 +100,20 @@ def generate(commandline):
     s = _PARSER_CODE
 
     if long_option_cases:
-        s = s.replace('%LONG_OPTION_CASES%', utils.indent('\n\n'.join(long_option_cases), 6))
+        s = s.replace('%LONG_OPTION_CASES%',
+            utils.indent('\n\n'.join(long_option_cases), 6))
     else:
         s = s.replace('%LONG_OPTION_CASES%\n', '')
 
     if short_option_cases:
-        s = s.replace('%SHORT_OPTION_CASES%', utils.indent('\n\n'.join(short_option_cases), 8))
+        s = s.replace('%SHORT_OPTION_CASES%',
+            utils.indent('\n\n'.join(short_option_cases), 8))
     else:
         s = s.replace('%SHORT_OPTION_CASES%\n', '')
 
     if subcommand_call_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', utils.indent('\n\n'.join(subcommand_call_code), 6))
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%',
+            utils.indent('\n\n'.join(subcommand_call_code), 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 

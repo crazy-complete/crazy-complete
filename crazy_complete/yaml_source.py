@@ -14,7 +14,10 @@ def str_to_yaml(s):
     return json.dumps(s)
 
 def bool_to_yaml(b):
-    return {True: 'true', False: 'false'}[b]
+    try:
+        return {True: 'true', False: 'false'}[b]
+    except KeyError:
+        raise ValueError(f'Not a bool: {b}')
 
 def option_to_yaml(obj):
     r = '- option_strings: %s\n' % json.dumps(obj['option_strings'])
@@ -28,7 +31,7 @@ def option_to_yaml(obj):
     if obj.get('takes_args', True) is not True:
         try:
             r += '  takes_args: %s\n' % bool_to_yaml(obj['takes_args'])
-        except: # takes_args may be "?"
+        except ValueError: # takes_args may be "?"
             r += '  takes_args: %s\n' % str_to_yaml(obj['takes_args'])
 
     if obj.get('group', None):

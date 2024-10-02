@@ -1,3 +1,5 @@
+''' This module contains code for completing arguments in Bash '''
+
 from . import shell
 
 class BashCompletionBase:

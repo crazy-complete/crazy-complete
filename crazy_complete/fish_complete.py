@@ -1,3 +1,5 @@
+''' This module contains code for completing arguments in Fish '''
+
 from . import shell
 from . import helpers
 

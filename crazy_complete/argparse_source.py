@@ -75,9 +75,12 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
     Converts an ArgumentParser object to a CommandLine object.
 
     Args:
-        parser (argparse.ArgumentParser): The ArgumentParser object to convert.
-        prog (str, optional): The name of the program. Defaults to the program name of the parser.
-        description (str, optional): The description of the program. Defaults to the description of the parser.
+        parser (argparse.ArgumentParser):
+            The ArgumentParser object to convert.
+        prog (str, optional):
+            The name of the program.  Defaults to the program name of the parser.
+        description (str, optional):
+            The description of the program.  Defaults to the description of the parser.
 
     Returns:
         CommandLine: A CommandLine object representing the converted parser.

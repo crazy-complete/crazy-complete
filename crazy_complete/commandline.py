@@ -1,3 +1,5 @@
+''' This module contains the CommandLine, Option and Positional classes '''
+
 from collections import OrderedDict
 
 from . import config as _config
@@ -39,10 +41,17 @@ class CommandLine:
             abbreviate_options (ExtendedBool): Specifies if options can be abbreviated.
             inherit_options (ExtendedBool): Specifies if options are visible to subcommands.
         '''
-        assert isinstance(program_name, str), "CommandLine: program_name: expected str, got %r" % program_name
-        assert isinstance(help, (str, None.__class__)), "CommandLine: help: expected str, got %r" % help
-        assert isinstance(parent, (CommandLine, None.__class__)), "CommandLine: parent: expected CommandLine, got %r" % parent
-        assert isinstance(aliases, list), "CommandLine: aliases: expected list, got %r" % aliases
+        assert isinstance(program_name, str), \
+            "CommandLine: program_name: expected str, got %r" % program_name
+
+        assert isinstance(help, (str, None.__class__)), \
+            "CommandLine: help: expected str, got %r" % help
+
+        assert isinstance(parent, (CommandLine, None.__class__)), \
+            "CommandLine: parent: expected CommandLine, got %r" % parent
+
+        assert isinstance(aliases, list), \
+            "CommandLine: aliases: expected list, got %r" % aliases
 
         self.prog = program_name
         self.parent = parent
@@ -148,8 +157,11 @@ class CommandLine:
         Raises:
             Exception: If the command line object already has subcommands.
         '''
-        assert isinstance(name, str), "CommandLine.add_subcommands: name: expected str, got %r" % name
-        assert isinstance(help, (str, None.__class__)), "CommandLine.add_subcommands: help: expected str, got %r" % help
+        assert isinstance(name, str), \
+            "CommandLine.add_subcommands: name: expected str, got %r" % name
+
+        assert isinstance(help, (str, None.__class__)), \
+            "CommandLine.add_subcommands: help: expected str, got %r" % help
 
         if self.subcommands:
             raise Exception('CommandLine object already has subcommands')
@@ -198,8 +210,11 @@ class CommandLine:
         Returns:
             list: A list of Option objects
         '''
-        assert is_bool(with_parent_options), "CommandLine.get_options: with_parent_options: expected bool, got %r" % with_parent_options
-        assert is_bool(only_with_arguments), "CommandLine.get_options: only_with_arguments: expected bool, got %r" % only_with_arguments
+        assert is_bool(with_parent_options), \
+            "CommandLine.get_options: with_parent_options: expected bool, got %r" % with_parent_options
+
+        assert is_bool(only_with_arguments), \
+            "CommandLine.get_options: only_with_arguments: expected bool, got %r" % only_with_arguments
 
         getter = CommandLine.OptionsGetter(self,
             with_parent_options=with_parent_options,
@@ -217,8 +232,11 @@ class CommandLine:
         Returns:
             list: A list of option strings
         '''
-        assert is_bool(with_parent_options), "CommandLine.get_option_strings: with_parent_options: expected bool, got %r" % with_parent_options
-        assert is_bool(only_with_arguments), "CommandLine.get_option_strings: only_with_arguments: expected bool, got %r" % only_with_arguments
+        assert is_bool(with_parent_options), \
+            "CommandLine.get_option_strings: with_parent_options: expected bool, got %r" % with_parent_options
+
+        assert is_bool(only_with_arguments), \
+            "CommandLine.get_option_strings: only_with_arguments: expected bool, got %r" % only_with_arguments
 
         option_strings = []
 
@@ -258,7 +276,8 @@ class CommandLine:
         Returns:
             list: A list of parent CommandLine objects.
         '''
-        assert is_bool(include_self), "CommandLine.get_parents: include_self: expected bool, got %r" % include_self
+        assert is_bool(include_self), \
+            "CommandLine.get_parents: include_self: expected bool, got %r" % include_self
 
         parents = []
 
@@ -399,7 +418,8 @@ class Positional:
 
     def get_positional_index(self):
         '''
-        Returns the index of the current positional argument within the current commandline, including parent commandlines.
+        Returns the index of the current positional argument within the current
+        commandline, including parent commandlines.
 
         Returns:
             int: The index of the positional argument.
@@ -419,7 +439,8 @@ class Positional:
 
     def get_positional_num(self):
         '''
-        Returns the number of the current positional argument within the current commandline, including parent commandlines.
+        Returns the number of the current positional argument within the current
+        commandline, including parent commandlines.
 
         Note:
             This is the same as `CommandLine.get_positional_index() + 1`.
@@ -526,7 +547,8 @@ class Option:
 
     def get_conflicting_option_strings(self):
         '''
-        Returns a list of option strings conflicting with the current option within the same mutually exclusive group.
+        Returns a list of option strings conflicting with the current option
+        within the same mutually exclusive group.
 
         Returns:
             list: A list of option strings representing conflicting options.
@@ -595,8 +617,11 @@ class SubCommandsOption(Positional):
 
 class MutuallyExclusiveGroup:
     def __init__(self, parent, group):
-        assert isinstance(parent, CommandLine), "MutuallyExclusiveGroup: parent: expected CommandLine, got %r" % parent
-        assert isinstance(group, str), "MutuallyExclusiveGroup: group: expected str, got %r" % group
+        assert isinstance(parent, CommandLine), \
+            "MutuallyExclusiveGroup: parent: expected CommandLine, got %r" % parent
+
+        assert isinstance(group, str), \
+            "MutuallyExclusiveGroup: group: expected str, got %r" % group
 
         self.parent = parent
         self.group = group
@@ -637,8 +662,11 @@ def CommandLine_Apply_Config(commandline, config):
     Returns:
         None
     '''
-    assert isinstance(commandline, CommandLine), "CommandLine_Apply_Config: commandline: expected CommandLine, got %r" % commandline
-    assert isinstance(config, _config.Config), "CommandLine_Apply_Config: config: expected Config, got %r" % config
+    assert isinstance(commandline, CommandLine), \
+        "CommandLine_Apply_Config: commandline: expected CommandLine, got %r" % commandline
+
+    assert isinstance(config, _config.Config), \
+        "CommandLine_Apply_Config: config: expected Config, got %r" % config
 
     if commandline.abbreviate_commands == ExtendedBool.INHERIT:
         commandline.abbreviate_commands = config.abbreviate_commands

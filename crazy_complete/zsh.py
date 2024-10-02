@@ -167,7 +167,9 @@ class ZshCompletionGenerator:
 
         self.helper_used = True
         zsh_helper = self.ctxt.helpers.use_function('zsh_helper')
-        r =  'case "$(%s get_positional %d)" in\n' % (zsh_helper, self.subcommands.get_positional_num())
+        positional_num = self.subcommands.get_positional_num()
+
+        r =  'case "$(%s get_positional %d)" in\n' % (zsh_helper, positional_num)
         for subcommand in self.subcommands.subcommands:
             sub_funcname = shell.make_completion_funcname(subcommand)
             cmds = utils.get_all_command_variations(subcommand)
@@ -233,7 +235,13 @@ class ZshCompletionGenerator:
         return r
 
 def generate_completion(commandline, program_name=None, config=None):
-    result = shell.CompletionGenerator(ZshCompletionGenerator, zsh_helpers.ZSH_Helpers, commandline, program_name, config)
+    result = shell.CompletionGenerator(
+        ZshCompletionGenerator,
+        zsh_helpers.ZSH_Helpers,
+        commandline,
+        program_name,
+        config)
+
     functions = result.result
 
     output = []

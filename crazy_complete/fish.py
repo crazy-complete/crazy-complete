@@ -225,7 +225,12 @@ class FishCompletionGenerator:
 
 
 def generate_completion(commandline, program_name=None, config=None):
-    result = shell.CompletionGenerator(FishCompletionGenerator, fish_helpers.FISH_Helpers, commandline, program_name, config)
+    result = shell.CompletionGenerator(
+        FishCompletionGenerator,
+        fish_helpers.FISH_Helpers,
+        commandline,
+        program_name,
+        config)
 
     output = []
 

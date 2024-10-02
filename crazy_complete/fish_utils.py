@@ -1,3 +1,5 @@
+''' Fish utility functions '''
+
 from . import shell
 
 class FishString:
@@ -11,17 +13,23 @@ class FishString:
     escaped and unescaped strings.
 
     Attributes:
-        s (str): The string that represents the command or command argument.
-        raw (bool): A flag that indicates whether the string is already escaped. If `True`,
-                    the string is assumed to be already escaped and will not be escaped again.
+        s (str):
+            The string that represents the command or command argument.
+        raw (bool):
+            A flag that indicates whether the string is already escaped. If `True`,
+            the string is assumed to be already escaped and will not be escaped again.
 
     Args:
-        s (str): The string to be used in the command.
-        raw (bool, optional): If `True`, the string will be treated as already escaped. Defaults to `False`.
+        s (str):
+            The string to be used in the command.
+        raw (bool, optional):
+            If `True`, the string will be treated as already escaped. Defaults to `False`.
 
     Methods:
-        escape(): Returns the escaped version of the string, unless the string is already escaped (`raw=True`).
-        __str__(): Returns the raw string `s` for direct use or display.
+        escape():
+            Returns the escaped version of the string, unless the string is already escaped (`raw=True`).
+        __str__():
+            Returns the raw string `s` for direct use or display.
     '''
 
     def __init__(self, s, raw=False):

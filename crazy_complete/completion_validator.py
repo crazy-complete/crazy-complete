@@ -1,3 +1,5 @@
+''' This module contains code for validating the `complete` attribute '''
+
 def get_required_arg(l, name):
     try:
         return l.pop(0)

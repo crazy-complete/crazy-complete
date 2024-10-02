@@ -1,3 +1,5 @@
+''' This module contains code for completing arguments in Zsh '''
+
 from . import shell
 from . import helpers
 
@@ -11,11 +13,14 @@ class ZshCompleter(shell.ShellCompleter):
     def choices(self, ctxt, choices):
         if hasattr(choices, 'items'):
             funcname = shell.make_completion_funcname_for_context(ctxt)
+            metavar = shell.escape(ctxt.option.metavar or '') # TODO
             code  = 'local -a describe=(\n'
             for item, description in choices.items():
-                code += '  %s:%s\n' % (shell.escape(escape_colon(str(item))), shell.escape(str(description)))
+                item = shell.escape(escape_colon(str(item)))
+                desc = shell.escape(str(description))
+                code += f'  {item}:{desc}\n'
             code += ')\n\n'
-            code += '_describe -- %s describe' % shell.escape(ctxt.option.metavar or '') # TODO
+            code += f'_describe -- {metavar} describe'
 
             ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
             funcname = ctxt.helpers.use_function(funcname)

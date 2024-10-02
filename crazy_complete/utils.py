@@ -1,3 +1,5 @@
+''' This module contains utility functions '''
+
 import sys
 
 # =============================================================================
@@ -33,8 +35,11 @@ class GeneralAbbreviationGenerator:
             min_abbreviated_length (int): The minimum length of an abbreviation.
             words (iterable of str): The list of words from which to generate abbreviations.
         '''
-        assert isinstance(min_abbreviated_length, int), "GeneralAbbreviationGenerator(): min_abbreviated_length: expected int, got %r" % min_abbreviated_length
-        assert is_iterable(words), "GeneralAbbreviationGenerator(): words: expected iterable, got %r" % words
+        assert isinstance(min_abbreviated_length, int), \
+            "GeneralAbbreviationGenerator: min_abbreviated_length: expected int, got %r" % min_abbreviated_length
+
+        assert is_iterable(words), \
+            "GeneralAbbreviationGenerator: words: expected iterable, got %r" % words
 
         self.min_abbreviated_length = min_abbreviated_length
         self.abbreviations = {}
@@ -67,7 +72,8 @@ class GeneralAbbreviationGenerator:
         Returns:
             list: A list of abbreviations for the given word.
         '''
-        assert isinstance(word, str), "GeneralAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
+        assert isinstance(word, str), \
+            "GeneralAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
 
         return self.abbreviations[word]
 
@@ -81,7 +87,8 @@ class GeneralAbbreviationGenerator:
         Returns:
             list: A list of abbreviations for the given words.
         '''
-        assert is_iterable(words), "GeneralAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
+        assert is_iterable(words), \
+            "GeneralAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
         r = []
         for word in words:
@@ -93,7 +100,8 @@ class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
     AbbreviationGenerator for abbreviating long and old-style options
     '''
     def __init__(self, words):
-        assert is_iterable(words), "OptionAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
+        assert is_iterable(words), \
+            "OptionAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
         words = list(words)
 
@@ -124,12 +132,14 @@ class DummyAbbreviationGenerator:
         pass
 
     def get_abbreviations(self, word):
-        assert isinstance(word, str), "DummyAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
+        assert isinstance(word, str), \
+            "DummyAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
 
         return [word]
 
     def get_many_abbreviations(self, words):
-        assert is_iterable(words), "DummyAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
+        assert is_iterable(words), \
+            "DummyAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
         return words
 

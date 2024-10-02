@@ -1,3 +1,5 @@
+''' Classes for including functions in the generation process '''
+
 from . import utils
 
 class FunctionBase:
@@ -13,8 +15,10 @@ class ShellFunction(FunctionBase):
         if funcname is None:
             funcname = self.funcname
 
+        code = self.code.replace('%FUNCNAME%', funcname)
+
         r  = '%s() {\n' % funcname
-        r += '%s\n'     % utils.indent(self.code, 2).rstrip()
+        r += '%s\n'     % utils.indent(code, 2).rstrip()
         r += '}'
         return r
 
@@ -23,8 +27,10 @@ class FishFunction(FunctionBase):
         if funcname is None:
             funcname = self.funcname
 
+        code = self.code.replace('%FUNCNAME%', funcname)
+
         r  = 'function %s\n' % funcname
-        r += '%s\n'          % utils.indent(self.code, 2).rstrip()
+        r += '%s\n'          % utils.indent(code, 2).rstrip()
         r += 'end'
         return r
 
@@ -38,7 +44,9 @@ class GeneralHelpers:
         return '_%s_%s' % (self.function_prefix, function_name)
 
     def add_function(self, function):
-        assert isinstance(function, FunctionBase), "GeneralHelpers.add_function: function: expected FunctionBase, got %r" % function
+        assert isinstance(function, FunctionBase), \
+            "GeneralHelpers.add_function: function: expected FunctionBase, got %r" % function
+
         self.functions[function.funcname] = function
 
     def use_function(self, function_name):

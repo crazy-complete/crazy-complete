@@ -1,3 +1,5 @@
+''' Bash utility functions '''
+
 from . import shell
 from . import utils
 

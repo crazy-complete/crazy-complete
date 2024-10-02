@@ -1,3 +1,5 @@
+''' Functions for parsing the `when` attribute '''
+
 import shlex
 
 class OptionIs:
