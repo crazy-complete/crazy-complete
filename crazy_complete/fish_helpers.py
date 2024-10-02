@@ -360,7 +360,7 @@ if set -q files[1]
 end
 ''')
 
-class FISH_Helpers(helpers.GeneralHelpers):
+class FishHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
         self.add_function(_FISH_HELPER)

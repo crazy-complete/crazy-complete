@@ -44,7 +44,7 @@ class BashCompletionCommand(BashCompletionBase):
 
         return '\n'.join(r)
 
-class Compgen_W(BashCompletionBase):
+class CompgenW(BashCompletionBase):
     def __init__(self, ctxt, values):
         self.ctxt = ctxt
         self.values = values
@@ -75,7 +75,7 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, '')
 
     def choices(self, ctxt, choices):
-        return Compgen_W(ctxt, choices)
+        return CompgenW(ctxt, choices)
 
     def command(self, ctxt):
         return BashCompletionCompgen(ctxt, '-A command')

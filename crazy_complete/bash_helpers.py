@@ -86,7 +86,7 @@ for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
 done
 ''')
 
-class BASH_Helpers(helpers.GeneralHelpers):
+class BashHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
         self.add_function(_COMPGEN_W_REPLACEMENT)

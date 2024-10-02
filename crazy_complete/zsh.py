@@ -237,7 +237,7 @@ class ZshCompletionGenerator:
 def generate_completion(commandline, program_name=None, config=None):
     result = shell.CompletionGenerator(
         ZshCompletionGenerator,
-        zsh_helpers.ZSH_Helpers,
+        zsh_helpers.ZshHelpers,
         commandline,
         program_name,
         config)

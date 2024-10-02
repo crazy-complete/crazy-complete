@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from .commandline import CommandLine, ExtendedBool
 
-def Dictionary_To_CommandLine(dictionary, prog):
+def dictionary_to_commandline(dictionary, prog):
     commandline = CommandLine(
         prog,
         parent              = None,
@@ -63,7 +63,7 @@ class CommandlineTree:
         for previous_command in previous_commands:
             node = node.subcommands[previous_command]
 
-        node.subcommands[command] = CommandlineTree.Node(Dictionary_To_CommandLine(commandline, command), {})
+        node.subcommands[command] = CommandlineTree.Node(dictionary_to_commandline(commandline, command), {})
 
     def get_root_commandline(self):
         if len(self.root.subcommands) == 0:
@@ -74,7 +74,7 @@ class CommandlineTree:
 
         return list(self.root.subcommands.values())[0]
 
-def Dictionaries_To_Commandline(dictionaries):
+def dictionaries_to_commandline(dictionaries):
     def add_subcommands(node):
         if len(node.subcommands):
             subp = node.commandline.add_subcommands()
@@ -90,7 +90,7 @@ def Dictionaries_To_Commandline(dictionaries):
     root.visit(add_subcommands)
     return root.commandline
 
-def Option_To_Dictionary(self):
+def option_to_dictionary(self):
     r = OrderedDict()
     r['option_strings'] = self.option_strings
 
@@ -117,7 +117,7 @@ def Option_To_Dictionary(self):
 
     return r
 
-def Positional_To_Dictionary(self):
+def positional_to_dictionary(self):
     r = OrderedDict()
 
     r['number'] = self.number
@@ -139,7 +139,7 @@ def Positional_To_Dictionary(self):
 
     return r
 
-def CommandLine_To_Dictionary(commandline):
+def commandline_to_dictionary(commandline):
     r = OrderedDict()
 
     prog = ' '.join(c.prog for c in commandline.get_parents(include_self=True))
@@ -164,16 +164,16 @@ def CommandLine_To_Dictionary(commandline):
     if commandline.options:
         r['options'] = []
         for option in commandline.options:
-            r['options'].append(Option_To_Dictionary(option))
+            r['options'].append(option_to_dictionary(option))
 
     if commandline.positionals:
         r['positionals'] = []
         for positional in commandline.positionals:
-            r['positionals'].append(Positional_To_Dictionary(positional))
+            r['positionals'].append(positional_to_dictionary(positional))
 
     return r
 
-def CommandLine_To_Dictionaries(commandline):
+def commandline_to_dictionaries(commandline):
     dictionaries = []
-    commandline.visit_commandlines(lambda c: dictionaries.append(CommandLine_To_Dictionary(c)))
+    commandline.visit_commandlines(lambda c: dictionaries.append(commandline_to_dictionary(c)))
     return dictionaries

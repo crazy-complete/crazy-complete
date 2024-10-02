@@ -409,7 +409,7 @@ __is_oldstyle_option() {
 def generate_completion(commandline, program_name=None, config=None):
     result = shell.CompletionGenerator(
         BashCompletionGenerator,
-        bash_helpers.BASH_Helpers,
+        bash_helpers.BashHelpers,
         commandline,
         program_name,
         config)

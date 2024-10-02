@@ -100,8 +100,8 @@ def to_yaml(obj):
 
     return r.rstrip()
 
-def CommandLine_To_YAML(commandline):
-    dictionaries = dictionary_source.CommandLine_To_Dictionaries(commandline)
+def commandline_to_yaml(commandline):
+    dictionaries = dictionary_source.commandline_to_dictionaries(commandline)
     r = []
 
     for dictionary in dictionaries:
@@ -112,4 +112,4 @@ def CommandLine_To_YAML(commandline):
 def load_from_file(file):
     with open(file, 'r', encoding='utf-8') as fh:
         dictionaries = list(yaml.safe_load_all(fh))
-        return dictionary_source.Dictionaries_To_Commandline(dictionaries)
+        return dictionary_source.dictionaries_to_commandline(dictionaries)

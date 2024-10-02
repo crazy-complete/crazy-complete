@@ -175,7 +175,7 @@ for line in lines:
     elif have_options:
         process(line)
 
-print(crazy_complete.yaml_source.CommandLine_To_YAML(COMMANDLINE))
+print(crazy_complete.yaml_source.commandline_to_yaml(COMMANDLINE))
 
 if len(COMPLETE):
     print("Warning, not everything in COMPLETE has been consumed:", file=sys.stderr)

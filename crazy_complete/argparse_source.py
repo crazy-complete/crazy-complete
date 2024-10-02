@@ -70,7 +70,7 @@ def get_complete(action):
 
     raise Exception(f'Unknown action type: {action}')
 
-def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
+def argumentparser_to_commandline(parser, prog=None, description=None):
     '''
     Converts an ArgumentParser object to a CommandLine object.
 
@@ -106,7 +106,7 @@ def ArgumentParser_to_CommandLine(parser, prog=None, description=None):
 
             subcommands = commandline.add_subcommands()
             for name, data in subparsers.items():
-                subcmd = ArgumentParser_to_CommandLine(data['parser'], name, data['help'])
+                subcmd = argumentparser_to_commandline(data['parser'], name, data['help'])
                 subcommands.add_commandline_object(subcmd)
         elif not action.option_strings:
             if action.nargs in ('+', '*'):
@@ -225,4 +225,4 @@ def load_from_file(file, parser_variable=None, parser_blacklist=[]):
             raise Exception(f"Found too many ArgumentParser objects in `{file}`")
         parser = parsers[0]
 
-    return ArgumentParser_to_CommandLine(parser)
+    return argumentparser_to_commandline(parser)

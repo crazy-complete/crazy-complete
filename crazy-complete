@@ -128,12 +128,12 @@ def generate(opts):
     cmdline = load_definitions_file(opts)
 
     if opts.shell == 'json':
-        output = json_source.CommandLine_To_JSON(cmdline)
+        output = json_source.commandline_to_json(cmdline)
         write_string_to_file(output, opts.output_file)
         return
 
     if opts.shell == 'yaml':
-        output = yaml_source.CommandLine_To_YAML(cmdline)
+        output = yaml_source.commandline_to_yaml(cmdline)
         write_string_to_file(output, opts.output_file)
         return
 

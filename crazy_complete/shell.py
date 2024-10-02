@@ -209,7 +209,7 @@ class CompletionGenerator:
         if config is None:
             config = _config.Config()
 
-        _commandline.CommandLine_Apply_Config(commandline, config)
+        _commandline.commandline_apply_config(commandline, config)
         completion_validator.CompletionValidator().validate_commandlines(commandline)
 
         self.include_files_content = []

@@ -55,6 +55,6 @@ for option in cmdline.options:
     if option.takes_args and option.complete[0] == 'none':
         print('Option %r=%s has no complete' % (option.option_strings, option.metavar), file=sys.stderr)
 
-output = crazy_complete.yaml_source.CommandLine_To_YAML(cmdline)
+output = crazy_complete.yaml_source.commandline_to_yaml(cmdline)
 
 print(output)

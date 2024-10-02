@@ -302,7 +302,7 @@ done < <(eval "$1")
 _describe '' describe
 ''')
 
-class ZSH_Helpers(helpers.GeneralHelpers):
+class ZshHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
         self.add_function(_ZSH_HELPER_FUNC)

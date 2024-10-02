@@ -648,7 +648,7 @@ class MutuallyExclusiveGroup:
         option.parent = self.parent
         option.group = self.group
 
-def CommandLine_Apply_Config(commandline, config):
+def commandline_apply_config(commandline, config):
     '''
     Applies configuration settings to a command line object.
 
@@ -663,10 +663,10 @@ def CommandLine_Apply_Config(commandline, config):
         None
     '''
     assert isinstance(commandline, CommandLine), \
-        "CommandLine_Apply_Config: commandline: expected CommandLine, got %r" % commandline
+        "commandline_apply_config: commandline: expected CommandLine, got %r" % commandline
 
     assert isinstance(config, _config.Config), \
-        "CommandLine_Apply_Config: config: expected Config, got %r" % config
+        "commandline_apply_config: config: expected Config, got %r" % config
 
     if commandline.abbreviate_commands == ExtendedBool.INHERIT:
         commandline.abbreviate_commands = config.abbreviate_commands
@@ -684,4 +684,4 @@ def CommandLine_Apply_Config(commandline, config):
 
     if commandline.get_subcommands_option():
         for subcommand in commandline.get_subcommands_option().subcommands:
-            CommandLine_Apply_Config(subcommand, config)
+            commandline_apply_config(subcommand, config)
