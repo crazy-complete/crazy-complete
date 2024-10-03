@@ -28,7 +28,7 @@ class Conditions:
             if unsafe:
                 guard = "__fish_seen_subcommand_from %s" % (' '.join(words))
             else:
-                guard = "$helper '$options' positional_contains %d %s" % (num, ' '.join(words))
+                guard = "$query '$opts' positional_contains %d %s" % (num, ' '.join(words))
             conditions += [guard]
 
         if self.not_has_option:
@@ -47,7 +47,7 @@ class Conditions:
                 use_helper = True
 
             if use_helper:
-                guard = "not $helper '$options' has_option %s" % ' '.join(self.not_has_option)
+                guard = "not $query '$opts' has_option %s" % ' '.join(self.not_has_option)
             conditions += [guard]
 
         if self.num_of_positionals is not None:
@@ -55,12 +55,12 @@ class Conditions:
                 guard = "test (__fish_number_of_cmd_args_wo_opts) %s %d" % (
                     self.num_of_positionals.operator, self.num_of_positionals.value) # TODO - 1)
             else:
-                guard = "$helper '$options' num_of_positionals %s %d" % (
+                guard = "$query '$opts' num_of_positionals %s %d" % (
                     self.num_of_positionals.operator, self.num_of_positionals.value - 1)
             conditions += [guard]
 
         if self.when is not None:
-            guard = "$helper '$options' %s" % self.when
+            guard = "$query '$opts' %s" % self.when
             conditions += [guard]
 
         if not conditions:
@@ -124,7 +124,7 @@ class FishCompletionGenerator:
         self.lines = []
         self.conditions = VariableManager('guard')
         self.command_comment = '# command %s' % ' '.join(p.prog for p in self.commandline.get_parents(include_self=True))
-        self.options_for_helper = 'set -l options "%s"' % self._get_option_strings_for_helper()
+        self.options_for_helper = 'set -l opts "%s"' % self._get_option_strings_for_helper()
 
         complete_definitions = []
         for option in self.commandline.get_options():
@@ -139,8 +139,8 @@ class FishCompletionGenerator:
         for definition in complete_definitions:
             cmd = definition.get_complete_cmd(self.ctxt.config.fish_fast)
 
-            if cmd.condition is not None and '$helper' in cmd.condition.s:
-                self.ctxt.helpers.use_function('fish_helper')
+            if cmd.condition is not None and '$query' in cmd.condition.s:
+                self.ctxt.helpers.use_function('fish_query')
 
             if not self.ctxt.config.fish_inline_conditions:
                 if cmd.condition is not None:
@@ -246,8 +246,8 @@ def generate_completion(commandline, program_name=None, config=None):
         output.append('')
 
     output.append('set -l prog "%s"'   % result.result[0].commandline.prog)
-    if result.ctxt.helpers.is_used('fish_helper'):
-        output.append('set -l helper "%s"' % result.ctxt.helpers.use_function('fish_helper'))
+    if result.ctxt.helpers.is_used('fish_query'):
+        output.append('set -l query "%s"' % result.ctxt.helpers.use_function('fish_query'))
 
     output.append('')
     output.append('# Generally disable file completion')

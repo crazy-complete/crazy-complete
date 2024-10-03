@@ -4,13 +4,12 @@ This module contains helper functions for Fish.
 
 from . import helpers
 
-# TODO?
-_FISH_HELPER = helpers.FishFunction('fish_helper', r'''
+_FISH_QUERY = helpers.FishFunction('fish_query', r'''
 # ===========================================================================
 #
 # This function implements the parsing of options and positionals in the Fish shell.
 #
-# Usage: __fish_helper <OPTIONS> <COMMAND> [ARGS...]
+# Usage: __fish_query <OPTIONS> <COMMAND> [ARGS...]
 #
 # The first argument is a comma-separated list of options that the parser should know about.
 # Short options (-o), long options (--option), and old-style options (-option) are supported.
@@ -19,7 +18,7 @@ _FISH_HELPER = helpers.FishFunction('fish_helper', r'''
 # If an option takes an optional argument, it is suffixed by '=?'.
 #
 # For example:
-#   __fish_helper '-f,--flag,-old-style,--with-arg=,--with-optional=?'
+#   __fish_query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
 #
 #   Here, -f, --flag and -old-style don't take options, --with-arg requires an
 #   argument and --with-optional takes an optional argument.
@@ -30,7 +29,7 @@ _FISH_HELPER = helpers.FishFunction('fish_helper', r'''
 #     NUM counts from one.
 #
 #   has_option <OPTIONS...>
-#     Checks if a option given in OPTIONS is passed on commandline.
+#     Checks if an option given in OPTIONS is passed on commandline.
 #
 #   option_is <OPTIONS...> -- <VALUES...>
 #     Checks if any option in OPTIONS has a value of VALUES.
@@ -45,7 +44,7 @@ _FISH_HELPER = helpers.FishFunction('fish_helper', r'''
 #
 # ===========================================================================
 
-set -l func '__fish_helper'
+set -l func '__fish_query'
 
 set -l positionals
 set -l having_options
@@ -68,10 +67,10 @@ set -e argv[1]
 
 set -l my_cache_key "$(commandline -b) $options"
 
-if test "$__CACHE_KEY" = "$my_cache_key"
-  set positionals    $__CACHE_POSITIONALS
-  set having_options $__CACHE_HAVING_OPTIONS
-  set option_values  $__CACHE_OPTION_VALUES
+if test "$__QUERY_CACHE_KEY" = "$my_cache_key"
+  set positionals    $__QUERY_CACHE_POSITIONALS
+  set having_options $__QUERY_CACHE_HAVING_OPTIONS
+  set option_values  $__QUERY_CACHE_OPTION_VALUES
 else
   # =========================================================================
   # Parsing of OPTIONS argument
@@ -231,10 +230,10 @@ else
     set argi (math $argi + 1)
   end
 
-  set -g __CACHE_POSITIONALS    $positionals
-  set -g __CACHE_HAVING_OPTIONS $having_options
-  set -g __CACHE_OPTION_VALUES  $option_values
-  set -g __CACHE_KEY            $my_cache_key
+  set -g __QUERY_CACHE_POSITIONALS    $positionals
+  set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
+  set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+  set -g __QUERY_CACHE_KEY            $my_cache_key
 end
 
 # ===========================================================================
@@ -363,5 +362,5 @@ end
 class FishHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
-        self.add_function(_FISH_HELPER)
+        self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
