@@ -4,7 +4,7 @@ This module contains helper functions for Zsh.
 
 from . import helpers
 
-_ZSH_HELPER_FUNC = helpers.ShellFunction('zsh_helper', r'''
+_ZSH_QUERY_FUNC = helpers.ShellFunction('zsh_query', r'''
 # ===========================================================================
 #
 # This function is for querying the command line.
@@ -28,16 +28,16 @@ _ZSH_HELPER_FUNC = helpers.ShellFunction('zsh_helper', r'''
 #     Prints out the positional argument number NUM (starting from 1)
 #
 #   has_option <OPTIONS...>
-#     Checks if a option given in OPTIONS is passed on commandline.
+#     Checks if an option given in OPTIONS is passed on commandline.
 #
 #   option_is <OPTIONS...> -- <VALUES...>
 #     Checks if one option in OPTIONS has a value of VALUES.
 #
 # EXAMPLE
 #   local POSITIONALS HAVING_OPTIONS OPTION_VALUES
-#   zsh_helper setup '-f,-a=,-optional=?' program_name -f -optional -a foo bar
-#   zsh_helper has_option -f
-#   zsh_helper option_is -a -- foo
+#   zsh_query setup '-f,-a=,-optional=?' program_name -f -optional -a foo bar
+#   zsh_query has_option -f
+#   zsh_query option_is -a -- foo
 #
 #   Here, -f is a flag, -a takes an argument, and -optional takes an optional
 #   argument.
@@ -46,11 +46,10 @@ _ZSH_HELPER_FUNC = helpers.ShellFunction('zsh_helper', r'''
 #
 # ===========================================================================
 
-local FUNC="zsh_helper"
-local CONTAINS="${FUNC}_contains"
+local FUNC="zsh_query"
 
-$CONTAINS() {
-  local arg key="$1"; shift
+__zsh_query_contains() {
+  local arg='' key="$1"; shift
   for arg; do [[ "$key" == "$arg" ]] && return 0; done
   return 1
 }
@@ -60,7 +59,7 @@ if [[ $# == 0 ]]; then
   return 1;
 fi
 
-local cmd=$1
+local cmd="$1"
 shift
 
 case "$cmd" in
@@ -86,7 +85,7 @@ case "$cmd" in
 
     local option=''
     for option in "${HAVING_OPTIONS[@]}"; do
-      $CONTAINS "$option" "$@" && return 0
+      __zsh_query_contains "$option" "$@" && return 0
     done
 
     return 1
@@ -120,9 +119,9 @@ case "$cmd" in
     local I=${#HAVING_OPTIONS[@]}
     while test $I -ge 1; do
       local option="${HAVING_OPTIONS[$I]}"
-      if $CONTAINS "$option" "${cmd_option_is_options[@]}"; then
+      if __zsh_query_contains "$option" "${cmd_option_is_options[@]}"; then
         local VALUE="${OPTION_VALUES[$I]}"
-        $CONTAINS "$VALUE" "${cmd_option_is_values[@]}" && return 0
+        __zsh_query_contains "$VALUE" "${cmd_option_is_values[@]}" && return 0
       fi
 
       (( --I ))
@@ -199,7 +198,7 @@ while [[ $argi -le $# ]]; do
           OPTION_VALUES+=("${arg#$option=}")
           break
         elif [[ "$arg" == "$option" ]]; then
-          if $CONTAINS "$option" "${long_opts_with_arg[@]}"; then
+          if __zsh_query_contains "$option" "${long_opts_with_arg[@]}"; then
             if $have_trailing_arg; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("${@[$((argi + 1))]}")
@@ -222,7 +221,7 @@ while [[ $argi -le $# ]]; do
           have_match=true
           break
         elif [[ "$arg" == "$option" ]]; then
-          if $CONTAINS "$option" "${old_opts_with_arg[@]}"; then
+          if __zsh_query_contains "$option" "${old_opts_with_arg[@]}"; then
             if $have_trailing_arg; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("${@[$((argi + 1))]}")
@@ -250,7 +249,7 @@ while [[ $argi -le $# ]]; do
             local option_char="${option:1:1}"
 
             if test "$arg_char" = "$option_char"; then
-              if $CONTAINS "$option" "${short_opts_with_arg[@]}"; then
+              if __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
                 if $have_trailing_chars; then
                   HAVING_OPTIONS+=("$option")
                   OPTION_VALUES+=("${arg:$((i+1))}")
@@ -261,7 +260,7 @@ while [[ $argi -le $# ]]; do
                   (( argi++ ))
                   is_end=true
                 fi
-              elif $CONTAINS "$option" "${short_opts_with_optional_arg[@]}"; then
+              elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
                 HAVING_OPTIONS+=("$option")
 
                 if $have_trailing_chars; then
@@ -305,5 +304,5 @@ _describe '' describe
 class ZshHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
-        self.add_function(_ZSH_HELPER_FUNC)
+        self.add_function(_ZSH_QUERY_FUNC)
         self.add_function(_EXEC)

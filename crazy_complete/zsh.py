@@ -81,7 +81,7 @@ class ZshCompletionGenerator:
         self.subcommands = commandline.get_subcommands_option()
         self.command_counter = 0
         self.completer = zsh_complete.ZshCompleter()
-        self.helper_used = False
+        self.query_used = False
         self._generate_completion_function()
 
     def _get_option_strings(self):
@@ -140,15 +140,15 @@ class ZshCompletionGenerator:
         code = []
 
         # We have to call these functions first, because they tell us if
-        # the zsh_helper function is used.
+        # the zsh_query function is used.
         subcommand_code = self._generate_subcommand()
         options_code = self._generate_option_parsing()
 
-        if self.helper_used:
-            zsh_helper = self.ctxt.helpers.use_function('zsh_helper')
+        if self.query_used:
+            zsh_query = self.ctxt.helpers.use_function('zsh_query')
             r  = 'local opts=%s\n' % shell.escape(self._get_option_strings())
             r += 'local -a HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=()\n'
-            r += '%s setup "$opts" "${words[@]}"' % zsh_helper
+            r += '%s setup "$opts" "${words[@]}"' % zsh_query
             code.append(r)
 
         if subcommand_code:
@@ -165,11 +165,11 @@ class ZshCompletionGenerator:
         if not self.subcommands:
             return ''
 
-        self.helper_used = True
-        zsh_helper = self.ctxt.helpers.use_function('zsh_helper')
+        self.query_used = True
+        zsh_query = self.ctxt.helpers.use_function('zsh_query')
         positional_num = self.subcommands.get_positional_num()
 
-        r =  'case "$(%s get_positional %d)" in\n' % (zsh_helper, positional_num)
+        r =  'case "$(%s get_positional %d)" in\n' % (zsh_query, positional_num)
         for subcommand in self.subcommands.subcommands:
             sub_funcname = shell.make_completion_funcname(subcommand)
             cmds = utils.get_all_command_variations(subcommand)
@@ -226,9 +226,9 @@ class ZshCompletionGenerator:
             r += ')\n'
 
         for when, option_spec in args_with_when:
-            self.helper_used = True
-            zsh_helper = self.ctxt.helpers.use_function('zsh_helper')
-            r += '%s %s &&\\\n' % (zsh_helper, when)
+            self.query_used = True
+            zsh_query = self.ctxt.helpers.use_function('zsh_query')
+            r += '%s %s &&\\\n' % (zsh_query, when)
             r += '  args+=(%s)\n' % option_spec
 
         r += '_arguments -S -s -w "${args[@]}"'
