@@ -45,7 +45,7 @@ class MasterCompletionFunction:
         for option in options:
             if option.takes_args == '?':
                 options_with_optional_arg.append(option)
-            elif option.takes_args:
+            elif option.takes_args is True:
                 options_with_required_arg.append(option)
 
         self.add_options(options_with_required_arg)
@@ -125,9 +125,9 @@ class BashCompletionGenerator:
         self.captured_variables = VariableUsageTracer()
         self._complete_commandline()
 
-    def _complete_action(self, action, append=True):
-        context = self.ctxt.getOptionGenerationContext(self.commandline, action)
-        return self.completer.complete(context, *action.complete).get_code(append)
+    def _complete_option(self, option, append=True):
+        context = self.ctxt.getOptionGenerationContext(self.commandline, option)
+        return self.completer.complete(context, *option.complete).get_code(append)
 
     def _generate_commandline_parsing(self):
         options = self.commandline.get_options(with_parent_options=True)
@@ -243,7 +243,7 @@ class BashCompletionGenerator:
         else:
             abbreviations = utils.DummyAbbreviationGenerator()
 
-        complete_option = MasterCompletionFunction('__complete_option', options, abbreviations, self._complete_action, self)
+        complete_option = MasterCompletionFunction('__complete_option', options, abbreviations, self._complete_option, self)
         code = complete_option.get()
 
         if code:
@@ -363,7 +363,7 @@ __is_oldstyle_option() {
             r += 'test "$POSITIONAL_NUM" %s %d && ' % (operator, positional.get_positional_num())
             if positional.when:
                 r += '%s && ' % self._generate_when_conditions(positional.when)
-            r += '%s\n\n' % make_block(self._complete_action(positional, False))
+            r += '%s\n\n' % make_block(self._complete_option(positional, False))
 
         if self.subcommands:
             cmds = self.subcommands.get_choices().keys()
