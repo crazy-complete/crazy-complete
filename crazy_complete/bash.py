@@ -93,8 +93,8 @@ class MasterCompletionFunction:
             r += '  if %s; then\n' % self.generator._generate_when_conditions(option.when)
             if completion_code:
                 r += '%s\n' % utils.indent(completion_code, 4)
-            r += '    return 0;;\n'
-            r += '  fi\n'
+            r += '    return 0\n'
+            r += '  fi;;\n'
             r += 'esac'
             self.code.append(r)
 
