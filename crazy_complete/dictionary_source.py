@@ -142,9 +142,7 @@ def positional_to_dictionary(self):
 def commandline_to_dictionary(commandline):
     r = OrderedDict()
 
-    prog = ' '.join(c.prog for c in commandline.get_parents(include_self=True))
-
-    r['prog'] = prog
+    r['prog'] = commandline.get_command_path()
 
     if commandline.aliases:
         r['aliases'] = commandline.aliases

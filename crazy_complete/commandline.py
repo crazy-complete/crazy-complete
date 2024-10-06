@@ -319,6 +319,10 @@ class CommandLine:
         commandlines = self.get_parents(include_self=True)
         return commandlines[0].prog
 
+    def get_command_path(self):
+        cmd = ' '.join(c.prog for c in self.get_parents(include_self=True))
+        return cmd
+
     def get_all_commands(self, with_aliases=True):
         r = [self.prog]
         if with_aliases:

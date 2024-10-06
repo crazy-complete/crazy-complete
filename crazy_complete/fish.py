@@ -123,7 +123,7 @@ class FishCompletionGenerator:
         self.completer = fish_complete.FishCompleter()
         self.lines = []
         self.conditions = VariableManager('guard')
-        self.command_comment = '# command %s' % ' '.join(p.prog for p in self.commandline.get_parents(include_self=True))
+        self.command_comment = '# command %s' % self.commandline.get_command_path()
         self.options_for_helper = 'set -l opts "%s"' % self._get_option_strings_for_helper()
 
         complete_definitions = []

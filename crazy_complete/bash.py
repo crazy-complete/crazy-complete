@@ -17,18 +17,12 @@ from .bash_utils import *
 
 class VariableUsageTracer:
     def __init__(self):
-        self.have = []
         self.values = []
-
-    def make_have_variable(self, option):
-        if option not in self.have:
-            self.have.append(option)
-        return make_option_variable_name(option, prefix='HAVE_')
 
     def make_value_variable(self, option):
         if option not in self.values:
             self.values.append(option)
-        return make_option_variable_name(option, prefix='VALUE_')
+        return make_option_variable_name(option, prefix='OPT_')
 
 class MasterCompletionFunction:
     def __init__(self, name, options, abbreviations, complete, generator):
@@ -132,16 +126,11 @@ class BashCompletionGenerator:
     def _generate_commandline_parsing(self):
         options = self.commandline.get_options(with_parent_options=True)
 
-        local_have_vars = ['%s=0' % make_option_variable_name(o, 'HAVE_') for o in options]
-        local_value_vars = [make_option_variable_name(o, 'VALUE_') for o in options]
-
         r = 'local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM\n'
 
-        if local_have_vars:
-            r += 'local %s\n' % ' '.join(local_have_vars)
-
-        if local_value_vars:
-            r += 'local %s\n' % ' '.join(local_value_vars)
+        if options:
+            local_vars = [make_option_variable_name(o, 'OPT_') for o in options]
+            r += 'local -a %s\n' % ' '.join(local_vars)
 
         r +=  '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
         return r
@@ -169,10 +158,10 @@ class BashCompletionGenerator:
             conditions = []
 
             for o in self._find_options(parsed.options):
-                have_option = '(( %s ))' % self.captured_variables.make_have_variable(o)
+                have_option = '(( ${#%s} ))' % self.captured_variables.make_value_variable(o)
                 value_equals = []
                 for value in parsed.values:
-                    value_equals.append('[[ "$%s" == %s ]]' % (
+                    value_equals.append('[[ "${%s[-1]}" == %s ]]' % (
                         self.captured_variables.make_value_variable(o),
                         shell.escape(value)
                     ))
@@ -193,7 +182,7 @@ class BashCompletionGenerator:
             conditions = []
 
             for o in self._find_options(parsed.options):
-                cond = '(( %s ))' % self.captured_variables.make_have_variable(o)
+                cond = '(( ${#%s} ))' % self.captured_variables.make_value_variable(o)
                 conditions.append(cond)
 
             if len(conditions) == 1:
@@ -210,10 +199,10 @@ class BashCompletionGenerator:
             option_guard = []
 
             if not option.multiple_option:
-                option_guard += ["! %s" % self.captured_variables.make_have_variable(option)]
+                option_guard += ["! ${#%s}" % self.captured_variables.make_value_variable(option)]
 
             for exclusive_option in option.get_conflicting_options():
-                option_guard += ["! %s" % self.captured_variables.make_have_variable(exclusive_option)]
+                option_guard += ["! ${#%s}" % self.captured_variables.make_value_variable(exclusive_option)]
 
             if option_guard:
                 option_guard = '(( %s )) && ' % ' && '.join(option_guard)
@@ -429,7 +418,7 @@ __is_oldstyle_option() {
             # This code is used to complete positionals
             code['positional_completion'] = self._generate_positionals_completion()
 
-        # This sets up END_OF_OPTIONS, POSITIONALS, POSITIONAL_NUM and the HAVE_* variables.
+        # This sets up END_OF_OPTIONS, POSITIONALS, POSITIONAL_NUM and the OPT_* variables.
         code['command_line_parsing'] = self._generate_commandline_parsing()
 
         r  = '%s() {\n' % shell.make_completion_funcname(self.commandline)
