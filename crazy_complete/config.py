@@ -25,7 +25,8 @@ class Config:
         Sets whether commands can be abbreviated.
 
         Args:
-            enable (bool): If True, commands can be abbreviated; if False, they cannot.
+            enable (bool):
+                If True, commands can be abbreviated; if False, they cannot.
 
         Notes:
             This feature defaults to `False`.
@@ -53,7 +54,8 @@ class Config:
         Sets whether options can be abbreviated.
 
         Args:
-            enable (bool): If True, options can be abbreviated; if False, they cannot.
+            enable (bool):
+                If True, options can be abbreviated; if False, they cannot.
 
         Notes:
             This feature defaults to `False`.
@@ -81,8 +83,9 @@ class Config:
         Sets whether options are suggested multiple times during completion.
 
         Args:
-            enable (bool): If True, options can appear multiple times during completion;
-                           if False, options are suggested only once.
+            enable (bool):
+                If True, options can appear multiple times during completion;
+                if False, options are suggested only once.
 
         Notes:
             This feature defaults to `False`.
@@ -99,7 +102,7 @@ class Config:
                     - set_multiple_options(False): works
 
         See also:
-            CommandLine.add(..., multiple_option=BOOL, ...)
+            CommandLine.add_option(..., multiple_option=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_multiple_options", "enable")
 
@@ -110,8 +113,9 @@ class Config:
         Sets whether parent options are visible to subcommands.
 
         Args:
-            enable (bool): If True, parent options are visible to subcommands.
-                           If False, they are not.
+            enable (bool):
+                If True, parent options are visible to subcommands.
+                If False, they are not.
 
         Notes:
             This feature defaults to `False`.
@@ -143,7 +147,9 @@ class Config:
             # vim: ft=zsh
 
         Args:
-            enable (bool): If True, add a vim modline comment; if False, don't add a modline comment.
+            enable (bool):
+                If True, add a vim modline comment;
+                if False, don't add a modline comment.
 
         Notes:
             This feature defaults to `True`.
@@ -164,8 +170,9 @@ class Config:
         omitting this line may be necessary.
 
         Args:
-            enable (bool): If true, add a `#compdef` line on top of the file;
-                           If false, don't add a `#compdef` line.
+            enable (bool):
+                If true, add a `#compdef` line on top of the file;
+                If false, don't add a `#compdef` line.
 
         Notes:
             This feature defaults to `True`
@@ -188,7 +195,8 @@ class Config:
         '''
         Add a file which should be included to the generated code.
         '''
-        assert isinstance(file, str), f"Config.include_file: file: expected str, got `{file}`"
+        assert isinstance(file, str), \
+            f"Config.include_file: file: expected str, got `{file}`"
 
         self.include_files.append(file)
 

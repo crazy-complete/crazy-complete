@@ -580,7 +580,7 @@ class Option:
 
 class SubCommandsOption(Positional):
     def __init__(self, parent, name, help):
-        self.subcommands = list()
+        self.subcommands = []
 
         super().__init__(
             parent,
