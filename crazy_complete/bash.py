@@ -51,16 +51,48 @@ class MasterCompletionFunction:
         self.add_options(options_with_required_arg)
         if options_with_optional_arg:
             self.code.append('[[ "$mode" == WITH_OPTIONALS ]] || return 1')
-            self.code.append('')
             self.add_options(options_with_optional_arg)
 
-    def add_options(self, options):
-        for option in options:
-            opts = []
-            opts.extend(self.abbreviations.get_many_abbreviations(option.get_long_option_strings()))
-            opts.extend(self.abbreviations.get_many_abbreviations(option.get_old_option_strings()))
-            opts.extend(option.get_short_option_strings())
+    def _get_all_option_strings(self, option):
+        opts = []
+        opts.extend(self.abbreviations.get_many_abbreviations(option.get_long_option_strings()))
+        opts.extend(self.abbreviations.get_many_abbreviations(option.get_old_option_strings()))
+        opts.extend(option.get_short_option_strings())
+        return opts
 
+    def add_options(self, options):
+        options_with_when = []
+        options_wout_when = []
+        options_group_by_complete = OrderedDict()
+
+        for option in options:
+            if option.when:
+                options_with_when.append(option)
+            else:
+                options_wout_when.append(option)
+
+        for option in options_wout_when:
+            complete = self.complete(option, False)
+            if complete not in options_group_by_complete:
+                options_group_by_complete[complete] = []
+            options_group_by_complete[complete].append(option)
+
+        if options_group_by_complete:
+            r = 'case "$opt" in\n'
+            for complete, options in options_group_by_complete.items():
+                opts = []
+                for option in options:
+                    opts.extend(self._get_all_option_strings(option))
+
+                r += '  %s)\n' % '|'.join(opts)
+                if complete:
+                    r += '%s\n' % utils.indent(complete, 4)
+                r += '    return 0;;\n'
+            r += 'esac'
+            self.code.append(r)
+
+        for option in options_with_when:
+            opts = self._get_all_option_strings(option)
             completion_code = self.complete(option, False)
 
             r  = 'case "$opt" in %s)\n' % '|'.join(opts)
@@ -68,14 +100,14 @@ class MasterCompletionFunction:
             if completion_code:
                 r += '%s\n' % utils.indent(completion_code, 2)
             r += '  return 0;;\n'
-            r += 'esac\n'
+            r += 'esac'
             self.code.append(r)
 
     def get(self):
         if self.code:
             r  = '%s() {\n' % self.name
             r += '  local opt="$1" cur="$2" mode="$3"\n\n'
-            r += '%s\n' % utils.indent('\n'.join(self.code), 2)
+            r += '%s\n\n' % utils.indent('\n\n'.join(self.code), 2)
             r += '  return 1\n'
             r += '}'
             return r
@@ -296,6 +328,7 @@ __is_oldstyle_option() {
           (G1        , '  -*=*)'),
           (OR|OO     , '\n    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0'),
           (G1        , ';;\n'),
+          (G1        , '  --*);;\n'),
           (G1        , '  -*)'),
           (G2 and OLD, '\n    if ! __is_oldstyle_option "$cur"; then'),
           (G2        , '\n      local i'),
