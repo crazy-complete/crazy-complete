@@ -25,7 +25,11 @@ argp.add_argument('-f', '--fast', action='store_true', default=False,
 opts = argp.parse_args()
 
 def generate_completion(shell, outfile, args):
-    run(['../crazy-complete', '--debug', '--input-type=python', shell, '-o', outfile, 'crazy-complete-test'] + args)
+    definition_file = args['definition_file']
+    args = args['args']
+    cmd = ['../crazy-complete', '--debug', '--zsh-compdef=False', *args, shell, '-o', outfile, definition_file]
+    print('RUNNING:', cmd)
+    run(cmd)
 
 def indent(string, num_spaces):
     lines = string.split('\n')
@@ -108,7 +112,7 @@ def do_tests(tests, shell, result_queue):
             try:    tmux_shell.stop()
             except: pass
             completion_file = 'out.%s' % shell
-            generate_completion(shell, completion_file, ['--zsh-compdef=False'] + test['generate-scripts'])
+            generate_completion(shell, completion_file, test['generate-scripts'])
             tmux_shell.start()
             tmux.resize_window(80, 100)
             tmux_shell.set_prompt()

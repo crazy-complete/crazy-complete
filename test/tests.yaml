@@ -1,4 +1,4 @@
-generate-scripts: []
+generate-scripts: {"args": ["--input-type=python"], "definition_file": "crazy-complete-test"}
 ---
 number: 1
 description: "No arguments, check if all commands are listed"
@@ -720,3 +720,57 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test alias2 --arg
   1  2  3
+---
+generate-scripts: {"args": ["--input-type=yaml"], "definition_file": "when-test.yaml"}
+---
+number: 50
+description: "Check --complete with --files"
+send: "crazy-complete-test --files --complete "
+bash_expected: |
+  > crazy-complete-test --files --complete
+  file1  file2  file3
+  > crazy-complete-test --files --complete file
+fish_expected: |
+  > crazy-complete-test --files --complete file
+  file1  file2  file3
+zsh_expected: |
+  > crazy-complete-test --files --complete file
+---
+number: 51
+description: "Check --complete with --directories"
+send: "crazy-complete-test --directories --complete "
+bash_expected: |
+  > crazy-complete-test --directories --complete
+  dir1  dir2  dir3
+  > crazy-complete-test --directories --complete dir
+fish_expected: |
+  > crazy-complete-test --directories --complete dir
+  dir1  dir2  dir3
+zsh_expected: |
+  > crazy-complete-test --directories --complete dir
+---
+number: 52
+description: "Check positional with --files"
+send: "crazy-complete-test --files "
+bash_expected: |
+  > crazy-complete-test --files
+  file1  file2  file3
+  > crazy-complete-test --files file
+fish_expected: |
+  > crazy-complete-test --files file
+  file1  file2  file3
+zsh_expected: |
+  > crazy-complete-test --files file
+---
+number: 53
+description: "Check positional with --directories"
+send: "crazy-complete-test --directories "
+bash_expected: |
+  > crazy-complete-test --directories
+  dir1  dir2  dir3
+  > crazy-complete-test --directories dir
+fish_expected: |
+  > crazy-complete-test --directories dir
+  dir1  dir2  dir3
+zsh_expected: |
+  > crazy-complete-test --directories dir
