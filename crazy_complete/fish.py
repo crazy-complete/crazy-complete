@@ -71,11 +71,11 @@ class Conditions:
 class FishCompletionDefinition:
     def __init__(
           self,
-          short_options=[],           # List of short options
-          long_options=[],            # List of long options
-          old_options=[],             # List of old-style options
-          description=None,           # Description
-          requires_argument=False,    # Option requires an argument
+          short_options=[],        # List of short options
+          long_options=[],         # List of long options
+          old_options=[],          # List of old-style options
+          description=None,        # Description
+          requires_argument=False, # Option requires an argument
           completion_args=None
         ):
         self.short_options = short_options
@@ -177,10 +177,11 @@ class FishCompletionGenerator:
         if not option.multiple_option:
             definition.conds.not_has_option.extend(option.option_strings)
 
-        # TODO: fix or at least explain this...
+        # If we don't inherit options, add a condition to the option that
+        # ensures that we're in the right (sub)command.
         if not self.commandline.inherit_options and self.commandline.get_subcommands_option():
             positional = self.commandline.get_subcommands_option().get_positional_num()
-            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional) # -1 TODO
+            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
 
         definition.conds.positional_contains = get_positional_contains(option)
         definition.conds.when = option.when
@@ -202,9 +203,9 @@ class FishCompletionGenerator:
 
         positional = option.get_positional_num()
         if option.repeatable:
-            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-ge', positional) # -1 TODO
+            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-ge', positional)
         else:
-            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional) # -1 TODO
+            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
 
         return definition
 
@@ -219,7 +220,7 @@ class FishCompletionGenerator:
         )
 
         positional = option.get_positional_num()
-        definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional) # -1 TODO
+        definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
         definition.conds.positional_contains = get_positional_contains(option)
         return definition
 

@@ -90,10 +90,11 @@ class MasterCompletionFunction:
             completion_code = self.complete(option, False)
 
             r  = 'case "$opt" in %s)\n' % '|'.join(opts)
-            # TODO: add when
+            r += '  if %s; then\n' % self.generator._generate_when_conditions(option.when)
             if completion_code:
-                r += '%s\n' % utils.indent(completion_code, 2)
-            r += '  return 0;;\n'
+                r += '%s\n' % utils.indent(completion_code, 4)
+            r += '    return 0;;\n'
+            r += '  fi\n'
             r += 'esac'
             self.code.append(r)
 
@@ -190,7 +191,7 @@ class BashCompletionGenerator:
             else:
                 return '{ %s; }' % ' || '.join(conditions)
         else:
-            raise Exception('invalid instance of `parse`')
+            raise AssertionError('invalid instance of `parse`')
 
     def _generate_option_strings_completion(self):
         r  = 'if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then\n'
@@ -225,10 +226,11 @@ class BashCompletionGenerator:
         options = self.commandline.get_options(only_with_arguments=True)
 
         if self.commandline.abbreviate_options:
-            # TODO: describe why we use with_parent_options=True here
-            # TODO: with_parent_options only if inherit_options is true
+            # If we inherit options from parent commands, add those
+            # to the abbreviation generator
             abbreviations = get_OptionAbbreviationGenerator(
-                self.commandline.get_options(with_parent_options=True))
+                self.commandline.get_options(
+                    with_parent_options=self.commandline.inherit_options))
         else:
             abbreviations = utils.DummyAbbreviationGenerator()
 

@@ -684,7 +684,6 @@ def commandline_apply_config(commandline, config):
     for option in commandline.options:
         if option.multiple_option == ExtendedBool.INHERIT:
             option.multiple_option = config.multiple_options
-            # TODO: this should be commandline.multiple_options
 
     if commandline.get_subcommands_option():
         for subcommand in commandline.get_subcommands_option().subcommands:

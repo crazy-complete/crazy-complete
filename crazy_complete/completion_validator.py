@@ -147,22 +147,30 @@ class CompletionValidator:
 
     @staticmethod
     def range(args):
-        for arg in args:
-            if not isinstance(arg, int):
-                raise Exception(f"Not an int: {arg}")
+        start = get_required_arg(args, "start")
+        stop  = get_required_arg(args, "stop")
+        step  = get_optional_arg(args, 1)
+        require_no_more(args)
 
-        if len(args) == 2:
-            start, stop = args
+        if not isinstance(start, int):
+            raise Exception(f"start: not an int: {start}")
+
+        if not isinstance(stop, int):
+            raise Exception(f"stop: not an int: {stop}")
+
+        if not isinstance(step, int):
+            raise Exception(f"step: not an int: {step}")
+
+        if step > 0:
             if start > stop:
-                raise Exception(f"start > stop: {start} > {stop}")
+                raise Exception(f"start > stop: {start} > {stop} (step={step})")
+        elif step < 0:
+            if stop > start:
+                raise Exception(f"stop > start: {stop} > {start} (step={step})")
+        else:
+            raise Exception(f"step: cannot be 0")
 
-            return (start, stop, 1)
-
-        if len(args) == 3:
-            # TODO: check
-            return args
-
-        raise Exception('Invalid number of arguments')
+        return args
 
     @staticmethod
     def user(args):

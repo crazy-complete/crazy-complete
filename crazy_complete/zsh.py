@@ -190,7 +190,6 @@ class ZshCompletionGenerator:
         for option in options:
             args.append(self.complete_option(option))
 
-        # TODO: describe why we need this
         for cmdline in self.commandline.get_parents():
             for option in cmdline.get_positionals():
                 args.append(self.complete_positional(option))

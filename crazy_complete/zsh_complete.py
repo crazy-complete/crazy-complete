@@ -13,14 +13,14 @@ class ZshCompleter(shell.ShellCompleter):
     def choices(self, ctxt, choices):
         if hasattr(choices, 'items'):
             funcname = shell.make_completion_funcname_for_context(ctxt)
-            metavar = shell.escape(ctxt.option.metavar or '') # TODO
-            code  = 'local -a describe=(\n'
+            metavar = shell.escape(ctxt.option.metavar or '')
+            code  = 'local -a items=(\n'
             for item, description in choices.items():
                 item = shell.escape(escape_colon(str(item)))
                 desc = shell.escape(str(description))
                 code += f'  {item}:{desc}\n'
             code += ')\n\n'
-            code += f'_describe -- {metavar} describe'
+            code += f'_describe -- {metavar} items'
 
             ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
             funcname = ctxt.helpers.use_function(funcname)
@@ -34,13 +34,13 @@ class ZshCompleter(shell.ShellCompleter):
     def directory(self, ctxt, opts={}):
         directory = opts.get('directory', None)
         if directory:
-            return '"_directories -W %s"' % directory
+            return '"_directories -W %s"' % shell.escape(directory)
         return '_directories'
 
     def file(self, ctxt, opts={}):
         directory = opts.get('directory', None)
         if directory:
-            return '"_files -W %s"' % directory
+            return '"_files -W %s"' % shell.escape(directory)
         return '_files'
 
     def group(self, ctxt):
