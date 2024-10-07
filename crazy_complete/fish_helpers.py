@@ -133,25 +133,20 @@ else
           set -a positionals $cmdline[$argi]
         end
         break
+      case '--*=*'
+        set -l split (string split -m 1 -- '=' $arg)
+        set -a having_options $split[1]
+        set -a option_values "$split[2]"
       case '--*'
-        for option in $long_opts_with_arg $long_opts_without_arg $long_opts_with_optional_arg
-          if string match -q -- "$option=*" $arg
-            set -a having_options $option
-            set -a option_values (string replace -- "$option=" "" $arg)
-            break
-          else if string match -q -- $option $arg
-            if contains -- $option $long_opts_with_arg
-              if $have_trailing_arg
-                set -a having_options $option
-                set -a option_values $cmdline[(math $argi + 1)]
-                set argi (math $argi + 1)
-              end
-            else
-              set -a having_options $option
-              set -a option_values ""
-            end
-            break
+        if contains -- $arg $long_opts_with_arg
+          if $have_trailing_arg
+            set -a having_options $arg
+            set -a option_values $cmdline[(math $argi + 1)]
+            set argi (math $argi + 1)
           end
+        else
+          set -a having_options $arg
+          set -a option_values ""
         end
       case '-*'
         set -l end_of_parsing false
