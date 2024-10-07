@@ -151,27 +151,24 @@ else
       case '-*'
         set -l end_of_parsing false
 
-        for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg
-          if string match -q -- "$option=*" $arg
-            set -a having_options $option
-            set -a option_values (string replace -- "$option=" "" $arg)
+        if string match -q -- "*=*" $arg
+          set -l split (string split -m 1 -- '=' $arg)
+          if contains -- $split[1] $old_opts_with_arg $old_opts_with_optional_arg
+            set -a having_options $split[1]
+            set -a option_values "$split[2]"
             set end_of_parsing true
-            break
-          else if string match -q -- $option $arg
-            if contains -- $option $old_opts_with_arg
-              if $have_trailing_arg
-                set -a having_options $option
-                set -a option_values $cmdline[(math $argi + 1)]
-                set argi (math $argi + 1)
-              end
-            else
-              set -a having_options $option
-              set -a option_values ""
-            end
-
-            set end_of_parsing true
-            break
           end
+        else if contains -- $arg $old_opts_with_arg
+          if $have_trailing_arg
+            set -a having_options $arg
+            set -a option_values $cmdline[(math $argi + 1)]
+            set argi (math $argi + 1)
+            set end_of_parsing true
+          end
+        else if contains -- $arg $old_opts_without_arg $old_opts_with_optional_arg
+          set -a having_options $arg
+          set -a option_values ""
+          set end_of_parsing true
         end
 
         set -l arg_length (string length -- $arg)
