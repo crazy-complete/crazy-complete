@@ -154,13 +154,13 @@ else
           end
         end
       case '-*'
-        set -l have_match false
+        set -l end_of_parsing false
 
         for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg
           if string match -q -- "$option=*" $arg
             set -a having_options $option
             set -a option_values (string replace -- "$option=" "" $arg)
-            set have_match true
+            set end_of_parsing true
             break
           else if string match -q -- $option $arg
             if contains -- $option $old_opts_with_arg
@@ -174,54 +174,38 @@ else
               set -a option_values ""
             end
 
-            set have_match true
+            set end_of_parsing true
             break
           end
         end
 
-        if not $have_match
-          set -l arg_length (string length -- $arg)
-          set -l i 2
-          set is_end false
-          while not $is_end && test $i -le $arg_length
-            set -l char (string sub -s $i -l 1 -- "$arg")
-            set -l have_trailing_chars (test $i -lt $arg_length && echo true || echo false)
+        set -l arg_length (string length -- $arg)
+        set -l i 2
+        while not $end_of_parsing; and test $i -le $arg_length
+          set -l option "-$(string sub -s $i -l 1 -- $arg)"
+          set -l trailing_chars "$(string sub -s (math $i + 1) -- $arg)"
 
-            for option in $short_opts_with_arg $short_opts_without_arg $short_opts_with_optional_arg
-              set -l option_char (string sub -s 2 -l 1 -- $option)
+          if contains -- $option $short_opts_without_arg
+            set -a having_options $option
+            set -a option_values ""
+          else if contains -- $option $short_opts_with_arg
+            set end_of_parsing true
 
-              if test "$char" = "$option_char"
-                if contains -- $option $short_opts_with_arg
-                  if $have_trailing_chars
-                    set -a having_options $option
-                    set -a option_values (string sub -s (math $i + 1) -- $arg)
-                    set is_end true
-                  else if $have_trailing_arg
-                    set -a having_options $option
-                    set -a option_values $cmdline[(math $argi + 1)]
-                    set argi (math $argi + 1)
-                    set is_end true
-                  end
-                else if contains -- $option $short_opts_with_optional_arg
-                  set -a having_options $option
-
-                  if $have_trailing_chars
-                    set -a option_values (string sub -s (math $i + 1) -- $arg)
-                    set is_end true
-                  else
-                    set -a option_values ""
-                  end
-                else
-                  set -a having_options $option
-                  set -a option_values ""
-                end
-
-                break
-              end
+            if test -n "$trailing_chars"
+              set -a having_options $option
+              set -a option_values $trailing_chars
+            else if $have_trailing_arg
+              set -a having_options $option
+              set -a option_values $cmdline[(math $argi + 1)]
+              set argi (math $argi + 1)
             end
-
-            set i (math $i + 1)
+          else if contains -- $option $short_opts_with_optional_arg
+            set -a having_options $option
+            set end_of_parsing true
+            set -a option_values "$trailing_chars" # may be empty
           end
+
+          set i (math $i + 1)
         end
       case '*'
         set -a positionals $arg

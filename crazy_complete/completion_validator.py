@@ -35,7 +35,7 @@ class CompletionValidator:
                 CompletionValidator.validate_complete(option.complete)
             except Exception as e:
                 raise Exception("%s: %s: %s" % (
-                    cmdline.prog,
+                    cmdline.get_command_path(),
                     ' '.join(option.option_strings),
                     e))
 
@@ -44,7 +44,7 @@ class CompletionValidator:
                 CompletionValidator.validate_complete(positional.complete)
             except Exception as e:
                 raise Exception("%s: %d (%s): %s" % (
-                    cmdline.prog,
+                    cmdline.get_command_path(),
                     positional.number,
                     positional.metavar,
                     e))

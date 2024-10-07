@@ -84,7 +84,7 @@ class FishCompletionDefinition:
         self.description = description
         self.requires_argument = requires_argument
         self.completion_args = completion_args
-        self.conds = Conditions()
+        self.conditions = Conditions()
 
     def get_complete_cmd(self, unsafe=False):
         cmd = FishCompleteCommand()
@@ -100,11 +100,11 @@ class FishCompletionDefinition:
             cmd.flags.add('r')
 
         cmd.parse_args(self.completion_args)
-        cmd.set_condition(self.conds.get(unsafe=unsafe), raw=True)
+        cmd.set_condition(self.conditions.get(unsafe=unsafe), raw=True)
 
         return cmd
 
-def get_positional_contains(option):
+def _get_positional_contains(option):
     cmdlines = option.parent.get_parents(include_self=True)
     del cmdlines[0]
 
@@ -122,19 +122,19 @@ class FishCompletionGenerator:
         self.ctxt = ctxt
         self.completer = fish_complete.FishCompleter()
         self.lines = []
-        self.conditions = VariableManager('guard')
+        self.conditions = VariableManager('C')
         self.command_comment = '# command %s' % self.commandline.get_command_path()
-        self.options_for_helper = 'set -l opts "%s"' % self._get_option_strings_for_helper()
+        self.options_for_query = 'set -l opts "%s"' % self._get_option_strings_for_query()
 
         complete_definitions = []
         for option in self.commandline.get_options():
-            complete_definitions.append(self.complete_option(option))
+            complete_definitions.append(self._complete_option(option))
 
         for positional in self.commandline.get_positionals():
-            complete_definitions.append(self.complete_positional(positional))
+            complete_definitions.append(self._complete_positional(positional))
 
         if self.commandline.get_subcommands_option():
-            complete_definitions.append(self.complete_subcommands(self.commandline.get_subcommands_option()))
+            complete_definitions.append(self._complete_subcommands(self.commandline.get_subcommands_option()))
 
         for definition in complete_definitions:
             cmd = definition.get_complete_cmd(self.ctxt.config.fish_fast)
@@ -148,7 +148,7 @@ class FishCompletionGenerator:
 
             self.lines.append(cmd.get())
 
-    def _get_option_strings_for_helper(self):
+    def _get_option_strings_for_query(self):
         r = []
         for option in self.commandline.get_options(with_parent_options=True):
             if option.takes_args == '?':
@@ -159,7 +159,7 @@ class FishCompletionGenerator:
                 r.extend(option.option_strings)
         return ','.join(r)
 
-    def complete_option(self, option):
+    def _complete_option(self, option):
         context = self.ctxt.getOptionGenerationContext(self.commandline, option)
         completion_args = self.completer.complete(context, *option.complete).get_args()
 
@@ -172,23 +172,23 @@ class FishCompletionGenerator:
             completion_args     = completion_args)
 
         conflicting_options = option.get_conflicting_option_strings()
-        definition.conds.not_has_option.extend(conflicting_options)
+        definition.conditions.not_has_option.extend(conflicting_options)
 
         if not option.multiple_option:
-            definition.conds.not_has_option.extend(option.option_strings)
+            definition.conditions.not_has_option.extend(option.option_strings)
 
         # If we don't inherit options, add a condition to the option that
         # ensures that we're in the right (sub)command.
         if not self.commandline.inherit_options and self.commandline.get_subcommands_option():
             positional = self.commandline.get_subcommands_option().get_positional_num()
-            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
+            definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
 
-        definition.conds.positional_contains = get_positional_contains(option)
-        definition.conds.when = option.when
+        definition.conditions.positional_contains = _get_positional_contains(option)
+        definition.conditions.when = option.when
 
         return definition
 
-    def complete_positional(self, option):
+    def _complete_positional(self, option):
         context = self.ctxt.getOptionGenerationContext(self.commandline, option)
         completion_args = self.completer.complete(context, *option.complete).get_args()
 
@@ -198,18 +198,18 @@ class FishCompletionGenerator:
             completion_args     = completion_args
         )
 
-        definition.conds.when = option.when
-        definition.conds.positional_contains = get_positional_contains(option)
+        definition.conditions.when = option.when
+        definition.conditions.positional_contains = _get_positional_contains(option)
 
         positional = option.get_positional_num()
         if option.repeatable:
-            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-ge', positional)
+            definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-ge', positional)
         else:
-            definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
+            definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
 
         return definition
 
-    def complete_subcommands(self, option):
+    def _complete_subcommands(self, option):
         items = option.get_choices()
         context = self.ctxt.getOptionGenerationContext(self.commandline, option)
         completion_args = self.completer.complete(context, 'choices', items).get_args()
@@ -220,8 +220,8 @@ class FishCompletionGenerator:
         )
 
         positional = option.get_positional_num()
-        definition.conds.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
-        definition.conds.positional_contains = get_positional_contains(option)
+        definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
+        definition.conditions.positional_contains = _get_positional_contains(option)
         return definition
 
 
@@ -246,7 +246,7 @@ def generate_completion(commandline, program_name=None, config=None):
         output.append(code)
         output.append('')
 
-    output.append('set -l prog "%s"'   % result.result[0].commandline.prog)
+    output.append('set -l prog "%s"' % result.result[0].commandline.prog)
     if result.ctxt.helpers.is_used('fish_query'):
         output.append('set -l query "%s"' % result.ctxt.helpers.use_function('fish_query'))
 
@@ -257,7 +257,7 @@ def generate_completion(commandline, program_name=None, config=None):
     for generator in result.result:
         output.append('')
         output.append(generator.command_comment)
-        output.append(generator.options_for_helper)
+        output.append(generator.options_for_query)
         output.extend(generator.conditions.get_lines())
         output.extend(generator.lines)
 
