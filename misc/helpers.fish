@@ -155,11 +155,11 @@ function __fish_query
               set end_of_parsing true
             end
           else if contains -- $arg $old_opts_with_arg
+            set end_of_parsing true
             if $have_trailing_arg
               set -a having_options $arg
               set -a option_values $cmdline[(math $argi + 1)]
               set argi (math $argi + 1)
-              set end_of_parsing true
             end
           else if contains -- $arg $old_opts_without_arg $old_opts_with_optional_arg
             set -a having_options $arg
