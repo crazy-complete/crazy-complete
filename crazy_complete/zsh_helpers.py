@@ -184,104 +184,80 @@ while [[ $argi -le $# ]]; do
   local have_trailing_arg=$(test $argi -lt $# && echo true || echo false)
 
   case "$arg" in
-    (-)
+    -)
       POSITIONALS+=(-);;
-    (--)
+    --)
       for argi in $(seq $((argi + 1)) $#); do
         POSITIONALS+=("${@[$argi]}")
       done
       break;;
-    (--*)
-      for option in $long_opts_with_arg $long_opts_without_arg $long_opts_with_optional_arg; do
-        if [[ "$arg" == "$option="* ]]; then
-          HAVING_OPTIONS+=("$option")
-          OPTION_VALUES+=("${arg#$option=}")
-          break
-        elif [[ "$arg" == "$option" ]]; then
-          if __zsh_query_contains "$option" "${long_opts_with_arg[@]}"; then
-            if $have_trailing_arg; then
-              HAVING_OPTIONS+=("$option")
-              OPTION_VALUES+=("${@[$((argi + 1))]}")
-              (( argi++ ))
-            fi
-          else
-            HAVING_OPTIONS+=("$option")
-            OPTION_VALUES+=("")
-          fi
-          break
+    --*=*)
+      HAVING_OPTIONS+=("${arg%%=*}")
+      OPTION_VALUES+=("${arg#*=}");;
+    --*)
+      if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
+        if $have_trailing_arg; then
+          HAVING_OPTIONS+=("$arg")
+          OPTION_VALUES+=("${@[$((argi + 1))]}")
+          (( argi++ ))
         fi
-      done;;
-    (-*)
-      local have_match=false
-
-      for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg; do
-        if [[ "$arg" == "$option="* ]]; then
-          HAVING_OPTIONS+=("$option")
-          OPTION_VALUES+=("${arg#$option=}")
-          have_match=true
-          break
-        elif [[ "$arg" == "$option" ]]; then
-          if __zsh_query_contains "$option" "${old_opts_with_arg[@]}"; then
-            if $have_trailing_arg; then
-              HAVING_OPTIONS+=("$option")
-              OPTION_VALUES+=("${@[$((argi + 1))]}")
-              (( argi++ ))
-            fi
-          else
-            HAVING_OPTIONS+=("$option")
-            OPTION_VALUES+=("")
-          fi
-
-          have_match=true
-          break
-        fi
-      done
-
-      if ! $have_match; then
-        local arg_length=${#arg}
-        local i=1
-        local is_end=false
-        while ! $is_end && test $i -lt $arg_length; do
-          local arg_char="${arg:$i:1}"
-          local have_trailing_chars=$(test $((i+1)) -lt $arg_length && echo true || echo false)
-
-          for option in $short_opts_with_arg $short_opts_without_arg $short_opts_with_optional_arg; do
-            local option_char="${option:1:1}"
-
-            if test "$arg_char" = "$option_char"; then
-              if __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
-                if $have_trailing_chars; then
-                  HAVING_OPTIONS+=("$option")
-                  OPTION_VALUES+=("${arg:$((i+1))}")
-                  is_end=true
-                elif $have_trailing_arg; then
-                  HAVING_OPTIONS+=("$option")
-                  OPTION_VALUES+=("${@[$((argi + 1))]}")
-                  (( argi++ ))
-                  is_end=true
-                fi
-              elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
-                HAVING_OPTIONS+=("$option")
-
-                if $have_trailing_chars; then
-                  is_end=true
-                  OPTION_VALUES+=("${arg:$((i+1))}")
-                else
-                  OPTION_VALUES+=("")
-                fi
-              else
-                HAVING_OPTIONS+=("$option")
-                OPTION_VALUES+=("")
-              fi
-
-              break
-            fi
-          done
-
-          (( i++ ))
-        done
+      else
+        HAVING_OPTIONS+=("$arg")
+        OPTION_VALUES+=("")
       fi;;
-    (*)
+    -*)
+      local end_of_parsing=false
+
+      if [[ "$arg" == *=* ]]; then
+        local option="${arg%%=*}"
+        local value="${arg#*=}"
+        if __zsh_query_contains "$option" "${old_opts_with_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
+          HAVING_OPTIONS+=("$option")
+          OPTION_VALUES+=("$value")
+          end_of_parsing=true
+        fi
+      elif __zsh_query_contains "$arg" "${old_opts_with_arg[@]}"; then
+        end_of_parsing=true
+        if $have_trailing_arg; then
+          HAVING_OPTIONS+=("$arg")
+          OPTION_VALUES+=("${@[$((argi + 1))]}")
+          (( argi++ ))
+        fi
+      elif __zsh_query_contains "$arg" "${old_opts_without_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
+        HAVING_OPTIONS+=("$arg")
+        OPTION_VALUES+=("")
+        end_of_parsing=true
+      fi
+
+      local arg_length=${#arg}
+      local i=1
+      while ! $end_of_parsing && test $i -lt $arg_length; do
+        local option="-${arg:$i:1}"
+        local trailing_chars="${arg:$((i+1))}"
+
+        if __zsh_query_contains "$option" "${short_opts_without_arg[@]}"; then
+          HAVING_OPTIONS+=("$option")
+          OPTION_VALUES+=("")
+        elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
+          end_of_parsing=true
+
+          if [[ -n "$trailing_chars" ]]; then
+            HAVING_OPTIONS+=("$option")
+            OPTION_VALUES+=("$trailing_chars")
+          else if $have_trailing_arg
+            HAVING_OPTIONS+=("$option")
+            OPTION_VALUES+=("${@[$((argi + 1))]}")
+            (( argi++ ))
+          fi
+        elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
+          end_of_parsing=true
+          HAVING_OPTIONS+=("$option")
+          OPTION_VALUES+=("$trailing_chars") # may be empty
+        fi
+
+        (( i++ ))
+      done;;
+    *)
       POSITIONALS+=("$arg");;
   esac
 
