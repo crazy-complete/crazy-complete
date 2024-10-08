@@ -6,7 +6,7 @@ Every program should have autocompletion in the shell to enhance user experience
 **Key Features**:
 - **Generates Robust Scripts**: Ensures that the autocompletion scripts are reliable and efficient.
 - **Multi-Shell Support**: Works seamlessly with Bash, Fish, and Zsh, providing flexibility across different environments.
-- **Zero Dependencies**: No external dependencies are required, making the integration smooth and hassle-free.
+- **Minimal Dependencies**: The only external dependency is PyYAML.
 - **Configurable and Extendable**: The generated autocompletion scripts are highly configurable and can be easily extended to suit your specific needs.
 - **Standalone Scripts**: The generated scripts are standalone and do not depend on modified environments, unlike some alternatives like argcomplete.
 - **Easy to Use**: Simple and intuitive to set up, allowing you to quickly add autocompletion functionality to your programs.
