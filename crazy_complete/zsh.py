@@ -233,6 +233,16 @@ class ZshCompletionGenerator:
         r += '_arguments -S -s -w "${args[@]}"'
         return r
 
+def _define_option_types(ctxt, commandline):
+    for option in commandline.options:
+        for option_string in option.option_strings:
+            if option_string.startswith('--'):
+                ctxt.helpers.use_function('zsh_query', 'long_options')
+            elif len(option_string) == 2:
+                ctxt.helpers.use_function('zsh_query', 'short_options')
+            else:
+                ctxt.helpers.use_function('zsh_query', 'old_options')
+
 def generate_completion(commandline, program_name=None, config=None):
     result = shell.CompletionGenerator(
         ZshCompletionGenerator,
@@ -242,6 +252,10 @@ def generate_completion(commandline, program_name=None, config=None):
         config)
 
     functions = result.result
+
+    if result.ctxt.helpers.is_used('zsh_query'):
+        result.result[0].commandline.visit_commandlines(
+            lambda cmdline: _define_option_types(result.ctxt, cmdline))
 
     output = []
 
