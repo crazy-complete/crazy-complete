@@ -6,12 +6,12 @@ from collections import namedtuple, OrderedDict
 
 from . import generation_notice
 from . import modeline
-from . import shell
 from . import utils
 from . import fish_complete
 from . import fish_helpers
 from .fish_utils import *
 from . import when
+from . import generation
 
 class FishQuery:
     def __init__(self, ctxt):
@@ -276,11 +276,12 @@ def _define_option_types(ctxt, commandline):
                 ctxt.helpers.use_function('fish_query', 'old_options')
 
 def generate_completion(commandline, program_name=None, config=None):
-    result = shell.CompletionGenerator(
+    commandline = generation.enhance_commandline(commandline, program_name, config)
+
+    result = generation.CompletionGenerator(
         FishCompletionGenerator,
         fish_helpers.FishHelpers,
         commandline,
-        program_name,
         config)
 
     if result.ctxt.helpers.is_used('fish_query'):

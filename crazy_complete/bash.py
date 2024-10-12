@@ -14,6 +14,7 @@ from . import bash_helpers
 from . import bash_complete
 from . import bash_parser
 from .bash_utils import *
+from . import generation
 
 class VariableUsageTracer:
     def __init__(self):
@@ -431,11 +432,12 @@ __is_oldstyle_option() {
         self.result = r
 
 def generate_completion(commandline, program_name=None, config=None):
-    result = shell.CompletionGenerator(
+    commandline = generation.enhance_commandline(commandline, program_name, config)
+
+    result = generation.CompletionGenerator(
         BashCompletionGenerator,
         bash_helpers.BashHelpers,
         commandline,
-        program_name,
         config)
 
     commandline = result.result[0].commandline

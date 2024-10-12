@@ -2,6 +2,7 @@
 Code for generating a zsh auto completion file
 '''
 
+from . import generation
 from . import generation_notice
 from . import modeline
 from . import shell
@@ -244,11 +245,12 @@ def _define_option_types(ctxt, commandline):
                 ctxt.helpers.use_function('zsh_query', 'old_options')
 
 def generate_completion(commandline, program_name=None, config=None):
-    result = shell.CompletionGenerator(
+    commandline = generation.enhance_commandline(commandline, program_name, config)
+
+    result = generation.CompletionGenerator(
         ZshCompletionGenerator,
         zsh_helpers.ZshHelpers,
         commandline,
-        program_name,
         config)
 
     functions = result.result
