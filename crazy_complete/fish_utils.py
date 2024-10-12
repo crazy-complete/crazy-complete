@@ -156,7 +156,7 @@ class FishCompleteCommand:
             self.flags.discard('f')
 
         if self.flags:
-            r.append('-%s' % ''.join(self.flags))
+            r.append('-%s' % ''.join(sorted(self.flags)))
 
         if self.arguments is not None:
             r.extend(['-a', self.arguments])

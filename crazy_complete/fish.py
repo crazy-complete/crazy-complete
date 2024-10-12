@@ -11,11 +11,46 @@ from . import utils
 from . import fish_complete
 from . import fish_helpers
 from .fish_utils import *
+from . import when
+
+class FishQuery:
+    def __init__(self, ctxt):
+        self.ctxt = ctxt
+
+    def positional_contains(self, num, words):
+        self.ctxt.helpers.use_function('fish_query', 'positional_contains')
+        r = "$query '$opts' positional_contains %d %s" % (num, ' '.join(words))
+        return r
+
+    def has_option(self, options):
+        self.ctxt.helpers.use_function('fish_query', 'has_option')
+        r = "$query '$opts' has_option %s" % ' '.join(options)
+        return r
+
+    def option_is(self, options, values):
+        self.ctxt.helpers.use_function('fish_query', 'option_is')
+        r = "$query '$opts' option_is %s -- %s" % (
+            ' '.join(options), ' '.join(values))
+        return r
+
+    def num_of_positionals(self, operator, num):
+        self.ctxt.helpers.use_function('fish_query', 'num_of_positionals')
+        r = "$query '$opts' num_of_positionals %s %d" % (operator, num)
+        return r
+
+    def by_object(self, obj):
+        if isinstance(obj, when.OptionIs):
+            return self.option_is(obj.options, obj.values)
+        if isinstance(obj, when.HasOption):
+            return self.has_option(obj.options)
+        raise AssertionError("Should not be reached")
 
 class Conditions:
     NumOfPositionals = namedtuple('NumOfPositionals', ['operator', 'value'])
 
-    def __init__(self):
+    def __init__(self, ctxt):
+        self.ctxt = ctxt
+        self.fish_query = FishQuery(ctxt)
         self.positional_contains = {}
         self.not_has_option = []
         self.num_of_positionals = None
@@ -28,7 +63,7 @@ class Conditions:
             if unsafe:
                 guard = "__fish_seen_subcommand_from %s" % (' '.join(words))
             else:
-                guard = "$query '$opts' positional_contains %d %s" % (num, ' '.join(words))
+                guard = self.fish_query.positional_contains(num, words)
             conditions += [guard]
 
         if self.not_has_option:
@@ -47,7 +82,7 @@ class Conditions:
                 use_helper = True
 
             if use_helper:
-                guard = "not $query '$opts' has_option %s" % ' '.join(self.not_has_option)
+                guard = "not %s" % self.fish_query.has_option(self.not_has_option)
             conditions += [guard]
 
         if self.num_of_positionals is not None:
@@ -55,12 +90,13 @@ class Conditions:
                 guard = "test (__fish_number_of_cmd_args_wo_opts) %s %d" % (
                     self.num_of_positionals.operator, self.num_of_positionals.value) # TODO - 1)
             else:
-                guard = "$query '$opts' num_of_positionals %s %d" % (
+                guard = self.fish_query.num_of_positionals(
                     self.num_of_positionals.operator, self.num_of_positionals.value - 1)
             conditions += [guard]
 
         if self.when is not None:
-            guard = "$query '$opts' %s" % self.when
+            parsed = when.parse_when(self.when)
+            guard = self.fish_query.by_object(parsed)
             conditions += [guard]
 
         if not conditions:
@@ -71,6 +107,7 @@ class Conditions:
 class FishCompletionDefinition:
     def __init__(
           self,
+          ctxt,
           short_options=[],        # List of short options
           long_options=[],         # List of long options
           old_options=[],          # List of old-style options
@@ -78,13 +115,14 @@ class FishCompletionDefinition:
           requires_argument=False, # Option requires an argument
           completion_args=None
         ):
+        self.ctxt = ctxt
         self.short_options = short_options
         self.long_options = long_options
         self.old_options = old_options
         self.description = description
         self.requires_argument = requires_argument
         self.completion_args = completion_args
-        self.conditions = Conditions()
+        self.conditions = Conditions(ctxt)
 
     def get_complete_cmd(self, unsafe=False):
         cmd = FishCompleteCommand()
@@ -164,6 +202,7 @@ class FishCompletionGenerator:
         completion_args = self.completer.complete(context, *option.complete).get_args()
 
         definition = FishCompletionDefinition(
+            self.ctxt,
             short_options       = option.get_short_option_strings(),
             long_options        = option.get_long_option_strings(),
             old_options         = option.get_old_option_strings(),
@@ -193,6 +232,7 @@ class FishCompletionGenerator:
         completion_args = self.completer.complete(context, *option.complete).get_args()
 
         definition = FishCompletionDefinition(
+            self.ctxt,
             requires_argument   = True,
             description         = option.help,
             completion_args     = completion_args
@@ -215,6 +255,7 @@ class FishCompletionGenerator:
         completion_args = self.completer.complete(context, 'choices', items).get_args()
 
         definition = FishCompletionDefinition(
+            self.ctxt,
             description    = 'Commands',
             completion_args = completion_args
         )
@@ -224,6 +265,15 @@ class FishCompletionGenerator:
         definition.conditions.positional_contains = _get_positional_contains(option)
         return definition
 
+def _define_option_types(ctxt, commandline):
+    for option in commandline.options:
+        for option_string in option.option_strings:
+            if option_string.startswith('--'):
+                ctxt.helpers.use_function('fish_query', 'long_options')
+            elif len(option_string) == 2:
+                ctxt.helpers.use_function('fish_query', 'short_options')
+            else:
+                ctxt.helpers.use_function('fish_query', 'old_options')
 
 def generate_completion(commandline, program_name=None, config=None):
     result = shell.CompletionGenerator(
@@ -232,6 +282,10 @@ def generate_completion(commandline, program_name=None, config=None):
         commandline,
         program_name,
         config)
+
+    if result.ctxt.helpers.is_used('fish_query'):
+        result.result[0].commandline.visit_commandlines(
+            lambda cmdline: _define_option_types(result.ctxt, cmdline))
 
     output = []
 

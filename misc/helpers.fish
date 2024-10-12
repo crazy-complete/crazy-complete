@@ -40,20 +40,20 @@ function __fish_query
   #
   # ===========================================================================
   
-  set -l func '__fish_query'
-  
   set -l positionals
   set -l having_options
   set -l option_values
   
+#ifdef DEBUG
   switch (count $argv)
     case 0
-      echo "$func: missing OPTIONS argument" >&2
+      echo "%FUNCNAME%: missing OPTIONS argument" >&2
       return 1
     case 1
-      echo "$func: missing COMMAND" >&2
+      echo "%FUNCNAME%: missing COMMAND" >&2
       return 1
   end
+#endif
   
   set -l options $argv[1]
   set -e argv[1]
@@ -72,17 +72,21 @@ function __fish_query
     # Parsing of OPTIONS argument
     # =========================================================================
   
+#ifdef short_options
     set -l short_opts_with_arg
-    set -l long_opts_with_arg
-    set -l old_opts_with_arg
-  
     set -l short_opts_without_arg
-    set -l long_opts_without_arg
-    set -l old_opts_without_arg
-  
     set -l short_opts_with_optional_arg
+#endif
+#ifdef long_options
+    set -l long_opts_with_arg
+    set -l long_opts_without_arg
     set -l long_opts_with_optional_arg
+#endif
+#ifdef old_options
+    set -l old_opts_with_arg
+    set -l old_opts_without_arg
     set -l old_opts_with_optional_arg
+#endif
   
     set -l option
   
@@ -90,21 +94,26 @@ function __fish_query
       for option in (string split -- ',' $options)
         # Using one big switch case is the fastest way
         switch $option
+#ifdef long_options
           case '--?*=';   set -a long_opts_with_arg           (string replace -- '='  '' $option)
           case '--?*=\?'; set -a long_opts_with_optional_arg  (string replace -- '=?' '' $option)
           case '--?*';    set -a long_opts_without_arg        $option
-  
+#endif
+#ifdef short_options
           case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
           case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
           case '-?';      set -a short_opts_with_arg          $option
-  
+#endif
+#ifdef old_options
           case '-??*=';   set -a old_opts_with_arg            (string replace -- '='  '' $option)
           case '-??*=\?'; set -a old_opts_with_optional_arg   (string replace -- '=?' '' $option)
           case '-??*';    set -a old_opts_without_arg         $option
-  
+#endif
+#ifdef DEBUG
           case '*'
-            echo "$func: argv[1]: '$option' is not a short, long or old-style option" >&2
+            echo "%FUNCNAME%: argv[1]: '$option' is not a short, long or old-style option" >&2
             return 1
+#endif
         end
       end
     end
@@ -134,6 +143,7 @@ function __fish_query
           set -a having_options $split[1]
           set -a option_values "$split[2]"
         case '--*'
+#ifdef long_options
           if contains -- $arg $long_opts_with_arg
             if $have_trailing_arg
               set -a having_options $arg
@@ -144,9 +154,11 @@ function __fish_query
             set -a having_options $arg
             set -a option_values ""
           end
+#endif
         case '-*'
           set -l end_of_parsing false
 
+#ifdef old_options
           if string match -q -- "*=*" $arg
             set -l split (string split -m 1 -- '=' $arg)
             if contains -- $split[1] $old_opts_with_arg $old_opts_with_optional_arg
@@ -166,7 +178,9 @@ function __fish_query
             set -a option_values ""
             set end_of_parsing true
           end
+#endif
 
+#ifdef short_options
           set -l arg_length (string length -- $arg)
           set -l i 2
           while not $end_of_parsing; and test $i -le $arg_length
@@ -195,6 +209,7 @@ function __fish_query
 
             set i (math $i + 1)
           end
+#endif
         case '*'
           set -a positionals $arg
       end
@@ -213,39 +228,46 @@ function __fish_query
   # ===========================================================================
   
   switch $cmd
+#ifdef positional_contains
     case 'positional_contains'
       if test (count $argv) -eq 0
-        echo "$func: positional_contains: argv[3]: missing number" >&2
+        echo "%FUNCNAME%: positional_contains: argv[3]: missing number" >&2
         return 1
       end
   
       set -l positional_num $argv[1]
       set -e argv[1]
       contains -- $positionals[$positional_num] $argv && return 0 || return 1
+#endif
+#ifdef has_option
     case 'has_option'
       for option in $having_options
         contains -- $option $argv && return 0
       end
   
       return 1
+#endif
+#ifdef num_of_positionals
     case 'num_of_positionals'
       switch (count $argv)
         case 0
           count $positionals
         case 1
-          echo "$func: num_of_positionals: $argv[1]: missing operand" >&2
+          echo "%FUNCNAME%: num_of_positionals: $argv[1]: missing operand" >&2
           return 1
         case 2
           if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
             test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
           else
-            echo "$func: num_of_positionals: $argv[1]: unknown operator" >&2
+            echo "%FUNCNAME%: num_of_positionals: $argv[1]: unknown operator" >&2
             return 1
           end
         case '*'
-          echo "$func: num_of_positionals: too many arguments" >&2
+          echo "%FUNCNAME%: num_of_positionals: too many arguments" >&2
           return 1
       end
+#endif
+#ifdef option_is
     case 'option_is'
       set -l options
       set -l values
@@ -262,7 +284,7 @@ function __fish_query
       end
   
       if test (count $values) -eq 0
-        echo "$func: missing values" >&2
+        echo "%FUNCNAME%: missing values" >&2
         return 1
       end
   
@@ -278,9 +300,12 @@ function __fish_query
       end
   
       return 1
+#endif
+#ifdef DEBUG
     case '*'
-      echo "$func: argv[2]: invalid command" >&2
+      echo "%FUNCNAME%: argv[2]: invalid command" >&2
       return 1
+#endif
   end
 end
 
