@@ -5,7 +5,7 @@ custom methods.
 
 import argparse
 
-from .commandline import ExtendedBool
+from .cli import ExtendedBool
 
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access

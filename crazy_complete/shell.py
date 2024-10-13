@@ -3,7 +3,7 @@
 import re
 import collections
 
-from . import commandline as _commandline
+from . import cli
 from . import utils
 from . import config as _config
 
@@ -77,7 +77,7 @@ def make_completion_funcname(cmdline, prefix='_', suffix=''):
         For a program with the name 'my_program' and a subcommand with the name 'subcommand',
         the generated function name is '_my_program_subcommand'.
     '''
-    assert isinstance(cmdline, _commandline.CommandLine), \
+    assert isinstance(cmdline, cli.CommandLine), \
         "make_completion_funcname: cmdline: expected CommandLine, got %r" % cmdline
 
     commandlines = cmdline.get_parents(include_self=True)
@@ -96,9 +96,9 @@ def make_completion_funcname_for_context(ctxt):
 
     funcname = make_identifier('_'.join(p.prog for p in commandlines))
 
-    if isinstance(ctxt.option, _commandline.Option):
+    if isinstance(ctxt.option, cli.Option):
         return '%s_%s' % (funcname, ctxt.option.option_strings[0])
-    if isinstance(ctxt.option, _commandline.Positional):
+    if isinstance(ctxt.option, cli.Positional):
         return '%s_%s' % (funcname, ctxt.option.metavar)
 
     raise AssertionError('make_completion_funcname_for_context: Should not be reached')

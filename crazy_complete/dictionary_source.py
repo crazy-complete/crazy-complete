@@ -5,7 +5,7 @@ dictionaries and vice versa.
 
 from collections import OrderedDict
 
-from .commandline import CommandLine, ExtendedBool
+from .cli import CommandLine, ExtendedBool
 
 def dictionary_to_commandline(dictionary, prog):
     commandline = CommandLine(

@@ -43,7 +43,7 @@ class Config:
                     - set_abbreviate_commands(False): works
 
         See also:
-            commandline.CommandLine(..., abbreviate_commands=BOOL, ...)
+            cli.CommandLine(..., abbreviate_commands=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_abbreviate_commands", "enable")
 
@@ -72,7 +72,7 @@ class Config:
                     - set_abbreviate_options(False): works
 
         See also:
-            commandline.CommandLine(..., abbreviate_options=BOOL, ...)
+            cli.CommandLine(..., abbreviate_options=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_abbreviate_options", "enable")
 
@@ -102,7 +102,7 @@ class Config:
                     - set_multiple_options(False): works
 
         See also:
-            CommandLine.add_option(..., multiple_option=BOOL, ...)
+            cli.CommandLine.add_option(..., multiple_option=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_multiple_options", "enable")
 
@@ -132,7 +132,7 @@ class Config:
                     - set_inherit_options(False): works
 
         See also:
-            commandline.CommandLine(..., inherit_options=BOOL, ...)
+            cli.CommandLine(..., inherit_options=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_inherit_options", "enable")
 

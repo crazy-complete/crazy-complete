@@ -8,7 +8,7 @@ import yaml
 
 from . import utils
 from . import dictionary_source
-from .commandline import ExtendedBool
+from .cli import ExtendedBool
 
 def str_to_yaml(s):
     return json.dumps(s)

@@ -1,7 +1,7 @@
 ''' Functions that are used in the generation process '''
 
 from . import completion_validator
-from . import commandline as _commandline
+from . import cli
 from . import utils
 from . import config as _config
 
@@ -33,7 +33,7 @@ def enhance_commandline(commandline, program_name, config):
     if config is None:
         config = _config.Config()
 
-    _commandline.commandline_apply_config(commandline, config)
+    cli.commandline_apply_config(commandline, config)
     completion_validator.CompletionValidator().validate_commandlines(commandline)
     return commandline
 

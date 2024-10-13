@@ -8,7 +8,7 @@ from collections import OrderedDict
 
 from . import file_loader
 from . import utils
-from .commandline import CommandLine, MutuallyExclusiveGroup
+from .cli import CommandLine, MutuallyExclusiveGroup
 
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access
