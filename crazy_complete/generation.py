@@ -24,6 +24,43 @@ class OptionGenerationContext(GenerationContext):
         self.commandline = commandline
         self.option = option
 
+def commandline_apply_config(commandline, config):
+    '''
+    Applies configuration settings to a command line object.
+
+    If a setting in the CommandLine or Option object is set to ExtendedBool.INHERIT,
+    it will be overridden by the corresponding setting from the config object.
+
+    Args:
+        commandline (CommandLine): The command line object to apply the configuration to.
+        config (Config): The configuration object containing the settings to apply.
+
+    Returns:
+        None
+    '''
+    assert isinstance(commandline, cli.CommandLine), \
+        "commandline_apply_config: commandline: expected CommandLine, got %r" % commandline
+
+    assert isinstance(config, _config.Config), \
+        "commandline_apply_config: config: expected Config, got %r" % config
+
+    if commandline.abbreviate_commands == cli.ExtendedBool.INHERIT:
+        commandline.abbreviate_commands = config.abbreviate_commands
+
+    if commandline.abbreviate_options == cli.ExtendedBool.INHERIT:
+        commandline.abbreviate_options = config.abbreviate_options
+
+    if commandline.inherit_options == cli.ExtendedBool.INHERIT:
+        commandline.inherit_options = config.inherit_options
+
+    for option in commandline.options:
+        if option.multiple_option == cli.ExtendedBool.INHERIT:
+            option.multiple_option = config.multiple_options
+
+    if commandline.get_subcommands_option():
+        for subcommand in commandline.get_subcommands_option().subcommands:
+            commandline_apply_config(subcommand, config)
+
 def enhance_commandline(commandline, program_name, config):
     commandline = commandline.copy()
 
@@ -33,7 +70,7 @@ def enhance_commandline(commandline, program_name, config):
     if config is None:
         config = _config.Config()
 
-    cli.commandline_apply_config(commandline, config)
+    commandline_apply_config(commandline, config)
     completion_validator.CompletionValidator().validate_commandlines(commandline)
     return commandline
 

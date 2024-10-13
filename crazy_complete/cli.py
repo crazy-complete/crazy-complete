@@ -2,8 +2,6 @@
 
 from collections import OrderedDict
 
-from . import config as _config
-
 class ExtendedBool:
     TRUE    = True
     FALSE   = False
@@ -651,40 +649,3 @@ class MutuallyExclusiveGroup:
         ''' Adds an option object '''
         option.parent = self.parent
         option.group = self.group
-
-def commandline_apply_config(commandline, config):
-    '''
-    Applies configuration settings to a command line object.
-
-    If a setting in the CommandLine or Option object is set to ExtendedBool.INHERIT,
-    it will be overridden by the corresponding setting from the config object.
-
-    Args:
-        commandline (CommandLine): The command line object to apply the configuration to.
-        config (Config): The configuration object containing the settings to apply.
-
-    Returns:
-        None
-    '''
-    assert isinstance(commandline, CommandLine), \
-        "commandline_apply_config: commandline: expected CommandLine, got %r" % commandline
-
-    assert isinstance(config, _config.Config), \
-        "commandline_apply_config: config: expected Config, got %r" % config
-
-    if commandline.abbreviate_commands == ExtendedBool.INHERIT:
-        commandline.abbreviate_commands = config.abbreviate_commands
-
-    if commandline.abbreviate_options == ExtendedBool.INHERIT:
-        commandline.abbreviate_options = config.abbreviate_options
-
-    if commandline.inherit_options == ExtendedBool.INHERIT:
-        commandline.inherit_options = config.inherit_options
-
-    for option in commandline.options:
-        if option.multiple_option == ExtendedBool.INHERIT:
-            option.multiple_option = config.multiple_options
-
-    if commandline.get_subcommands_option():
-        for subcommand in commandline.get_subcommands_option().subcommands:
-            commandline_apply_config(subcommand, config)
