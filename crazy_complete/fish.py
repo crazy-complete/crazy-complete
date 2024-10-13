@@ -67,21 +67,16 @@ class Conditions:
             conditions += [guard]
 
         if self.not_has_option:
-            use_helper = False
             if unsafe:
-                guard = "__fish_not_contain_opt"
+                guard = "not __fish_seen_argument"
                 for opt in self.not_has_option:
                     if opt.startswith('--'):
-                        guard += ' %s' % opt.lstrip('-')
-                    elif opt.startswith('-') and len(opt) == 2:
+                        guard += ' -l %s' % opt.lstrip('-')
+                    elif len(opt) == 2:
                         guard += ' -s %s' % opt[1]
                     else:
-                        # __fish_not_contain_opt does not support old-options
-                        use_helper = True
+                        guard += ' -o %s' % opt.lstrip('-')
             else:
-                use_helper = True
-
-            if use_helper:
                 guard = "not %s" % self.fish_query.has_option(self.not_has_option)
             conditions += [guard]
 
