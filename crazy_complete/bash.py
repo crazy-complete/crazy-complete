@@ -4,6 +4,7 @@ Code for generating a bash auto completion file
 
 from collections import OrderedDict
 
+from . import config as config_
 from . import generation_notice
 from . import modeline
 from . import shell
@@ -432,21 +433,19 @@ __is_oldstyle_option() {
         self.result = r
 
 def generate_completion(commandline, program_name=None, config=None):
+    if config is None:
+        config = config_.Config()
+
     commandline = generation.enhance_commandline(commandline, program_name, config)
-
-    result = generation.CompletionGenerator(
-        BashCompletionGenerator,
-        bash_helpers.BashHelpers,
-        commandline,
-        config)
-
-    commandline = result.result[0].commandline
+    helpers = bash_helpers.BashHelpers(commandline.prog)
+    ctxt = generation.GenerationContext(config, helpers)
+    result = generation.visit_commandlines(BashCompletionGenerator, ctxt, commandline)
 
     output = []
     output += [generation_notice.GENERATION_NOTICE]
-    output += result.include_files_content
-    output += result.ctxt.helpers.get_used_functions_code()
-    output += [r.result for r in result.result]
+    output += config.get_included_files_content()
+    output += helpers.get_used_functions_code()
+    output += [generator.result for generator in result]
     output += ['complete -F %s %s' % (shell.make_completion_funcname(commandline), commandline.prog)]
     if config.vim_modeline:
         output += [modeline.get_vim_modeline('sh')]

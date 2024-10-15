@@ -4,6 +4,7 @@ Code for generating a fish auto completion file
 
 from collections import namedtuple, OrderedDict
 
+from . import config as config_
 from . import generation_notice
 from . import modeline
 from . import utils
@@ -271,40 +272,40 @@ def _define_option_types(ctxt, commandline):
                 ctxt.helpers.use_function('fish_query', 'old_options')
 
 def generate_completion(commandline, program_name=None, config=None):
+    if config is None:
+        config = _config.Config()
+
     commandline = generation.enhance_commandline(commandline, program_name, config)
+    helpers = fish_helpers.FishHelpers(commandline.prog)
+    ctxt = generation.GenerationContext(config, helpers)
+    result = generation.visit_commandlines(FishCompletionGenerator, ctxt, commandline)
 
-    result = generation.CompletionGenerator(
-        FishCompletionGenerator,
-        fish_helpers.FishHelpers,
-        commandline,
-        config)
-
-    if result.ctxt.helpers.is_used('fish_query'):
-        result.result[0].commandline.visit_commandlines(
-            lambda cmdline: _define_option_types(result.ctxt, cmdline))
+    if helpers.is_used('fish_query'):
+       commandline.visit_commandlines(
+            lambda cmdline: _define_option_types(ctxt, cmdline))
 
     output = []
 
     output.append(generation_notice.GENERATION_NOTICE)
     output.append('')
 
-    for code in result.include_files_content:
+    for code in config.get_included_files_content():
         output.append(code)
         output.append('')
 
-    for code in result.ctxt.helpers.get_used_functions_code():
+    for code in helpers.get_used_functions_code():
         output.append(code)
         output.append('')
 
-    output.append('set -l prog "%s"' % result.result[0].commandline.prog)
-    if result.ctxt.helpers.is_used('fish_query'):
-        output.append('set -l query "%s"' % result.ctxt.helpers.use_function('fish_query'))
+    output.append('set -l prog "%s"' % commandline.prog)
+    if helpers.is_used('fish_query'):
+        output.append('set -l query "%s"' % helpers.use_function('fish_query'))
 
     output.append('')
     output.append('# Generally disable file completion')
     output.append('complete -c $prog -x')
 
-    for generator in result.result:
+    for generator in result:
         output.append('')
         output.append(generator.command_comment)
         output.append(generator.options_for_query)

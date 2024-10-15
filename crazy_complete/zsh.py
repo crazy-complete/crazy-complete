@@ -2,6 +2,7 @@
 Code for generating a zsh auto completion file
 '''
 
+from . import config as config_
 from . import generation
 from . import generation_notice
 from . import modeline
@@ -245,38 +246,36 @@ def _define_option_types(ctxt, commandline):
                 ctxt.helpers.use_function('zsh_query', 'old_options')
 
 def generate_completion(commandline, program_name=None, config=None):
+    if config is None:
+        config = config_.Config()
+
     commandline = generation.enhance_commandline(commandline, program_name, config)
+    helpers = zsh_helpers.ZshHelpers(commandline.prog)
+    ctxt = generation.GenerationContext(config, helpers)
+    result = generation.visit_commandlines(ZshCompletionGenerator, ctxt, commandline)
 
-    result = generation.CompletionGenerator(
-        ZshCompletionGenerator,
-        zsh_helpers.ZshHelpers,
-        commandline,
-        config)
-
-    functions = result.result
-
-    if result.ctxt.helpers.is_used('zsh_query'):
-        result.result[0].commandline.visit_commandlines(
-            lambda cmdline: _define_option_types(result.ctxt, cmdline))
+    if helpers.is_used('zsh_query'):
+        commandline.visit_commandlines(
+            lambda cmdline: _define_option_types(ctxt, cmdline))
 
     output = []
 
     if config.zsh_compdef:
-        output += ['#compdef %s' % functions[0].commandline.prog]
+        output += ['#compdef %s' % commandline.prog]
 
     output.append(generation_notice.GENERATION_NOTICE)
 
-    output.extend(result.include_files_content)
+    output.extend(config.get_included_files_content())
 
-    for code in result.ctxt.helpers.get_used_functions_code():
+    for code in helpers.get_used_functions_code():
         output.append(code)
 
-    output += [r.result for r in functions]
+    output += [generator.result for generator in result]
 
     if config.zsh_compdef:
-        output += ['%s "$@"' % functions[0].funcname]
+        output += ['%s "$@"' % result[0].funcname]
     else:
-        output += ['compdef %s %s' % (functions[0].funcname, functions[0].commandline.prog)]
+        output += ['compdef %s %s' % (result[0].funcname, commandline.prog)]
 
     if config.vim_modeline:
         output += [modeline.get_vim_modeline('zsh')]

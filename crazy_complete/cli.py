@@ -11,7 +11,7 @@ def is_bool(obj):
     return isinstance(obj, bool)
 
 def is_extended_bool(obj):
-    return isinstance(obj, bool) or obj == ExtendedBool.INHERIT
+    return obj in (True, False, ExtendedBool.INHERIT)
 
 class CommandLine:
     '''
@@ -501,8 +501,8 @@ class Option:
         '''
         return self.option_strings
 
-    def get_option_strings_key(self):
-        return ' '.join(sorted(self.option_strings))
+    def get_option_strings_key(self, delimiter=' '):
+        return delimiter.join(sorted(self.option_strings))
 
     def get_short_option_strings(self):
         '''

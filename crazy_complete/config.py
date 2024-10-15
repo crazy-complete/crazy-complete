@@ -205,3 +205,10 @@ class Config:
         Add files which should be included to the generated code.
         '''
         self.include_files.extend(files)
+
+    def get_included_files_content(self):
+        content = []
+        for file in self.include_files:
+            with open(file, 'r', encoding='utf-8') as fh:
+                content.append(fh.read().strip())
+        return content

@@ -2,8 +2,8 @@
 
 from . import completion_validator
 from . import cli
-from . import utils
 from . import config as _config
+from . import when
 
 class GenerationContext:
     def __init__(self, config, helpers):
@@ -24,7 +24,7 @@ class OptionGenerationContext(GenerationContext):
         self.commandline = commandline
         self.option = option
 
-def commandline_apply_config(commandline, config):
+def apply_config(commandline, config):
     '''
     Applies configuration settings to a command line object.
 
@@ -57,9 +57,19 @@ def commandline_apply_config(commandline, config):
         if option.multiple_option == cli.ExtendedBool.INHERIT:
             option.multiple_option = config.multiple_options
 
-    if commandline.get_subcommands_option():
-        for subcommand in commandline.get_subcommands_option().subcommands:
-            commandline_apply_config(subcommand, config)
+def add_parsed_when(commandline):
+    for option in commandline.options:
+        if option.when:
+            try:
+                setattr(option, 'when_parsed', when.parse_when(option.when))
+            except Exception as e:
+                raise Exception('%s: %s: %s: %s' % (
+                    commandline.get_command_path(),
+                    option.get_option_strings_key('|'),
+                    option.when,
+                    e))
+        else:
+            setattr(option, 'when_parsed', None)
 
 def enhance_commandline(commandline, program_name, config):
     commandline = commandline.copy()
@@ -67,24 +77,17 @@ def enhance_commandline(commandline, program_name, config):
     if program_name is not None:
         commandline.prog = program_name
 
-    if config is None:
-        config = _config.Config()
-
-    commandline_apply_config(commandline, config)
+    commandline.visit_commandlines(lambda c: apply_config(c, config))
+    commandline.visit_commandlines(lambda c: add_parsed_when(c))
     completion_validator.CompletionValidator().validate_commandlines(commandline)
     return commandline
 
-class CompletionGenerator:
-    def __init__(self, completion_class, helpers_class, commandline, config):
-        self.include_files_content = []
-        for file in config.include_files:
-            with open(file, 'r', encoding='utf-8') as fh:
-                self.include_files_content.append(fh.read().strip())
+def visit_commandlines(completion_class, ctxt, commandline):
+    result = []
 
-        self.completion_class = completion_class
-        self.ctxt = GenerationContext(config, helpers_class(commandline.prog))
-        self.result = []
-        commandline.visit_commandlines(self._call_generator)
+    def _call_generator(commandline):
+        result.append(completion_class(ctxt, commandline))
 
-    def _call_generator(self, commandline):
-        self.result.append(self.completion_class(self.ctxt, commandline))
+    commandline.visit_commandlines(_call_generator)
+
+    return result
