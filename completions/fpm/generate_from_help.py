@@ -96,7 +96,7 @@ COMPLETE = {
     '--pleaserun-chdir': {'complete': ['directory']},
 }
 
-COMMANDLINE = crazy_complete.commandline.CommandLine('fpm', help="Effing package management")
+COMMANDLINE = crazy_complete.cli.CommandLine('fpm', help="Effing package management")
 
 COMMANDLINE.add_positional(1, complete=['file'], repeatable=True)
 
@@ -115,7 +115,7 @@ def process(line):
     opts = []
     metavar = None
     when = None
-    multiple_option = crazy_complete.commandline.ExtendedBool.INHERIT
+    multiple_option = crazy_complete.cli.ExtendedBool.INHERIT
     complete = None
 
     while words[0].startswith('-'):
