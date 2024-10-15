@@ -90,6 +90,7 @@ function _pylint__--fail-on
     class-variable-slots-conflict \
     invalid-class-object \
     invalid-enum-extension \
+    declare-non-slot \
     non-iterator-returned \
     unexpected-special-method-signature \
     invalid-length-returned \
@@ -213,7 +214,7 @@ function _pylint__--fail-on
     too-many-locals \
     too-many-statements \
     too-many-boolean-expressions \
-    too-many-positional \
+    too-many-positional-arguments \
     consider-merging-isinstance \
     too-many-nested-blocks \
     simplifiable-if-statement \
@@ -368,6 +369,10 @@ function _pylint__--fail-on
     non-ascii-file-name \
     using-f-string-in-unsupported-version \
     using-final-decorator-in-unsupported-version \
+    using-exception-groups-in-unsupported-version \
+    using-generic-type-syntax-in-unsupported-version \
+    using-assignment-expression-in-unsupported-version \
+    using-positional-only-args-in-unsupported-version \
     missing-timeout \
     nested-min-max \
     bad-chained-comparison \
@@ -382,12 +387,12 @@ function _pylint__--fail-on
     boolean-datetime
 end
 
-function _pylint_fish_helper
+function _pylint_fish_query
   # ===========================================================================
   #
   # This function implements the parsing of options and positionals in the Fish shell.
   #
-  # Usage: __fish_helper <OPTIONS> <COMMAND> [ARGS...]
+  # Usage: __fish_query <OPTIONS> <COMMAND> [ARGS...]
   #
   # The first argument is a comma-separated list of options that the parser should know about.
   # Short options (-o), long options (--option), and old-style options (-option) are supported.
@@ -396,7 +401,7 @@ function _pylint_fish_helper
   # If an option takes an optional argument, it is suffixed by '=?'.
   #
   # For example:
-  #   __fish_helper '-f,--flag,-old-style,--with-arg=,--with-optional=?'
+  #   __fish_query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
   #
   #   Here, -f, --flag and -old-style don't take options, --with-arg requires an
   #   argument and --with-optional takes an optional argument.
@@ -407,7 +412,7 @@ function _pylint_fish_helper
   #     NUM counts from one.
   #
   #   has_option <OPTIONS...>
-  #     Checks if a option given in OPTIONS is passed on commandline.
+  #     Checks if an option given in OPTIONS is passed on commandline.
   #
   #   option_is <OPTIONS...> -- <VALUES...>
   #     Checks if any option in OPTIONS has a value of VALUES.
@@ -422,20 +427,9 @@ function _pylint_fish_helper
   #
   # ===========================================================================
 
-  set -l func '__fish_helper'
-
   set -l positionals
   set -l having_options
   set -l option_values
-
-  switch (count $argv)
-    case 0
-      echo "$func: missing OPTIONS argument" >&2
-      return 1
-    case 1
-      echo "$func: missing COMMAND" >&2
-      return 1
-  end
 
   set -l options $argv[1]
   set -e argv[1]
@@ -445,26 +439,21 @@ function _pylint_fish_helper
 
   set -l my_cache_key "$(commandline -b) $options"
 
-  if test "$__CACHE_KEY" = "$my_cache_key"
-    set positionals    $__CACHE_POSITIONALS
-    set having_options $__CACHE_HAVING_OPTIONS
-    set option_values  $__CACHE_OPTION_VALUES
+  if test "$__QUERY_CACHE_KEY" = "$my_cache_key"
+    set positionals    $__QUERY_CACHE_POSITIONALS
+    set having_options $__QUERY_CACHE_HAVING_OPTIONS
+    set option_values  $__QUERY_CACHE_OPTION_VALUES
   else
     # =========================================================================
     # Parsing of OPTIONS argument
     # =========================================================================
 
     set -l short_opts_with_arg
-    set -l long_opts_with_arg
-    set -l old_opts_with_arg
-
     set -l short_opts_without_arg
-    set -l long_opts_without_arg
-    set -l old_opts_without_arg
-
     set -l short_opts_with_optional_arg
+    set -l long_opts_with_arg
+    set -l long_opts_without_arg
     set -l long_opts_with_optional_arg
-    set -l old_opts_with_optional_arg
 
     set -l option
 
@@ -475,18 +464,9 @@ function _pylint_fish_helper
           case '--?*=';   set -a long_opts_with_arg           (string replace -- '='  '' $option)
           case '--?*=\?'; set -a long_opts_with_optional_arg  (string replace -- '=?' '' $option)
           case '--?*';    set -a long_opts_without_arg        $option
-
           case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
           case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
           case '-?';      set -a short_opts_with_arg          $option
-
-          case '-??*=';   set -a old_opts_with_arg            (string replace -- '='  '' $option)
-          case '-??*=\?'; set -a old_opts_with_optional_arg   (string replace -- '=?' '' $option)
-          case '-??*';    set -a old_opts_without_arg         $option
-
-          case '*'
-            echo "$func: argv[1]: '$option' is not a short, long or old-style option" >&2
-            return 1
         end
       end
     end
@@ -511,95 +491,51 @@ function _pylint_fish_helper
             set -a positionals $cmdline[$argi]
           end
           break
+        case '--*=*'
+          set -l split (string split -m 1 -- '=' $arg)
+          set -a having_options $split[1]
+          set -a option_values "$split[2]"
         case '--*'
-          for option in $long_opts_with_arg $long_opts_without_arg $long_opts_with_optional_arg
-            if string match -q -- "$option=*" $arg
-              set -a having_options $option
-              set -a option_values (string replace -- "$option=" "" $arg)
-              break
-            else if string match -q -- $option $arg
-              if contains -- $option $long_opts_with_arg
-                if $have_trailing_arg
-                  set -a having_options $option
-                  set -a option_values $cmdline[(math $argi + 1)]
-                  set argi (math $argi + 1)
-                end
-              else
-                set -a having_options $option
-                set -a option_values ""
-              end
-              break
+          if contains -- $arg $long_opts_with_arg
+            if $have_trailing_arg
+              set -a having_options $arg
+              set -a option_values $cmdline[(math $argi + 1)]
+              set argi (math $argi + 1)
             end
+          else
+            set -a having_options $arg
+            set -a option_values ""
           end
         case '-*'
-          set -l have_match false
+          set -l end_of_parsing false
 
-          for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg
-            if string match -q -- "$option=*" $arg
+          set -l arg_length (string length -- $arg)
+          set -l i 2
+          while not $end_of_parsing; and test $i -le $arg_length
+            set -l option "-$(string sub -s $i -l 1 -- $arg)"
+            set -l trailing_chars "$(string sub -s (math $i + 1) -- $arg)"
+
+            if contains -- $option $short_opts_without_arg
               set -a having_options $option
-              set -a option_values (string replace -- "$option=" "" $arg)
-              set have_match true
-              break
-            else if string match -q -- $option $arg
-              if contains -- $option $old_opts_with_arg
-                if $have_trailing_arg
-                  set -a having_options $option
-                  set -a option_values $cmdline[(math $argi + 1)]
-                  set argi (math $argi + 1)
-                end
-              else
+              set -a option_values ""
+            else if contains -- $option $short_opts_with_arg
+              set end_of_parsing true
+
+              if test -n "$trailing_chars"
                 set -a having_options $option
-                set -a option_values ""
+                set -a option_values $trailing_chars
+              else if $have_trailing_arg
+                set -a having_options $option
+                set -a option_values $cmdline[(math $argi + 1)]
+                set argi (math $argi + 1)
               end
-
-              set have_match true
-              break
+            else if contains -- $option $short_opts_with_optional_arg
+              set -a having_options $option
+              set end_of_parsing true
+              set -a option_values "$trailing_chars" # may be empty
             end
-          end
 
-          if not $have_match
-            set -l arg_length (string length -- $arg)
-            set -l i 2
-            set is_end false
-            while not $is_end && test $i -le $arg_length
-              set -l char (string sub -s $i -l 1 -- "$arg")
-              set -l have_trailing_chars (test $i -lt $arg_length && echo true || echo false)
-
-              for option in $short_opts_with_arg $short_opts_without_arg $short_opts_with_optional_arg
-                set -l option_char (string sub -s 2 -l 1 -- $option)
-
-                if test "$char" = "$option_char"
-                  if contains -- $option $short_opts_with_arg
-                    if $have_trailing_chars
-                      set -a having_options $option
-                      set -a option_values (string sub -s (math $i + 1) -- $arg)
-                      set is_end true
-                    else if $have_trailing_arg
-                      set -a having_options $option
-                      set -a option_values $cmdline[(math $argi + 1)]
-                      set argi (math $argi + 1)
-                      set is_end true
-                    end
-                  else if contains -- $option $short_opts_with_optional_arg
-                    set -a having_options $option
-
-                    if $have_trailing_chars
-                      set -a option_values (string sub -s (math $i + 1) -- $arg)
-                      set is_end true
-                    else
-                      set -a option_values ""
-                    end
-                  else
-                    set -a having_options $option
-                    set -a option_values ""
-                  end
-
-                  break
-                end
-              end
-
-              set i (math $i + 1)
-            end
+            set i (math $i + 1)
           end
         case '*'
           set -a positionals $arg
@@ -608,10 +544,10 @@ function _pylint_fish_helper
       set argi (math $argi + 1)
     end
 
-    set -g __CACHE_POSITIONALS    $positionals
-    set -g __CACHE_HAVING_OPTIONS $having_options
-    set -g __CACHE_OPTION_VALUES  $option_values
-    set -g __CACHE_KEY            $my_cache_key
+    set -g __QUERY_CACHE_POSITIONALS    $positionals
+    set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
+    set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+    set -g __QUERY_CACHE_KEY            $my_cache_key
   end
 
   # ===========================================================================
@@ -619,15 +555,6 @@ function _pylint_fish_helper
   # ===========================================================================
 
   switch $cmd
-    case 'positional_contains'
-      if test (count $argv) -eq 0
-        echo "$func: positional_contains: argv[3]: missing number" >&2
-        return 1
-      end
-
-      set -l positional_num $argv[1]
-      set -e argv[1]
-      contains -- $positionals[$positional_num] $argv && return 0 || return 1
     case 'has_option'
       for option in $having_options
         contains -- $option $argv && return 0
@@ -639,92 +566,57 @@ function _pylint_fish_helper
         case 0
           count $positionals
         case 1
-          echo "$func: num_of_positionals: $argv[1]: missing operand" >&2
+          echo "_pylint_fish_query: num_of_positionals: $argv[1]: missing operand" >&2
           return 1
         case 2
           if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
             test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
           else
-            echo "$func: num_of_positionals: $argv[1]: unknown operator" >&2
+            echo "_pylint_fish_query: num_of_positionals: $argv[1]: unknown operator" >&2
             return 1
           end
         case '*'
-          echo "$func: num_of_positionals: too many arguments" >&2
+          echo "_pylint_fish_query: num_of_positionals: too many arguments" >&2
           return 1
       end
-    case 'option_is'
-      set -l options
-      set -l values
-
-      for arg in $argv
-        set -e argv[1]
-
-        if string match -q -- -- $arg
-          set values $argv
-          break
-        else
-          set -a options $arg
-        end
-      end
-
-      if test (count $values) -eq 0
-        echo "$func: missing values" >&2
-        return 1
-      end
-
-      set -l i (count $having_options)
-      while test $i -ge 1
-        if contains -- $having_options[$i] $options
-          if contains -- $option_values[$i] $values
-            return 0
-          end
-        end
-
-        set i (math $i - 1)
-      end
-
-      return 1
-    case '*'
-      echo "$func: argv[2]: invalid command" >&2
-      return 1
   end
 end
 
 set -l prog "pylint"
-set -l helper "_pylint_fish_helper"
+set -l query "_pylint_fish_query"
 
 # Generally disable file completion
 complete -c $prog -x
 
 # command pylint
-set -l options "-h,--help,--rcfile=,--output=,--help-msg=,--list-msgs,--list-msgs-enabled,--list-groups,--list-conf-levels,--list-extensions,--full-documentation,--generate-rcfile,--generate-toml-config,--long-help,--init-hook=,--errors-only,-E,--verbose,-v,--enable-all-extensions,--ignore=,--ignore-patterns=,--ignore-paths=,--persistent=,--load-plugins=,--fail-under=,--fail-on=,--jobs=,-j=,--limit-inference-results=,--extension-pkg-allow-list=,--extension-pkg-whitelist=,--suggestion-mode=,--exit-zero,--from-stdin,--source-roots=,--recursive=,--py-version=,--ignored-modules=,--analyse-fallback-blocks=,--clear-cache-post-run=,--prefer-stubs=,--output-format=,-f=,--reports=,-r=,--evaluation=,--score=,-s=,--msg-template=,--confidence=,--enable=,-e=,--disable=,-d=,--min-similarity-lines=,--ignore-comments=,--ignore-docstrings=,--ignore-imports=,--ignore-signatures=,--ignore-on-opaque-inference=,--mixin-class-rgx=,--ignore-mixin-members=,--ignored-checks-for-mixins=,--ignore-none=,--ignored-classes=,--generated-members=,--contextmanager-decorators=,--missing-member-hint-distance=,--missing-member-max-choices=,--missing-member-hint=,--signature-mutators=,--notes=,--notes-rgx=,--timeout-methods=,--spelling-dict=,--spelling-ignore-words=,--spelling-private-dict-file=,--spelling-store-unknown-words=,--max-spelling-suggestions=,--spelling-ignore-comment-directives=,--max-nested-blocks=,--never-returning-functions=,--suggest-join-with-non-empty-separator=,--check-str-concat-over-line-jumps=,--check-quote-consistency=,--max-args=,--max-locals=,--max-returns=,--max-branches=,--max-statements=,--max-parents=,--ignored-parents=,--max-attributes=,--min-public-methods=,--max-public-methods=,--max-bool-expr=,--exclude-too-few-public-methods=,--overgeneral-exceptions=,--defining-attr-methods=,--valid-classmethod-first-arg=,--valid-metaclass-classmethod-first-arg=,--exclude-protected=,--check-protected-access-in-special-methods=,--max-line-length=,--ignore-long-lines=,--single-line-if-stmt=,--single-line-class-stmt=,--max-module-lines=,--indent-string=,--indent-after-paren=,--expected-line-ending-format=,--good-names=,--good-names-rgxs=,--bad-names=,--bad-names-rgxs=,--name-group=,--include-naming-hint=,--property-classes=,--argument-naming-style=,--argument-rgx=,--attr-naming-style=,--attr-rgx=,--class-naming-style=,--class-rgx=,--class-attribute-naming-style=,--class-attribute-rgx=,--class-const-naming-style=,--class-const-rgx=,--const-naming-style=,--const-rgx=,--function-naming-style=,--function-rgx=,--inlinevar-naming-style=,--inlinevar-rgx=,--method-naming-style=,--method-rgx=,--module-naming-style=,--module-rgx=,--typealias-rgx=,--typevar-rgx=,--variable-naming-style=,--variable-rgx=,--no-docstring-rgx=,--docstring-min-length=,--init-import=,--dummy-variables-rgx=,--additional-builtins=,--callbacks=,--redefining-builtins-modules=,--ignored-argument-names=,--allow-global-unused-variables=,--allowed-redefined-builtins=,--deprecated-modules=,--preferred-modules=,--import-graph=,--ext-import-graph=,--int-import-graph=,--known-standard-library=,--known-third-party=,--allow-any-import-level=,--allow-wildcard-with-all=,--allow-reexport-from-package=,--logging-modules=,--logging-format-style="
-set -l guard000 "not $helper '$options' has_option --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard001 "not $helper '$options' has_option -h --help --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard002 "not $helper '$options' has_option -h --help --rcfile --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard003 "not $helper '$options' has_option -h --help --rcfile --output --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard004 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard005 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard006 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard007 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard008 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --full-documentation --generate-rcfile --generate-toml-config --long-help"
-set -l guard009 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --generate-rcfile --generate-toml-config --long-help"
-set -l guard010 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-toml-config --long-help"
-set -l guard011 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --long-help"
-set -l guard012 "not $helper '$options' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config"
-set -l guard013 "$helper '$options' num_of_positionals -ge 0"
-complete -c $prog -n $guard000 -s h -l help -d 'show this help message and exit' -f
-complete -c $prog -n $guard001 -l rcfile -d 'Specify a configuration file to load.' -rF
-complete -c $prog -n $guard002 -l output -d 'Specify an output file.' -rF
-complete -c $prog -n $guard003 -l help-msg -d 'Display a help message for the given message id and exit. The value may be a comma separated list of message ids.' -x
-complete -c $prog -n $guard004 -l list-msgs -d "Display a list of all pylint's messages divided by whether they are emittable with the given interpreter." -f
-complete -c $prog -n $guard005 -l list-msgs-enabled -d 'Display a list of what messages are enabled, disabled and non-emittable with the given configuration.' -f
-complete -c $prog -n $guard006 -l list-groups -d "List pylint's message groups." -f
-complete -c $prog -n $guard007 -l list-conf-levels -d "Generate pylint's confidence levels." -f
-complete -c $prog -n $guard008 -l list-extensions -d 'List available extensions.' -f
-complete -c $prog -n $guard009 -l full-documentation -d "Generate pylint's full documentation." -f
-complete -c $prog -n $guard010 -l generate-rcfile -d 'Generate a sample configuration file according to the current configuration. You can put other options before this one to get them in the generated configuration.' -f
-complete -c $prog -n $guard011 -l generate-toml-config -d 'Generate a sample configuration file according to the current configuration. You can put other options before this one to get them in the generated configuration. The config is in the .toml format.' -f
-complete -c $prog -n $guard012 -l long-help -d 'Show more verbose help.' -f
+set -l opts "-h,--help,--rcfile=,--output=,--help-msg=,--list-msgs,--list-msgs-enabled,--list-groups,--list-conf-levels,--list-extensions,--full-documentation,--generate-rcfile,--generate-toml-config,--long-help,--init-hook=,--errors-only,-E,--verbose,-v,--enable-all-extensions,--ignore=,--ignore-patterns=,--ignore-paths=,--persistent=,--load-plugins=,--fail-under=,--fail-on=,--jobs=,-j=,--limit-inference-results=,--extension-pkg-allow-list=,--extension-pkg-whitelist=,--suggestion-mode=,--exit-zero,--from-stdin,--source-roots=,--recursive=,--py-version=,--ignored-modules=,--analyse-fallback-blocks=,--clear-cache-post-run=,--prefer-stubs=,--output-format=,-f=,--reports=,-r=,--evaluation=,--score=,-s=,--msg-template=,--confidence=,--enable=,-e=,--disable=,-d=,--min-similarity-lines=,--ignore-comments=,--ignore-docstrings=,--ignore-imports=,--ignore-signatures=,--ignore-on-opaque-inference=,--mixin-class-rgx=,--ignore-mixin-members=,--ignored-checks-for-mixins=,--ignore-none=,--ignored-classes=,--generated-members=,--contextmanager-decorators=,--missing-member-hint-distance=,--missing-member-max-choices=,--missing-member-hint=,--signature-mutators=,--notes=,--notes-rgx=,--timeout-methods=,--spelling-dict=,--spelling-ignore-words=,--spelling-private-dict-file=,--spelling-store-unknown-words=,--max-spelling-suggestions=,--spelling-ignore-comment-directives=,--max-nested-blocks=,--never-returning-functions=,--suggest-join-with-non-empty-separator=,--check-str-concat-over-line-jumps=,--check-quote-consistency=,--max-args=,--max-positional-arguments=,--max-locals=,--max-returns=,--max-branches=,--max-statements=,--max-parents=,--ignored-parents=,--max-attributes=,--min-public-methods=,--max-public-methods=,--max-bool-expr=,--exclude-too-few-public-methods=,--overgeneral-exceptions=,--defining-attr-methods=,--valid-classmethod-first-arg=,--valid-metaclass-classmethod-first-arg=,--exclude-protected=,--check-protected-access-in-special-methods=,--max-line-length=,--ignore-long-lines=,--single-line-if-stmt=,--single-line-class-stmt=,--max-module-lines=,--indent-string=,--indent-after-paren=,--expected-line-ending-format=,--good-names=,--good-names-rgxs=,--bad-names=,--bad-names-rgxs=,--name-group=,--include-naming-hint=,--property-classes=,--argument-naming-style=,--argument-rgx=,--attr-naming-style=,--attr-rgx=,--class-naming-style=,--class-rgx=,--class-attribute-naming-style=,--class-attribute-rgx=,--class-const-naming-style=,--class-const-rgx=,--const-naming-style=,--const-rgx=,--function-naming-style=,--function-rgx=,--inlinevar-naming-style=,--inlinevar-rgx=,--method-naming-style=,--method-rgx=,--module-naming-style=,--module-rgx=,--typealias-rgx=,--typevar-rgx=,--variable-naming-style=,--variable-rgx=,--no-docstring-rgx=,--docstring-min-length=,--init-import=,--dummy-variables-rgx=,--additional-builtins=,--callbacks=,--redefining-builtins-modules=,--ignored-argument-names=,--allow-global-unused-variables=,--allowed-redefined-builtins=,--deprecated-modules=,--preferred-modules=,--import-graph=,--ext-import-graph=,--int-import-graph=,--known-standard-library=,--known-third-party=,--allow-any-import-level=,--allow-wildcard-with-all=,--allow-reexport-from-package=,--logging-modules=,--logging-format-style="
+set -l C000 "not $query '$opts' has_option --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C001 "not $query '$opts' has_option -h --help --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C002 "not $query '$opts' has_option -h --help --rcfile --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C003 "not $query '$opts' has_option -h --help --rcfile --output --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C004 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C005 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C006 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C007 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C008 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --full-documentation --generate-rcfile --generate-toml-config --long-help"
+set -l C009 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --generate-rcfile --generate-toml-config --long-help"
+set -l C010 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-toml-config --long-help"
+set -l C011 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --long-help"
+set -l C012 "not $query '$opts' has_option -h --help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config"
+set -l C013 "$query '$opts' num_of_positionals -ge 0"
+complete -c $prog -n $C000 -s h -l help -d 'show this help message and exit' -f
+complete -c $prog -n $C001 -l rcfile -d 'Specify a configuration file to load.' -Fr
+complete -c $prog -n $C002 -l output -d 'Specify an output file.' -Fr
+complete -c $prog -n $C003 -l help-msg -d 'Display a help message for the given message id and exit. The value may be a comma separated list of message ids.' -x
+complete -c $prog -n $C004 -l list-msgs -d "Display a list of all pylint's messages divided by whether they are emittable with the given interpreter." -f
+complete -c $prog -n $C005 -l list-msgs-enabled -d 'Display a list of what messages are enabled, disabled and non-emittable with the given configuration.' -f
+complete -c $prog -n $C006 -l list-groups -d "List pylint's message groups." -f
+complete -c $prog -n $C007 -l list-conf-levels -d "Generate pylint's confidence levels." -f
+complete -c $prog -n $C008 -l list-extensions -d 'List available extensions.' -f
+complete -c $prog -n $C009 -l full-documentation -d "Generate pylint's full documentation." -f
+complete -c $prog -n $C010 -l generate-rcfile -d 'Generate a sample configuration file according to the current configuration. You can put other options before this one to get them in the generated configuration.' -f
+complete -c $prog -n $C011 -l generate-toml-config -d 'Generate a sample configuration file according to the current configuration. You can put other options before this one to get them in the generated configuration. The config is in the .toml format.' -f
+complete -c $prog -n $C012 -l long-help -d 'Show more verbose help.' -f
 complete -c $prog -l init-hook -d 'Python code to execute, usually for sys.path manipulation such as pygtk.require().' -x
 complete -c $prog -s E -l errors-only -d 'In error mode, messages with a category besides ERROR or FATAL are suppressed, and no reports are done by default. Error mode is compatible with disabling specific errors.' -f
 complete -c $prog -s v -l verbose -d 'In verbose mode, extra non-checker-related info will be displayed.' -f
@@ -790,6 +682,7 @@ complete -c $prog -l suggest-join-with-non-empty-separator -d 'Let '"'"'consider
 complete -c $prog -l check-str-concat-over-line-jumps -d 'This flag controls whether the implicit-str-concat should generate a warning on implicit string concatenation in sequences defined over several lines. (default: False)' -x -a 'y n'
 complete -c $prog -l check-quote-consistency -d 'This flag controls whether inconsistent-quotes generates a warning when the character used as a quote delimiter is used inconsistently within a module. (default: False)' -x -a 'y n'
 complete -c $prog -l max-args -d 'Maximum number of arguments for function / method. (default: 5)' -x
+complete -c $prog -l max-positional-arguments -d 'Maximum number of positional arguments for function / method. (default: 5)' -x
 complete -c $prog -l max-locals -d 'Maximum number of locals for function / method body. (default: 15)' -x
 complete -c $prog -l max-returns -d 'Maximum number of return / yield for function / method body. (default: 6)' -x
 complete -c $prog -l max-branches -d 'Maximum number of branch for function / method body. (default: 12)' -x
@@ -858,9 +751,9 @@ complete -c $prog -l allow-global-unused-variables -d 'Tells whether unused glob
 complete -c $prog -l allowed-redefined-builtins -d 'List of names allowed to shadow builtins (default: ())' -x
 complete -c $prog -l deprecated-modules -d 'Deprecated modules which should not be used, separated by a comma. (default: ())' -x
 complete -c $prog -l preferred-modules -d 'Couples of modules and preferred modules, separated by a comma. (default: ())' -x
-complete -c $prog -l import-graph -d 'Output a graph (.gv or any supported image format) of all (i.e. internal and external) dependencies to the given file (report RP0402 must not be disabled). (default: )' -rF
-complete -c $prog -l ext-import-graph -d 'Output a graph (.gv or any supported image format) of external dependencies to the given file (report RP0402 must not be disabled). (default: )' -rF
-complete -c $prog -l int-import-graph -d 'Output a graph (.gv or any supported image format) of internal dependencies to the given file (report RP0402 must not be disabled). (default: )' -rF
+complete -c $prog -l import-graph -d 'Output a graph (.gv or any supported image format) of all (i.e. internal and external) dependencies to the given file (report RP0402 must not be disabled). (default: )' -Fr
+complete -c $prog -l ext-import-graph -d 'Output a graph (.gv or any supported image format) of external dependencies to the given file (report RP0402 must not be disabled). (default: )' -Fr
+complete -c $prog -l int-import-graph -d 'Output a graph (.gv or any supported image format) of internal dependencies to the given file (report RP0402 must not be disabled). (default: )' -Fr
 complete -c $prog -l known-standard-library -d 'Force import order to recognize a module as part of the standard compatibility libraries. (default: ())' -x
 complete -c $prog -l known-third-party -d "Force import order to recognize a module as part of a third party library. (default: ('enchant',))" -x
 complete -c $prog -l allow-any-import-level -d 'List of modules that can be imported at any level, not just the top level one. (default: ())' -x
@@ -868,6 +761,6 @@ complete -c $prog -l allow-wildcard-with-all -d 'Allow wildcard imports from mod
 complete -c $prog -l allow-reexport-from-package -d 'Allow explicit reexports by alias from a package __init__. (default: False)' -x -a 'y n'
 complete -c $prog -l logging-modules -d "Logging modules to check that the string format arguments are in logging function parameter format. (default: ('logging',))" -x
 complete -c $prog -l logging-format-style -d 'The type of string formatting that logging methods do. `old` means using % formatting, `new` is for `{}` formatting. (default: old)' -x -a 'new old'
-complete -c $prog -n $guard013 -rF
+complete -c $prog -n $C013 -Fr
 
 # vim: ft=fish ts=2 sts=2 sw=2 et

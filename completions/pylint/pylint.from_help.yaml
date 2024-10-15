@@ -1,5 +1,5 @@
 prog: "pylint"
-help: <Program description here>
+help: "<Program description here>"
 options:
 # usage: pylint [options]
 # 
@@ -361,6 +361,10 @@ options:
   - option_strings: ["--max-args"]
     metavar: "<int>"
     help: "Maximum number of arguments for function / method. (default: 5)"
+
+  - option_strings: ["--max-positional-arguments"]
+    metavar: "<int>"
+    help: "Maximum number of positional arguments for function / method. (default: 5)"
 
   - option_strings: ["--max-locals"]
     metavar: "<int>"

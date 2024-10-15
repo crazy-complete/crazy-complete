@@ -23,15 +23,14 @@ _pylint_compgen_w_replacement() {
 _pylint_value_list() {
   local separator="$1"; shift
   local -a values=("$@")
+  local -a having_values
 
   if [[ -z "$cur" ]]; then
     COMPREPLY=("${values[@]}")
     return
   fi
 
-  local IFS="$separator"
-  local -a having_values=($cur)
-  unset IFS
+  IFS="$separator" read -r -a having_values <<< "$cur"
 
   local -a remaining_values=()
   local value having_value found_value
@@ -80,7 +79,7 @@ _pylint_parse_commandline() {
   END_OF_OPTIONS=0
   POSITIONAL_NUM=0
 
-  local command="${words[0]}" argi arg i char has_trailing_chars
+  local cmd="${words[0]}" argi arg i char trailing_chars
 
   for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
     arg="${words[argi]}"
@@ -95,1240 +94,956 @@ _pylint_parse_commandline() {
       -)
         POSITIONALS[POSITIONAL_NUM++]="-";;
       -*)
-        case "$command" in pylint)
+        case "$cmd" in pylint)
           case "$arg" in
             --help)
-              HAVE_help=1
+              OPT_help+=(_OPT_ISSET_)
               continue;;
             --rcfile)
-              HAVE_rcfile=1
-              VALUE_rcfile="${words[++argi]}"
+              OPT_rcfile+=("${words[++argi]}")
               continue;;
             --rcfile=*)
-              HAVE_rcfile=1
-              VALUE_rcfile="${arg#*=}"
+              OPT_rcfile+=("${arg#*=}")
               continue;;
             --output)
-              HAVE_output=1
-              VALUE_output="${words[++argi]}"
+              OPT_output+=("${words[++argi]}")
               continue;;
             --output=*)
-              HAVE_output=1
-              VALUE_output="${arg#*=}"
+              OPT_output+=("${arg#*=}")
               continue;;
             --help-msg)
-              HAVE_help_msg=1
-              VALUE_help_msg="${words[++argi]}"
+              OPT_help_msg+=("${words[++argi]}")
               continue;;
             --help-msg=*)
-              HAVE_help_msg=1
-              VALUE_help_msg="${arg#*=}"
+              OPT_help_msg+=("${arg#*=}")
               continue;;
             --list-msgs)
-              HAVE_list_msgs=1
+              OPT_list_msgs+=(_OPT_ISSET_)
               continue;;
             --list-msgs-enabled)
-              HAVE_list_msgs_enabled=1
+              OPT_list_msgs_enabled+=(_OPT_ISSET_)
               continue;;
             --list-groups)
-              HAVE_list_groups=1
+              OPT_list_groups+=(_OPT_ISSET_)
               continue;;
             --list-conf-levels)
-              HAVE_list_conf_levels=1
+              OPT_list_conf_levels+=(_OPT_ISSET_)
               continue;;
             --list-extensions)
-              HAVE_list_extensions=1
+              OPT_list_extensions+=(_OPT_ISSET_)
               continue;;
             --full-documentation)
-              HAVE_full_documentation=1
+              OPT_full_documentation+=(_OPT_ISSET_)
               continue;;
             --generate-rcfile)
-              HAVE_generate_rcfile=1
+              OPT_generate_rcfile+=(_OPT_ISSET_)
               continue;;
             --generate-toml-config)
-              HAVE_generate_toml_config=1
+              OPT_generate_toml_config+=(_OPT_ISSET_)
               continue;;
             --long-help)
-              HAVE_long_help=1
+              OPT_long_help+=(_OPT_ISSET_)
               continue;;
             --init-hook)
-              HAVE_init_hook=1
-              VALUE_init_hook="${words[++argi]}"
+              OPT_init_hook+=("${words[++argi]}")
               continue;;
             --init-hook=*)
-              HAVE_init_hook=1
-              VALUE_init_hook="${arg#*=}"
+              OPT_init_hook+=("${arg#*=}")
               continue;;
             --errors-only)
-              HAVE_errors_only=1
+              OPT_errors_only+=(_OPT_ISSET_)
               continue;;
             --verbose)
-              HAVE_verbose=1
+              OPT_verbose+=(_OPT_ISSET_)
               continue;;
             --enable-all-extensions)
-              HAVE_enable_all_extensions=1
+              OPT_enable_all_extensions+=(_OPT_ISSET_)
               continue;;
             --ignore)
-              HAVE_ignore=1
-              VALUE_ignore="${words[++argi]}"
+              OPT_ignore+=("${words[++argi]}")
               continue;;
             --ignore=*)
-              HAVE_ignore=1
-              VALUE_ignore="${arg#*=}"
+              OPT_ignore+=("${arg#*=}")
               continue;;
             --ignore-patterns)
-              HAVE_ignore_patterns=1
-              VALUE_ignore_patterns="${words[++argi]}"
+              OPT_ignore_patterns+=("${words[++argi]}")
               continue;;
             --ignore-patterns=*)
-              HAVE_ignore_patterns=1
-              VALUE_ignore_patterns="${arg#*=}"
+              OPT_ignore_patterns+=("${arg#*=}")
               continue;;
             --ignore-paths)
-              HAVE_ignore_paths=1
-              VALUE_ignore_paths="${words[++argi]}"
+              OPT_ignore_paths+=("${words[++argi]}")
               continue;;
             --ignore-paths=*)
-              HAVE_ignore_paths=1
-              VALUE_ignore_paths="${arg#*=}"
+              OPT_ignore_paths+=("${arg#*=}")
               continue;;
             --persistent)
-              HAVE_persistent=1
-              VALUE_persistent="${words[++argi]}"
+              OPT_persistent+=("${words[++argi]}")
               continue;;
             --persistent=*)
-              HAVE_persistent=1
-              VALUE_persistent="${arg#*=}"
+              OPT_persistent+=("${arg#*=}")
               continue;;
             --load-plugins)
-              HAVE_load_plugins=1
-              VALUE_load_plugins="${words[++argi]}"
+              OPT_load_plugins+=("${words[++argi]}")
               continue;;
             --load-plugins=*)
-              HAVE_load_plugins=1
-              VALUE_load_plugins="${arg#*=}"
+              OPT_load_plugins+=("${arg#*=}")
               continue;;
             --fail-under)
-              HAVE_fail_under=1
-              VALUE_fail_under="${words[++argi]}"
+              OPT_fail_under+=("${words[++argi]}")
               continue;;
             --fail-under=*)
-              HAVE_fail_under=1
-              VALUE_fail_under="${arg#*=}"
+              OPT_fail_under+=("${arg#*=}")
               continue;;
             --fail-on)
-              HAVE_fail_on=1
-              VALUE_fail_on="${words[++argi]}"
+              OPT_fail_on+=("${words[++argi]}")
               continue;;
             --fail-on=*)
-              HAVE_fail_on=1
-              VALUE_fail_on="${arg#*=}"
+              OPT_fail_on+=("${arg#*=}")
               continue;;
             --jobs)
-              HAVE_jobs=1
-              VALUE_jobs="${words[++argi]}"
+              OPT_jobs+=("${words[++argi]}")
               continue;;
             --jobs=*)
-              HAVE_jobs=1
-              VALUE_jobs="${arg#*=}"
+              OPT_jobs+=("${arg#*=}")
               continue;;
             --limit-inference-results)
-              HAVE_limit_inference_results=1
-              VALUE_limit_inference_results="${words[++argi]}"
+              OPT_limit_inference_results+=("${words[++argi]}")
               continue;;
             --limit-inference-results=*)
-              HAVE_limit_inference_results=1
-              VALUE_limit_inference_results="${arg#*=}"
+              OPT_limit_inference_results+=("${arg#*=}")
               continue;;
             --extension-pkg-allow-list)
-              HAVE_extension_pkg_allow_list=1
-              VALUE_extension_pkg_allow_list="${words[++argi]}"
+              OPT_extension_pkg_allow_list+=("${words[++argi]}")
               continue;;
             --extension-pkg-allow-list=*)
-              HAVE_extension_pkg_allow_list=1
-              VALUE_extension_pkg_allow_list="${arg#*=}"
+              OPT_extension_pkg_allow_list+=("${arg#*=}")
               continue;;
             --extension-pkg-whitelist)
-              HAVE_extension_pkg_whitelist=1
-              VALUE_extension_pkg_whitelist="${words[++argi]}"
+              OPT_extension_pkg_whitelist+=("${words[++argi]}")
               continue;;
             --extension-pkg-whitelist=*)
-              HAVE_extension_pkg_whitelist=1
-              VALUE_extension_pkg_whitelist="${arg#*=}"
+              OPT_extension_pkg_whitelist+=("${arg#*=}")
               continue;;
             --suggestion-mode)
-              HAVE_suggestion_mode=1
-              VALUE_suggestion_mode="${words[++argi]}"
+              OPT_suggestion_mode+=("${words[++argi]}")
               continue;;
             --suggestion-mode=*)
-              HAVE_suggestion_mode=1
-              VALUE_suggestion_mode="${arg#*=}"
+              OPT_suggestion_mode+=("${arg#*=}")
               continue;;
             --exit-zero)
-              HAVE_exit_zero=1
+              OPT_exit_zero+=(_OPT_ISSET_)
               continue;;
             --from-stdin)
-              HAVE_from_stdin=1
+              OPT_from_stdin+=(_OPT_ISSET_)
               continue;;
             --source-roots)
-              HAVE_source_roots=1
-              VALUE_source_roots="${words[++argi]}"
+              OPT_source_roots+=("${words[++argi]}")
               continue;;
             --source-roots=*)
-              HAVE_source_roots=1
-              VALUE_source_roots="${arg#*=}"
+              OPT_source_roots+=("${arg#*=}")
               continue;;
             --recursive)
-              HAVE_recursive=1
-              VALUE_recursive="${words[++argi]}"
+              OPT_recursive+=("${words[++argi]}")
               continue;;
             --recursive=*)
-              HAVE_recursive=1
-              VALUE_recursive="${arg#*=}"
+              OPT_recursive+=("${arg#*=}")
               continue;;
             --py-version)
-              HAVE_py_version=1
-              VALUE_py_version="${words[++argi]}"
+              OPT_py_version+=("${words[++argi]}")
               continue;;
             --py-version=*)
-              HAVE_py_version=1
-              VALUE_py_version="${arg#*=}"
+              OPT_py_version+=("${arg#*=}")
               continue;;
             --ignored-modules)
-              HAVE_ignored_modules=1
-              VALUE_ignored_modules="${words[++argi]}"
+              OPT_ignored_modules+=("${words[++argi]}")
               continue;;
             --ignored-modules=*)
-              HAVE_ignored_modules=1
-              VALUE_ignored_modules="${arg#*=}"
+              OPT_ignored_modules+=("${arg#*=}")
               continue;;
             --analyse-fallback-blocks)
-              HAVE_analyse_fallback_blocks=1
-              VALUE_analyse_fallback_blocks="${words[++argi]}"
+              OPT_analyse_fallback_blocks+=("${words[++argi]}")
               continue;;
             --analyse-fallback-blocks=*)
-              HAVE_analyse_fallback_blocks=1
-              VALUE_analyse_fallback_blocks="${arg#*=}"
+              OPT_analyse_fallback_blocks+=("${arg#*=}")
               continue;;
             --clear-cache-post-run)
-              HAVE_clear_cache_post_run=1
-              VALUE_clear_cache_post_run="${words[++argi]}"
+              OPT_clear_cache_post_run+=("${words[++argi]}")
               continue;;
             --clear-cache-post-run=*)
-              HAVE_clear_cache_post_run=1
-              VALUE_clear_cache_post_run="${arg#*=}"
+              OPT_clear_cache_post_run+=("${arg#*=}")
               continue;;
             --prefer-stubs)
-              HAVE_prefer_stubs=1
-              VALUE_prefer_stubs="${words[++argi]}"
+              OPT_prefer_stubs+=("${words[++argi]}")
               continue;;
             --prefer-stubs=*)
-              HAVE_prefer_stubs=1
-              VALUE_prefer_stubs="${arg#*=}"
+              OPT_prefer_stubs+=("${arg#*=}")
               continue;;
             --output-format)
-              HAVE_output_format=1
-              VALUE_output_format="${words[++argi]}"
+              OPT_output_format+=("${words[++argi]}")
               continue;;
             --output-format=*)
-              HAVE_output_format=1
-              VALUE_output_format="${arg#*=}"
+              OPT_output_format+=("${arg#*=}")
               continue;;
             --reports)
-              HAVE_reports=1
-              VALUE_reports="${words[++argi]}"
+              OPT_reports+=("${words[++argi]}")
               continue;;
             --reports=*)
-              HAVE_reports=1
-              VALUE_reports="${arg#*=}"
+              OPT_reports+=("${arg#*=}")
               continue;;
             --evaluation)
-              HAVE_evaluation=1
-              VALUE_evaluation="${words[++argi]}"
+              OPT_evaluation+=("${words[++argi]}")
               continue;;
             --evaluation=*)
-              HAVE_evaluation=1
-              VALUE_evaluation="${arg#*=}"
+              OPT_evaluation+=("${arg#*=}")
               continue;;
             --score)
-              HAVE_score=1
-              VALUE_score="${words[++argi]}"
+              OPT_score+=("${words[++argi]}")
               continue;;
             --score=*)
-              HAVE_score=1
-              VALUE_score="${arg#*=}"
+              OPT_score+=("${arg#*=}")
               continue;;
             --msg-template)
-              HAVE_msg_template=1
-              VALUE_msg_template="${words[++argi]}"
+              OPT_msg_template+=("${words[++argi]}")
               continue;;
             --msg-template=*)
-              HAVE_msg_template=1
-              VALUE_msg_template="${arg#*=}"
+              OPT_msg_template+=("${arg#*=}")
               continue;;
             --confidence)
-              HAVE_confidence=1
-              VALUE_confidence="${words[++argi]}"
+              OPT_confidence+=("${words[++argi]}")
               continue;;
             --confidence=*)
-              HAVE_confidence=1
-              VALUE_confidence="${arg#*=}"
+              OPT_confidence+=("${arg#*=}")
               continue;;
             --enable)
-              HAVE_enable=1
-              VALUE_enable="${words[++argi]}"
+              OPT_enable+=("${words[++argi]}")
               continue;;
             --enable=*)
-              HAVE_enable=1
-              VALUE_enable="${arg#*=}"
+              OPT_enable+=("${arg#*=}")
               continue;;
             --disable)
-              HAVE_disable=1
-              VALUE_disable="${words[++argi]}"
+              OPT_disable+=("${words[++argi]}")
               continue;;
             --disable=*)
-              HAVE_disable=1
-              VALUE_disable="${arg#*=}"
+              OPT_disable+=("${arg#*=}")
               continue;;
             --min-similarity-lines)
-              HAVE_min_similarity_lines=1
-              VALUE_min_similarity_lines="${words[++argi]}"
+              OPT_min_similarity_lines+=("${words[++argi]}")
               continue;;
             --min-similarity-lines=*)
-              HAVE_min_similarity_lines=1
-              VALUE_min_similarity_lines="${arg#*=}"
+              OPT_min_similarity_lines+=("${arg#*=}")
               continue;;
             --ignore-comments)
-              HAVE_ignore_comments=1
-              VALUE_ignore_comments="${words[++argi]}"
+              OPT_ignore_comments+=("${words[++argi]}")
               continue;;
             --ignore-comments=*)
-              HAVE_ignore_comments=1
-              VALUE_ignore_comments="${arg#*=}"
+              OPT_ignore_comments+=("${arg#*=}")
               continue;;
             --ignore-docstrings)
-              HAVE_ignore_docstrings=1
-              VALUE_ignore_docstrings="${words[++argi]}"
+              OPT_ignore_docstrings+=("${words[++argi]}")
               continue;;
             --ignore-docstrings=*)
-              HAVE_ignore_docstrings=1
-              VALUE_ignore_docstrings="${arg#*=}"
+              OPT_ignore_docstrings+=("${arg#*=}")
               continue;;
             --ignore-imports)
-              HAVE_ignore_imports=1
-              VALUE_ignore_imports="${words[++argi]}"
+              OPT_ignore_imports+=("${words[++argi]}")
               continue;;
             --ignore-imports=*)
-              HAVE_ignore_imports=1
-              VALUE_ignore_imports="${arg#*=}"
+              OPT_ignore_imports+=("${arg#*=}")
               continue;;
             --ignore-signatures)
-              HAVE_ignore_signatures=1
-              VALUE_ignore_signatures="${words[++argi]}"
+              OPT_ignore_signatures+=("${words[++argi]}")
               continue;;
             --ignore-signatures=*)
-              HAVE_ignore_signatures=1
-              VALUE_ignore_signatures="${arg#*=}"
+              OPT_ignore_signatures+=("${arg#*=}")
               continue;;
             --ignore-on-opaque-inference)
-              HAVE_ignore_on_opaque_inference=1
-              VALUE_ignore_on_opaque_inference="${words[++argi]}"
+              OPT_ignore_on_opaque_inference+=("${words[++argi]}")
               continue;;
             --ignore-on-opaque-inference=*)
-              HAVE_ignore_on_opaque_inference=1
-              VALUE_ignore_on_opaque_inference="${arg#*=}"
+              OPT_ignore_on_opaque_inference+=("${arg#*=}")
               continue;;
             --mixin-class-rgx)
-              HAVE_mixin_class_rgx=1
-              VALUE_mixin_class_rgx="${words[++argi]}"
+              OPT_mixin_class_rgx+=("${words[++argi]}")
               continue;;
             --mixin-class-rgx=*)
-              HAVE_mixin_class_rgx=1
-              VALUE_mixin_class_rgx="${arg#*=}"
+              OPT_mixin_class_rgx+=("${arg#*=}")
               continue;;
             --ignore-mixin-members)
-              HAVE_ignore_mixin_members=1
-              VALUE_ignore_mixin_members="${words[++argi]}"
+              OPT_ignore_mixin_members+=("${words[++argi]}")
               continue;;
             --ignore-mixin-members=*)
-              HAVE_ignore_mixin_members=1
-              VALUE_ignore_mixin_members="${arg#*=}"
+              OPT_ignore_mixin_members+=("${arg#*=}")
               continue;;
             --ignored-checks-for-mixins)
-              HAVE_ignored_checks_for_mixins=1
-              VALUE_ignored_checks_for_mixins="${words[++argi]}"
+              OPT_ignored_checks_for_mixins+=("${words[++argi]}")
               continue;;
             --ignored-checks-for-mixins=*)
-              HAVE_ignored_checks_for_mixins=1
-              VALUE_ignored_checks_for_mixins="${arg#*=}"
+              OPT_ignored_checks_for_mixins+=("${arg#*=}")
               continue;;
             --ignore-none)
-              HAVE_ignore_none=1
-              VALUE_ignore_none="${words[++argi]}"
+              OPT_ignore_none+=("${words[++argi]}")
               continue;;
             --ignore-none=*)
-              HAVE_ignore_none=1
-              VALUE_ignore_none="${arg#*=}"
+              OPT_ignore_none+=("${arg#*=}")
               continue;;
             --ignored-classes)
-              HAVE_ignored_classes=1
-              VALUE_ignored_classes="${words[++argi]}"
+              OPT_ignored_classes+=("${words[++argi]}")
               continue;;
             --ignored-classes=*)
-              HAVE_ignored_classes=1
-              VALUE_ignored_classes="${arg#*=}"
+              OPT_ignored_classes+=("${arg#*=}")
               continue;;
             --generated-members)
-              HAVE_generated_members=1
-              VALUE_generated_members="${words[++argi]}"
+              OPT_generated_members+=("${words[++argi]}")
               continue;;
             --generated-members=*)
-              HAVE_generated_members=1
-              VALUE_generated_members="${arg#*=}"
+              OPT_generated_members+=("${arg#*=}")
               continue;;
             --contextmanager-decorators)
-              HAVE_contextmanager_decorators=1
-              VALUE_contextmanager_decorators="${words[++argi]}"
+              OPT_contextmanager_decorators+=("${words[++argi]}")
               continue;;
             --contextmanager-decorators=*)
-              HAVE_contextmanager_decorators=1
-              VALUE_contextmanager_decorators="${arg#*=}"
+              OPT_contextmanager_decorators+=("${arg#*=}")
               continue;;
             --missing-member-hint-distance)
-              HAVE_missing_member_hint_distance=1
-              VALUE_missing_member_hint_distance="${words[++argi]}"
+              OPT_missing_member_hint_distance+=("${words[++argi]}")
               continue;;
             --missing-member-hint-distance=*)
-              HAVE_missing_member_hint_distance=1
-              VALUE_missing_member_hint_distance="${arg#*=}"
+              OPT_missing_member_hint_distance+=("${arg#*=}")
               continue;;
             --missing-member-max-choices)
-              HAVE_missing_member_max_choices=1
-              VALUE_missing_member_max_choices="${words[++argi]}"
+              OPT_missing_member_max_choices+=("${words[++argi]}")
               continue;;
             --missing-member-max-choices=*)
-              HAVE_missing_member_max_choices=1
-              VALUE_missing_member_max_choices="${arg#*=}"
+              OPT_missing_member_max_choices+=("${arg#*=}")
               continue;;
             --missing-member-hint)
-              HAVE_missing_member_hint=1
-              VALUE_missing_member_hint="${words[++argi]}"
+              OPT_missing_member_hint+=("${words[++argi]}")
               continue;;
             --missing-member-hint=*)
-              HAVE_missing_member_hint=1
-              VALUE_missing_member_hint="${arg#*=}"
+              OPT_missing_member_hint+=("${arg#*=}")
               continue;;
             --signature-mutators)
-              HAVE_signature_mutators=1
-              VALUE_signature_mutators="${words[++argi]}"
+              OPT_signature_mutators+=("${words[++argi]}")
               continue;;
             --signature-mutators=*)
-              HAVE_signature_mutators=1
-              VALUE_signature_mutators="${arg#*=}"
+              OPT_signature_mutators+=("${arg#*=}")
               continue;;
             --notes)
-              HAVE_notes=1
-              VALUE_notes="${words[++argi]}"
+              OPT_notes+=("${words[++argi]}")
               continue;;
             --notes=*)
-              HAVE_notes=1
-              VALUE_notes="${arg#*=}"
+              OPT_notes+=("${arg#*=}")
               continue;;
             --notes-rgx)
-              HAVE_notes_rgx=1
-              VALUE_notes_rgx="${words[++argi]}"
+              OPT_notes_rgx+=("${words[++argi]}")
               continue;;
             --notes-rgx=*)
-              HAVE_notes_rgx=1
-              VALUE_notes_rgx="${arg#*=}"
+              OPT_notes_rgx+=("${arg#*=}")
               continue;;
             --timeout-methods)
-              HAVE_timeout_methods=1
-              VALUE_timeout_methods="${words[++argi]}"
+              OPT_timeout_methods+=("${words[++argi]}")
               continue;;
             --timeout-methods=*)
-              HAVE_timeout_methods=1
-              VALUE_timeout_methods="${arg#*=}"
+              OPT_timeout_methods+=("${arg#*=}")
               continue;;
             --spelling-dict)
-              HAVE_spelling_dict=1
-              VALUE_spelling_dict="${words[++argi]}"
+              OPT_spelling_dict+=("${words[++argi]}")
               continue;;
             --spelling-dict=*)
-              HAVE_spelling_dict=1
-              VALUE_spelling_dict="${arg#*=}"
+              OPT_spelling_dict+=("${arg#*=}")
               continue;;
             --spelling-ignore-words)
-              HAVE_spelling_ignore_words=1
-              VALUE_spelling_ignore_words="${words[++argi]}"
+              OPT_spelling_ignore_words+=("${words[++argi]}")
               continue;;
             --spelling-ignore-words=*)
-              HAVE_spelling_ignore_words=1
-              VALUE_spelling_ignore_words="${arg#*=}"
+              OPT_spelling_ignore_words+=("${arg#*=}")
               continue;;
             --spelling-private-dict-file)
-              HAVE_spelling_private_dict_file=1
-              VALUE_spelling_private_dict_file="${words[++argi]}"
+              OPT_spelling_private_dict_file+=("${words[++argi]}")
               continue;;
             --spelling-private-dict-file=*)
-              HAVE_spelling_private_dict_file=1
-              VALUE_spelling_private_dict_file="${arg#*=}"
+              OPT_spelling_private_dict_file+=("${arg#*=}")
               continue;;
             --spelling-store-unknown-words)
-              HAVE_spelling_store_unknown_words=1
-              VALUE_spelling_store_unknown_words="${words[++argi]}"
+              OPT_spelling_store_unknown_words+=("${words[++argi]}")
               continue;;
             --spelling-store-unknown-words=*)
-              HAVE_spelling_store_unknown_words=1
-              VALUE_spelling_store_unknown_words="${arg#*=}"
+              OPT_spelling_store_unknown_words+=("${arg#*=}")
               continue;;
             --max-spelling-suggestions)
-              HAVE_max_spelling_suggestions=1
-              VALUE_max_spelling_suggestions="${words[++argi]}"
+              OPT_max_spelling_suggestions+=("${words[++argi]}")
               continue;;
             --max-spelling-suggestions=*)
-              HAVE_max_spelling_suggestions=1
-              VALUE_max_spelling_suggestions="${arg#*=}"
+              OPT_max_spelling_suggestions+=("${arg#*=}")
               continue;;
             --spelling-ignore-comment-directives)
-              HAVE_spelling_ignore_comment_directives=1
-              VALUE_spelling_ignore_comment_directives="${words[++argi]}"
+              OPT_spelling_ignore_comment_directives+=("${words[++argi]}")
               continue;;
             --spelling-ignore-comment-directives=*)
-              HAVE_spelling_ignore_comment_directives=1
-              VALUE_spelling_ignore_comment_directives="${arg#*=}"
+              OPT_spelling_ignore_comment_directives+=("${arg#*=}")
               continue;;
             --max-nested-blocks)
-              HAVE_max_nested_blocks=1
-              VALUE_max_nested_blocks="${words[++argi]}"
+              OPT_max_nested_blocks+=("${words[++argi]}")
               continue;;
             --max-nested-blocks=*)
-              HAVE_max_nested_blocks=1
-              VALUE_max_nested_blocks="${arg#*=}"
+              OPT_max_nested_blocks+=("${arg#*=}")
               continue;;
             --never-returning-functions)
-              HAVE_never_returning_functions=1
-              VALUE_never_returning_functions="${words[++argi]}"
+              OPT_never_returning_functions+=("${words[++argi]}")
               continue;;
             --never-returning-functions=*)
-              HAVE_never_returning_functions=1
-              VALUE_never_returning_functions="${arg#*=}"
+              OPT_never_returning_functions+=("${arg#*=}")
               continue;;
             --suggest-join-with-non-empty-separator)
-              HAVE_suggest_join_with_non_empty_separator=1
-              VALUE_suggest_join_with_non_empty_separator="${words[++argi]}"
+              OPT_suggest_join_with_non_empty_separator+=("${words[++argi]}")
               continue;;
             --suggest-join-with-non-empty-separator=*)
-              HAVE_suggest_join_with_non_empty_separator=1
-              VALUE_suggest_join_with_non_empty_separator="${arg#*=}"
+              OPT_suggest_join_with_non_empty_separator+=("${arg#*=}")
               continue;;
             --check-str-concat-over-line-jumps)
-              HAVE_check_str_concat_over_line_jumps=1
-              VALUE_check_str_concat_over_line_jumps="${words[++argi]}"
+              OPT_check_str_concat_over_line_jumps+=("${words[++argi]}")
               continue;;
             --check-str-concat-over-line-jumps=*)
-              HAVE_check_str_concat_over_line_jumps=1
-              VALUE_check_str_concat_over_line_jumps="${arg#*=}"
+              OPT_check_str_concat_over_line_jumps+=("${arg#*=}")
               continue;;
             --check-quote-consistency)
-              HAVE_check_quote_consistency=1
-              VALUE_check_quote_consistency="${words[++argi]}"
+              OPT_check_quote_consistency+=("${words[++argi]}")
               continue;;
             --check-quote-consistency=*)
-              HAVE_check_quote_consistency=1
-              VALUE_check_quote_consistency="${arg#*=}"
+              OPT_check_quote_consistency+=("${arg#*=}")
               continue;;
             --max-args)
-              HAVE_max_args=1
-              VALUE_max_args="${words[++argi]}"
+              OPT_max_args+=("${words[++argi]}")
               continue;;
             --max-args=*)
-              HAVE_max_args=1
-              VALUE_max_args="${arg#*=}"
+              OPT_max_args+=("${arg#*=}")
+              continue;;
+            --max-positional-arguments)
+              OPT_max_positional_arguments+=("${words[++argi]}")
+              continue;;
+            --max-positional-arguments=*)
+              OPT_max_positional_arguments+=("${arg#*=}")
               continue;;
             --max-locals)
-              HAVE_max_locals=1
-              VALUE_max_locals="${words[++argi]}"
+              OPT_max_locals+=("${words[++argi]}")
               continue;;
             --max-locals=*)
-              HAVE_max_locals=1
-              VALUE_max_locals="${arg#*=}"
+              OPT_max_locals+=("${arg#*=}")
               continue;;
             --max-returns)
-              HAVE_max_returns=1
-              VALUE_max_returns="${words[++argi]}"
+              OPT_max_returns+=("${words[++argi]}")
               continue;;
             --max-returns=*)
-              HAVE_max_returns=1
-              VALUE_max_returns="${arg#*=}"
+              OPT_max_returns+=("${arg#*=}")
               continue;;
             --max-branches)
-              HAVE_max_branches=1
-              VALUE_max_branches="${words[++argi]}"
+              OPT_max_branches+=("${words[++argi]}")
               continue;;
             --max-branches=*)
-              HAVE_max_branches=1
-              VALUE_max_branches="${arg#*=}"
+              OPT_max_branches+=("${arg#*=}")
               continue;;
             --max-statements)
-              HAVE_max_statements=1
-              VALUE_max_statements="${words[++argi]}"
+              OPT_max_statements+=("${words[++argi]}")
               continue;;
             --max-statements=*)
-              HAVE_max_statements=1
-              VALUE_max_statements="${arg#*=}"
+              OPT_max_statements+=("${arg#*=}")
               continue;;
             --max-parents)
-              HAVE_max_parents=1
-              VALUE_max_parents="${words[++argi]}"
+              OPT_max_parents+=("${words[++argi]}")
               continue;;
             --max-parents=*)
-              HAVE_max_parents=1
-              VALUE_max_parents="${arg#*=}"
+              OPT_max_parents+=("${arg#*=}")
               continue;;
             --ignored-parents)
-              HAVE_ignored_parents=1
-              VALUE_ignored_parents="${words[++argi]}"
+              OPT_ignored_parents+=("${words[++argi]}")
               continue;;
             --ignored-parents=*)
-              HAVE_ignored_parents=1
-              VALUE_ignored_parents="${arg#*=}"
+              OPT_ignored_parents+=("${arg#*=}")
               continue;;
             --max-attributes)
-              HAVE_max_attributes=1
-              VALUE_max_attributes="${words[++argi]}"
+              OPT_max_attributes+=("${words[++argi]}")
               continue;;
             --max-attributes=*)
-              HAVE_max_attributes=1
-              VALUE_max_attributes="${arg#*=}"
+              OPT_max_attributes+=("${arg#*=}")
               continue;;
             --min-public-methods)
-              HAVE_min_public_methods=1
-              VALUE_min_public_methods="${words[++argi]}"
+              OPT_min_public_methods+=("${words[++argi]}")
               continue;;
             --min-public-methods=*)
-              HAVE_min_public_methods=1
-              VALUE_min_public_methods="${arg#*=}"
+              OPT_min_public_methods+=("${arg#*=}")
               continue;;
             --max-public-methods)
-              HAVE_max_public_methods=1
-              VALUE_max_public_methods="${words[++argi]}"
+              OPT_max_public_methods+=("${words[++argi]}")
               continue;;
             --max-public-methods=*)
-              HAVE_max_public_methods=1
-              VALUE_max_public_methods="${arg#*=}"
+              OPT_max_public_methods+=("${arg#*=}")
               continue;;
             --max-bool-expr)
-              HAVE_max_bool_expr=1
-              VALUE_max_bool_expr="${words[++argi]}"
+              OPT_max_bool_expr+=("${words[++argi]}")
               continue;;
             --max-bool-expr=*)
-              HAVE_max_bool_expr=1
-              VALUE_max_bool_expr="${arg#*=}"
+              OPT_max_bool_expr+=("${arg#*=}")
               continue;;
             --exclude-too-few-public-methods)
-              HAVE_exclude_too_few_public_methods=1
-              VALUE_exclude_too_few_public_methods="${words[++argi]}"
+              OPT_exclude_too_few_public_methods+=("${words[++argi]}")
               continue;;
             --exclude-too-few-public-methods=*)
-              HAVE_exclude_too_few_public_methods=1
-              VALUE_exclude_too_few_public_methods="${arg#*=}"
+              OPT_exclude_too_few_public_methods+=("${arg#*=}")
               continue;;
             --overgeneral-exceptions)
-              HAVE_overgeneral_exceptions=1
-              VALUE_overgeneral_exceptions="${words[++argi]}"
+              OPT_overgeneral_exceptions+=("${words[++argi]}")
               continue;;
             --overgeneral-exceptions=*)
-              HAVE_overgeneral_exceptions=1
-              VALUE_overgeneral_exceptions="${arg#*=}"
+              OPT_overgeneral_exceptions+=("${arg#*=}")
               continue;;
             --defining-attr-methods)
-              HAVE_defining_attr_methods=1
-              VALUE_defining_attr_methods="${words[++argi]}"
+              OPT_defining_attr_methods+=("${words[++argi]}")
               continue;;
             --defining-attr-methods=*)
-              HAVE_defining_attr_methods=1
-              VALUE_defining_attr_methods="${arg#*=}"
+              OPT_defining_attr_methods+=("${arg#*=}")
               continue;;
             --valid-classmethod-first-arg)
-              HAVE_valid_classmethod_first_arg=1
-              VALUE_valid_classmethod_first_arg="${words[++argi]}"
+              OPT_valid_classmethod_first_arg+=("${words[++argi]}")
               continue;;
             --valid-classmethod-first-arg=*)
-              HAVE_valid_classmethod_first_arg=1
-              VALUE_valid_classmethod_first_arg="${arg#*=}"
+              OPT_valid_classmethod_first_arg+=("${arg#*=}")
               continue;;
             --valid-metaclass-classmethod-first-arg)
-              HAVE_valid_metaclass_classmethod_first_arg=1
-              VALUE_valid_metaclass_classmethod_first_arg="${words[++argi]}"
+              OPT_valid_metaclass_classmethod_first_arg+=("${words[++argi]}")
               continue;;
             --valid-metaclass-classmethod-first-arg=*)
-              HAVE_valid_metaclass_classmethod_first_arg=1
-              VALUE_valid_metaclass_classmethod_first_arg="${arg#*=}"
+              OPT_valid_metaclass_classmethod_first_arg+=("${arg#*=}")
               continue;;
             --exclude-protected)
-              HAVE_exclude_protected=1
-              VALUE_exclude_protected="${words[++argi]}"
+              OPT_exclude_protected+=("${words[++argi]}")
               continue;;
             --exclude-protected=*)
-              HAVE_exclude_protected=1
-              VALUE_exclude_protected="${arg#*=}"
+              OPT_exclude_protected+=("${arg#*=}")
               continue;;
             --check-protected-access-in-special-methods)
-              HAVE_check_protected_access_in_special_methods=1
-              VALUE_check_protected_access_in_special_methods="${words[++argi]}"
+              OPT_check_protected_access_in_special_methods+=("${words[++argi]}")
               continue;;
             --check-protected-access-in-special-methods=*)
-              HAVE_check_protected_access_in_special_methods=1
-              VALUE_check_protected_access_in_special_methods="${arg#*=}"
+              OPT_check_protected_access_in_special_methods+=("${arg#*=}")
               continue;;
             --max-line-length)
-              HAVE_max_line_length=1
-              VALUE_max_line_length="${words[++argi]}"
+              OPT_max_line_length+=("${words[++argi]}")
               continue;;
             --max-line-length=*)
-              HAVE_max_line_length=1
-              VALUE_max_line_length="${arg#*=}"
+              OPT_max_line_length+=("${arg#*=}")
               continue;;
             --ignore-long-lines)
-              HAVE_ignore_long_lines=1
-              VALUE_ignore_long_lines="${words[++argi]}"
+              OPT_ignore_long_lines+=("${words[++argi]}")
               continue;;
             --ignore-long-lines=*)
-              HAVE_ignore_long_lines=1
-              VALUE_ignore_long_lines="${arg#*=}"
+              OPT_ignore_long_lines+=("${arg#*=}")
               continue;;
             --single-line-if-stmt)
-              HAVE_single_line_if_stmt=1
-              VALUE_single_line_if_stmt="${words[++argi]}"
+              OPT_single_line_if_stmt+=("${words[++argi]}")
               continue;;
             --single-line-if-stmt=*)
-              HAVE_single_line_if_stmt=1
-              VALUE_single_line_if_stmt="${arg#*=}"
+              OPT_single_line_if_stmt+=("${arg#*=}")
               continue;;
             --single-line-class-stmt)
-              HAVE_single_line_class_stmt=1
-              VALUE_single_line_class_stmt="${words[++argi]}"
+              OPT_single_line_class_stmt+=("${words[++argi]}")
               continue;;
             --single-line-class-stmt=*)
-              HAVE_single_line_class_stmt=1
-              VALUE_single_line_class_stmt="${arg#*=}"
+              OPT_single_line_class_stmt+=("${arg#*=}")
               continue;;
             --max-module-lines)
-              HAVE_max_module_lines=1
-              VALUE_max_module_lines="${words[++argi]}"
+              OPT_max_module_lines+=("${words[++argi]}")
               continue;;
             --max-module-lines=*)
-              HAVE_max_module_lines=1
-              VALUE_max_module_lines="${arg#*=}"
+              OPT_max_module_lines+=("${arg#*=}")
               continue;;
             --indent-string)
-              HAVE_indent_string=1
-              VALUE_indent_string="${words[++argi]}"
+              OPT_indent_string+=("${words[++argi]}")
               continue;;
             --indent-string=*)
-              HAVE_indent_string=1
-              VALUE_indent_string="${arg#*=}"
+              OPT_indent_string+=("${arg#*=}")
               continue;;
             --indent-after-paren)
-              HAVE_indent_after_paren=1
-              VALUE_indent_after_paren="${words[++argi]}"
+              OPT_indent_after_paren+=("${words[++argi]}")
               continue;;
             --indent-after-paren=*)
-              HAVE_indent_after_paren=1
-              VALUE_indent_after_paren="${arg#*=}"
+              OPT_indent_after_paren+=("${arg#*=}")
               continue;;
             --expected-line-ending-format)
-              HAVE_expected_line_ending_format=1
-              VALUE_expected_line_ending_format="${words[++argi]}"
+              OPT_expected_line_ending_format+=("${words[++argi]}")
               continue;;
             --expected-line-ending-format=*)
-              HAVE_expected_line_ending_format=1
-              VALUE_expected_line_ending_format="${arg#*=}"
+              OPT_expected_line_ending_format+=("${arg#*=}")
               continue;;
             --good-names)
-              HAVE_good_names=1
-              VALUE_good_names="${words[++argi]}"
+              OPT_good_names+=("${words[++argi]}")
               continue;;
             --good-names=*)
-              HAVE_good_names=1
-              VALUE_good_names="${arg#*=}"
+              OPT_good_names+=("${arg#*=}")
               continue;;
             --good-names-rgxs)
-              HAVE_good_names_rgxs=1
-              VALUE_good_names_rgxs="${words[++argi]}"
+              OPT_good_names_rgxs+=("${words[++argi]}")
               continue;;
             --good-names-rgxs=*)
-              HAVE_good_names_rgxs=1
-              VALUE_good_names_rgxs="${arg#*=}"
+              OPT_good_names_rgxs+=("${arg#*=}")
               continue;;
             --bad-names)
-              HAVE_bad_names=1
-              VALUE_bad_names="${words[++argi]}"
+              OPT_bad_names+=("${words[++argi]}")
               continue;;
             --bad-names=*)
-              HAVE_bad_names=1
-              VALUE_bad_names="${arg#*=}"
+              OPT_bad_names+=("${arg#*=}")
               continue;;
             --bad-names-rgxs)
-              HAVE_bad_names_rgxs=1
-              VALUE_bad_names_rgxs="${words[++argi]}"
+              OPT_bad_names_rgxs+=("${words[++argi]}")
               continue;;
             --bad-names-rgxs=*)
-              HAVE_bad_names_rgxs=1
-              VALUE_bad_names_rgxs="${arg#*=}"
+              OPT_bad_names_rgxs+=("${arg#*=}")
               continue;;
             --name-group)
-              HAVE_name_group=1
-              VALUE_name_group="${words[++argi]}"
+              OPT_name_group+=("${words[++argi]}")
               continue;;
             --name-group=*)
-              HAVE_name_group=1
-              VALUE_name_group="${arg#*=}"
+              OPT_name_group+=("${arg#*=}")
               continue;;
             --include-naming-hint)
-              HAVE_include_naming_hint=1
-              VALUE_include_naming_hint="${words[++argi]}"
+              OPT_include_naming_hint+=("${words[++argi]}")
               continue;;
             --include-naming-hint=*)
-              HAVE_include_naming_hint=1
-              VALUE_include_naming_hint="${arg#*=}"
+              OPT_include_naming_hint+=("${arg#*=}")
               continue;;
             --property-classes)
-              HAVE_property_classes=1
-              VALUE_property_classes="${words[++argi]}"
+              OPT_property_classes+=("${words[++argi]}")
               continue;;
             --property-classes=*)
-              HAVE_property_classes=1
-              VALUE_property_classes="${arg#*=}"
+              OPT_property_classes+=("${arg#*=}")
               continue;;
             --argument-naming-style)
-              HAVE_argument_naming_style=1
-              VALUE_argument_naming_style="${words[++argi]}"
+              OPT_argument_naming_style+=("${words[++argi]}")
               continue;;
             --argument-naming-style=*)
-              HAVE_argument_naming_style=1
-              VALUE_argument_naming_style="${arg#*=}"
+              OPT_argument_naming_style+=("${arg#*=}")
               continue;;
             --argument-rgx)
-              HAVE_argument_rgx=1
-              VALUE_argument_rgx="${words[++argi]}"
+              OPT_argument_rgx+=("${words[++argi]}")
               continue;;
             --argument-rgx=*)
-              HAVE_argument_rgx=1
-              VALUE_argument_rgx="${arg#*=}"
+              OPT_argument_rgx+=("${arg#*=}")
               continue;;
             --attr-naming-style)
-              HAVE_attr_naming_style=1
-              VALUE_attr_naming_style="${words[++argi]}"
+              OPT_attr_naming_style+=("${words[++argi]}")
               continue;;
             --attr-naming-style=*)
-              HAVE_attr_naming_style=1
-              VALUE_attr_naming_style="${arg#*=}"
+              OPT_attr_naming_style+=("${arg#*=}")
               continue;;
             --attr-rgx)
-              HAVE_attr_rgx=1
-              VALUE_attr_rgx="${words[++argi]}"
+              OPT_attr_rgx+=("${words[++argi]}")
               continue;;
             --attr-rgx=*)
-              HAVE_attr_rgx=1
-              VALUE_attr_rgx="${arg#*=}"
+              OPT_attr_rgx+=("${arg#*=}")
               continue;;
             --class-naming-style)
-              HAVE_class_naming_style=1
-              VALUE_class_naming_style="${words[++argi]}"
+              OPT_class_naming_style+=("${words[++argi]}")
               continue;;
             --class-naming-style=*)
-              HAVE_class_naming_style=1
-              VALUE_class_naming_style="${arg#*=}"
+              OPT_class_naming_style+=("${arg#*=}")
               continue;;
             --class-rgx)
-              HAVE_class_rgx=1
-              VALUE_class_rgx="${words[++argi]}"
+              OPT_class_rgx+=("${words[++argi]}")
               continue;;
             --class-rgx=*)
-              HAVE_class_rgx=1
-              VALUE_class_rgx="${arg#*=}"
+              OPT_class_rgx+=("${arg#*=}")
               continue;;
             --class-attribute-naming-style)
-              HAVE_class_attribute_naming_style=1
-              VALUE_class_attribute_naming_style="${words[++argi]}"
+              OPT_class_attribute_naming_style+=("${words[++argi]}")
               continue;;
             --class-attribute-naming-style=*)
-              HAVE_class_attribute_naming_style=1
-              VALUE_class_attribute_naming_style="${arg#*=}"
+              OPT_class_attribute_naming_style+=("${arg#*=}")
               continue;;
             --class-attribute-rgx)
-              HAVE_class_attribute_rgx=1
-              VALUE_class_attribute_rgx="${words[++argi]}"
+              OPT_class_attribute_rgx+=("${words[++argi]}")
               continue;;
             --class-attribute-rgx=*)
-              HAVE_class_attribute_rgx=1
-              VALUE_class_attribute_rgx="${arg#*=}"
+              OPT_class_attribute_rgx+=("${arg#*=}")
               continue;;
             --class-const-naming-style)
-              HAVE_class_const_naming_style=1
-              VALUE_class_const_naming_style="${words[++argi]}"
+              OPT_class_const_naming_style+=("${words[++argi]}")
               continue;;
             --class-const-naming-style=*)
-              HAVE_class_const_naming_style=1
-              VALUE_class_const_naming_style="${arg#*=}"
+              OPT_class_const_naming_style+=("${arg#*=}")
               continue;;
             --class-const-rgx)
-              HAVE_class_const_rgx=1
-              VALUE_class_const_rgx="${words[++argi]}"
+              OPT_class_const_rgx+=("${words[++argi]}")
               continue;;
             --class-const-rgx=*)
-              HAVE_class_const_rgx=1
-              VALUE_class_const_rgx="${arg#*=}"
+              OPT_class_const_rgx+=("${arg#*=}")
               continue;;
             --const-naming-style)
-              HAVE_const_naming_style=1
-              VALUE_const_naming_style="${words[++argi]}"
+              OPT_const_naming_style+=("${words[++argi]}")
               continue;;
             --const-naming-style=*)
-              HAVE_const_naming_style=1
-              VALUE_const_naming_style="${arg#*=}"
+              OPT_const_naming_style+=("${arg#*=}")
               continue;;
             --const-rgx)
-              HAVE_const_rgx=1
-              VALUE_const_rgx="${words[++argi]}"
+              OPT_const_rgx+=("${words[++argi]}")
               continue;;
             --const-rgx=*)
-              HAVE_const_rgx=1
-              VALUE_const_rgx="${arg#*=}"
+              OPT_const_rgx+=("${arg#*=}")
               continue;;
             --function-naming-style)
-              HAVE_function_naming_style=1
-              VALUE_function_naming_style="${words[++argi]}"
+              OPT_function_naming_style+=("${words[++argi]}")
               continue;;
             --function-naming-style=*)
-              HAVE_function_naming_style=1
-              VALUE_function_naming_style="${arg#*=}"
+              OPT_function_naming_style+=("${arg#*=}")
               continue;;
             --function-rgx)
-              HAVE_function_rgx=1
-              VALUE_function_rgx="${words[++argi]}"
+              OPT_function_rgx+=("${words[++argi]}")
               continue;;
             --function-rgx=*)
-              HAVE_function_rgx=1
-              VALUE_function_rgx="${arg#*=}"
+              OPT_function_rgx+=("${arg#*=}")
               continue;;
             --inlinevar-naming-style)
-              HAVE_inlinevar_naming_style=1
-              VALUE_inlinevar_naming_style="${words[++argi]}"
+              OPT_inlinevar_naming_style+=("${words[++argi]}")
               continue;;
             --inlinevar-naming-style=*)
-              HAVE_inlinevar_naming_style=1
-              VALUE_inlinevar_naming_style="${arg#*=}"
+              OPT_inlinevar_naming_style+=("${arg#*=}")
               continue;;
             --inlinevar-rgx)
-              HAVE_inlinevar_rgx=1
-              VALUE_inlinevar_rgx="${words[++argi]}"
+              OPT_inlinevar_rgx+=("${words[++argi]}")
               continue;;
             --inlinevar-rgx=*)
-              HAVE_inlinevar_rgx=1
-              VALUE_inlinevar_rgx="${arg#*=}"
+              OPT_inlinevar_rgx+=("${arg#*=}")
               continue;;
             --method-naming-style)
-              HAVE_method_naming_style=1
-              VALUE_method_naming_style="${words[++argi]}"
+              OPT_method_naming_style+=("${words[++argi]}")
               continue;;
             --method-naming-style=*)
-              HAVE_method_naming_style=1
-              VALUE_method_naming_style="${arg#*=}"
+              OPT_method_naming_style+=("${arg#*=}")
               continue;;
             --method-rgx)
-              HAVE_method_rgx=1
-              VALUE_method_rgx="${words[++argi]}"
+              OPT_method_rgx+=("${words[++argi]}")
               continue;;
             --method-rgx=*)
-              HAVE_method_rgx=1
-              VALUE_method_rgx="${arg#*=}"
+              OPT_method_rgx+=("${arg#*=}")
               continue;;
             --module-naming-style)
-              HAVE_module_naming_style=1
-              VALUE_module_naming_style="${words[++argi]}"
+              OPT_module_naming_style+=("${words[++argi]}")
               continue;;
             --module-naming-style=*)
-              HAVE_module_naming_style=1
-              VALUE_module_naming_style="${arg#*=}"
+              OPT_module_naming_style+=("${arg#*=}")
               continue;;
             --module-rgx)
-              HAVE_module_rgx=1
-              VALUE_module_rgx="${words[++argi]}"
+              OPT_module_rgx+=("${words[++argi]}")
               continue;;
             --module-rgx=*)
-              HAVE_module_rgx=1
-              VALUE_module_rgx="${arg#*=}"
+              OPT_module_rgx+=("${arg#*=}")
               continue;;
             --typealias-rgx)
-              HAVE_typealias_rgx=1
-              VALUE_typealias_rgx="${words[++argi]}"
+              OPT_typealias_rgx+=("${words[++argi]}")
               continue;;
             --typealias-rgx=*)
-              HAVE_typealias_rgx=1
-              VALUE_typealias_rgx="${arg#*=}"
+              OPT_typealias_rgx+=("${arg#*=}")
               continue;;
             --typevar-rgx)
-              HAVE_typevar_rgx=1
-              VALUE_typevar_rgx="${words[++argi]}"
+              OPT_typevar_rgx+=("${words[++argi]}")
               continue;;
             --typevar-rgx=*)
-              HAVE_typevar_rgx=1
-              VALUE_typevar_rgx="${arg#*=}"
+              OPT_typevar_rgx+=("${arg#*=}")
               continue;;
             --variable-naming-style)
-              HAVE_variable_naming_style=1
-              VALUE_variable_naming_style="${words[++argi]}"
+              OPT_variable_naming_style+=("${words[++argi]}")
               continue;;
             --variable-naming-style=*)
-              HAVE_variable_naming_style=1
-              VALUE_variable_naming_style="${arg#*=}"
+              OPT_variable_naming_style+=("${arg#*=}")
               continue;;
             --variable-rgx)
-              HAVE_variable_rgx=1
-              VALUE_variable_rgx="${words[++argi]}"
+              OPT_variable_rgx+=("${words[++argi]}")
               continue;;
             --variable-rgx=*)
-              HAVE_variable_rgx=1
-              VALUE_variable_rgx="${arg#*=}"
+              OPT_variable_rgx+=("${arg#*=}")
               continue;;
             --no-docstring-rgx)
-              HAVE_no_docstring_rgx=1
-              VALUE_no_docstring_rgx="${words[++argi]}"
+              OPT_no_docstring_rgx+=("${words[++argi]}")
               continue;;
             --no-docstring-rgx=*)
-              HAVE_no_docstring_rgx=1
-              VALUE_no_docstring_rgx="${arg#*=}"
+              OPT_no_docstring_rgx+=("${arg#*=}")
               continue;;
             --docstring-min-length)
-              HAVE_docstring_min_length=1
-              VALUE_docstring_min_length="${words[++argi]}"
+              OPT_docstring_min_length+=("${words[++argi]}")
               continue;;
             --docstring-min-length=*)
-              HAVE_docstring_min_length=1
-              VALUE_docstring_min_length="${arg#*=}"
+              OPT_docstring_min_length+=("${arg#*=}")
               continue;;
             --init-import)
-              HAVE_init_import=1
-              VALUE_init_import="${words[++argi]}"
+              OPT_init_import+=("${words[++argi]}")
               continue;;
             --init-import=*)
-              HAVE_init_import=1
-              VALUE_init_import="${arg#*=}"
+              OPT_init_import+=("${arg#*=}")
               continue;;
             --dummy-variables-rgx)
-              HAVE_dummy_variables_rgx=1
-              VALUE_dummy_variables_rgx="${words[++argi]}"
+              OPT_dummy_variables_rgx+=("${words[++argi]}")
               continue;;
             --dummy-variables-rgx=*)
-              HAVE_dummy_variables_rgx=1
-              VALUE_dummy_variables_rgx="${arg#*=}"
+              OPT_dummy_variables_rgx+=("${arg#*=}")
               continue;;
             --additional-builtins)
-              HAVE_additional_builtins=1
-              VALUE_additional_builtins="${words[++argi]}"
+              OPT_additional_builtins+=("${words[++argi]}")
               continue;;
             --additional-builtins=*)
-              HAVE_additional_builtins=1
-              VALUE_additional_builtins="${arg#*=}"
+              OPT_additional_builtins+=("${arg#*=}")
               continue;;
             --callbacks)
-              HAVE_callbacks=1
-              VALUE_callbacks="${words[++argi]}"
+              OPT_callbacks+=("${words[++argi]}")
               continue;;
             --callbacks=*)
-              HAVE_callbacks=1
-              VALUE_callbacks="${arg#*=}"
+              OPT_callbacks+=("${arg#*=}")
               continue;;
             --redefining-builtins-modules)
-              HAVE_redefining_builtins_modules=1
-              VALUE_redefining_builtins_modules="${words[++argi]}"
+              OPT_redefining_builtins_modules+=("${words[++argi]}")
               continue;;
             --redefining-builtins-modules=*)
-              HAVE_redefining_builtins_modules=1
-              VALUE_redefining_builtins_modules="${arg#*=}"
+              OPT_redefining_builtins_modules+=("${arg#*=}")
               continue;;
             --ignored-argument-names)
-              HAVE_ignored_argument_names=1
-              VALUE_ignored_argument_names="${words[++argi]}"
+              OPT_ignored_argument_names+=("${words[++argi]}")
               continue;;
             --ignored-argument-names=*)
-              HAVE_ignored_argument_names=1
-              VALUE_ignored_argument_names="${arg#*=}"
+              OPT_ignored_argument_names+=("${arg#*=}")
               continue;;
             --allow-global-unused-variables)
-              HAVE_allow_global_unused_variables=1
-              VALUE_allow_global_unused_variables="${words[++argi]}"
+              OPT_allow_global_unused_variables+=("${words[++argi]}")
               continue;;
             --allow-global-unused-variables=*)
-              HAVE_allow_global_unused_variables=1
-              VALUE_allow_global_unused_variables="${arg#*=}"
+              OPT_allow_global_unused_variables+=("${arg#*=}")
               continue;;
             --allowed-redefined-builtins)
-              HAVE_allowed_redefined_builtins=1
-              VALUE_allowed_redefined_builtins="${words[++argi]}"
+              OPT_allowed_redefined_builtins+=("${words[++argi]}")
               continue;;
             --allowed-redefined-builtins=*)
-              HAVE_allowed_redefined_builtins=1
-              VALUE_allowed_redefined_builtins="${arg#*=}"
+              OPT_allowed_redefined_builtins+=("${arg#*=}")
               continue;;
             --deprecated-modules)
-              HAVE_deprecated_modules=1
-              VALUE_deprecated_modules="${words[++argi]}"
+              OPT_deprecated_modules+=("${words[++argi]}")
               continue;;
             --deprecated-modules=*)
-              HAVE_deprecated_modules=1
-              VALUE_deprecated_modules="${arg#*=}"
+              OPT_deprecated_modules+=("${arg#*=}")
               continue;;
             --preferred-modules)
-              HAVE_preferred_modules=1
-              VALUE_preferred_modules="${words[++argi]}"
+              OPT_preferred_modules+=("${words[++argi]}")
               continue;;
             --preferred-modules=*)
-              HAVE_preferred_modules=1
-              VALUE_preferred_modules="${arg#*=}"
+              OPT_preferred_modules+=("${arg#*=}")
               continue;;
             --import-graph)
-              HAVE_import_graph=1
-              VALUE_import_graph="${words[++argi]}"
+              OPT_import_graph+=("${words[++argi]}")
               continue;;
             --import-graph=*)
-              HAVE_import_graph=1
-              VALUE_import_graph="${arg#*=}"
+              OPT_import_graph+=("${arg#*=}")
               continue;;
             --ext-import-graph)
-              HAVE_ext_import_graph=1
-              VALUE_ext_import_graph="${words[++argi]}"
+              OPT_ext_import_graph+=("${words[++argi]}")
               continue;;
             --ext-import-graph=*)
-              HAVE_ext_import_graph=1
-              VALUE_ext_import_graph="${arg#*=}"
+              OPT_ext_import_graph+=("${arg#*=}")
               continue;;
             --int-import-graph)
-              HAVE_int_import_graph=1
-              VALUE_int_import_graph="${words[++argi]}"
+              OPT_int_import_graph+=("${words[++argi]}")
               continue;;
             --int-import-graph=*)
-              HAVE_int_import_graph=1
-              VALUE_int_import_graph="${arg#*=}"
+              OPT_int_import_graph+=("${arg#*=}")
               continue;;
             --known-standard-library)
-              HAVE_known_standard_library=1
-              VALUE_known_standard_library="${words[++argi]}"
+              OPT_known_standard_library+=("${words[++argi]}")
               continue;;
             --known-standard-library=*)
-              HAVE_known_standard_library=1
-              VALUE_known_standard_library="${arg#*=}"
+              OPT_known_standard_library+=("${arg#*=}")
               continue;;
             --known-third-party)
-              HAVE_known_third_party=1
-              VALUE_known_third_party="${words[++argi]}"
+              OPT_known_third_party+=("${words[++argi]}")
               continue;;
             --known-third-party=*)
-              HAVE_known_third_party=1
-              VALUE_known_third_party="${arg#*=}"
+              OPT_known_third_party+=("${arg#*=}")
               continue;;
             --allow-any-import-level)
-              HAVE_allow_any_import_level=1
-              VALUE_allow_any_import_level="${words[++argi]}"
+              OPT_allow_any_import_level+=("${words[++argi]}")
               continue;;
             --allow-any-import-level=*)
-              HAVE_allow_any_import_level=1
-              VALUE_allow_any_import_level="${arg#*=}"
+              OPT_allow_any_import_level+=("${arg#*=}")
               continue;;
             --allow-wildcard-with-all)
-              HAVE_allow_wildcard_with_all=1
-              VALUE_allow_wildcard_with_all="${words[++argi]}"
+              OPT_allow_wildcard_with_all+=("${words[++argi]}")
               continue;;
             --allow-wildcard-with-all=*)
-              HAVE_allow_wildcard_with_all=1
-              VALUE_allow_wildcard_with_all="${arg#*=}"
+              OPT_allow_wildcard_with_all+=("${arg#*=}")
               continue;;
             --allow-reexport-from-package)
-              HAVE_allow_reexport_from_package=1
-              VALUE_allow_reexport_from_package="${words[++argi]}"
+              OPT_allow_reexport_from_package+=("${words[++argi]}")
               continue;;
             --allow-reexport-from-package=*)
-              HAVE_allow_reexport_from_package=1
-              VALUE_allow_reexport_from_package="${arg#*=}"
+              OPT_allow_reexport_from_package+=("${arg#*=}")
               continue;;
             --logging-modules)
-              HAVE_logging_modules=1
-              VALUE_logging_modules="${words[++argi]}"
+              OPT_logging_modules+=("${words[++argi]}")
               continue;;
             --logging-modules=*)
-              HAVE_logging_modules=1
-              VALUE_logging_modules="${arg#*=}"
+              OPT_logging_modules+=("${arg#*=}")
               continue;;
             --logging-format-style)
-              HAVE_logging_format_style=1
-              VALUE_logging_format_style="${words[++argi]}"
+              OPT_logging_format_style+=("${words[++argi]}")
               continue;;
             --logging-format-style=*)
-              HAVE_logging_format_style=1
-              VALUE_logging_format_style="${arg#*=}"
+              OPT_logging_format_style+=("${arg#*=}")
               continue;;
           esac
         esac
-
         for ((i=1; i < ${#arg}; ++i)); do
           char="${arg:$i:1}"
-          has_trailing_chars=$( (( i + 1 < ${#arg} )) && echo true || echo false)
-          case "$command" in pylint)
+          trailing_chars="${arg:$((i + 1))}"
+          case "$cmd" in pylint)
             case "$char" in
               h)
-                HAVE_help=1;;
+                OPT_help+=(_OPT_ISSET_);;
               E)
-                HAVE_errors_only=1;;
+                OPT_errors_only+=(_OPT_ISSET_);;
               v)
-                HAVE_verbose=1;;
+                OPT_verbose+=(_OPT_ISSET_);;
               j)
-                HAVE_jobs=1
-                if $has_trailing_chars
-                then VALUE_jobs="${arg:$((i + 1))}"
-                else VALUE_jobs="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_jobs+=("$trailing_chars")
+                else OPT_jobs+=("${words[++argi]}")
                 fi
                 continue 2;;
               f)
-                HAVE_output_format=1
-                if $has_trailing_chars
-                then VALUE_output_format="${arg:$((i + 1))}"
-                else VALUE_output_format="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_output_format+=("$trailing_chars")
+                else OPT_output_format+=("${words[++argi]}")
                 fi
                 continue 2;;
               r)
-                HAVE_reports=1
-                if $has_trailing_chars
-                then VALUE_reports="${arg:$((i + 1))}"
-                else VALUE_reports="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_reports+=("$trailing_chars")
+                else OPT_reports+=("${words[++argi]}")
                 fi
                 continue 2;;
               s)
-                HAVE_score=1
-                if $has_trailing_chars
-                then VALUE_score="${arg:$((i + 1))}"
-                else VALUE_score="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_score+=("$trailing_chars")
+                else OPT_score+=("${words[++argi]}")
                 fi
                 continue 2;;
               e)
-                HAVE_enable=1
-                if $has_trailing_chars
-                then VALUE_enable="${arg:$((i + 1))}"
-                else VALUE_enable="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_enable+=("$trailing_chars")
+                else OPT_enable+=("${words[++argi]}")
                 fi
                 continue 2;;
               d)
-                HAVE_disable=1
-                if $has_trailing_chars
-                then VALUE_disable="${arg:$((i + 1))}"
-                else VALUE_disable="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_disable+=("$trailing_chars")
+                else OPT_disable+=("${words[++argi]}")
                 fi
                 continue 2;;
             esac
           esac
-
         done;;
       *)
         POSITIONALS[POSITIONAL_NUM++]="$arg"
@@ -1352,623 +1067,31 @@ _pylint() {
   _init_completion -n = || return
 
   local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local HAVE_help=0 HAVE_rcfile=0 HAVE_output=0 HAVE_help_msg=0 HAVE_list_msgs=0 HAVE_list_msgs_enabled=0 HAVE_list_groups=0 HAVE_list_conf_levels=0 HAVE_list_extensions=0 HAVE_full_documentation=0 HAVE_generate_rcfile=0 HAVE_generate_toml_config=0 HAVE_long_help=0 HAVE_init_hook=0 HAVE_errors_only=0 HAVE_verbose=0 HAVE_enable_all_extensions=0 HAVE_ignore=0 HAVE_ignore_patterns=0 HAVE_ignore_paths=0 HAVE_persistent=0 HAVE_load_plugins=0 HAVE_fail_under=0 HAVE_fail_on=0 HAVE_jobs=0 HAVE_limit_inference_results=0 HAVE_extension_pkg_allow_list=0 HAVE_extension_pkg_whitelist=0 HAVE_suggestion_mode=0 HAVE_exit_zero=0 HAVE_from_stdin=0 HAVE_source_roots=0 HAVE_recursive=0 HAVE_py_version=0 HAVE_ignored_modules=0 HAVE_analyse_fallback_blocks=0 HAVE_clear_cache_post_run=0 HAVE_prefer_stubs=0 HAVE_output_format=0 HAVE_reports=0 HAVE_evaluation=0 HAVE_score=0 HAVE_msg_template=0 HAVE_confidence=0 HAVE_enable=0 HAVE_disable=0 HAVE_min_similarity_lines=0 HAVE_ignore_comments=0 HAVE_ignore_docstrings=0 HAVE_ignore_imports=0 HAVE_ignore_signatures=0 HAVE_ignore_on_opaque_inference=0 HAVE_mixin_class_rgx=0 HAVE_ignore_mixin_members=0 HAVE_ignored_checks_for_mixins=0 HAVE_ignore_none=0 HAVE_ignored_classes=0 HAVE_generated_members=0 HAVE_contextmanager_decorators=0 HAVE_missing_member_hint_distance=0 HAVE_missing_member_max_choices=0 HAVE_missing_member_hint=0 HAVE_signature_mutators=0 HAVE_notes=0 HAVE_notes_rgx=0 HAVE_timeout_methods=0 HAVE_spelling_dict=0 HAVE_spelling_ignore_words=0 HAVE_spelling_private_dict_file=0 HAVE_spelling_store_unknown_words=0 HAVE_max_spelling_suggestions=0 HAVE_spelling_ignore_comment_directives=0 HAVE_max_nested_blocks=0 HAVE_never_returning_functions=0 HAVE_suggest_join_with_non_empty_separator=0 HAVE_check_str_concat_over_line_jumps=0 HAVE_check_quote_consistency=0 HAVE_max_args=0 HAVE_max_locals=0 HAVE_max_returns=0 HAVE_max_branches=0 HAVE_max_statements=0 HAVE_max_parents=0 HAVE_ignored_parents=0 HAVE_max_attributes=0 HAVE_min_public_methods=0 HAVE_max_public_methods=0 HAVE_max_bool_expr=0 HAVE_exclude_too_few_public_methods=0 HAVE_overgeneral_exceptions=0 HAVE_defining_attr_methods=0 HAVE_valid_classmethod_first_arg=0 HAVE_valid_metaclass_classmethod_first_arg=0 HAVE_exclude_protected=0 HAVE_check_protected_access_in_special_methods=0 HAVE_max_line_length=0 HAVE_ignore_long_lines=0 HAVE_single_line_if_stmt=0 HAVE_single_line_class_stmt=0 HAVE_max_module_lines=0 HAVE_indent_string=0 HAVE_indent_after_paren=0 HAVE_expected_line_ending_format=0 HAVE_good_names=0 HAVE_good_names_rgxs=0 HAVE_bad_names=0 HAVE_bad_names_rgxs=0 HAVE_name_group=0 HAVE_include_naming_hint=0 HAVE_property_classes=0 HAVE_argument_naming_style=0 HAVE_argument_rgx=0 HAVE_attr_naming_style=0 HAVE_attr_rgx=0 HAVE_class_naming_style=0 HAVE_class_rgx=0 HAVE_class_attribute_naming_style=0 HAVE_class_attribute_rgx=0 HAVE_class_const_naming_style=0 HAVE_class_const_rgx=0 HAVE_const_naming_style=0 HAVE_const_rgx=0 HAVE_function_naming_style=0 HAVE_function_rgx=0 HAVE_inlinevar_naming_style=0 HAVE_inlinevar_rgx=0 HAVE_method_naming_style=0 HAVE_method_rgx=0 HAVE_module_naming_style=0 HAVE_module_rgx=0 HAVE_typealias_rgx=0 HAVE_typevar_rgx=0 HAVE_variable_naming_style=0 HAVE_variable_rgx=0 HAVE_no_docstring_rgx=0 HAVE_docstring_min_length=0 HAVE_init_import=0 HAVE_dummy_variables_rgx=0 HAVE_additional_builtins=0 HAVE_callbacks=0 HAVE_redefining_builtins_modules=0 HAVE_ignored_argument_names=0 HAVE_allow_global_unused_variables=0 HAVE_allowed_redefined_builtins=0 HAVE_deprecated_modules=0 HAVE_preferred_modules=0 HAVE_import_graph=0 HAVE_ext_import_graph=0 HAVE_int_import_graph=0 HAVE_known_standard_library=0 HAVE_known_third_party=0 HAVE_allow_any_import_level=0 HAVE_allow_wildcard_with_all=0 HAVE_allow_reexport_from_package=0 HAVE_logging_modules=0 HAVE_logging_format_style=0
-  local VALUE_help VALUE_rcfile VALUE_output VALUE_help_msg VALUE_list_msgs VALUE_list_msgs_enabled VALUE_list_groups VALUE_list_conf_levels VALUE_list_extensions VALUE_full_documentation VALUE_generate_rcfile VALUE_generate_toml_config VALUE_long_help VALUE_init_hook VALUE_errors_only VALUE_verbose VALUE_enable_all_extensions VALUE_ignore VALUE_ignore_patterns VALUE_ignore_paths VALUE_persistent VALUE_load_plugins VALUE_fail_under VALUE_fail_on VALUE_jobs VALUE_limit_inference_results VALUE_extension_pkg_allow_list VALUE_extension_pkg_whitelist VALUE_suggestion_mode VALUE_exit_zero VALUE_from_stdin VALUE_source_roots VALUE_recursive VALUE_py_version VALUE_ignored_modules VALUE_analyse_fallback_blocks VALUE_clear_cache_post_run VALUE_prefer_stubs VALUE_output_format VALUE_reports VALUE_evaluation VALUE_score VALUE_msg_template VALUE_confidence VALUE_enable VALUE_disable VALUE_min_similarity_lines VALUE_ignore_comments VALUE_ignore_docstrings VALUE_ignore_imports VALUE_ignore_signatures VALUE_ignore_on_opaque_inference VALUE_mixin_class_rgx VALUE_ignore_mixin_members VALUE_ignored_checks_for_mixins VALUE_ignore_none VALUE_ignored_classes VALUE_generated_members VALUE_contextmanager_decorators VALUE_missing_member_hint_distance VALUE_missing_member_max_choices VALUE_missing_member_hint VALUE_signature_mutators VALUE_notes VALUE_notes_rgx VALUE_timeout_methods VALUE_spelling_dict VALUE_spelling_ignore_words VALUE_spelling_private_dict_file VALUE_spelling_store_unknown_words VALUE_max_spelling_suggestions VALUE_spelling_ignore_comment_directives VALUE_max_nested_blocks VALUE_never_returning_functions VALUE_suggest_join_with_non_empty_separator VALUE_check_str_concat_over_line_jumps VALUE_check_quote_consistency VALUE_max_args VALUE_max_locals VALUE_max_returns VALUE_max_branches VALUE_max_statements VALUE_max_parents VALUE_ignored_parents VALUE_max_attributes VALUE_min_public_methods VALUE_max_public_methods VALUE_max_bool_expr VALUE_exclude_too_few_public_methods VALUE_overgeneral_exceptions VALUE_defining_attr_methods VALUE_valid_classmethod_first_arg VALUE_valid_metaclass_classmethod_first_arg VALUE_exclude_protected VALUE_check_protected_access_in_special_methods VALUE_max_line_length VALUE_ignore_long_lines VALUE_single_line_if_stmt VALUE_single_line_class_stmt VALUE_max_module_lines VALUE_indent_string VALUE_indent_after_paren VALUE_expected_line_ending_format VALUE_good_names VALUE_good_names_rgxs VALUE_bad_names VALUE_bad_names_rgxs VALUE_name_group VALUE_include_naming_hint VALUE_property_classes VALUE_argument_naming_style VALUE_argument_rgx VALUE_attr_naming_style VALUE_attr_rgx VALUE_class_naming_style VALUE_class_rgx VALUE_class_attribute_naming_style VALUE_class_attribute_rgx VALUE_class_const_naming_style VALUE_class_const_rgx VALUE_const_naming_style VALUE_const_rgx VALUE_function_naming_style VALUE_function_rgx VALUE_inlinevar_naming_style VALUE_inlinevar_rgx VALUE_method_naming_style VALUE_method_rgx VALUE_module_naming_style VALUE_module_rgx VALUE_typealias_rgx VALUE_typevar_rgx VALUE_variable_naming_style VALUE_variable_rgx VALUE_no_docstring_rgx VALUE_docstring_min_length VALUE_init_import VALUE_dummy_variables_rgx VALUE_additional_builtins VALUE_callbacks VALUE_redefining_builtins_modules VALUE_ignored_argument_names VALUE_allow_global_unused_variables VALUE_allowed_redefined_builtins VALUE_deprecated_modules VALUE_preferred_modules VALUE_import_graph VALUE_ext_import_graph VALUE_int_import_graph VALUE_known_standard_library VALUE_known_third_party VALUE_allow_any_import_level VALUE_allow_wildcard_with_all VALUE_allow_reexport_from_package VALUE_logging_modules VALUE_logging_format_style
+  local -a OPT_help OPT_rcfile OPT_output OPT_help_msg OPT_list_msgs OPT_list_msgs_enabled OPT_list_groups OPT_list_conf_levels OPT_list_extensions OPT_full_documentation OPT_generate_rcfile OPT_generate_toml_config OPT_long_help OPT_init_hook OPT_errors_only OPT_verbose OPT_enable_all_extensions OPT_ignore OPT_ignore_patterns OPT_ignore_paths OPT_persistent OPT_load_plugins OPT_fail_under OPT_fail_on OPT_jobs OPT_limit_inference_results OPT_extension_pkg_allow_list OPT_extension_pkg_whitelist OPT_suggestion_mode OPT_exit_zero OPT_from_stdin OPT_source_roots OPT_recursive OPT_py_version OPT_ignored_modules OPT_analyse_fallback_blocks OPT_clear_cache_post_run OPT_prefer_stubs OPT_output_format OPT_reports OPT_evaluation OPT_score OPT_msg_template OPT_confidence OPT_enable OPT_disable OPT_min_similarity_lines OPT_ignore_comments OPT_ignore_docstrings OPT_ignore_imports OPT_ignore_signatures OPT_ignore_on_opaque_inference OPT_mixin_class_rgx OPT_ignore_mixin_members OPT_ignored_checks_for_mixins OPT_ignore_none OPT_ignored_classes OPT_generated_members OPT_contextmanager_decorators OPT_missing_member_hint_distance OPT_missing_member_max_choices OPT_missing_member_hint OPT_signature_mutators OPT_notes OPT_notes_rgx OPT_timeout_methods OPT_spelling_dict OPT_spelling_ignore_words OPT_spelling_private_dict_file OPT_spelling_store_unknown_words OPT_max_spelling_suggestions OPT_spelling_ignore_comment_directives OPT_max_nested_blocks OPT_never_returning_functions OPT_suggest_join_with_non_empty_separator OPT_check_str_concat_over_line_jumps OPT_check_quote_consistency OPT_max_args OPT_max_positional_arguments OPT_max_locals OPT_max_returns OPT_max_branches OPT_max_statements OPT_max_parents OPT_ignored_parents OPT_max_attributes OPT_min_public_methods OPT_max_public_methods OPT_max_bool_expr OPT_exclude_too_few_public_methods OPT_overgeneral_exceptions OPT_defining_attr_methods OPT_valid_classmethod_first_arg OPT_valid_metaclass_classmethod_first_arg OPT_exclude_protected OPT_check_protected_access_in_special_methods OPT_max_line_length OPT_ignore_long_lines OPT_single_line_if_stmt OPT_single_line_class_stmt OPT_max_module_lines OPT_indent_string OPT_indent_after_paren OPT_expected_line_ending_format OPT_good_names OPT_good_names_rgxs OPT_bad_names OPT_bad_names_rgxs OPT_name_group OPT_include_naming_hint OPT_property_classes OPT_argument_naming_style OPT_argument_rgx OPT_attr_naming_style OPT_attr_rgx OPT_class_naming_style OPT_class_rgx OPT_class_attribute_naming_style OPT_class_attribute_rgx OPT_class_const_naming_style OPT_class_const_rgx OPT_const_naming_style OPT_const_rgx OPT_function_naming_style OPT_function_rgx OPT_inlinevar_naming_style OPT_inlinevar_rgx OPT_method_naming_style OPT_method_rgx OPT_module_naming_style OPT_module_rgx OPT_typealias_rgx OPT_typevar_rgx OPT_variable_naming_style OPT_variable_rgx OPT_no_docstring_rgx OPT_docstring_min_length OPT_init_import OPT_dummy_variables_rgx OPT_additional_builtins OPT_callbacks OPT_redefining_builtins_modules OPT_ignored_argument_names OPT_allow_global_unused_variables OPT_allowed_redefined_builtins OPT_deprecated_modules OPT_preferred_modules OPT_import_graph OPT_ext_import_graph OPT_int_import_graph OPT_known_standard_library OPT_known_third_party OPT_allow_any_import_level OPT_allow_wildcard_with_all OPT_allow_reexport_from_package OPT_logging_modules OPT_logging_format_style
 
   _pylint_parse_commandline
 
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
 
-    case "$opt" in --rcfile)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --output)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --help-msg)
-      return 0;;
-    esac
-
-    case "$opt" in --init-hook)
-      return 0;;
-    esac
-
-    case "$opt" in --ignore)
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-patterns)
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-paths)
-      return 0;;
-    esac
-
-    case "$opt" in --persistent)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --load-plugins)
-      return 0;;
-    esac
-
-    case "$opt" in --fail-under)
-      return 0;;
-    esac
-
-    case "$opt" in --fail-on)
-      _pylint_value_list , invalid-name disallowed-name typevar-name-incorrect-variance empty-docstring missing-module-docstring missing-class-docstring missing-function-docstring unnecessary-negation singleton-comparison unidiomatic-typecheck typevar-double-variance typevar-name-mismatch consider-using-enumerate consider-iterating-dictionary bad-classmethod-argument bad-mcs-method-argument bad-mcs-classmethod-argument single-string-used-for-slots consider-using-dict-items use-maxsplit-arg use-sequence-for-iteration consider-using-f-string line-too-long too-many-lines trailing-whitespace missing-final-newline trailing-newlines multiple-statements superfluous-parens mixed-line-endings unexpected-line-ending-format wrong-spelling-in-comment wrong-spelling-in-docstring invalid-characters-in-docstring multiple-imports wrong-import-order ungrouped-imports wrong-import-position useless-import-alias import-outside-toplevel use-implicit-booleaness-not-len use-implicit-booleaness-not-comparison use-implicit-booleaness-not-comparison-to-string use-implicit-booleaness-not-comparison-to-zero non-ascii-name non-ascii-module-import bad-file-encoding unnecessary-dunder-call unnecessary-lambda-assignment unnecessary-direct-lambda-call syntax-error unrecognized-inline-option bad-plugin-value bad-configuration-section unrecognized-option init-is-generator return-in-init function-redefined not-in-loop return-outside-function yield-outside-function nonexistent-operator duplicate-argument-name abstract-class-instantiated bad-reversed-sequence too-many-star-expressions invalid-star-assignment-target star-needs-assignment-target nonlocal-and-global continue-in-finally nonlocal-without-binding used-prior-global-declaration misplaced-format-function method-hidden access-member-before-definition no-method-argument no-self-argument invalid-slots-object assigning-non-slot invalid-slots inherit-non-class inconsistent-mro duplicate-bases class-variable-slots-conflict invalid-class-object invalid-enum-extension non-iterator-returned unexpected-special-method-signature invalid-length-returned invalid-bool-returned invalid-index-returned invalid-repr-returned invalid-str-returned invalid-bytes-returned invalid-hash-returned invalid-length-hint-returned invalid-format-returned invalid-getnewargs-returned invalid-getnewargs-ex-returned import-error relative-beyond-top-level used-before-assignment undefined-variable undefined-all-variable invalid-all-object invalid-all-format possibly-used-before-assignment no-name-in-module unpacking-non-sequence potential-index-error bad-except-order raising-bad-type misplaced-bare-raise bad-exception-cause raising-non-exception notimplemented-raised catching-non-exception bad-super-call no-member not-callable assignment-from-no-return no-value-for-parameter too-many-function-args unexpected-keyword-arg redundant-keyword-arg missing-kwoa invalid-sequence-index invalid-slice-index assignment-from-none not-context-manager invalid-unary-operand-type unsupported-binary-operation repeated-keyword not-an-iterable not-a-mapping unsupported-membership-test unsubscriptable-object unsupported-assignment-operation unsupported-delete-operation invalid-metaclass dict-iter-missing-items await-outside-async unhashable-member invalid-slice-step logging-unsupported-format logging-format-truncated logging-too-many-args logging-too-few-args bad-format-character truncated-format-string mixed-format-string format-needs-mapping missing-format-string-key too-many-format-args too-few-format-args bad-string-format-type bad-str-strip-call invalid-envvar-value singledispatch-method singledispatchmethod-function yield-inside-async-function not-async-context-manager invalid-unicode-codec bidirectional-unicode invalid-character-backspace invalid-character-carriage-return invalid-character-sub invalid-character-esc invalid-character-nul invalid-character-zero-width-space positional-only-arguments-expected invalid-field-call modified-iterating-dict modified-iterating-set fatal astroid-error parse-error config-parse-error method-check-failed raw-checker-failed bad-inline-option locally-disabled file-ignored suppressed-message useless-suppression deprecated-pragma use-symbolic-message-instead c-extension-no-member useless-option-value literal-comparison comparison-with-itself comparison-of-constants no-classmethod-decorator no-staticmethod-decorator useless-object-inheritance property-with-parameters cyclic-import consider-using-from-import duplicate-code too-many-ancestors too-many-instance-attributes too-few-public-methods too-many-public-methods too-many-return-statements too-many-branches too-many-arguments too-many-locals too-many-statements too-many-boolean-expressions too-many-positional consider-merging-isinstance too-many-nested-blocks simplifiable-if-statement redefined-argument-from-local no-else-return consider-using-ternary trailing-comma-tuple stop-iteration-return simplify-boolean-expression inconsistent-return-statements useless-return consider-swap-variables consider-using-join consider-using-in consider-using-get chained-comparison consider-using-dict-comprehension consider-using-set-comprehension simplifiable-if-expression no-else-raise unnecessary-comprehension consider-using-sys-exit no-else-break no-else-continue super-with-arguments simplifiable-condition condition-evals-to-constant consider-using-generator use-a-generator consider-using-min-builtin consider-using-max-builtin consider-using-with unnecessary-dict-index-lookup use-list-literal use-dict-literal unnecessary-list-index-lookup use-yield-from unknown-option-value unreachable dangerous-default-value pointless-statement pointless-string-statement expression-not-assigned unnecessary-pass unnecessary-lambda duplicate-key useless-else-on-loop exec-used eval-used confusing-with-statement using-constant-test missing-parentheses-for-call-in-test self-assigning-variable redeclared-assigned-name assert-on-string-literal duplicate-value named-expr-without-context pointless-exception-statement return-in-finally contextmanager-generator-missing-cleanup comparison-with-callable lost-exception nan-comparison assert-on-tuple attribute-defined-outside-init bad-staticmethod-argument protected-access implicit-flag-alias arguments-differ signature-differs abstract-method super-init-not-called non-parent-init-called invalid-overridden-method arguments-renamed unused-private-member overridden-final-method subclassed-final-class redefined-slots-in-subclass super-without-brackets useless-parent-delegation unnecessary-semicolon bad-indentation wildcard-import reimported import-self preferred-module misplaced-future shadowed-import fixme global-variable-undefined global-variable-not-assigned global-statement global-at-module-level unused-import unused-variable unused-argument unused-wildcard-import redefined-outer-name redefined-builtin undefined-loop-variable unbalanced-tuple-unpacking cell-var-from-loop possibly-unused-variable self-cls-assignment unbalanced-dict-unpacking bare-except duplicate-except try-except-raise raise-missing-from binary-op-exception raising-format-tuple wrong-exception-operation broad-exception-caught broad-exception-raised keyword-arg-before-vararg arguments-out-of-order non-str-assignment-to-dunder-name isinstance-second-argument-not-valid-type kwarg-superseded-by-positional-arg logging-not-lazy logging-format-interpolation logging-fstring-interpolation bad-format-string-key unused-format-string-key bad-format-string missing-format-argument-key unused-format-string-argument format-combined-specification missing-format-attribute invalid-format-index duplicate-string-formatting-argument f-string-without-interpolation format-string-without-interpolation anomalous-backslash-in-string anomalous-unicode-escape-in-string implicit-str-concat inconsistent-quotes redundant-u-string-prefix bad-open-mode redundant-unittest-assert bad-thread-instantiation shallow-copy-environ invalid-envvar-default subprocess-popen-preexec-fn subprocess-run-check unspecified-encoding forgotten-debug-statement method-cache-max-size-none useless-with-lock unnecessary-ellipsis non-ascii-file-name using-f-string-in-unsupported-version using-final-decorator-in-unsupported-version missing-timeout nested-min-max bad-chained-comparison modified-iterating-list deprecated-module deprecated-method deprecated-argument deprecated-class deprecated-decorator deprecated-attribute return-arg-in-generator boolean-datetime
-      return 0;;
-    esac
-
-    case "$opt" in --jobs|-j)
-      return 0;;
-    esac
-
-    case "$opt" in --limit-inference-results)
-      return 0;;
-    esac
-
-    case "$opt" in --extension-pkg-allow-list)
-      return 0;;
-    esac
-
-    case "$opt" in --extension-pkg-whitelist)
-      return 0;;
-    esac
-
-    case "$opt" in --suggestion-mode)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --source-roots)
-      return 0;;
-    esac
-
-    case "$opt" in --recursive)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --py-version)
-      return 0;;
-    esac
-
-    case "$opt" in --ignored-modules)
-      return 0;;
-    esac
-
-    case "$opt" in --analyse-fallback-blocks)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --clear-cache-post-run)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --prefer-stubs)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --output-format|-f)
-      return 0;;
-    esac
-
-    case "$opt" in --reports|-r)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --evaluation)
-      return 0;;
-    esac
-
-    case "$opt" in --score|-s)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --msg-template)
-      return 0;;
-    esac
-
-    case "$opt" in --confidence)
-      return 0;;
-    esac
-
-    case "$opt" in --enable|-e)
-      _pylint_value_list , invalid-name disallowed-name typevar-name-incorrect-variance empty-docstring missing-module-docstring missing-class-docstring missing-function-docstring unnecessary-negation singleton-comparison unidiomatic-typecheck typevar-double-variance typevar-name-mismatch consider-using-enumerate consider-iterating-dictionary bad-classmethod-argument bad-mcs-method-argument bad-mcs-classmethod-argument single-string-used-for-slots consider-using-dict-items use-maxsplit-arg use-sequence-for-iteration consider-using-f-string line-too-long too-many-lines trailing-whitespace missing-final-newline trailing-newlines multiple-statements superfluous-parens mixed-line-endings unexpected-line-ending-format wrong-spelling-in-comment wrong-spelling-in-docstring invalid-characters-in-docstring multiple-imports wrong-import-order ungrouped-imports wrong-import-position useless-import-alias import-outside-toplevel use-implicit-booleaness-not-len use-implicit-booleaness-not-comparison use-implicit-booleaness-not-comparison-to-string use-implicit-booleaness-not-comparison-to-zero non-ascii-name non-ascii-module-import bad-file-encoding unnecessary-dunder-call unnecessary-lambda-assignment unnecessary-direct-lambda-call syntax-error unrecognized-inline-option bad-plugin-value bad-configuration-section unrecognized-option init-is-generator return-in-init function-redefined not-in-loop return-outside-function yield-outside-function nonexistent-operator duplicate-argument-name abstract-class-instantiated bad-reversed-sequence too-many-star-expressions invalid-star-assignment-target star-needs-assignment-target nonlocal-and-global continue-in-finally nonlocal-without-binding used-prior-global-declaration misplaced-format-function method-hidden access-member-before-definition no-method-argument no-self-argument invalid-slots-object assigning-non-slot invalid-slots inherit-non-class inconsistent-mro duplicate-bases class-variable-slots-conflict invalid-class-object invalid-enum-extension non-iterator-returned unexpected-special-method-signature invalid-length-returned invalid-bool-returned invalid-index-returned invalid-repr-returned invalid-str-returned invalid-bytes-returned invalid-hash-returned invalid-length-hint-returned invalid-format-returned invalid-getnewargs-returned invalid-getnewargs-ex-returned import-error relative-beyond-top-level used-before-assignment undefined-variable undefined-all-variable invalid-all-object invalid-all-format possibly-used-before-assignment no-name-in-module unpacking-non-sequence potential-index-error bad-except-order raising-bad-type misplaced-bare-raise bad-exception-cause raising-non-exception notimplemented-raised catching-non-exception bad-super-call no-member not-callable assignment-from-no-return no-value-for-parameter too-many-function-args unexpected-keyword-arg redundant-keyword-arg missing-kwoa invalid-sequence-index invalid-slice-index assignment-from-none not-context-manager invalid-unary-operand-type unsupported-binary-operation repeated-keyword not-an-iterable not-a-mapping unsupported-membership-test unsubscriptable-object unsupported-assignment-operation unsupported-delete-operation invalid-metaclass dict-iter-missing-items await-outside-async unhashable-member invalid-slice-step logging-unsupported-format logging-format-truncated logging-too-many-args logging-too-few-args bad-format-character truncated-format-string mixed-format-string format-needs-mapping missing-format-string-key too-many-format-args too-few-format-args bad-string-format-type bad-str-strip-call invalid-envvar-value singledispatch-method singledispatchmethod-function yield-inside-async-function not-async-context-manager invalid-unicode-codec bidirectional-unicode invalid-character-backspace invalid-character-carriage-return invalid-character-sub invalid-character-esc invalid-character-nul invalid-character-zero-width-space positional-only-arguments-expected invalid-field-call modified-iterating-dict modified-iterating-set fatal astroid-error parse-error config-parse-error method-check-failed raw-checker-failed bad-inline-option locally-disabled file-ignored suppressed-message useless-suppression deprecated-pragma use-symbolic-message-instead c-extension-no-member useless-option-value literal-comparison comparison-with-itself comparison-of-constants no-classmethod-decorator no-staticmethod-decorator useless-object-inheritance property-with-parameters cyclic-import consider-using-from-import duplicate-code too-many-ancestors too-many-instance-attributes too-few-public-methods too-many-public-methods too-many-return-statements too-many-branches too-many-arguments too-many-locals too-many-statements too-many-boolean-expressions too-many-positional consider-merging-isinstance too-many-nested-blocks simplifiable-if-statement redefined-argument-from-local no-else-return consider-using-ternary trailing-comma-tuple stop-iteration-return simplify-boolean-expression inconsistent-return-statements useless-return consider-swap-variables consider-using-join consider-using-in consider-using-get chained-comparison consider-using-dict-comprehension consider-using-set-comprehension simplifiable-if-expression no-else-raise unnecessary-comprehension consider-using-sys-exit no-else-break no-else-continue super-with-arguments simplifiable-condition condition-evals-to-constant consider-using-generator use-a-generator consider-using-min-builtin consider-using-max-builtin consider-using-with unnecessary-dict-index-lookup use-list-literal use-dict-literal unnecessary-list-index-lookup use-yield-from unknown-option-value unreachable dangerous-default-value pointless-statement pointless-string-statement expression-not-assigned unnecessary-pass unnecessary-lambda duplicate-key useless-else-on-loop exec-used eval-used confusing-with-statement using-constant-test missing-parentheses-for-call-in-test self-assigning-variable redeclared-assigned-name assert-on-string-literal duplicate-value named-expr-without-context pointless-exception-statement return-in-finally contextmanager-generator-missing-cleanup comparison-with-callable lost-exception nan-comparison assert-on-tuple attribute-defined-outside-init bad-staticmethod-argument protected-access implicit-flag-alias arguments-differ signature-differs abstract-method super-init-not-called non-parent-init-called invalid-overridden-method arguments-renamed unused-private-member overridden-final-method subclassed-final-class redefined-slots-in-subclass super-without-brackets useless-parent-delegation unnecessary-semicolon bad-indentation wildcard-import reimported import-self preferred-module misplaced-future shadowed-import fixme global-variable-undefined global-variable-not-assigned global-statement global-at-module-level unused-import unused-variable unused-argument unused-wildcard-import redefined-outer-name redefined-builtin undefined-loop-variable unbalanced-tuple-unpacking cell-var-from-loop possibly-unused-variable self-cls-assignment unbalanced-dict-unpacking bare-except duplicate-except try-except-raise raise-missing-from binary-op-exception raising-format-tuple wrong-exception-operation broad-exception-caught broad-exception-raised keyword-arg-before-vararg arguments-out-of-order non-str-assignment-to-dunder-name isinstance-second-argument-not-valid-type kwarg-superseded-by-positional-arg logging-not-lazy logging-format-interpolation logging-fstring-interpolation bad-format-string-key unused-format-string-key bad-format-string missing-format-argument-key unused-format-string-argument format-combined-specification missing-format-attribute invalid-format-index duplicate-string-formatting-argument f-string-without-interpolation format-string-without-interpolation anomalous-backslash-in-string anomalous-unicode-escape-in-string implicit-str-concat inconsistent-quotes redundant-u-string-prefix bad-open-mode redundant-unittest-assert bad-thread-instantiation shallow-copy-environ invalid-envvar-default subprocess-popen-preexec-fn subprocess-run-check unspecified-encoding forgotten-debug-statement method-cache-max-size-none useless-with-lock unnecessary-ellipsis non-ascii-file-name using-f-string-in-unsupported-version using-final-decorator-in-unsupported-version missing-timeout nested-min-max bad-chained-comparison modified-iterating-list deprecated-module deprecated-method deprecated-argument deprecated-class deprecated-decorator deprecated-attribute return-arg-in-generator boolean-datetime
-      return 0;;
-    esac
-
-    case "$opt" in --disable|-d)
-      _pylint_value_list , invalid-name disallowed-name typevar-name-incorrect-variance empty-docstring missing-module-docstring missing-class-docstring missing-function-docstring unnecessary-negation singleton-comparison unidiomatic-typecheck typevar-double-variance typevar-name-mismatch consider-using-enumerate consider-iterating-dictionary bad-classmethod-argument bad-mcs-method-argument bad-mcs-classmethod-argument single-string-used-for-slots consider-using-dict-items use-maxsplit-arg use-sequence-for-iteration consider-using-f-string line-too-long too-many-lines trailing-whitespace missing-final-newline trailing-newlines multiple-statements superfluous-parens mixed-line-endings unexpected-line-ending-format wrong-spelling-in-comment wrong-spelling-in-docstring invalid-characters-in-docstring multiple-imports wrong-import-order ungrouped-imports wrong-import-position useless-import-alias import-outside-toplevel use-implicit-booleaness-not-len use-implicit-booleaness-not-comparison use-implicit-booleaness-not-comparison-to-string use-implicit-booleaness-not-comparison-to-zero non-ascii-name non-ascii-module-import bad-file-encoding unnecessary-dunder-call unnecessary-lambda-assignment unnecessary-direct-lambda-call syntax-error unrecognized-inline-option bad-plugin-value bad-configuration-section unrecognized-option init-is-generator return-in-init function-redefined not-in-loop return-outside-function yield-outside-function nonexistent-operator duplicate-argument-name abstract-class-instantiated bad-reversed-sequence too-many-star-expressions invalid-star-assignment-target star-needs-assignment-target nonlocal-and-global continue-in-finally nonlocal-without-binding used-prior-global-declaration misplaced-format-function method-hidden access-member-before-definition no-method-argument no-self-argument invalid-slots-object assigning-non-slot invalid-slots inherit-non-class inconsistent-mro duplicate-bases class-variable-slots-conflict invalid-class-object invalid-enum-extension non-iterator-returned unexpected-special-method-signature invalid-length-returned invalid-bool-returned invalid-index-returned invalid-repr-returned invalid-str-returned invalid-bytes-returned invalid-hash-returned invalid-length-hint-returned invalid-format-returned invalid-getnewargs-returned invalid-getnewargs-ex-returned import-error relative-beyond-top-level used-before-assignment undefined-variable undefined-all-variable invalid-all-object invalid-all-format possibly-used-before-assignment no-name-in-module unpacking-non-sequence potential-index-error bad-except-order raising-bad-type misplaced-bare-raise bad-exception-cause raising-non-exception notimplemented-raised catching-non-exception bad-super-call no-member not-callable assignment-from-no-return no-value-for-parameter too-many-function-args unexpected-keyword-arg redundant-keyword-arg missing-kwoa invalid-sequence-index invalid-slice-index assignment-from-none not-context-manager invalid-unary-operand-type unsupported-binary-operation repeated-keyword not-an-iterable not-a-mapping unsupported-membership-test unsubscriptable-object unsupported-assignment-operation unsupported-delete-operation invalid-metaclass dict-iter-missing-items await-outside-async unhashable-member invalid-slice-step logging-unsupported-format logging-format-truncated logging-too-many-args logging-too-few-args bad-format-character truncated-format-string mixed-format-string format-needs-mapping missing-format-string-key too-many-format-args too-few-format-args bad-string-format-type bad-str-strip-call invalid-envvar-value singledispatch-method singledispatchmethod-function yield-inside-async-function not-async-context-manager invalid-unicode-codec bidirectional-unicode invalid-character-backspace invalid-character-carriage-return invalid-character-sub invalid-character-esc invalid-character-nul invalid-character-zero-width-space positional-only-arguments-expected invalid-field-call modified-iterating-dict modified-iterating-set fatal astroid-error parse-error config-parse-error method-check-failed raw-checker-failed bad-inline-option locally-disabled file-ignored suppressed-message useless-suppression deprecated-pragma use-symbolic-message-instead c-extension-no-member useless-option-value literal-comparison comparison-with-itself comparison-of-constants no-classmethod-decorator no-staticmethod-decorator useless-object-inheritance property-with-parameters cyclic-import consider-using-from-import duplicate-code too-many-ancestors too-many-instance-attributes too-few-public-methods too-many-public-methods too-many-return-statements too-many-branches too-many-arguments too-many-locals too-many-statements too-many-boolean-expressions too-many-positional consider-merging-isinstance too-many-nested-blocks simplifiable-if-statement redefined-argument-from-local no-else-return consider-using-ternary trailing-comma-tuple stop-iteration-return simplify-boolean-expression inconsistent-return-statements useless-return consider-swap-variables consider-using-join consider-using-in consider-using-get chained-comparison consider-using-dict-comprehension consider-using-set-comprehension simplifiable-if-expression no-else-raise unnecessary-comprehension consider-using-sys-exit no-else-break no-else-continue super-with-arguments simplifiable-condition condition-evals-to-constant consider-using-generator use-a-generator consider-using-min-builtin consider-using-max-builtin consider-using-with unnecessary-dict-index-lookup use-list-literal use-dict-literal unnecessary-list-index-lookup use-yield-from unknown-option-value unreachable dangerous-default-value pointless-statement pointless-string-statement expression-not-assigned unnecessary-pass unnecessary-lambda duplicate-key useless-else-on-loop exec-used eval-used confusing-with-statement using-constant-test missing-parentheses-for-call-in-test self-assigning-variable redeclared-assigned-name assert-on-string-literal duplicate-value named-expr-without-context pointless-exception-statement return-in-finally contextmanager-generator-missing-cleanup comparison-with-callable lost-exception nan-comparison assert-on-tuple attribute-defined-outside-init bad-staticmethod-argument protected-access implicit-flag-alias arguments-differ signature-differs abstract-method super-init-not-called non-parent-init-called invalid-overridden-method arguments-renamed unused-private-member overridden-final-method subclassed-final-class redefined-slots-in-subclass super-without-brackets useless-parent-delegation unnecessary-semicolon bad-indentation wildcard-import reimported import-self preferred-module misplaced-future shadowed-import fixme global-variable-undefined global-variable-not-assigned global-statement global-at-module-level unused-import unused-variable unused-argument unused-wildcard-import redefined-outer-name redefined-builtin undefined-loop-variable unbalanced-tuple-unpacking cell-var-from-loop possibly-unused-variable self-cls-assignment unbalanced-dict-unpacking bare-except duplicate-except try-except-raise raise-missing-from binary-op-exception raising-format-tuple wrong-exception-operation broad-exception-caught broad-exception-raised keyword-arg-before-vararg arguments-out-of-order non-str-assignment-to-dunder-name isinstance-second-argument-not-valid-type kwarg-superseded-by-positional-arg logging-not-lazy logging-format-interpolation logging-fstring-interpolation bad-format-string-key unused-format-string-key bad-format-string missing-format-argument-key unused-format-string-argument format-combined-specification missing-format-attribute invalid-format-index duplicate-string-formatting-argument f-string-without-interpolation format-string-without-interpolation anomalous-backslash-in-string anomalous-unicode-escape-in-string implicit-str-concat inconsistent-quotes redundant-u-string-prefix bad-open-mode redundant-unittest-assert bad-thread-instantiation shallow-copy-environ invalid-envvar-default subprocess-popen-preexec-fn subprocess-run-check unspecified-encoding forgotten-debug-statement method-cache-max-size-none useless-with-lock unnecessary-ellipsis non-ascii-file-name using-f-string-in-unsupported-version using-final-decorator-in-unsupported-version missing-timeout nested-min-max bad-chained-comparison modified-iterating-list deprecated-module deprecated-method deprecated-argument deprecated-class deprecated-decorator deprecated-attribute return-arg-in-generator boolean-datetime
-      return 0;;
-    esac
-
-    case "$opt" in --min-similarity-lines)
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-comments)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-docstrings)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-imports)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-signatures)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-on-opaque-inference)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --mixin-class-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-mixin-members)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --ignored-checks-for-mixins)
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-none)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --ignored-classes)
-      return 0;;
-    esac
-
-    case "$opt" in --generated-members)
-      return 0;;
-    esac
-
-    case "$opt" in --contextmanager-decorators)
-      return 0;;
-    esac
-
-    case "$opt" in --missing-member-hint-distance)
-      return 0;;
-    esac
-
-    case "$opt" in --missing-member-max-choices)
-      return 0;;
-    esac
-
-    case "$opt" in --missing-member-hint)
-      return 0;;
-    esac
-
-    case "$opt" in --signature-mutators)
-      return 0;;
-    esac
-
-    case "$opt" in --notes)
-      return 0;;
-    esac
-
-    case "$opt" in --notes-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --timeout-methods)
-      return 0;;
-    esac
-
-    case "$opt" in --spelling-dict)
-      return 0;;
-    esac
-
-    case "$opt" in --spelling-ignore-words)
-      return 0;;
-    esac
-
-    case "$opt" in --spelling-private-dict-file)
-      return 0;;
-    esac
-
-    case "$opt" in --spelling-store-unknown-words)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --max-spelling-suggestions)
-      return 0;;
-    esac
-
-    case "$opt" in --spelling-ignore-comment-directives)
-      return 0;;
-    esac
-
-    case "$opt" in --max-nested-blocks)
-      return 0;;
-    esac
-
-    case "$opt" in --never-returning-functions)
-      return 0;;
-    esac
-
-    case "$opt" in --suggest-join-with-non-empty-separator)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --check-str-concat-over-line-jumps)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --check-quote-consistency)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --max-args)
-      return 0;;
-    esac
-
-    case "$opt" in --max-locals)
-      return 0;;
-    esac
-
-    case "$opt" in --max-returns)
-      return 0;;
-    esac
-
-    case "$opt" in --max-branches)
-      return 0;;
-    esac
-
-    case "$opt" in --max-statements)
-      return 0;;
-    esac
-
-    case "$opt" in --max-parents)
-      return 0;;
-    esac
-
-    case "$opt" in --ignored-parents)
-      return 0;;
-    esac
-
-    case "$opt" in --max-attributes)
-      return 0;;
-    esac
-
-    case "$opt" in --min-public-methods)
-      return 0;;
-    esac
-
-    case "$opt" in --max-public-methods)
-      return 0;;
-    esac
-
-    case "$opt" in --max-bool-expr)
-      return 0;;
-    esac
-
-    case "$opt" in --exclude-too-few-public-methods)
-      return 0;;
-    esac
-
-    case "$opt" in --overgeneral-exceptions)
-      return 0;;
-    esac
-
-    case "$opt" in --defining-attr-methods)
-      return 0;;
-    esac
-
-    case "$opt" in --valid-classmethod-first-arg)
-      return 0;;
-    esac
-
-    case "$opt" in --valid-metaclass-classmethod-first-arg)
-      return 0;;
-    esac
-
-    case "$opt" in --exclude-protected)
-      return 0;;
-    esac
-
-    case "$opt" in --check-protected-access-in-special-methods)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --max-line-length)
-      return 0;;
-    esac
-
-    case "$opt" in --ignore-long-lines)
-      return 0;;
-    esac
-
-    case "$opt" in --single-line-if-stmt)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --single-line-class-stmt)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --max-module-lines)
-      return 0;;
-    esac
-
-    case "$opt" in --indent-string)
-      return 0;;
-    esac
-
-    case "$opt" in --indent-after-paren)
-      return 0;;
-    esac
-
-    case "$opt" in --expected-line-ending-format)
-      return 0;;
-    esac
-
-    case "$opt" in --good-names)
-      return 0;;
-    esac
-
-    case "$opt" in --good-names-rgxs)
-      return 0;;
-    esac
-
-    case "$opt" in --bad-names)
-      return 0;;
-    esac
-
-    case "$opt" in --bad-names-rgxs)
-      return 0;;
-    esac
-
-    case "$opt" in --name-group)
-      return 0;;
-    esac
-
-    case "$opt" in --include-naming-hint)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --property-classes)
-      return 0;;
-    esac
-
-    case "$opt" in --argument-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --argument-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --attr-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --attr-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --class-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --class-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --class-attribute-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --class-attribute-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --class-const-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --class-const-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --const-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --const-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --function-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --function-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --inlinevar-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --inlinevar-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --method-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --method-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --module-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --module-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --typealias-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --typevar-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --variable-naming-style)
-      _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
-      return 0;;
-    esac
-
-    case "$opt" in --variable-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --no-docstring-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --docstring-min-length)
-      return 0;;
-    esac
-
-    case "$opt" in --init-import)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --dummy-variables-rgx)
-      return 0;;
-    esac
-
-    case "$opt" in --additional-builtins)
-      return 0;;
-    esac
-
-    case "$opt" in --callbacks)
-      return 0;;
-    esac
-
-    case "$opt" in --redefining-builtins-modules)
-      return 0;;
-    esac
-
-    case "$opt" in --ignored-argument-names)
-      return 0;;
-    esac
-
-    case "$opt" in --allow-global-unused-variables)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --allowed-redefined-builtins)
-      return 0;;
-    esac
-
-    case "$opt" in --deprecated-modules)
-      return 0;;
-    esac
-
-    case "$opt" in --preferred-modules)
-      return 0;;
-    esac
-
-    case "$opt" in --import-graph)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --ext-import-graph)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --int-import-graph)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --known-standard-library)
-      return 0;;
-    esac
-
-    case "$opt" in --known-third-party)
-      return 0;;
-    esac
-
-    case "$opt" in --allow-any-import-level)
-      return 0;;
-    esac
-
-    case "$opt" in --allow-wildcard-with-all)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --allow-reexport-from-package)
-      _pylint_compgen_w_replacement -- "$cur" y n
-      return 0;;
-    esac
-
-    case "$opt" in --logging-modules)
-      return 0;;
-    esac
-
-    case "$opt" in --logging-format-style)
-      _pylint_compgen_w_replacement -- "$cur" new old
-      return 0;;
+    case "$opt" in
+      --rcfile|--output|--import-graph|--ext-import-graph|--int-import-graph)
+        _filedir
+        return 0;;
+      --help-msg|--init-hook|--ignore|--ignore-patterns|--ignore-paths|--load-plugins|--fail-under|--jobs|-j|--limit-inference-results|--extension-pkg-allow-list|--extension-pkg-whitelist|--source-roots|--py-version|--ignored-modules|--output-format|-f|--evaluation|--msg-template|--confidence|--min-similarity-lines|--mixin-class-rgx|--ignored-checks-for-mixins|--ignored-classes|--generated-members|--contextmanager-decorators|--missing-member-hint-distance|--missing-member-max-choices|--missing-member-hint|--signature-mutators|--notes|--notes-rgx|--timeout-methods|--spelling-dict|--spelling-ignore-words|--spelling-private-dict-file|--max-spelling-suggestions|--spelling-ignore-comment-directives|--max-nested-blocks|--never-returning-functions|--max-args|--max-positional-arguments|--max-locals|--max-returns|--max-branches|--max-statements|--max-parents|--ignored-parents|--max-attributes|--min-public-methods|--max-public-methods|--max-bool-expr|--exclude-too-few-public-methods|--overgeneral-exceptions|--defining-attr-methods|--valid-classmethod-first-arg|--valid-metaclass-classmethod-first-arg|--exclude-protected|--max-line-length|--ignore-long-lines|--max-module-lines|--indent-string|--indent-after-paren|--expected-line-ending-format|--good-names|--good-names-rgxs|--bad-names|--bad-names-rgxs|--name-group|--property-classes|--argument-rgx|--attr-rgx|--class-rgx|--class-attribute-rgx|--class-const-rgx|--const-rgx|--function-rgx|--inlinevar-rgx|--method-rgx|--module-rgx|--typealias-rgx|--typevar-rgx|--variable-rgx|--no-docstring-rgx|--docstring-min-length|--dummy-variables-rgx|--additional-builtins|--callbacks|--redefining-builtins-modules|--ignored-argument-names|--allowed-redefined-builtins|--deprecated-modules|--preferred-modules|--known-standard-library|--known-third-party|--allow-any-import-level|--logging-modules)
+        return 0;;
+      --persistent|--suggestion-mode|--recursive|--analyse-fallback-blocks|--clear-cache-post-run|--prefer-stubs|--reports|-r|--score|-s|--ignore-comments|--ignore-docstrings|--ignore-imports|--ignore-signatures|--ignore-on-opaque-inference|--ignore-mixin-members|--ignore-none|--spelling-store-unknown-words|--suggest-join-with-non-empty-separator|--check-str-concat-over-line-jumps|--check-quote-consistency|--check-protected-access-in-special-methods|--single-line-if-stmt|--single-line-class-stmt|--include-naming-hint|--init-import|--allow-global-unused-variables|--allow-wildcard-with-all|--allow-reexport-from-package)
+        _pylint_compgen_w_replacement -- "$cur" y n
+        return 0;;
+      --fail-on|--enable|-e|--disable|-d)
+        _pylint_value_list , invalid-name disallowed-name typevar-name-incorrect-variance empty-docstring missing-module-docstring missing-class-docstring missing-function-docstring unnecessary-negation singleton-comparison unidiomatic-typecheck typevar-double-variance typevar-name-mismatch consider-using-enumerate consider-iterating-dictionary bad-classmethod-argument bad-mcs-method-argument bad-mcs-classmethod-argument single-string-used-for-slots consider-using-dict-items use-maxsplit-arg use-sequence-for-iteration consider-using-f-string line-too-long too-many-lines trailing-whitespace missing-final-newline trailing-newlines multiple-statements superfluous-parens mixed-line-endings unexpected-line-ending-format wrong-spelling-in-comment wrong-spelling-in-docstring invalid-characters-in-docstring multiple-imports wrong-import-order ungrouped-imports wrong-import-position useless-import-alias import-outside-toplevel use-implicit-booleaness-not-len use-implicit-booleaness-not-comparison use-implicit-booleaness-not-comparison-to-string use-implicit-booleaness-not-comparison-to-zero non-ascii-name non-ascii-module-import bad-file-encoding unnecessary-dunder-call unnecessary-lambda-assignment unnecessary-direct-lambda-call syntax-error unrecognized-inline-option bad-plugin-value bad-configuration-section unrecognized-option init-is-generator return-in-init function-redefined not-in-loop return-outside-function yield-outside-function nonexistent-operator duplicate-argument-name abstract-class-instantiated bad-reversed-sequence too-many-star-expressions invalid-star-assignment-target star-needs-assignment-target nonlocal-and-global continue-in-finally nonlocal-without-binding used-prior-global-declaration misplaced-format-function method-hidden access-member-before-definition no-method-argument no-self-argument invalid-slots-object assigning-non-slot invalid-slots inherit-non-class inconsistent-mro duplicate-bases class-variable-slots-conflict invalid-class-object invalid-enum-extension declare-non-slot non-iterator-returned unexpected-special-method-signature invalid-length-returned invalid-bool-returned invalid-index-returned invalid-repr-returned invalid-str-returned invalid-bytes-returned invalid-hash-returned invalid-length-hint-returned invalid-format-returned invalid-getnewargs-returned invalid-getnewargs-ex-returned import-error relative-beyond-top-level used-before-assignment undefined-variable undefined-all-variable invalid-all-object invalid-all-format possibly-used-before-assignment no-name-in-module unpacking-non-sequence potential-index-error bad-except-order raising-bad-type misplaced-bare-raise bad-exception-cause raising-non-exception notimplemented-raised catching-non-exception bad-super-call no-member not-callable assignment-from-no-return no-value-for-parameter too-many-function-args unexpected-keyword-arg redundant-keyword-arg missing-kwoa invalid-sequence-index invalid-slice-index assignment-from-none not-context-manager invalid-unary-operand-type unsupported-binary-operation repeated-keyword not-an-iterable not-a-mapping unsupported-membership-test unsubscriptable-object unsupported-assignment-operation unsupported-delete-operation invalid-metaclass dict-iter-missing-items await-outside-async unhashable-member invalid-slice-step logging-unsupported-format logging-format-truncated logging-too-many-args logging-too-few-args bad-format-character truncated-format-string mixed-format-string format-needs-mapping missing-format-string-key too-many-format-args too-few-format-args bad-string-format-type bad-str-strip-call invalid-envvar-value singledispatch-method singledispatchmethod-function yield-inside-async-function not-async-context-manager invalid-unicode-codec bidirectional-unicode invalid-character-backspace invalid-character-carriage-return invalid-character-sub invalid-character-esc invalid-character-nul invalid-character-zero-width-space positional-only-arguments-expected invalid-field-call modified-iterating-dict modified-iterating-set fatal astroid-error parse-error config-parse-error method-check-failed raw-checker-failed bad-inline-option locally-disabled file-ignored suppressed-message useless-suppression deprecated-pragma use-symbolic-message-instead c-extension-no-member useless-option-value literal-comparison comparison-with-itself comparison-of-constants no-classmethod-decorator no-staticmethod-decorator useless-object-inheritance property-with-parameters cyclic-import consider-using-from-import duplicate-code too-many-ancestors too-many-instance-attributes too-few-public-methods too-many-public-methods too-many-return-statements too-many-branches too-many-arguments too-many-locals too-many-statements too-many-boolean-expressions too-many-positional-arguments consider-merging-isinstance too-many-nested-blocks simplifiable-if-statement redefined-argument-from-local no-else-return consider-using-ternary trailing-comma-tuple stop-iteration-return simplify-boolean-expression inconsistent-return-statements useless-return consider-swap-variables consider-using-join consider-using-in consider-using-get chained-comparison consider-using-dict-comprehension consider-using-set-comprehension simplifiable-if-expression no-else-raise unnecessary-comprehension consider-using-sys-exit no-else-break no-else-continue super-with-arguments simplifiable-condition condition-evals-to-constant consider-using-generator use-a-generator consider-using-min-builtin consider-using-max-builtin consider-using-with unnecessary-dict-index-lookup use-list-literal use-dict-literal unnecessary-list-index-lookup use-yield-from unknown-option-value unreachable dangerous-default-value pointless-statement pointless-string-statement expression-not-assigned unnecessary-pass unnecessary-lambda duplicate-key useless-else-on-loop exec-used eval-used confusing-with-statement using-constant-test missing-parentheses-for-call-in-test self-assigning-variable redeclared-assigned-name assert-on-string-literal duplicate-value named-expr-without-context pointless-exception-statement return-in-finally contextmanager-generator-missing-cleanup comparison-with-callable lost-exception nan-comparison assert-on-tuple attribute-defined-outside-init bad-staticmethod-argument protected-access implicit-flag-alias arguments-differ signature-differs abstract-method super-init-not-called non-parent-init-called invalid-overridden-method arguments-renamed unused-private-member overridden-final-method subclassed-final-class redefined-slots-in-subclass super-without-brackets useless-parent-delegation unnecessary-semicolon bad-indentation wildcard-import reimported import-self preferred-module misplaced-future shadowed-import fixme global-variable-undefined global-variable-not-assigned global-statement global-at-module-level unused-import unused-variable unused-argument unused-wildcard-import redefined-outer-name redefined-builtin undefined-loop-variable unbalanced-tuple-unpacking cell-var-from-loop possibly-unused-variable self-cls-assignment unbalanced-dict-unpacking bare-except duplicate-except try-except-raise raise-missing-from binary-op-exception raising-format-tuple wrong-exception-operation broad-exception-caught broad-exception-raised keyword-arg-before-vararg arguments-out-of-order non-str-assignment-to-dunder-name isinstance-second-argument-not-valid-type kwarg-superseded-by-positional-arg logging-not-lazy logging-format-interpolation logging-fstring-interpolation bad-format-string-key unused-format-string-key bad-format-string missing-format-argument-key unused-format-string-argument format-combined-specification missing-format-attribute invalid-format-index duplicate-string-formatting-argument f-string-without-interpolation format-string-without-interpolation anomalous-backslash-in-string anomalous-unicode-escape-in-string implicit-str-concat inconsistent-quotes redundant-u-string-prefix bad-open-mode redundant-unittest-assert bad-thread-instantiation shallow-copy-environ invalid-envvar-default subprocess-popen-preexec-fn subprocess-run-check unspecified-encoding forgotten-debug-statement method-cache-max-size-none useless-with-lock unnecessary-ellipsis non-ascii-file-name using-f-string-in-unsupported-version using-final-decorator-in-unsupported-version using-exception-groups-in-unsupported-version using-generic-type-syntax-in-unsupported-version using-assignment-expression-in-unsupported-version using-positional-only-args-in-unsupported-version missing-timeout nested-min-max bad-chained-comparison modified-iterating-list deprecated-module deprecated-method deprecated-argument deprecated-class deprecated-decorator deprecated-attribute return-arg-in-generator boolean-datetime
+        return 0;;
+      --argument-naming-style|--attr-naming-style|--class-naming-style|--class-attribute-naming-style|--class-const-naming-style|--const-naming-style|--function-naming-style|--inlinevar-naming-style|--method-naming-style|--module-naming-style|--variable-naming-style)
+        _pylint_compgen_w_replacement -- "$cur" snake_case camelCase PascalCase UPPER_CASE any
+        return 0;;
+      --logging-format-style)
+        _pylint_compgen_w_replacement -- "$cur" new old
+        return 0;;
     esac
 
     return 1
@@ -1987,181 +1110,183 @@ _pylint() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
     -*=*);;
+    --*);;
     -*)
         local i
         for ((i=2; i <= ${#cur}; ++i)); do
           local pre="${cur:0:$i}" value="${cur:$i}"
-          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && _pylint_prefix_compreply "$pre" && return 0
-        done
-      ;;
+          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
+            _pylint_prefix_compreply "$pre"
+            return 0
+          }
+        done;;
   esac
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
-    (( ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(-h --help)
-    (( ! HAVE_rcfile && ! HAVE_help && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--rcfile)
-    (( ! HAVE_output && ! HAVE_help && ! HAVE_rcfile && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--output)
-    (( ! HAVE_help_msg && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--help-msg)
-    (( ! HAVE_list_msgs && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--list-msgs)
-    (( ! HAVE_list_msgs_enabled && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--list-msgs-enabled)
-    (( ! HAVE_list_groups && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--list-groups)
-    (( ! HAVE_list_conf_levels && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--list-conf-levels)
-    (( ! HAVE_list_extensions && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--list-extensions)
-    (( ! HAVE_full_documentation && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--full-documentation)
-    (( ! HAVE_generate_rcfile && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_toml_config && ! HAVE_long_help )) && opts+=(--generate-rcfile)
-    (( ! HAVE_generate_toml_config && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_long_help )) && opts+=(--generate-toml-config)
-    (( ! HAVE_long_help && ! HAVE_help && ! HAVE_rcfile && ! HAVE_output && ! HAVE_help_msg && ! HAVE_list_msgs && ! HAVE_list_msgs_enabled && ! HAVE_list_groups && ! HAVE_list_conf_levels && ! HAVE_list_extensions && ! HAVE_full_documentation && ! HAVE_generate_rcfile && ! HAVE_generate_toml_config )) && opts+=(--long-help)
-    (( ! HAVE_init_hook )) && opts+=(--init-hook)
-    (( ! HAVE_errors_only )) && opts+=(--errors-only -E)
-    (( ! HAVE_verbose )) && opts+=(--verbose -v)
-    (( ! HAVE_enable_all_extensions )) && opts+=(--enable-all-extensions)
-    (( ! HAVE_ignore )) && opts+=(--ignore)
-    (( ! HAVE_ignore_patterns )) && opts+=(--ignore-patterns)
-    (( ! HAVE_ignore_paths )) && opts+=(--ignore-paths)
-    (( ! HAVE_persistent )) && opts+=(--persistent)
-    (( ! HAVE_load_plugins )) && opts+=(--load-plugins)
-    (( ! HAVE_fail_under )) && opts+=(--fail-under)
-    (( ! HAVE_fail_on )) && opts+=(--fail-on)
-    (( ! HAVE_jobs )) && opts+=(--jobs -j)
-    (( ! HAVE_limit_inference_results )) && opts+=(--limit-inference-results)
-    (( ! HAVE_extension_pkg_allow_list )) && opts+=(--extension-pkg-allow-list)
-    (( ! HAVE_extension_pkg_whitelist )) && opts+=(--extension-pkg-whitelist)
-    (( ! HAVE_suggestion_mode )) && opts+=(--suggestion-mode)
-    (( ! HAVE_exit_zero )) && opts+=(--exit-zero)
-    (( ! HAVE_from_stdin )) && opts+=(--from-stdin)
-    (( ! HAVE_source_roots )) && opts+=(--source-roots)
-    (( ! HAVE_recursive )) && opts+=(--recursive)
-    (( ! HAVE_py_version )) && opts+=(--py-version)
-    (( ! HAVE_ignored_modules )) && opts+=(--ignored-modules)
-    (( ! HAVE_analyse_fallback_blocks )) && opts+=(--analyse-fallback-blocks)
-    (( ! HAVE_clear_cache_post_run )) && opts+=(--clear-cache-post-run)
-    (( ! HAVE_prefer_stubs )) && opts+=(--prefer-stubs)
-    (( ! HAVE_output_format )) && opts+=(--output-format -f)
-    (( ! HAVE_reports )) && opts+=(--reports -r)
-    (( ! HAVE_evaluation )) && opts+=(--evaluation)
-    (( ! HAVE_score )) && opts+=(--score -s)
-    (( ! HAVE_msg_template )) && opts+=(--msg-template)
-    (( ! HAVE_confidence )) && opts+=(--confidence)
-    (( ! HAVE_enable )) && opts+=(--enable -e)
-    (( ! HAVE_disable )) && opts+=(--disable -d)
-    (( ! HAVE_min_similarity_lines )) && opts+=(--min-similarity-lines)
-    (( ! HAVE_ignore_comments )) && opts+=(--ignore-comments)
-    (( ! HAVE_ignore_docstrings )) && opts+=(--ignore-docstrings)
-    (( ! HAVE_ignore_imports )) && opts+=(--ignore-imports)
-    (( ! HAVE_ignore_signatures )) && opts+=(--ignore-signatures)
-    (( ! HAVE_ignore_on_opaque_inference )) && opts+=(--ignore-on-opaque-inference)
-    (( ! HAVE_mixin_class_rgx )) && opts+=(--mixin-class-rgx)
-    (( ! HAVE_ignore_mixin_members )) && opts+=(--ignore-mixin-members)
-    (( ! HAVE_ignored_checks_for_mixins )) && opts+=(--ignored-checks-for-mixins)
-    (( ! HAVE_ignore_none )) && opts+=(--ignore-none)
-    (( ! HAVE_ignored_classes )) && opts+=(--ignored-classes)
-    (( ! HAVE_generated_members )) && opts+=(--generated-members)
-    (( ! HAVE_contextmanager_decorators )) && opts+=(--contextmanager-decorators)
-    (( ! HAVE_missing_member_hint_distance )) && opts+=(--missing-member-hint-distance)
-    (( ! HAVE_missing_member_max_choices )) && opts+=(--missing-member-max-choices)
-    (( ! HAVE_missing_member_hint )) && opts+=(--missing-member-hint)
-    (( ! HAVE_signature_mutators )) && opts+=(--signature-mutators)
-    (( ! HAVE_notes )) && opts+=(--notes)
-    (( ! HAVE_notes_rgx )) && opts+=(--notes-rgx)
-    (( ! HAVE_timeout_methods )) && opts+=(--timeout-methods)
-    (( ! HAVE_spelling_dict )) && opts+=(--spelling-dict)
-    (( ! HAVE_spelling_ignore_words )) && opts+=(--spelling-ignore-words)
-    (( ! HAVE_spelling_private_dict_file )) && opts+=(--spelling-private-dict-file)
-    (( ! HAVE_spelling_store_unknown_words )) && opts+=(--spelling-store-unknown-words)
-    (( ! HAVE_max_spelling_suggestions )) && opts+=(--max-spelling-suggestions)
-    (( ! HAVE_spelling_ignore_comment_directives )) && opts+=(--spelling-ignore-comment-directives)
-    (( ! HAVE_max_nested_blocks )) && opts+=(--max-nested-blocks)
-    (( ! HAVE_never_returning_functions )) && opts+=(--never-returning-functions)
-    (( ! HAVE_suggest_join_with_non_empty_separator )) && opts+=(--suggest-join-with-non-empty-separator)
-    (( ! HAVE_check_str_concat_over_line_jumps )) && opts+=(--check-str-concat-over-line-jumps)
-    (( ! HAVE_check_quote_consistency )) && opts+=(--check-quote-consistency)
-    (( ! HAVE_max_args )) && opts+=(--max-args)
-    (( ! HAVE_max_locals )) && opts+=(--max-locals)
-    (( ! HAVE_max_returns )) && opts+=(--max-returns)
-    (( ! HAVE_max_branches )) && opts+=(--max-branches)
-    (( ! HAVE_max_statements )) && opts+=(--max-statements)
-    (( ! HAVE_max_parents )) && opts+=(--max-parents)
-    (( ! HAVE_ignored_parents )) && opts+=(--ignored-parents)
-    (( ! HAVE_max_attributes )) && opts+=(--max-attributes)
-    (( ! HAVE_min_public_methods )) && opts+=(--min-public-methods)
-    (( ! HAVE_max_public_methods )) && opts+=(--max-public-methods)
-    (( ! HAVE_max_bool_expr )) && opts+=(--max-bool-expr)
-    (( ! HAVE_exclude_too_few_public_methods )) && opts+=(--exclude-too-few-public-methods)
-    (( ! HAVE_overgeneral_exceptions )) && opts+=(--overgeneral-exceptions)
-    (( ! HAVE_defining_attr_methods )) && opts+=(--defining-attr-methods)
-    (( ! HAVE_valid_classmethod_first_arg )) && opts+=(--valid-classmethod-first-arg)
-    (( ! HAVE_valid_metaclass_classmethod_first_arg )) && opts+=(--valid-metaclass-classmethod-first-arg)
-    (( ! HAVE_exclude_protected )) && opts+=(--exclude-protected)
-    (( ! HAVE_check_protected_access_in_special_methods )) && opts+=(--check-protected-access-in-special-methods)
-    (( ! HAVE_max_line_length )) && opts+=(--max-line-length)
-    (( ! HAVE_ignore_long_lines )) && opts+=(--ignore-long-lines)
-    (( ! HAVE_single_line_if_stmt )) && opts+=(--single-line-if-stmt)
-    (( ! HAVE_single_line_class_stmt )) && opts+=(--single-line-class-stmt)
-    (( ! HAVE_max_module_lines )) && opts+=(--max-module-lines)
-    (( ! HAVE_indent_string )) && opts+=(--indent-string)
-    (( ! HAVE_indent_after_paren )) && opts+=(--indent-after-paren)
-    (( ! HAVE_expected_line_ending_format )) && opts+=(--expected-line-ending-format)
-    (( ! HAVE_good_names )) && opts+=(--good-names)
-    (( ! HAVE_good_names_rgxs )) && opts+=(--good-names-rgxs)
-    (( ! HAVE_bad_names )) && opts+=(--bad-names)
-    (( ! HAVE_bad_names_rgxs )) && opts+=(--bad-names-rgxs)
-    (( ! HAVE_name_group )) && opts+=(--name-group)
-    (( ! HAVE_include_naming_hint )) && opts+=(--include-naming-hint)
-    (( ! HAVE_property_classes )) && opts+=(--property-classes)
-    (( ! HAVE_argument_naming_style )) && opts+=(--argument-naming-style)
-    (( ! HAVE_argument_rgx )) && opts+=(--argument-rgx)
-    (( ! HAVE_attr_naming_style )) && opts+=(--attr-naming-style)
-    (( ! HAVE_attr_rgx )) && opts+=(--attr-rgx)
-    (( ! HAVE_class_naming_style )) && opts+=(--class-naming-style)
-    (( ! HAVE_class_rgx )) && opts+=(--class-rgx)
-    (( ! HAVE_class_attribute_naming_style )) && opts+=(--class-attribute-naming-style)
-    (( ! HAVE_class_attribute_rgx )) && opts+=(--class-attribute-rgx)
-    (( ! HAVE_class_const_naming_style )) && opts+=(--class-const-naming-style)
-    (( ! HAVE_class_const_rgx )) && opts+=(--class-const-rgx)
-    (( ! HAVE_const_naming_style )) && opts+=(--const-naming-style)
-    (( ! HAVE_const_rgx )) && opts+=(--const-rgx)
-    (( ! HAVE_function_naming_style )) && opts+=(--function-naming-style)
-    (( ! HAVE_function_rgx )) && opts+=(--function-rgx)
-    (( ! HAVE_inlinevar_naming_style )) && opts+=(--inlinevar-naming-style)
-    (( ! HAVE_inlinevar_rgx )) && opts+=(--inlinevar-rgx)
-    (( ! HAVE_method_naming_style )) && opts+=(--method-naming-style)
-    (( ! HAVE_method_rgx )) && opts+=(--method-rgx)
-    (( ! HAVE_module_naming_style )) && opts+=(--module-naming-style)
-    (( ! HAVE_module_rgx )) && opts+=(--module-rgx)
-    (( ! HAVE_typealias_rgx )) && opts+=(--typealias-rgx)
-    (( ! HAVE_typevar_rgx )) && opts+=(--typevar-rgx)
-    (( ! HAVE_variable_naming_style )) && opts+=(--variable-naming-style)
-    (( ! HAVE_variable_rgx )) && opts+=(--variable-rgx)
-    (( ! HAVE_no_docstring_rgx )) && opts+=(--no-docstring-rgx)
-    (( ! HAVE_docstring_min_length )) && opts+=(--docstring-min-length)
-    (( ! HAVE_init_import )) && opts+=(--init-import)
-    (( ! HAVE_dummy_variables_rgx )) && opts+=(--dummy-variables-rgx)
-    (( ! HAVE_additional_builtins )) && opts+=(--additional-builtins)
-    (( ! HAVE_callbacks )) && opts+=(--callbacks)
-    (( ! HAVE_redefining_builtins_modules )) && opts+=(--redefining-builtins-modules)
-    (( ! HAVE_ignored_argument_names )) && opts+=(--ignored-argument-names)
-    (( ! HAVE_allow_global_unused_variables )) && opts+=(--allow-global-unused-variables)
-    (( ! HAVE_allowed_redefined_builtins )) && opts+=(--allowed-redefined-builtins)
-    (( ! HAVE_deprecated_modules )) && opts+=(--deprecated-modules)
-    (( ! HAVE_preferred_modules )) && opts+=(--preferred-modules)
-    (( ! HAVE_import_graph )) && opts+=(--import-graph)
-    (( ! HAVE_ext_import_graph )) && opts+=(--ext-import-graph)
-    (( ! HAVE_int_import_graph )) && opts+=(--int-import-graph)
-    (( ! HAVE_known_standard_library )) && opts+=(--known-standard-library)
-    (( ! HAVE_known_third_party )) && opts+=(--known-third-party)
-    (( ! HAVE_allow_any_import_level )) && opts+=(--allow-any-import-level)
-    (( ! HAVE_allow_wildcard_with_all )) && opts+=(--allow-wildcard-with-all)
-    (( ! HAVE_allow_reexport_from_package )) && opts+=(--allow-reexport-from-package)
-    (( ! HAVE_logging_modules )) && opts+=(--logging-modules)
-    (( ! HAVE_logging_format_style )) && opts+=(--logging-format-style)
+    (( ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(-h --help)
+    (( ! ${#OPT_rcfile} && ! ${#OPT_help} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--rcfile)
+    (( ! ${#OPT_output} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--output)
+    (( ! ${#OPT_help_msg} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--help-msg)
+    (( ! ${#OPT_list_msgs} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--list-msgs)
+    (( ! ${#OPT_list_msgs_enabled} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--list-msgs-enabled)
+    (( ! ${#OPT_list_groups} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--list-groups)
+    (( ! ${#OPT_list_conf_levels} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--list-conf-levels)
+    (( ! ${#OPT_list_extensions} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--list-extensions)
+    (( ! ${#OPT_full_documentation} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--full-documentation)
+    (( ! ${#OPT_generate_rcfile} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_toml_config} && ! ${#OPT_long_help} )) && opts+=(--generate-rcfile)
+    (( ! ${#OPT_generate_toml_config} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_long_help} )) && opts+=(--generate-toml-config)
+    (( ! ${#OPT_long_help} && ! ${#OPT_help} && ! ${#OPT_rcfile} && ! ${#OPT_output} && ! ${#OPT_help_msg} && ! ${#OPT_list_msgs} && ! ${#OPT_list_msgs_enabled} && ! ${#OPT_list_groups} && ! ${#OPT_list_conf_levels} && ! ${#OPT_list_extensions} && ! ${#OPT_full_documentation} && ! ${#OPT_generate_rcfile} && ! ${#OPT_generate_toml_config} )) && opts+=(--long-help)
+    (( ! ${#OPT_init_hook} )) && opts+=(--init-hook)
+    (( ! ${#OPT_errors_only} )) && opts+=(--errors-only -E)
+    (( ! ${#OPT_verbose} )) && opts+=(--verbose -v)
+    (( ! ${#OPT_enable_all_extensions} )) && opts+=(--enable-all-extensions)
+    (( ! ${#OPT_ignore} )) && opts+=(--ignore)
+    (( ! ${#OPT_ignore_patterns} )) && opts+=(--ignore-patterns)
+    (( ! ${#OPT_ignore_paths} )) && opts+=(--ignore-paths)
+    (( ! ${#OPT_persistent} )) && opts+=(--persistent)
+    (( ! ${#OPT_load_plugins} )) && opts+=(--load-plugins)
+    (( ! ${#OPT_fail_under} )) && opts+=(--fail-under)
+    (( ! ${#OPT_fail_on} )) && opts+=(--fail-on)
+    (( ! ${#OPT_jobs} )) && opts+=(--jobs -j)
+    (( ! ${#OPT_limit_inference_results} )) && opts+=(--limit-inference-results)
+    (( ! ${#OPT_extension_pkg_allow_list} )) && opts+=(--extension-pkg-allow-list)
+    (( ! ${#OPT_extension_pkg_whitelist} )) && opts+=(--extension-pkg-whitelist)
+    (( ! ${#OPT_suggestion_mode} )) && opts+=(--suggestion-mode)
+    (( ! ${#OPT_exit_zero} )) && opts+=(--exit-zero)
+    (( ! ${#OPT_from_stdin} )) && opts+=(--from-stdin)
+    (( ! ${#OPT_source_roots} )) && opts+=(--source-roots)
+    (( ! ${#OPT_recursive} )) && opts+=(--recursive)
+    (( ! ${#OPT_py_version} )) && opts+=(--py-version)
+    (( ! ${#OPT_ignored_modules} )) && opts+=(--ignored-modules)
+    (( ! ${#OPT_analyse_fallback_blocks} )) && opts+=(--analyse-fallback-blocks)
+    (( ! ${#OPT_clear_cache_post_run} )) && opts+=(--clear-cache-post-run)
+    (( ! ${#OPT_prefer_stubs} )) && opts+=(--prefer-stubs)
+    (( ! ${#OPT_output_format} )) && opts+=(--output-format -f)
+    (( ! ${#OPT_reports} )) && opts+=(--reports -r)
+    (( ! ${#OPT_evaluation} )) && opts+=(--evaluation)
+    (( ! ${#OPT_score} )) && opts+=(--score -s)
+    (( ! ${#OPT_msg_template} )) && opts+=(--msg-template)
+    (( ! ${#OPT_confidence} )) && opts+=(--confidence)
+    (( ! ${#OPT_enable} )) && opts+=(--enable -e)
+    (( ! ${#OPT_disable} )) && opts+=(--disable -d)
+    (( ! ${#OPT_min_similarity_lines} )) && opts+=(--min-similarity-lines)
+    (( ! ${#OPT_ignore_comments} )) && opts+=(--ignore-comments)
+    (( ! ${#OPT_ignore_docstrings} )) && opts+=(--ignore-docstrings)
+    (( ! ${#OPT_ignore_imports} )) && opts+=(--ignore-imports)
+    (( ! ${#OPT_ignore_signatures} )) && opts+=(--ignore-signatures)
+    (( ! ${#OPT_ignore_on_opaque_inference} )) && opts+=(--ignore-on-opaque-inference)
+    (( ! ${#OPT_mixin_class_rgx} )) && opts+=(--mixin-class-rgx)
+    (( ! ${#OPT_ignore_mixin_members} )) && opts+=(--ignore-mixin-members)
+    (( ! ${#OPT_ignored_checks_for_mixins} )) && opts+=(--ignored-checks-for-mixins)
+    (( ! ${#OPT_ignore_none} )) && opts+=(--ignore-none)
+    (( ! ${#OPT_ignored_classes} )) && opts+=(--ignored-classes)
+    (( ! ${#OPT_generated_members} )) && opts+=(--generated-members)
+    (( ! ${#OPT_contextmanager_decorators} )) && opts+=(--contextmanager-decorators)
+    (( ! ${#OPT_missing_member_hint_distance} )) && opts+=(--missing-member-hint-distance)
+    (( ! ${#OPT_missing_member_max_choices} )) && opts+=(--missing-member-max-choices)
+    (( ! ${#OPT_missing_member_hint} )) && opts+=(--missing-member-hint)
+    (( ! ${#OPT_signature_mutators} )) && opts+=(--signature-mutators)
+    (( ! ${#OPT_notes} )) && opts+=(--notes)
+    (( ! ${#OPT_notes_rgx} )) && opts+=(--notes-rgx)
+    (( ! ${#OPT_timeout_methods} )) && opts+=(--timeout-methods)
+    (( ! ${#OPT_spelling_dict} )) && opts+=(--spelling-dict)
+    (( ! ${#OPT_spelling_ignore_words} )) && opts+=(--spelling-ignore-words)
+    (( ! ${#OPT_spelling_private_dict_file} )) && opts+=(--spelling-private-dict-file)
+    (( ! ${#OPT_spelling_store_unknown_words} )) && opts+=(--spelling-store-unknown-words)
+    (( ! ${#OPT_max_spelling_suggestions} )) && opts+=(--max-spelling-suggestions)
+    (( ! ${#OPT_spelling_ignore_comment_directives} )) && opts+=(--spelling-ignore-comment-directives)
+    (( ! ${#OPT_max_nested_blocks} )) && opts+=(--max-nested-blocks)
+    (( ! ${#OPT_never_returning_functions} )) && opts+=(--never-returning-functions)
+    (( ! ${#OPT_suggest_join_with_non_empty_separator} )) && opts+=(--suggest-join-with-non-empty-separator)
+    (( ! ${#OPT_check_str_concat_over_line_jumps} )) && opts+=(--check-str-concat-over-line-jumps)
+    (( ! ${#OPT_check_quote_consistency} )) && opts+=(--check-quote-consistency)
+    (( ! ${#OPT_max_args} )) && opts+=(--max-args)
+    (( ! ${#OPT_max_positional_arguments} )) && opts+=(--max-positional-arguments)
+    (( ! ${#OPT_max_locals} )) && opts+=(--max-locals)
+    (( ! ${#OPT_max_returns} )) && opts+=(--max-returns)
+    (( ! ${#OPT_max_branches} )) && opts+=(--max-branches)
+    (( ! ${#OPT_max_statements} )) && opts+=(--max-statements)
+    (( ! ${#OPT_max_parents} )) && opts+=(--max-parents)
+    (( ! ${#OPT_ignored_parents} )) && opts+=(--ignored-parents)
+    (( ! ${#OPT_max_attributes} )) && opts+=(--max-attributes)
+    (( ! ${#OPT_min_public_methods} )) && opts+=(--min-public-methods)
+    (( ! ${#OPT_max_public_methods} )) && opts+=(--max-public-methods)
+    (( ! ${#OPT_max_bool_expr} )) && opts+=(--max-bool-expr)
+    (( ! ${#OPT_exclude_too_few_public_methods} )) && opts+=(--exclude-too-few-public-methods)
+    (( ! ${#OPT_overgeneral_exceptions} )) && opts+=(--overgeneral-exceptions)
+    (( ! ${#OPT_defining_attr_methods} )) && opts+=(--defining-attr-methods)
+    (( ! ${#OPT_valid_classmethod_first_arg} )) && opts+=(--valid-classmethod-first-arg)
+    (( ! ${#OPT_valid_metaclass_classmethod_first_arg} )) && opts+=(--valid-metaclass-classmethod-first-arg)
+    (( ! ${#OPT_exclude_protected} )) && opts+=(--exclude-protected)
+    (( ! ${#OPT_check_protected_access_in_special_methods} )) && opts+=(--check-protected-access-in-special-methods)
+    (( ! ${#OPT_max_line_length} )) && opts+=(--max-line-length)
+    (( ! ${#OPT_ignore_long_lines} )) && opts+=(--ignore-long-lines)
+    (( ! ${#OPT_single_line_if_stmt} )) && opts+=(--single-line-if-stmt)
+    (( ! ${#OPT_single_line_class_stmt} )) && opts+=(--single-line-class-stmt)
+    (( ! ${#OPT_max_module_lines} )) && opts+=(--max-module-lines)
+    (( ! ${#OPT_indent_string} )) && opts+=(--indent-string)
+    (( ! ${#OPT_indent_after_paren} )) && opts+=(--indent-after-paren)
+    (( ! ${#OPT_expected_line_ending_format} )) && opts+=(--expected-line-ending-format)
+    (( ! ${#OPT_good_names} )) && opts+=(--good-names)
+    (( ! ${#OPT_good_names_rgxs} )) && opts+=(--good-names-rgxs)
+    (( ! ${#OPT_bad_names} )) && opts+=(--bad-names)
+    (( ! ${#OPT_bad_names_rgxs} )) && opts+=(--bad-names-rgxs)
+    (( ! ${#OPT_name_group} )) && opts+=(--name-group)
+    (( ! ${#OPT_include_naming_hint} )) && opts+=(--include-naming-hint)
+    (( ! ${#OPT_property_classes} )) && opts+=(--property-classes)
+    (( ! ${#OPT_argument_naming_style} )) && opts+=(--argument-naming-style)
+    (( ! ${#OPT_argument_rgx} )) && opts+=(--argument-rgx)
+    (( ! ${#OPT_attr_naming_style} )) && opts+=(--attr-naming-style)
+    (( ! ${#OPT_attr_rgx} )) && opts+=(--attr-rgx)
+    (( ! ${#OPT_class_naming_style} )) && opts+=(--class-naming-style)
+    (( ! ${#OPT_class_rgx} )) && opts+=(--class-rgx)
+    (( ! ${#OPT_class_attribute_naming_style} )) && opts+=(--class-attribute-naming-style)
+    (( ! ${#OPT_class_attribute_rgx} )) && opts+=(--class-attribute-rgx)
+    (( ! ${#OPT_class_const_naming_style} )) && opts+=(--class-const-naming-style)
+    (( ! ${#OPT_class_const_rgx} )) && opts+=(--class-const-rgx)
+    (( ! ${#OPT_const_naming_style} )) && opts+=(--const-naming-style)
+    (( ! ${#OPT_const_rgx} )) && opts+=(--const-rgx)
+    (( ! ${#OPT_function_naming_style} )) && opts+=(--function-naming-style)
+    (( ! ${#OPT_function_rgx} )) && opts+=(--function-rgx)
+    (( ! ${#OPT_inlinevar_naming_style} )) && opts+=(--inlinevar-naming-style)
+    (( ! ${#OPT_inlinevar_rgx} )) && opts+=(--inlinevar-rgx)
+    (( ! ${#OPT_method_naming_style} )) && opts+=(--method-naming-style)
+    (( ! ${#OPT_method_rgx} )) && opts+=(--method-rgx)
+    (( ! ${#OPT_module_naming_style} )) && opts+=(--module-naming-style)
+    (( ! ${#OPT_module_rgx} )) && opts+=(--module-rgx)
+    (( ! ${#OPT_typealias_rgx} )) && opts+=(--typealias-rgx)
+    (( ! ${#OPT_typevar_rgx} )) && opts+=(--typevar-rgx)
+    (( ! ${#OPT_variable_naming_style} )) && opts+=(--variable-naming-style)
+    (( ! ${#OPT_variable_rgx} )) && opts+=(--variable-rgx)
+    (( ! ${#OPT_no_docstring_rgx} )) && opts+=(--no-docstring-rgx)
+    (( ! ${#OPT_docstring_min_length} )) && opts+=(--docstring-min-length)
+    (( ! ${#OPT_init_import} )) && opts+=(--init-import)
+    (( ! ${#OPT_dummy_variables_rgx} )) && opts+=(--dummy-variables-rgx)
+    (( ! ${#OPT_additional_builtins} )) && opts+=(--additional-builtins)
+    (( ! ${#OPT_callbacks} )) && opts+=(--callbacks)
+    (( ! ${#OPT_redefining_builtins_modules} )) && opts+=(--redefining-builtins-modules)
+    (( ! ${#OPT_ignored_argument_names} )) && opts+=(--ignored-argument-names)
+    (( ! ${#OPT_allow_global_unused_variables} )) && opts+=(--allow-global-unused-variables)
+    (( ! ${#OPT_allowed_redefined_builtins} )) && opts+=(--allowed-redefined-builtins)
+    (( ! ${#OPT_deprecated_modules} )) && opts+=(--deprecated-modules)
+    (( ! ${#OPT_preferred_modules} )) && opts+=(--preferred-modules)
+    (( ! ${#OPT_import_graph} )) && opts+=(--import-graph)
+    (( ! ${#OPT_ext_import_graph} )) && opts+=(--ext-import-graph)
+    (( ! ${#OPT_int_import_graph} )) && opts+=(--int-import-graph)
+    (( ! ${#OPT_known_standard_library} )) && opts+=(--known-standard-library)
+    (( ! ${#OPT_known_third_party} )) && opts+=(--known-third-party)
+    (( ! ${#OPT_allow_any_import_level} )) && opts+=(--allow-any-import-level)
+    (( ! ${#OPT_allow_wildcard_with_all} )) && opts+=(--allow-wildcard-with-all)
+    (( ! ${#OPT_allow_reexport_from_package} )) && opts+=(--allow-reexport-from-package)
+    (( ! ${#OPT_logging_modules} )) && opts+=(--logging-modules)
+    (( ! ${#OPT_logging_format_style} )) && opts+=(--logging-format-style)
     _pylint_compgen_w_replacement -a -- "$cur" "${opts[@]}"
     return 1
   fi
 
   test "$POSITIONAL_NUM" -ge 1 && {
-    local -a COMPREPLY_BACK=("${COMPREPLY[@]}")
     _filedir
-    COMPREPLY=("${COMPREPLY_BACK[@]}" "${COMPREPLY[@]}")
     return 0;
   }
 

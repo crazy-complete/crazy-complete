@@ -365,6 +365,9 @@ Design:
 
   --max-args <int>      Maximum number of arguments for function / method.
                         (default: 5)
+  --max-positional-arguments <int>
+                        Maximum number of positional arguments for function /
+                        method. (default: 5)
   --max-locals <int>    Maximum number of locals for function / method body.
                         (default: 15)
   --max-returns <int>   Maximum number of return / yield for function / method
