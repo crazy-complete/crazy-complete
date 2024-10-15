@@ -32,7 +32,7 @@ _fpm_parse_commandline() {
   END_OF_OPTIONS=0
   POSITIONAL_NUM=0
 
-  local command="${words[0]}" argi arg i char has_trailing_chars
+  local cmd="${words[0]}" argi arg i char trailing_chars
 
   for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
     arg="${words[argi]}"
@@ -47,1639 +47,1314 @@ _fpm_parse_commandline() {
       -)
         POSITIONALS[POSITIONAL_NUM++]="-";;
       -*)
-        case "$command" in fpm)
+        case "$cmd" in fpm)
           case "$arg" in
             --output-type)
-              HAVE_output_type=1
-              VALUE_output_type="${words[++argi]}"
+              OPT_output_type+=("${words[++argi]}")
               continue;;
             --output-type=*)
-              HAVE_output_type=1
-              VALUE_output_type="${arg#*=}"
+              OPT_output_type+=("${arg#*=}")
               continue;;
             --input-type)
-              HAVE_input_type=1
-              VALUE_input_type="${words[++argi]}"
+              OPT_input_type+=("${words[++argi]}")
               continue;;
             --input-type=*)
-              HAVE_input_type=1
-              VALUE_input_type="${arg#*=}"
+              OPT_input_type+=("${arg#*=}")
               continue;;
             --chdir)
-              HAVE_chdir=1
-              VALUE_chdir="${words[++argi]}"
+              OPT_chdir+=("${words[++argi]}")
               continue;;
             --chdir=*)
-              HAVE_chdir=1
-              VALUE_chdir="${arg#*=}"
+              OPT_chdir+=("${arg#*=}")
               continue;;
             --prefix)
-              HAVE_prefix=1
-              VALUE_prefix="${words[++argi]}"
+              OPT_prefix+=("${words[++argi]}")
               continue;;
             --prefix=*)
-              HAVE_prefix=1
-              VALUE_prefix="${arg#*=}"
+              OPT_prefix+=("${arg#*=}")
               continue;;
             --package)
-              HAVE_package=1
-              VALUE_package="${words[++argi]}"
+              OPT_package+=("${words[++argi]}")
               continue;;
             --package=*)
-              HAVE_package=1
-              VALUE_package="${arg#*=}"
+              OPT_package+=("${arg#*=}")
               continue;;
             --force)
-              HAVE_force=1
+              OPT_force+=(_OPT_ISSET_)
               continue;;
             --name)
-              HAVE_name=1
-              VALUE_name="${words[++argi]}"
+              OPT_name+=("${words[++argi]}")
               continue;;
             --name=*)
-              HAVE_name=1
-              VALUE_name="${arg#*=}"
+              OPT_name+=("${arg#*=}")
               continue;;
             --log)
-              HAVE_log=1
-              VALUE_log="${words[++argi]}"
+              OPT_log+=("${words[++argi]}")
               continue;;
             --log=*)
-              HAVE_log=1
-              VALUE_log="${arg#*=}"
+              OPT_log+=("${arg#*=}")
               continue;;
             --verbose)
-              HAVE_verbose=1
+              OPT_verbose+=(_OPT_ISSET_)
               continue;;
             --debug)
-              HAVE_debug=1
+              OPT_debug+=(_OPT_ISSET_)
               continue;;
             --debug-workspace)
-              HAVE_debug_workspace=1
+              OPT_debug_workspace+=(_OPT_ISSET_)
               continue;;
             --version)
-              HAVE_version=1
-              VALUE_version="${words[++argi]}"
+              OPT_version+=("${words[++argi]}")
               continue;;
             --version=*)
-              HAVE_version=1
-              VALUE_version="${arg#*=}"
+              OPT_version+=("${arg#*=}")
               continue;;
             --iteration)
-              HAVE_iteration=1
-              VALUE_iteration="${words[++argi]}"
+              OPT_iteration+=("${words[++argi]}")
               continue;;
             --iteration=*)
-              HAVE_iteration=1
-              VALUE_iteration="${arg#*=}"
+              OPT_iteration+=("${arg#*=}")
               continue;;
             --epoch)
-              HAVE_epoch=1
-              VALUE_epoch="${words[++argi]}"
+              OPT_epoch+=("${words[++argi]}")
               continue;;
             --epoch=*)
-              HAVE_epoch=1
-              VALUE_epoch="${arg#*=}"
+              OPT_epoch+=("${arg#*=}")
               continue;;
             --license)
-              HAVE_license=1
-              VALUE_license="${words[++argi]}"
+              OPT_license+=("${words[++argi]}")
               continue;;
             --license=*)
-              HAVE_license=1
-              VALUE_license="${arg#*=}"
+              OPT_license+=("${arg#*=}")
               continue;;
             --vendor)
-              HAVE_vendor=1
-              VALUE_vendor="${words[++argi]}"
+              OPT_vendor+=("${words[++argi]}")
               continue;;
             --vendor=*)
-              HAVE_vendor=1
-              VALUE_vendor="${arg#*=}"
+              OPT_vendor+=("${arg#*=}")
               continue;;
             --category)
-              HAVE_category=1
-              VALUE_category="${words[++argi]}"
+              OPT_category+=("${words[++argi]}")
               continue;;
             --category=*)
-              HAVE_category=1
-              VALUE_category="${arg#*=}"
+              OPT_category+=("${arg#*=}")
               continue;;
             --depends)
-              HAVE_depends=1
-              VALUE_depends="${words[++argi]}"
+              OPT_depends+=("${words[++argi]}")
               continue;;
             --depends=*)
-              HAVE_depends=1
-              VALUE_depends="${arg#*=}"
+              OPT_depends+=("${arg#*=}")
               continue;;
             --no-depends)
-              HAVE_no_depends=1
+              OPT_no_depends+=(_OPT_ISSET_)
               continue;;
             --no-auto-depends)
-              HAVE_no_auto_depends=1
+              OPT_no_auto_depends+=(_OPT_ISSET_)
               continue;;
             --provides)
-              HAVE_provides=1
-              VALUE_provides="${words[++argi]}"
+              OPT_provides+=("${words[++argi]}")
               continue;;
             --provides=*)
-              HAVE_provides=1
-              VALUE_provides="${arg#*=}"
+              OPT_provides+=("${arg#*=}")
               continue;;
             --conflicts)
-              HAVE_conflicts=1
-              VALUE_conflicts="${words[++argi]}"
+              OPT_conflicts+=("${words[++argi]}")
               continue;;
             --conflicts=*)
-              HAVE_conflicts=1
-              VALUE_conflicts="${arg#*=}"
+              OPT_conflicts+=("${arg#*=}")
               continue;;
             --replaces)
-              HAVE_replaces=1
-              VALUE_replaces="${words[++argi]}"
+              OPT_replaces+=("${words[++argi]}")
               continue;;
             --replaces=*)
-              HAVE_replaces=1
-              VALUE_replaces="${arg#*=}"
+              OPT_replaces+=("${arg#*=}")
               continue;;
             --config-files)
-              HAVE_config_files=1
-              VALUE_config_files="${words[++argi]}"
+              OPT_config_files+=("${words[++argi]}")
               continue;;
             --config-files=*)
-              HAVE_config_files=1
-              VALUE_config_files="${arg#*=}"
+              OPT_config_files+=("${arg#*=}")
               continue;;
             --directories)
-              HAVE_directories=1
-              VALUE_directories="${words[++argi]}"
+              OPT_directories+=("${words[++argi]}")
               continue;;
             --directories=*)
-              HAVE_directories=1
-              VALUE_directories="${arg#*=}"
+              OPT_directories+=("${arg#*=}")
               continue;;
             --architecture)
-              HAVE_architecture=1
-              VALUE_architecture="${words[++argi]}"
+              OPT_architecture+=("${words[++argi]}")
               continue;;
             --architecture=*)
-              HAVE_architecture=1
-              VALUE_architecture="${arg#*=}"
+              OPT_architecture+=("${arg#*=}")
               continue;;
             --maintainer)
-              HAVE_maintainer=1
-              VALUE_maintainer="${words[++argi]}"
+              OPT_maintainer+=("${words[++argi]}")
               continue;;
             --maintainer=*)
-              HAVE_maintainer=1
-              VALUE_maintainer="${arg#*=}"
+              OPT_maintainer+=("${arg#*=}")
               continue;;
             --package-name-suffix)
-              HAVE_package_name_suffix=1
-              VALUE_package_name_suffix="${words[++argi]}"
+              OPT_package_name_suffix+=("${words[++argi]}")
               continue;;
             --package-name-suffix=*)
-              HAVE_package_name_suffix=1
-              VALUE_package_name_suffix="${arg#*=}"
+              OPT_package_name_suffix+=("${arg#*=}")
               continue;;
             --edit)
-              HAVE_edit=1
+              OPT_edit+=(_OPT_ISSET_)
               continue;;
             --exclude)
-              HAVE_exclude=1
-              VALUE_exclude="${words[++argi]}"
+              OPT_exclude+=("${words[++argi]}")
               continue;;
             --exclude=*)
-              HAVE_exclude=1
-              VALUE_exclude="${arg#*=}"
+              OPT_exclude+=("${arg#*=}")
               continue;;
             --exclude-file)
-              HAVE_exclude_file=1
-              VALUE_exclude_file="${words[++argi]}"
+              OPT_exclude_file+=("${words[++argi]}")
               continue;;
             --exclude-file=*)
-              HAVE_exclude_file=1
-              VALUE_exclude_file="${arg#*=}"
+              OPT_exclude_file+=("${arg#*=}")
               continue;;
             --description)
-              HAVE_description=1
-              VALUE_description="${words[++argi]}"
+              OPT_description+=("${words[++argi]}")
               continue;;
             --description=*)
-              HAVE_description=1
-              VALUE_description="${arg#*=}"
+              OPT_description+=("${arg#*=}")
               continue;;
             --url)
-              HAVE_url=1
-              VALUE_url="${words[++argi]}"
+              OPT_url+=("${words[++argi]}")
               continue;;
             --url=*)
-              HAVE_url=1
-              VALUE_url="${arg#*=}"
+              OPT_url+=("${arg#*=}")
               continue;;
             --inputs)
-              HAVE_inputs=1
-              VALUE_inputs="${words[++argi]}"
+              OPT_inputs+=("${words[++argi]}")
               continue;;
             --inputs=*)
-              HAVE_inputs=1
-              VALUE_inputs="${arg#*=}"
+              OPT_inputs+=("${arg#*=}")
               continue;;
             --post-install)
-              HAVE_post_install=1
-              VALUE_post_install="${words[++argi]}"
+              OPT_post_install+=("${words[++argi]}")
               continue;;
             --post-install=*)
-              HAVE_post_install=1
-              VALUE_post_install="${arg#*=}"
+              OPT_post_install+=("${arg#*=}")
               continue;;
             --pre-install)
-              HAVE_pre_install=1
-              VALUE_pre_install="${words[++argi]}"
+              OPT_pre_install+=("${words[++argi]}")
               continue;;
             --pre-install=*)
-              HAVE_pre_install=1
-              VALUE_pre_install="${arg#*=}"
+              OPT_pre_install+=("${arg#*=}")
               continue;;
             --post-uninstall)
-              HAVE_post_uninstall=1
-              VALUE_post_uninstall="${words[++argi]}"
+              OPT_post_uninstall+=("${words[++argi]}")
               continue;;
             --post-uninstall=*)
-              HAVE_post_uninstall=1
-              VALUE_post_uninstall="${arg#*=}"
+              OPT_post_uninstall+=("${arg#*=}")
               continue;;
             --pre-uninstall)
-              HAVE_pre_uninstall=1
-              VALUE_pre_uninstall="${words[++argi]}"
+              OPT_pre_uninstall+=("${words[++argi]}")
               continue;;
             --pre-uninstall=*)
-              HAVE_pre_uninstall=1
-              VALUE_pre_uninstall="${arg#*=}"
+              OPT_pre_uninstall+=("${arg#*=}")
               continue;;
             --after-install)
-              HAVE_after_install=1
-              VALUE_after_install="${words[++argi]}"
+              OPT_after_install+=("${words[++argi]}")
               continue;;
             --after-install=*)
-              HAVE_after_install=1
-              VALUE_after_install="${arg#*=}"
+              OPT_after_install+=("${arg#*=}")
               continue;;
             --before-install)
-              HAVE_before_install=1
-              VALUE_before_install="${words[++argi]}"
+              OPT_before_install+=("${words[++argi]}")
               continue;;
             --before-install=*)
-              HAVE_before_install=1
-              VALUE_before_install="${arg#*=}"
+              OPT_before_install+=("${arg#*=}")
               continue;;
             --after-remove)
-              HAVE_after_remove=1
-              VALUE_after_remove="${words[++argi]}"
+              OPT_after_remove+=("${words[++argi]}")
               continue;;
             --after-remove=*)
-              HAVE_after_remove=1
-              VALUE_after_remove="${arg#*=}"
+              OPT_after_remove+=("${arg#*=}")
               continue;;
             --before-remove)
-              HAVE_before_remove=1
-              VALUE_before_remove="${words[++argi]}"
+              OPT_before_remove+=("${words[++argi]}")
               continue;;
             --before-remove=*)
-              HAVE_before_remove=1
-              VALUE_before_remove="${arg#*=}"
+              OPT_before_remove+=("${arg#*=}")
               continue;;
             --after-upgrade)
-              HAVE_after_upgrade=1
-              VALUE_after_upgrade="${words[++argi]}"
+              OPT_after_upgrade+=("${words[++argi]}")
               continue;;
             --after-upgrade=*)
-              HAVE_after_upgrade=1
-              VALUE_after_upgrade="${arg#*=}"
+              OPT_after_upgrade+=("${arg#*=}")
               continue;;
             --before-upgrade)
-              HAVE_before_upgrade=1
-              VALUE_before_upgrade="${words[++argi]}"
+              OPT_before_upgrade+=("${words[++argi]}")
               continue;;
             --before-upgrade=*)
-              HAVE_before_upgrade=1
-              VALUE_before_upgrade="${arg#*=}"
+              OPT_before_upgrade+=("${arg#*=}")
               continue;;
             --template-scripts)
-              HAVE_template_scripts=1
+              OPT_template_scripts+=(_OPT_ISSET_)
               continue;;
             --template-value)
-              HAVE_template_value=1
-              VALUE_template_value="${words[++argi]}"
+              OPT_template_value+=("${words[++argi]}")
               continue;;
             --template-value=*)
-              HAVE_template_value=1
-              VALUE_template_value="${arg#*=}"
+              OPT_template_value+=("${arg#*=}")
               continue;;
             --workdir)
-              HAVE_workdir=1
-              VALUE_workdir="${words[++argi]}"
+              OPT_workdir+=("${words[++argi]}")
               continue;;
             --workdir=*)
-              HAVE_workdir=1
-              VALUE_workdir="${arg#*=}"
+              OPT_workdir+=("${arg#*=}")
               continue;;
             --source-date-epoch-from-changelog)
-              HAVE_source_date_epoch_from_changelog=1
+              OPT_source_date_epoch_from_changelog+=(_OPT_ISSET_)
               continue;;
             --source-date-epoch-default)
-              HAVE_source_date_epoch_default=1
-              VALUE_source_date_epoch_default="${words[++argi]}"
+              OPT_source_date_epoch_default+=("${words[++argi]}")
               continue;;
             --source-date-epoch-default=*)
-              HAVE_source_date_epoch_default=1
-              VALUE_source_date_epoch_default="${arg#*=}"
+              OPT_source_date_epoch_default+=("${arg#*=}")
               continue;;
             --fpm-options-file)
-              HAVE_fpm_options_file=1
-              VALUE_fpm_options_file="${words[++argi]}"
+              OPT_fpm_options_file+=("${words[++argi]}")
               continue;;
             --fpm-options-file=*)
-              HAVE_fpm_options_file=1
-              VALUE_fpm_options_file="${arg#*=}"
+              OPT_fpm_options_file+=("${arg#*=}")
               continue;;
             --gem-bin-path)
-              HAVE_gem_bin_path=1
-              VALUE_gem_bin_path="${words[++argi]}"
+              OPT_gem_bin_path+=("${words[++argi]}")
               continue;;
             --gem-bin-path=*)
-              HAVE_gem_bin_path=1
-              VALUE_gem_bin_path="${arg#*=}"
+              OPT_gem_bin_path+=("${arg#*=}")
               continue;;
             --gem-package-prefix)
-              HAVE_gem_package_prefix=1
-              VALUE_gem_package_prefix="${words[++argi]}"
+              OPT_gem_package_prefix+=("${words[++argi]}")
               continue;;
             --gem-package-prefix=*)
-              HAVE_gem_package_prefix=1
-              VALUE_gem_package_prefix="${arg#*=}"
+              OPT_gem_package_prefix+=("${arg#*=}")
               continue;;
             --gem-package-name-prefix)
-              HAVE_gem_package_name_prefix=1
-              VALUE_gem_package_name_prefix="${words[++argi]}"
+              OPT_gem_package_name_prefix+=("${words[++argi]}")
               continue;;
             --gem-package-name-prefix=*)
-              HAVE_gem_package_name_prefix=1
-              VALUE_gem_package_name_prefix="${arg#*=}"
+              OPT_gem_package_name_prefix+=("${arg#*=}")
               continue;;
             --gem-gem)
-              HAVE_gem_gem=1
-              VALUE_gem_gem="${words[++argi]}"
+              OPT_gem_gem+=("${words[++argi]}")
               continue;;
             --gem-gem=*)
-              HAVE_gem_gem=1
-              VALUE_gem_gem="${arg#*=}"
+              OPT_gem_gem+=("${arg#*=}")
               continue;;
             --gem-shebang)
-              HAVE_gem_shebang=1
-              VALUE_gem_shebang="${words[++argi]}"
+              OPT_gem_shebang+=("${words[++argi]}")
               continue;;
             --gem-shebang=*)
-              HAVE_gem_shebang=1
-              VALUE_gem_shebang="${arg#*=}"
+              OPT_gem_shebang+=("${arg#*=}")
               continue;;
             --gem-fix-name)
-              HAVE_gem_fix_name=1
+              OPT_gem_fix_name+=(_OPT_ISSET_)
               continue;;
             --no-gem-fix-name)
-              HAVE_no_gem_fix_name=1
+              OPT_no_gem_fix_name+=(_OPT_ISSET_)
               continue;;
             --gem-fix-dependencies)
-              HAVE_gem_fix_dependencies=1
+              OPT_gem_fix_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-gem-fix-dependencies)
-              HAVE_no_gem_fix_dependencies=1
+              OPT_no_gem_fix_dependencies+=(_OPT_ISSET_)
               continue;;
             --gem-env-shebang)
-              HAVE_gem_env_shebang=1
+              OPT_gem_env_shebang+=(_OPT_ISSET_)
               continue;;
             --no-gem-env-shebang)
-              HAVE_no_gem_env_shebang=1
+              OPT_no_gem_env_shebang+=(_OPT_ISSET_)
               continue;;
             --gem-prerelease)
-              HAVE_gem_prerelease=1
+              OPT_gem_prerelease+=(_OPT_ISSET_)
               continue;;
             --no-gem-prerelease)
-              HAVE_no_gem_prerelease=1
+              OPT_no_gem_prerelease+=(_OPT_ISSET_)
               continue;;
             --gem-disable-dependency)
-              HAVE_gem_disable_dependency=1
-              VALUE_gem_disable_dependency="${words[++argi]}"
+              OPT_gem_disable_dependency+=("${words[++argi]}")
               continue;;
             --gem-disable-dependency=*)
-              HAVE_gem_disable_dependency=1
-              VALUE_gem_disable_dependency="${arg#*=}"
+              OPT_gem_disable_dependency+=("${arg#*=}")
               continue;;
             --gem-embed-dependencies)
-              HAVE_gem_embed_dependencies=1
+              OPT_gem_embed_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-gem-embed-dependencies)
-              HAVE_no_gem_embed_dependencies=1
+              OPT_no_gem_embed_dependencies+=(_OPT_ISSET_)
               continue;;
             --gem-version-bins)
-              HAVE_gem_version_bins=1
+              OPT_gem_version_bins+=(_OPT_ISSET_)
               continue;;
             --no-gem-version-bins)
-              HAVE_no_gem_version_bins=1
+              OPT_no_gem_version_bins+=(_OPT_ISSET_)
               continue;;
             --gem-stagingdir)
-              HAVE_gem_stagingdir=1
-              VALUE_gem_stagingdir="${words[++argi]}"
+              OPT_gem_stagingdir+=("${words[++argi]}")
               continue;;
             --gem-stagingdir=*)
-              HAVE_gem_stagingdir=1
-              VALUE_gem_stagingdir="${arg#*=}"
+              OPT_gem_stagingdir+=("${arg#*=}")
               continue;;
             --gem-git-repo)
-              HAVE_gem_git_repo=1
-              VALUE_gem_git_repo="${words[++argi]}"
+              OPT_gem_git_repo+=("${words[++argi]}")
               continue;;
             --gem-git-repo=*)
-              HAVE_gem_git_repo=1
-              VALUE_gem_git_repo="${arg#*=}"
+              OPT_gem_git_repo+=("${arg#*=}")
               continue;;
             --gem-git-branch)
-              HAVE_gem_git_branch=1
-              VALUE_gem_git_branch="${words[++argi]}"
+              OPT_gem_git_branch+=("${words[++argi]}")
               continue;;
             --gem-git-branch=*)
-              HAVE_gem_git_branch=1
-              VALUE_gem_git_branch="${arg#*=}"
+              OPT_gem_git_branch+=("${arg#*=}")
               continue;;
             --cpan-perl-bin)
-              HAVE_cpan_perl_bin=1
-              VALUE_cpan_perl_bin="${words[++argi]}"
+              OPT_cpan_perl_bin+=("${words[++argi]}")
               continue;;
             --cpan-perl-bin=*)
-              HAVE_cpan_perl_bin=1
-              VALUE_cpan_perl_bin="${arg#*=}"
+              OPT_cpan_perl_bin+=("${arg#*=}")
               continue;;
             --cpan-cpanm-bin)
-              HAVE_cpan_cpanm_bin=1
-              VALUE_cpan_cpanm_bin="${words[++argi]}"
+              OPT_cpan_cpanm_bin+=("${words[++argi]}")
               continue;;
             --cpan-cpanm-bin=*)
-              HAVE_cpan_cpanm_bin=1
-              VALUE_cpan_cpanm_bin="${arg#*=}"
+              OPT_cpan_cpanm_bin+=("${arg#*=}")
               continue;;
             --cpan-mirror)
-              HAVE_cpan_mirror=1
-              VALUE_cpan_mirror="${words[++argi]}"
+              OPT_cpan_mirror+=("${words[++argi]}")
               continue;;
             --cpan-mirror=*)
-              HAVE_cpan_mirror=1
-              VALUE_cpan_mirror="${arg#*=}"
+              OPT_cpan_mirror+=("${arg#*=}")
               continue;;
             --cpan-mirror-only)
-              HAVE_cpan_mirror_only=1
+              OPT_cpan_mirror_only+=(_OPT_ISSET_)
               continue;;
             --no-cpan-mirror-only)
-              HAVE_no_cpan_mirror_only=1
+              OPT_no_cpan_mirror_only+=(_OPT_ISSET_)
               continue;;
             --cpan-package-name-prefix)
-              HAVE_cpan_package_name_prefix=1
-              VALUE_cpan_package_name_prefix="${words[++argi]}"
+              OPT_cpan_package_name_prefix+=("${words[++argi]}")
               continue;;
             --cpan-package-name-prefix=*)
-              HAVE_cpan_package_name_prefix=1
-              VALUE_cpan_package_name_prefix="${arg#*=}"
+              OPT_cpan_package_name_prefix+=("${arg#*=}")
               continue;;
             --cpan-test)
-              HAVE_cpan_test=1
+              OPT_cpan_test+=(_OPT_ISSET_)
               continue;;
             --no-cpan-test)
-              HAVE_no_cpan_test=1
+              OPT_no_cpan_test+=(_OPT_ISSET_)
               continue;;
             --cpan-verbose)
-              HAVE_cpan_verbose=1
+              OPT_cpan_verbose+=(_OPT_ISSET_)
               continue;;
             --no-cpan-verbose)
-              HAVE_no_cpan_verbose=1
+              OPT_no_cpan_verbose+=(_OPT_ISSET_)
               continue;;
             --cpan-perl-lib-path)
-              HAVE_cpan_perl_lib_path=1
-              VALUE_cpan_perl_lib_path="${words[++argi]}"
+              OPT_cpan_perl_lib_path+=("${words[++argi]}")
               continue;;
             --cpan-perl-lib-path=*)
-              HAVE_cpan_perl_lib_path=1
-              VALUE_cpan_perl_lib_path="${arg#*=}"
+              OPT_cpan_perl_lib_path+=("${arg#*=}")
               continue;;
             --cpan-sandbox-non-core)
-              HAVE_cpan_sandbox_non_core=1
+              OPT_cpan_sandbox_non_core+=(_OPT_ISSET_)
               continue;;
             --no-cpan-sandbox-non-core)
-              HAVE_no_cpan_sandbox_non_core=1
+              OPT_no_cpan_sandbox_non_core+=(_OPT_ISSET_)
               continue;;
             --cpan-cpanm-force)
-              HAVE_cpan_cpanm_force=1
+              OPT_cpan_cpanm_force+=(_OPT_ISSET_)
               continue;;
             --no-cpan-cpanm-force)
-              HAVE_no_cpan_cpanm_force=1
+              OPT_no_cpan_cpanm_force+=(_OPT_ISSET_)
               continue;;
             --deb-ignore-iteration-in-dependencies)
-              HAVE_deb_ignore_iteration_in_dependencies=1
+              OPT_deb_ignore_iteration_in_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-deb-ignore-iteration-in-dependencies)
-              HAVE_no_deb_ignore_iteration_in_dependencies=1
+              OPT_no_deb_ignore_iteration_in_dependencies+=(_OPT_ISSET_)
               continue;;
             --deb-build-depends)
-              HAVE_deb_build_depends=1
-              VALUE_deb_build_depends="${words[++argi]}"
+              OPT_deb_build_depends+=("${words[++argi]}")
               continue;;
             --deb-build-depends=*)
-              HAVE_deb_build_depends=1
-              VALUE_deb_build_depends="${arg#*=}"
+              OPT_deb_build_depends+=("${arg#*=}")
               continue;;
             --deb-pre-depends)
-              HAVE_deb_pre_depends=1
-              VALUE_deb_pre_depends="${words[++argi]}"
+              OPT_deb_pre_depends+=("${words[++argi]}")
               continue;;
             --deb-pre-depends=*)
-              HAVE_deb_pre_depends=1
-              VALUE_deb_pre_depends="${arg#*=}"
+              OPT_deb_pre_depends+=("${arg#*=}")
               continue;;
             --deb-compression)
-              HAVE_deb_compression=1
-              VALUE_deb_compression="${words[++argi]}"
+              OPT_deb_compression+=("${words[++argi]}")
               continue;;
             --deb-compression=*)
-              HAVE_deb_compression=1
-              VALUE_deb_compression="${arg#*=}"
+              OPT_deb_compression+=("${arg#*=}")
               continue;;
             --deb-dist)
-              HAVE_deb_dist=1
-              VALUE_deb_dist="${words[++argi]}"
+              OPT_deb_dist+=("${words[++argi]}")
               continue;;
             --deb-dist=*)
-              HAVE_deb_dist=1
-              VALUE_deb_dist="${arg#*=}"
+              OPT_deb_dist+=("${arg#*=}")
               continue;;
             --deb-custom-control)
-              HAVE_deb_custom_control=1
-              VALUE_deb_custom_control="${words[++argi]}"
+              OPT_deb_custom_control+=("${words[++argi]}")
               continue;;
             --deb-custom-control=*)
-              HAVE_deb_custom_control=1
-              VALUE_deb_custom_control="${arg#*=}"
+              OPT_deb_custom_control+=("${arg#*=}")
               continue;;
             --deb-config)
-              HAVE_deb_config=1
-              VALUE_deb_config="${words[++argi]}"
+              OPT_deb_config+=("${words[++argi]}")
               continue;;
             --deb-config=*)
-              HAVE_deb_config=1
-              VALUE_deb_config="${arg#*=}"
+              OPT_deb_config+=("${arg#*=}")
               continue;;
             --deb-templates)
-              HAVE_deb_templates=1
-              VALUE_deb_templates="${words[++argi]}"
+              OPT_deb_templates+=("${words[++argi]}")
               continue;;
             --deb-templates=*)
-              HAVE_deb_templates=1
-              VALUE_deb_templates="${arg#*=}"
+              OPT_deb_templates+=("${arg#*=}")
               continue;;
             --deb-installed-size)
-              HAVE_deb_installed_size=1
-              VALUE_deb_installed_size="${words[++argi]}"
+              OPT_deb_installed_size+=("${words[++argi]}")
               continue;;
             --deb-installed-size=*)
-              HAVE_deb_installed_size=1
-              VALUE_deb_installed_size="${arg#*=}"
+              OPT_deb_installed_size+=("${arg#*=}")
               continue;;
             --deb-priority)
-              HAVE_deb_priority=1
-              VALUE_deb_priority="${words[++argi]}"
+              OPT_deb_priority+=("${words[++argi]}")
               continue;;
             --deb-priority=*)
-              HAVE_deb_priority=1
-              VALUE_deb_priority="${arg#*=}"
+              OPT_deb_priority+=("${arg#*=}")
               continue;;
             --deb-use-file-permissions)
-              HAVE_deb_use_file_permissions=1
+              OPT_deb_use_file_permissions+=(_OPT_ISSET_)
               continue;;
             --no-deb-use-file-permissions)
-              HAVE_no_deb_use_file_permissions=1
+              OPT_no_deb_use_file_permissions+=(_OPT_ISSET_)
               continue;;
             --deb-user)
-              HAVE_deb_user=1
-              VALUE_deb_user="${words[++argi]}"
+              OPT_deb_user+=("${words[++argi]}")
               continue;;
             --deb-user=*)
-              HAVE_deb_user=1
-              VALUE_deb_user="${arg#*=}"
+              OPT_deb_user+=("${arg#*=}")
               continue;;
             --deb-group)
-              HAVE_deb_group=1
-              VALUE_deb_group="${words[++argi]}"
+              OPT_deb_group+=("${words[++argi]}")
               continue;;
             --deb-group=*)
-              HAVE_deb_group=1
-              VALUE_deb_group="${arg#*=}"
+              OPT_deb_group+=("${arg#*=}")
               continue;;
             --deb-changelog)
-              HAVE_deb_changelog=1
-              VALUE_deb_changelog="${words[++argi]}"
+              OPT_deb_changelog+=("${words[++argi]}")
               continue;;
             --deb-changelog=*)
-              HAVE_deb_changelog=1
-              VALUE_deb_changelog="${arg#*=}"
+              OPT_deb_changelog+=("${arg#*=}")
               continue;;
             --deb-generate-changes)
-              HAVE_deb_generate_changes=1
+              OPT_deb_generate_changes+=(_OPT_ISSET_)
               continue;;
             --no-deb-generate-changes)
-              HAVE_no_deb_generate_changes=1
+              OPT_no_deb_generate_changes+=(_OPT_ISSET_)
               continue;;
             --deb-upstream-changelog)
-              HAVE_deb_upstream_changelog=1
-              VALUE_deb_upstream_changelog="${words[++argi]}"
+              OPT_deb_upstream_changelog+=("${words[++argi]}")
               continue;;
             --deb-upstream-changelog=*)
-              HAVE_deb_upstream_changelog=1
-              VALUE_deb_upstream_changelog="${arg#*=}"
+              OPT_deb_upstream_changelog+=("${arg#*=}")
               continue;;
             --deb-recommends)
-              HAVE_deb_recommends=1
-              VALUE_deb_recommends="${words[++argi]}"
+              OPT_deb_recommends+=("${words[++argi]}")
               continue;;
             --deb-recommends=*)
-              HAVE_deb_recommends=1
-              VALUE_deb_recommends="${arg#*=}"
+              OPT_deb_recommends+=("${arg#*=}")
               continue;;
             --deb-suggests)
-              HAVE_deb_suggests=1
-              VALUE_deb_suggests="${words[++argi]}"
+              OPT_deb_suggests+=("${words[++argi]}")
               continue;;
             --deb-suggests=*)
-              HAVE_deb_suggests=1
-              VALUE_deb_suggests="${arg#*=}"
+              OPT_deb_suggests+=("${arg#*=}")
               continue;;
             --deb-meta-file)
-              HAVE_deb_meta_file=1
-              VALUE_deb_meta_file="${words[++argi]}"
+              OPT_deb_meta_file+=("${words[++argi]}")
               continue;;
             --deb-meta-file=*)
-              HAVE_deb_meta_file=1
-              VALUE_deb_meta_file="${arg#*=}"
+              OPT_deb_meta_file+=("${arg#*=}")
               continue;;
             --deb-interest)
-              HAVE_deb_interest=1
-              VALUE_deb_interest="${words[++argi]}"
+              OPT_deb_interest+=("${words[++argi]}")
               continue;;
             --deb-interest=*)
-              HAVE_deb_interest=1
-              VALUE_deb_interest="${arg#*=}"
+              OPT_deb_interest+=("${arg#*=}")
               continue;;
             --deb-activate)
-              HAVE_deb_activate=1
-              VALUE_deb_activate="${words[++argi]}"
+              OPT_deb_activate+=("${words[++argi]}")
               continue;;
             --deb-activate=*)
-              HAVE_deb_activate=1
-              VALUE_deb_activate="${arg#*=}"
+              OPT_deb_activate+=("${arg#*=}")
               continue;;
             --deb-interest-noawait)
-              HAVE_deb_interest_noawait=1
-              VALUE_deb_interest_noawait="${words[++argi]}"
+              OPT_deb_interest_noawait+=("${words[++argi]}")
               continue;;
             --deb-interest-noawait=*)
-              HAVE_deb_interest_noawait=1
-              VALUE_deb_interest_noawait="${arg#*=}"
+              OPT_deb_interest_noawait+=("${arg#*=}")
               continue;;
             --deb-activate-noawait)
-              HAVE_deb_activate_noawait=1
-              VALUE_deb_activate_noawait="${words[++argi]}"
+              OPT_deb_activate_noawait+=("${words[++argi]}")
               continue;;
             --deb-activate-noawait=*)
-              HAVE_deb_activate_noawait=1
-              VALUE_deb_activate_noawait="${arg#*=}"
+              OPT_deb_activate_noawait+=("${arg#*=}")
               continue;;
             --deb-field)
-              HAVE_deb_field=1
-              VALUE_deb_field="${words[++argi]}"
+              OPT_deb_field+=("${words[++argi]}")
               continue;;
             --deb-field=*)
-              HAVE_deb_field=1
-              VALUE_deb_field="${arg#*=}"
+              OPT_deb_field+=("${arg#*=}")
               continue;;
             --deb-no-default-config-files)
-              HAVE_deb_no_default_config_files=1
+              OPT_deb_no_default_config_files+=(_OPT_ISSET_)
               continue;;
             --no-deb-no-default-config-files)
-              HAVE_no_deb_no_default_config_files=1
+              OPT_no_deb_no_default_config_files+=(_OPT_ISSET_)
               continue;;
             --deb-auto-config-files)
-              HAVE_deb_auto_config_files=1
+              OPT_deb_auto_config_files+=(_OPT_ISSET_)
               continue;;
             --no-deb-auto-config-files)
-              HAVE_no_deb_auto_config_files=1
+              OPT_no_deb_auto_config_files+=(_OPT_ISSET_)
               continue;;
             --deb-shlibs)
-              HAVE_deb_shlibs=1
-              VALUE_deb_shlibs="${words[++argi]}"
+              OPT_deb_shlibs+=("${words[++argi]}")
               continue;;
             --deb-shlibs=*)
-              HAVE_deb_shlibs=1
-              VALUE_deb_shlibs="${arg#*=}"
+              OPT_deb_shlibs+=("${arg#*=}")
               continue;;
             --deb-init)
-              HAVE_deb_init=1
-              VALUE_deb_init="${words[++argi]}"
+              OPT_deb_init+=("${words[++argi]}")
               continue;;
             --deb-init=*)
-              HAVE_deb_init=1
-              VALUE_deb_init="${arg#*=}"
+              OPT_deb_init+=("${arg#*=}")
               continue;;
             --deb-default)
-              HAVE_deb_default=1
-              VALUE_deb_default="${words[++argi]}"
+              OPT_deb_default+=("${words[++argi]}")
               continue;;
             --deb-default=*)
-              HAVE_deb_default=1
-              VALUE_deb_default="${arg#*=}"
+              OPT_deb_default+=("${arg#*=}")
               continue;;
             --deb-upstart)
-              HAVE_deb_upstart=1
-              VALUE_deb_upstart="${words[++argi]}"
+              OPT_deb_upstart+=("${words[++argi]}")
               continue;;
             --deb-upstart=*)
-              HAVE_deb_upstart=1
-              VALUE_deb_upstart="${arg#*=}"
+              OPT_deb_upstart+=("${arg#*=}")
               continue;;
             --deb-systemd)
-              HAVE_deb_systemd=1
-              VALUE_deb_systemd="${words[++argi]}"
+              OPT_deb_systemd+=("${words[++argi]}")
               continue;;
             --deb-systemd=*)
-              HAVE_deb_systemd=1
-              VALUE_deb_systemd="${arg#*=}"
+              OPT_deb_systemd+=("${arg#*=}")
               continue;;
             --deb-systemd-enable)
-              HAVE_deb_systemd_enable=1
+              OPT_deb_systemd_enable+=(_OPT_ISSET_)
               continue;;
             --no-deb-systemd-enable)
-              HAVE_no_deb_systemd_enable=1
+              OPT_no_deb_systemd_enable+=(_OPT_ISSET_)
               continue;;
             --deb-systemd-auto-start)
-              HAVE_deb_systemd_auto_start=1
+              OPT_deb_systemd_auto_start+=(_OPT_ISSET_)
               continue;;
             --no-deb-systemd-auto-start)
-              HAVE_no_deb_systemd_auto_start=1
+              OPT_no_deb_systemd_auto_start+=(_OPT_ISSET_)
               continue;;
             --deb-systemd-restart-after-upgrade)
-              HAVE_deb_systemd_restart_after_upgrade=1
+              OPT_deb_systemd_restart_after_upgrade+=(_OPT_ISSET_)
               continue;;
             --no-deb-systemd-restart-after-upgrade)
-              HAVE_no_deb_systemd_restart_after_upgrade=1
+              OPT_no_deb_systemd_restart_after_upgrade+=(_OPT_ISSET_)
               continue;;
             --deb-after-purge)
-              HAVE_deb_after_purge=1
-              VALUE_deb_after_purge="${words[++argi]}"
+              OPT_deb_after_purge+=("${words[++argi]}")
               continue;;
             --deb-after-purge=*)
-              HAVE_deb_after_purge=1
-              VALUE_deb_after_purge="${arg#*=}"
+              OPT_deb_after_purge+=("${arg#*=}")
               continue;;
             --deb-maintainerscripts-force-errorchecks)
-              HAVE_deb_maintainerscripts_force_errorchecks=1
+              OPT_deb_maintainerscripts_force_errorchecks+=(_OPT_ISSET_)
               continue;;
             --no-deb-maintainerscripts-force-errorchecks)
-              HAVE_no_deb_maintainerscripts_force_errorchecks=1
+              OPT_no_deb_maintainerscripts_force_errorchecks+=(_OPT_ISSET_)
               continue;;
             --npm-bin)
-              HAVE_npm_bin=1
-              VALUE_npm_bin="${words[++argi]}"
+              OPT_npm_bin+=("${words[++argi]}")
               continue;;
             --npm-bin=*)
-              HAVE_npm_bin=1
-              VALUE_npm_bin="${arg#*=}"
+              OPT_npm_bin+=("${arg#*=}")
               continue;;
             --npm-package-name-prefix)
-              HAVE_npm_package_name_prefix=1
-              VALUE_npm_package_name_prefix="${words[++argi]}"
+              OPT_npm_package_name_prefix+=("${words[++argi]}")
               continue;;
             --npm-package-name-prefix=*)
-              HAVE_npm_package_name_prefix=1
-              VALUE_npm_package_name_prefix="${arg#*=}"
+              OPT_npm_package_name_prefix+=("${arg#*=}")
               continue;;
             --npm-registry)
-              HAVE_npm_registry=1
-              VALUE_npm_registry="${words[++argi]}"
+              OPT_npm_registry+=("${words[++argi]}")
               continue;;
             --npm-registry=*)
-              HAVE_npm_registry=1
-              VALUE_npm_registry="${arg#*=}"
+              OPT_npm_registry+=("${arg#*=}")
               continue;;
             --rpm-use-file-permissions)
-              HAVE_rpm_use_file_permissions=1
+              OPT_rpm_use_file_permissions+=(_OPT_ISSET_)
               continue;;
             --no-rpm-use-file-permissions)
-              HAVE_no_rpm_use_file_permissions=1
+              OPT_no_rpm_use_file_permissions+=(_OPT_ISSET_)
               continue;;
             --rpm-user)
-              HAVE_rpm_user=1
-              VALUE_rpm_user="${words[++argi]}"
+              OPT_rpm_user+=("${words[++argi]}")
               continue;;
             --rpm-user=*)
-              HAVE_rpm_user=1
-              VALUE_rpm_user="${arg#*=}"
+              OPT_rpm_user+=("${arg#*=}")
               continue;;
             --rpm-group)
-              HAVE_rpm_group=1
-              VALUE_rpm_group="${words[++argi]}"
+              OPT_rpm_group+=("${words[++argi]}")
               continue;;
             --rpm-group=*)
-              HAVE_rpm_group=1
-              VALUE_rpm_group="${arg#*=}"
+              OPT_rpm_group+=("${arg#*=}")
               continue;;
             --rpm-defattrfile)
-              HAVE_rpm_defattrfile=1
-              VALUE_rpm_defattrfile="${words[++argi]}"
+              OPT_rpm_defattrfile+=("${words[++argi]}")
               continue;;
             --rpm-defattrfile=*)
-              HAVE_rpm_defattrfile=1
-              VALUE_rpm_defattrfile="${arg#*=}"
+              OPT_rpm_defattrfile+=("${arg#*=}")
               continue;;
             --rpm-defattrdir)
-              HAVE_rpm_defattrdir=1
-              VALUE_rpm_defattrdir="${words[++argi]}"
+              OPT_rpm_defattrdir+=("${words[++argi]}")
               continue;;
             --rpm-defattrdir=*)
-              HAVE_rpm_defattrdir=1
-              VALUE_rpm_defattrdir="${arg#*=}"
+              OPT_rpm_defattrdir+=("${arg#*=}")
               continue;;
             --rpm-rpmbuild-define)
-              HAVE_rpm_rpmbuild_define=1
-              VALUE_rpm_rpmbuild_define="${words[++argi]}"
+              OPT_rpm_rpmbuild_define+=("${words[++argi]}")
               continue;;
             --rpm-rpmbuild-define=*)
-              HAVE_rpm_rpmbuild_define=1
-              VALUE_rpm_rpmbuild_define="${arg#*=}"
+              OPT_rpm_rpmbuild_define+=("${arg#*=}")
               continue;;
             --rpm-dist)
-              HAVE_rpm_dist=1
-              VALUE_rpm_dist="${words[++argi]}"
+              OPT_rpm_dist+=("${words[++argi]}")
               continue;;
             --rpm-dist=*)
-              HAVE_rpm_dist=1
-              VALUE_rpm_dist="${arg#*=}"
+              OPT_rpm_dist+=("${arg#*=}")
               continue;;
             --rpm-digest)
-              HAVE_rpm_digest=1
-              VALUE_rpm_digest="${words[++argi]}"
+              OPT_rpm_digest+=("${words[++argi]}")
               continue;;
             --rpm-digest=*)
-              HAVE_rpm_digest=1
-              VALUE_rpm_digest="${arg#*=}"
+              OPT_rpm_digest+=("${arg#*=}")
               continue;;
             --rpm-compression-level)
-              HAVE_rpm_compression_level=1
-              VALUE_rpm_compression_level="${words[++argi]}"
+              OPT_rpm_compression_level+=("${words[++argi]}")
               continue;;
             --rpm-compression-level=*)
-              HAVE_rpm_compression_level=1
-              VALUE_rpm_compression_level="${arg#*=}"
+              OPT_rpm_compression_level+=("${arg#*=}")
               continue;;
             --rpm-compression)
-              HAVE_rpm_compression=1
-              VALUE_rpm_compression="${words[++argi]}"
+              OPT_rpm_compression+=("${words[++argi]}")
               continue;;
             --rpm-compression=*)
-              HAVE_rpm_compression=1
-              VALUE_rpm_compression="${arg#*=}"
+              OPT_rpm_compression+=("${arg#*=}")
               continue;;
             --rpm-os)
-              HAVE_rpm_os=1
-              VALUE_rpm_os="${words[++argi]}"
+              OPT_rpm_os+=("${words[++argi]}")
               continue;;
             --rpm-os=*)
-              HAVE_rpm_os=1
-              VALUE_rpm_os="${arg#*=}"
+              OPT_rpm_os+=("${arg#*=}")
               continue;;
             --rpm-changelog)
-              HAVE_rpm_changelog=1
-              VALUE_rpm_changelog="${words[++argi]}"
+              OPT_rpm_changelog+=("${words[++argi]}")
               continue;;
             --rpm-changelog=*)
-              HAVE_rpm_changelog=1
-              VALUE_rpm_changelog="${arg#*=}"
+              OPT_rpm_changelog+=("${arg#*=}")
               continue;;
             --rpm-summary)
-              HAVE_rpm_summary=1
-              VALUE_rpm_summary="${words[++argi]}"
+              OPT_rpm_summary+=("${words[++argi]}")
               continue;;
             --rpm-summary=*)
-              HAVE_rpm_summary=1
-              VALUE_rpm_summary="${arg#*=}"
+              OPT_rpm_summary+=("${arg#*=}")
               continue;;
             --rpm-sign)
-              HAVE_rpm_sign=1
+              OPT_rpm_sign+=(_OPT_ISSET_)
               continue;;
             --no-rpm-sign)
-              HAVE_no_rpm_sign=1
+              OPT_no_rpm_sign+=(_OPT_ISSET_)
               continue;;
             --rpm-auto-add-directories)
-              HAVE_rpm_auto_add_directories=1
+              OPT_rpm_auto_add_directories+=(_OPT_ISSET_)
               continue;;
             --no-rpm-auto-add-directories)
-              HAVE_no_rpm_auto_add_directories=1
+              OPT_no_rpm_auto_add_directories+=(_OPT_ISSET_)
               continue;;
             --rpm-auto-add-exclude-directories)
-              HAVE_rpm_auto_add_exclude_directories=1
-              VALUE_rpm_auto_add_exclude_directories="${words[++argi]}"
+              OPT_rpm_auto_add_exclude_directories+=("${words[++argi]}")
               continue;;
             --rpm-auto-add-exclude-directories=*)
-              HAVE_rpm_auto_add_exclude_directories=1
-              VALUE_rpm_auto_add_exclude_directories="${arg#*=}"
+              OPT_rpm_auto_add_exclude_directories+=("${arg#*=}")
               continue;;
             --rpm-autoreqprov)
-              HAVE_rpm_autoreqprov=1
+              OPT_rpm_autoreqprov+=(_OPT_ISSET_)
               continue;;
             --no-rpm-autoreqprov)
-              HAVE_no_rpm_autoreqprov=1
+              OPT_no_rpm_autoreqprov+=(_OPT_ISSET_)
               continue;;
             --rpm-autoreq)
-              HAVE_rpm_autoreq=1
+              OPT_rpm_autoreq+=(_OPT_ISSET_)
               continue;;
             --no-rpm-autoreq)
-              HAVE_no_rpm_autoreq=1
+              OPT_no_rpm_autoreq+=(_OPT_ISSET_)
               continue;;
             --rpm-autoprov)
-              HAVE_rpm_autoprov=1
+              OPT_rpm_autoprov+=(_OPT_ISSET_)
               continue;;
             --no-rpm-autoprov)
-              HAVE_no_rpm_autoprov=1
+              OPT_no_rpm_autoprov+=(_OPT_ISSET_)
               continue;;
             --rpm-attr)
-              HAVE_rpm_attr=1
-              VALUE_rpm_attr="${words[++argi]}"
+              OPT_rpm_attr+=("${words[++argi]}")
               continue;;
             --rpm-attr=*)
-              HAVE_rpm_attr=1
-              VALUE_rpm_attr="${arg#*=}"
+              OPT_rpm_attr+=("${arg#*=}")
               continue;;
             --rpm-init)
-              HAVE_rpm_init=1
-              VALUE_rpm_init="${words[++argi]}"
+              OPT_rpm_init+=("${words[++argi]}")
               continue;;
             --rpm-init=*)
-              HAVE_rpm_init=1
-              VALUE_rpm_init="${arg#*=}"
+              OPT_rpm_init+=("${arg#*=}")
               continue;;
             --rpm-filter-from-provides)
-              HAVE_rpm_filter_from_provides=1
-              VALUE_rpm_filter_from_provides="${words[++argi]}"
+              OPT_rpm_filter_from_provides+=("${words[++argi]}")
               continue;;
             --rpm-filter-from-provides=*)
-              HAVE_rpm_filter_from_provides=1
-              VALUE_rpm_filter_from_provides="${arg#*=}"
+              OPT_rpm_filter_from_provides+=("${arg#*=}")
               continue;;
             --rpm-filter-from-requires)
-              HAVE_rpm_filter_from_requires=1
-              VALUE_rpm_filter_from_requires="${words[++argi]}"
+              OPT_rpm_filter_from_requires+=("${words[++argi]}")
               continue;;
             --rpm-filter-from-requires=*)
-              HAVE_rpm_filter_from_requires=1
-              VALUE_rpm_filter_from_requires="${arg#*=}"
+              OPT_rpm_filter_from_requires+=("${arg#*=}")
               continue;;
             --rpm-tag)
-              HAVE_rpm_tag=1
-              VALUE_rpm_tag="${words[++argi]}"
+              OPT_rpm_tag+=("${words[++argi]}")
               continue;;
             --rpm-tag=*)
-              HAVE_rpm_tag=1
-              VALUE_rpm_tag="${arg#*=}"
+              OPT_rpm_tag+=("${arg#*=}")
               continue;;
             --rpm-ignore-iteration-in-dependencies)
-              HAVE_rpm_ignore_iteration_in_dependencies=1
+              OPT_rpm_ignore_iteration_in_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-rpm-ignore-iteration-in-dependencies)
-              HAVE_no_rpm_ignore_iteration_in_dependencies=1
+              OPT_no_rpm_ignore_iteration_in_dependencies+=(_OPT_ISSET_)
               continue;;
             --rpm-verbatim-gem-dependencies)
-              HAVE_rpm_verbatim_gem_dependencies=1
+              OPT_rpm_verbatim_gem_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-rpm-verbatim-gem-dependencies)
-              HAVE_no_rpm_verbatim_gem_dependencies=1
+              OPT_no_rpm_verbatim_gem_dependencies+=(_OPT_ISSET_)
               continue;;
             --rpm-macro-expansion)
-              HAVE_rpm_macro_expansion=1
+              OPT_rpm_macro_expansion+=(_OPT_ISSET_)
               continue;;
             --no-rpm-macro-expansion)
-              HAVE_no_rpm_macro_expansion=1
+              OPT_no_rpm_macro_expansion+=(_OPT_ISSET_)
               continue;;
             --rpm-verifyscript)
-              HAVE_rpm_verifyscript=1
-              VALUE_rpm_verifyscript="${words[++argi]}"
+              OPT_rpm_verifyscript+=("${words[++argi]}")
               continue;;
             --rpm-verifyscript=*)
-              HAVE_rpm_verifyscript=1
-              VALUE_rpm_verifyscript="${arg#*=}"
+              OPT_rpm_verifyscript+=("${arg#*=}")
               continue;;
             --rpm-pretrans)
-              HAVE_rpm_pretrans=1
-              VALUE_rpm_pretrans="${words[++argi]}"
+              OPT_rpm_pretrans+=("${words[++argi]}")
               continue;;
             --rpm-pretrans=*)
-              HAVE_rpm_pretrans=1
-              VALUE_rpm_pretrans="${arg#*=}"
+              OPT_rpm_pretrans+=("${arg#*=}")
               continue;;
             --rpm-posttrans)
-              HAVE_rpm_posttrans=1
-              VALUE_rpm_posttrans="${words[++argi]}"
+              OPT_rpm_posttrans+=("${words[++argi]}")
               continue;;
             --rpm-posttrans=*)
-              HAVE_rpm_posttrans=1
-              VALUE_rpm_posttrans="${arg#*=}"
+              OPT_rpm_posttrans+=("${arg#*=}")
               continue;;
             --rpm-trigger-before-install)
-              HAVE_rpm_trigger_before_install=1
-              VALUE_rpm_trigger_before_install="${words[++argi]}"
+              OPT_rpm_trigger_before_install+=("${words[++argi]}")
               continue;;
             --rpm-trigger-before-install=*)
-              HAVE_rpm_trigger_before_install=1
-              VALUE_rpm_trigger_before_install="${arg#*=}"
+              OPT_rpm_trigger_before_install+=("${arg#*=}")
               continue;;
             --rpm-trigger-after-install)
-              HAVE_rpm_trigger_after_install=1
-              VALUE_rpm_trigger_after_install="${words[++argi]}"
+              OPT_rpm_trigger_after_install+=("${words[++argi]}")
               continue;;
             --rpm-trigger-after-install=*)
-              HAVE_rpm_trigger_after_install=1
-              VALUE_rpm_trigger_after_install="${arg#*=}"
+              OPT_rpm_trigger_after_install+=("${arg#*=}")
               continue;;
             --rpm-trigger-before-uninstall)
-              HAVE_rpm_trigger_before_uninstall=1
-              VALUE_rpm_trigger_before_uninstall="${words[++argi]}"
+              OPT_rpm_trigger_before_uninstall+=("${words[++argi]}")
               continue;;
             --rpm-trigger-before-uninstall=*)
-              HAVE_rpm_trigger_before_uninstall=1
-              VALUE_rpm_trigger_before_uninstall="${arg#*=}"
+              OPT_rpm_trigger_before_uninstall+=("${arg#*=}")
               continue;;
             --rpm-trigger-after-target-uninstall)
-              HAVE_rpm_trigger_after_target_uninstall=1
-              VALUE_rpm_trigger_after_target_uninstall="${words[++argi]}"
+              OPT_rpm_trigger_after_target_uninstall+=("${words[++argi]}")
               continue;;
             --rpm-trigger-after-target-uninstall=*)
-              HAVE_rpm_trigger_after_target_uninstall=1
-              VALUE_rpm_trigger_after_target_uninstall="${arg#*=}"
+              OPT_rpm_trigger_after_target_uninstall+=("${arg#*=}")
               continue;;
             --pear-package-name-prefix)
-              HAVE_pear_package_name_prefix=1
-              VALUE_pear_package_name_prefix="${words[++argi]}"
+              OPT_pear_package_name_prefix+=("${words[++argi]}")
               continue;;
             --pear-package-name-prefix=*)
-              HAVE_pear_package_name_prefix=1
-              VALUE_pear_package_name_prefix="${arg#*=}"
+              OPT_pear_package_name_prefix+=("${arg#*=}")
               continue;;
             --pear-channel)
-              HAVE_pear_channel=1
-              VALUE_pear_channel="${words[++argi]}"
+              OPT_pear_channel+=("${words[++argi]}")
               continue;;
             --pear-channel=*)
-              HAVE_pear_channel=1
-              VALUE_pear_channel="${arg#*=}"
+              OPT_pear_channel+=("${arg#*=}")
               continue;;
             --pear-channel-update)
-              HAVE_pear_channel_update=1
+              OPT_pear_channel_update+=(_OPT_ISSET_)
               continue;;
             --no-pear-channel-update)
-              HAVE_no_pear_channel_update=1
+              OPT_no_pear_channel_update+=(_OPT_ISSET_)
               continue;;
             --pear-bin-dir)
-              HAVE_pear_bin_dir=1
-              VALUE_pear_bin_dir="${words[++argi]}"
+              OPT_pear_bin_dir+=("${words[++argi]}")
               continue;;
             --pear-bin-dir=*)
-              HAVE_pear_bin_dir=1
-              VALUE_pear_bin_dir="${arg#*=}"
+              OPT_pear_bin_dir+=("${arg#*=}")
               continue;;
             --pear-php-bin)
-              HAVE_pear_php_bin=1
-              VALUE_pear_php_bin="${words[++argi]}"
+              OPT_pear_php_bin+=("${words[++argi]}")
               continue;;
             --pear-php-bin=*)
-              HAVE_pear_php_bin=1
-              VALUE_pear_php_bin="${arg#*=}"
+              OPT_pear_php_bin+=("${arg#*=}")
               continue;;
             --pear-php-dir)
-              HAVE_pear_php_dir=1
-              VALUE_pear_php_dir="${words[++argi]}"
+              OPT_pear_php_dir+=("${words[++argi]}")
               continue;;
             --pear-php-dir=*)
-              HAVE_pear_php_dir=1
-              VALUE_pear_php_dir="${arg#*=}"
+              OPT_pear_php_dir+=("${arg#*=}")
               continue;;
             --pear-data-dir)
-              HAVE_pear_data_dir=1
-              VALUE_pear_data_dir="${words[++argi]}"
+              OPT_pear_data_dir+=("${words[++argi]}")
               continue;;
             --pear-data-dir=*)
-              HAVE_pear_data_dir=1
-              VALUE_pear_data_dir="${arg#*=}"
+              OPT_pear_data_dir+=("${arg#*=}")
               continue;;
             --python-bin)
-              HAVE_python_bin=1
-              VALUE_python_bin="${words[++argi]}"
+              OPT_python_bin+=("${words[++argi]}")
               continue;;
             --python-bin=*)
-              HAVE_python_bin=1
-              VALUE_python_bin="${arg#*=}"
+              OPT_python_bin+=("${arg#*=}")
               continue;;
             --python-easyinstall)
-              HAVE_python_easyinstall=1
-              VALUE_python_easyinstall="${words[++argi]}"
+              OPT_python_easyinstall+=("${words[++argi]}")
               continue;;
             --python-easyinstall=*)
-              HAVE_python_easyinstall=1
-              VALUE_python_easyinstall="${arg#*=}"
+              OPT_python_easyinstall+=("${arg#*=}")
               continue;;
             --python-pip)
-              HAVE_python_pip=1
-              VALUE_python_pip="${words[++argi]}"
+              OPT_python_pip+=("${words[++argi]}")
               continue;;
             --python-pip=*)
-              HAVE_python_pip=1
-              VALUE_python_pip="${arg#*=}"
+              OPT_python_pip+=("${arg#*=}")
               continue;;
             --python-pypi)
-              HAVE_python_pypi=1
-              VALUE_python_pypi="${words[++argi]}"
+              OPT_python_pypi+=("${words[++argi]}")
               continue;;
             --python-pypi=*)
-              HAVE_python_pypi=1
-              VALUE_python_pypi="${arg#*=}"
+              OPT_python_pypi+=("${arg#*=}")
               continue;;
             --python-trusted-host)
-              HAVE_python_trusted_host=1
-              VALUE_python_trusted_host="${words[++argi]}"
+              OPT_python_trusted_host+=("${words[++argi]}")
               continue;;
             --python-trusted-host=*)
-              HAVE_python_trusted_host=1
-              VALUE_python_trusted_host="${arg#*=}"
+              OPT_python_trusted_host+=("${arg#*=}")
               continue;;
             --python-package-prefix)
-              HAVE_python_package_prefix=1
-              VALUE_python_package_prefix="${words[++argi]}"
+              OPT_python_package_prefix+=("${words[++argi]}")
               continue;;
             --python-package-prefix=*)
-              HAVE_python_package_prefix=1
-              VALUE_python_package_prefix="${arg#*=}"
+              OPT_python_package_prefix+=("${arg#*=}")
               continue;;
             --python-package-name-prefix)
-              HAVE_python_package_name_prefix=1
-              VALUE_python_package_name_prefix="${words[++argi]}"
+              OPT_python_package_name_prefix+=("${words[++argi]}")
               continue;;
             --python-package-name-prefix=*)
-              HAVE_python_package_name_prefix=1
-              VALUE_python_package_name_prefix="${arg#*=}"
+              OPT_python_package_name_prefix+=("${arg#*=}")
               continue;;
             --python-fix-name)
-              HAVE_python_fix_name=1
+              OPT_python_fix_name+=(_OPT_ISSET_)
               continue;;
             --no-python-fix-name)
-              HAVE_no_python_fix_name=1
+              OPT_no_python_fix_name+=(_OPT_ISSET_)
               continue;;
             --python-fix-dependencies)
-              HAVE_python_fix_dependencies=1
+              OPT_python_fix_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-python-fix-dependencies)
-              HAVE_no_python_fix_dependencies=1
+              OPT_no_python_fix_dependencies+=(_OPT_ISSET_)
               continue;;
             --python-downcase-name)
-              HAVE_python_downcase_name=1
+              OPT_python_downcase_name+=(_OPT_ISSET_)
               continue;;
             --no-python-downcase-name)
-              HAVE_no_python_downcase_name=1
+              OPT_no_python_downcase_name+=(_OPT_ISSET_)
               continue;;
             --python-downcase-dependencies)
-              HAVE_python_downcase_dependencies=1
+              OPT_python_downcase_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-python-downcase-dependencies)
-              HAVE_no_python_downcase_dependencies=1
+              OPT_no_python_downcase_dependencies+=(_OPT_ISSET_)
               continue;;
             --python-install-bin)
-              HAVE_python_install_bin=1
-              VALUE_python_install_bin="${words[++argi]}"
+              OPT_python_install_bin+=("${words[++argi]}")
               continue;;
             --python-install-bin=*)
-              HAVE_python_install_bin=1
-              VALUE_python_install_bin="${arg#*=}"
+              OPT_python_install_bin+=("${arg#*=}")
               continue;;
             --python-install-lib)
-              HAVE_python_install_lib=1
-              VALUE_python_install_lib="${words[++argi]}"
+              OPT_python_install_lib+=("${words[++argi]}")
               continue;;
             --python-install-lib=*)
-              HAVE_python_install_lib=1
-              VALUE_python_install_lib="${arg#*=}"
+              OPT_python_install_lib+=("${arg#*=}")
               continue;;
             --python-install-data)
-              HAVE_python_install_data=1
-              VALUE_python_install_data="${words[++argi]}"
+              OPT_python_install_data+=("${words[++argi]}")
               continue;;
             --python-install-data=*)
-              HAVE_python_install_data=1
-              VALUE_python_install_data="${arg#*=}"
+              OPT_python_install_data+=("${arg#*=}")
               continue;;
             --python-dependencies)
-              HAVE_python_dependencies=1
+              OPT_python_dependencies+=(_OPT_ISSET_)
               continue;;
             --no-python-dependencies)
-              HAVE_no_python_dependencies=1
+              OPT_no_python_dependencies+=(_OPT_ISSET_)
               continue;;
             --python-obey-requirements-txt)
-              HAVE_python_obey_requirements_txt=1
+              OPT_python_obey_requirements_txt+=(_OPT_ISSET_)
               continue;;
             --no-python-obey-requirements-txt)
-              HAVE_no_python_obey_requirements_txt=1
+              OPT_no_python_obey_requirements_txt+=(_OPT_ISSET_)
               continue;;
             --python-scripts-executable)
-              HAVE_python_scripts_executable=1
-              VALUE_python_scripts_executable="${words[++argi]}"
+              OPT_python_scripts_executable+=("${words[++argi]}")
               continue;;
             --python-scripts-executable=*)
-              HAVE_python_scripts_executable=1
-              VALUE_python_scripts_executable="${arg#*=}"
+              OPT_python_scripts_executable+=("${arg#*=}")
               continue;;
             --python-disable-dependency)
-              HAVE_python_disable_dependency=1
-              VALUE_python_disable_dependency="${words[++argi]}"
+              OPT_python_disable_dependency+=("${words[++argi]}")
               continue;;
             --python-disable-dependency=*)
-              HAVE_python_disable_dependency=1
-              VALUE_python_disable_dependency="${arg#*=}"
+              OPT_python_disable_dependency+=("${arg#*=}")
               continue;;
             --python-setup-py-arguments)
-              HAVE_python_setup_py_arguments=1
-              VALUE_python_setup_py_arguments="${words[++argi]}"
+              OPT_python_setup_py_arguments+=("${words[++argi]}")
               continue;;
             --python-setup-py-arguments=*)
-              HAVE_python_setup_py_arguments=1
-              VALUE_python_setup_py_arguments="${arg#*=}"
+              OPT_python_setup_py_arguments+=("${arg#*=}")
               continue;;
             --python-internal-pip)
-              HAVE_python_internal_pip=1
+              OPT_python_internal_pip+=(_OPT_ISSET_)
               continue;;
             --no-python-internal-pip)
-              HAVE_no_python_internal_pip=1
+              OPT_no_python_internal_pip+=(_OPT_ISSET_)
               continue;;
             --osxpkg-identifier-prefix)
-              HAVE_osxpkg_identifier_prefix=1
-              VALUE_osxpkg_identifier_prefix="${words[++argi]}"
+              OPT_osxpkg_identifier_prefix+=("${words[++argi]}")
               continue;;
             --osxpkg-identifier-prefix=*)
-              HAVE_osxpkg_identifier_prefix=1
-              VALUE_osxpkg_identifier_prefix="${arg#*=}"
+              OPT_osxpkg_identifier_prefix+=("${arg#*=}")
               continue;;
             --osxpkg-payload-free)
-              HAVE_osxpkg_payload_free=1
+              OPT_osxpkg_payload_free+=(_OPT_ISSET_)
               continue;;
             --no-osxpkg-payload-free)
-              HAVE_no_osxpkg_payload_free=1
+              OPT_no_osxpkg_payload_free+=(_OPT_ISSET_)
               continue;;
             --osxpkg-ownership)
-              HAVE_osxpkg_ownership=1
-              VALUE_osxpkg_ownership="${words[++argi]}"
+              OPT_osxpkg_ownership+=("${words[++argi]}")
               continue;;
             --osxpkg-ownership=*)
-              HAVE_osxpkg_ownership=1
-              VALUE_osxpkg_ownership="${arg#*=}"
+              OPT_osxpkg_ownership+=("${arg#*=}")
               continue;;
             --osxpkg-postinstall-action)
-              HAVE_osxpkg_postinstall_action=1
-              VALUE_osxpkg_postinstall_action="${words[++argi]}"
+              OPT_osxpkg_postinstall_action+=("${words[++argi]}")
               continue;;
             --osxpkg-postinstall-action=*)
-              HAVE_osxpkg_postinstall_action=1
-              VALUE_osxpkg_postinstall_action="${arg#*=}"
+              OPT_osxpkg_postinstall_action+=("${arg#*=}")
               continue;;
             --osxpkg-dont-obsolete)
-              HAVE_osxpkg_dont_obsolete=1
-              VALUE_osxpkg_dont_obsolete="${words[++argi]}"
+              OPT_osxpkg_dont_obsolete+=("${words[++argi]}")
               continue;;
             --osxpkg-dont-obsolete=*)
-              HAVE_osxpkg_dont_obsolete=1
-              VALUE_osxpkg_dont_obsolete="${arg#*=}"
+              OPT_osxpkg_dont_obsolete+=("${arg#*=}")
               continue;;
             --solaris-user)
-              HAVE_solaris_user=1
-              VALUE_solaris_user="${words[++argi]}"
+              OPT_solaris_user+=("${words[++argi]}")
               continue;;
             --solaris-user=*)
-              HAVE_solaris_user=1
-              VALUE_solaris_user="${arg#*=}"
+              OPT_solaris_user+=("${arg#*=}")
               continue;;
             --solaris-group)
-              HAVE_solaris_group=1
-              VALUE_solaris_group="${words[++argi]}"
+              OPT_solaris_group+=("${words[++argi]}")
               continue;;
             --solaris-group=*)
-              HAVE_solaris_group=1
-              VALUE_solaris_group="${arg#*=}"
+              OPT_solaris_group+=("${arg#*=}")
               continue;;
             --p5p-user)
-              HAVE_p5p_user=1
-              VALUE_p5p_user="${words[++argi]}"
+              OPT_p5p_user+=("${words[++argi]}")
               continue;;
             --p5p-user=*)
-              HAVE_p5p_user=1
-              VALUE_p5p_user="${arg#*=}"
+              OPT_p5p_user+=("${arg#*=}")
               continue;;
             --p5p-group)
-              HAVE_p5p_group=1
-              VALUE_p5p_group="${words[++argi]}"
+              OPT_p5p_group+=("${words[++argi]}")
               continue;;
             --p5p-group=*)
-              HAVE_p5p_group=1
-              VALUE_p5p_group="${arg#*=}"
+              OPT_p5p_group+=("${arg#*=}")
               continue;;
             --p5p-zonetype)
-              HAVE_p5p_zonetype=1
-              VALUE_p5p_zonetype="${words[++argi]}"
+              OPT_p5p_zonetype+=("${words[++argi]}")
               continue;;
             --p5p-zonetype=*)
-              HAVE_p5p_zonetype=1
-              VALUE_p5p_zonetype="${arg#*=}"
+              OPT_p5p_zonetype+=("${arg#*=}")
               continue;;
             --p5p-publisher)
-              HAVE_p5p_publisher=1
-              VALUE_p5p_publisher="${words[++argi]}"
+              OPT_p5p_publisher+=("${words[++argi]}")
               continue;;
             --p5p-publisher=*)
-              HAVE_p5p_publisher=1
-              VALUE_p5p_publisher="${arg#*=}"
+              OPT_p5p_publisher+=("${arg#*=}")
               continue;;
             --p5p-lint)
-              HAVE_p5p_lint=1
+              OPT_p5p_lint+=(_OPT_ISSET_)
               continue;;
             --no-p5p-lint)
-              HAVE_no_p5p_lint=1
+              OPT_no_p5p_lint+=(_OPT_ISSET_)
               continue;;
             --p5p-validate)
-              HAVE_p5p_validate=1
+              OPT_p5p_validate+=(_OPT_ISSET_)
               continue;;
             --no-p5p-validate)
-              HAVE_no_p5p_validate=1
+              OPT_no_p5p_validate+=(_OPT_ISSET_)
               continue;;
             --freebsd-origin)
-              HAVE_freebsd_origin=1
-              VALUE_freebsd_origin="${words[++argi]}"
+              OPT_freebsd_origin+=("${words[++argi]}")
               continue;;
             --freebsd-origin=*)
-              HAVE_freebsd_origin=1
-              VALUE_freebsd_origin="${arg#*=}"
+              OPT_freebsd_origin+=("${arg#*=}")
               continue;;
             --snap-yaml)
-              HAVE_snap_yaml=1
-              VALUE_snap_yaml="${words[++argi]}"
+              OPT_snap_yaml+=("${words[++argi]}")
               continue;;
             --snap-yaml=*)
-              HAVE_snap_yaml=1
-              VALUE_snap_yaml="${arg#*=}"
+              OPT_snap_yaml+=("${arg#*=}")
               continue;;
             --snap-confinement)
-              HAVE_snap_confinement=1
-              VALUE_snap_confinement="${words[++argi]}"
+              OPT_snap_confinement+=("${words[++argi]}")
               continue;;
             --snap-confinement=*)
-              HAVE_snap_confinement=1
-              VALUE_snap_confinement="${arg#*=}"
+              OPT_snap_confinement+=("${arg#*=}")
               continue;;
             --snap-grade)
-              HAVE_snap_grade=1
-              VALUE_snap_grade="${words[++argi]}"
+              OPT_snap_grade+=("${words[++argi]}")
               continue;;
             --snap-grade=*)
-              HAVE_snap_grade=1
-              VALUE_snap_grade="${arg#*=}"
+              OPT_snap_grade+=("${arg#*=}")
               continue;;
             --pacman-optional-depends)
-              HAVE_pacman_optional_depends=1
-              VALUE_pacman_optional_depends="${words[++argi]}"
+              OPT_pacman_optional_depends+=("${words[++argi]}")
               continue;;
             --pacman-optional-depends=*)
-              HAVE_pacman_optional_depends=1
-              VALUE_pacman_optional_depends="${arg#*=}"
+              OPT_pacman_optional_depends+=("${arg#*=}")
               continue;;
             --pacman-use-file-permissions)
-              HAVE_pacman_use_file_permissions=1
+              OPT_pacman_use_file_permissions+=(_OPT_ISSET_)
               continue;;
             --no-pacman-use-file-permissions)
-              HAVE_no_pacman_use_file_permissions=1
+              OPT_no_pacman_use_file_permissions+=(_OPT_ISSET_)
               continue;;
             --pacman-user)
-              HAVE_pacman_user=1
-              VALUE_pacman_user="${words[++argi]}"
+              OPT_pacman_user+=("${words[++argi]}")
               continue;;
             --pacman-user=*)
-              HAVE_pacman_user=1
-              VALUE_pacman_user="${arg#*=}"
+              OPT_pacman_user+=("${arg#*=}")
               continue;;
             --pacman-group)
-              HAVE_pacman_group=1
-              VALUE_pacman_group="${words[++argi]}"
+              OPT_pacman_group+=("${words[++argi]}")
               continue;;
             --pacman-group=*)
-              HAVE_pacman_group=1
-              VALUE_pacman_group="${arg#*=}"
+              OPT_pacman_group+=("${arg#*=}")
               continue;;
             --pacman-compression)
-              HAVE_pacman_compression=1
-              VALUE_pacman_compression="${words[++argi]}"
+              OPT_pacman_compression+=("${words[++argi]}")
               continue;;
             --pacman-compression=*)
-              HAVE_pacman_compression=1
-              VALUE_pacman_compression="${arg#*=}"
+              OPT_pacman_compression+=("${arg#*=}")
               continue;;
             --pleaserun-name)
-              HAVE_pleaserun_name=1
-              VALUE_pleaserun_name="${words[++argi]}"
+              OPT_pleaserun_name+=("${words[++argi]}")
               continue;;
             --pleaserun-name=*)
-              HAVE_pleaserun_name=1
-              VALUE_pleaserun_name="${arg#*=}"
+              OPT_pleaserun_name+=("${arg#*=}")
               continue;;
             --pleaserun-chdir)
-              HAVE_pleaserun_chdir=1
-              VALUE_pleaserun_chdir="${words[++argi]}"
+              OPT_pleaserun_chdir+=("${words[++argi]}")
               continue;;
             --pleaserun-chdir=*)
-              HAVE_pleaserun_chdir=1
-              VALUE_pleaserun_chdir="${arg#*=}"
+              OPT_pleaserun_chdir+=("${arg#*=}")
               continue;;
             --pleaserun-user)
-              HAVE_pleaserun_user=1
-              VALUE_pleaserun_user="${words[++argi]}"
+              OPT_pleaserun_user+=("${words[++argi]}")
               continue;;
             --pleaserun-user=*)
-              HAVE_pleaserun_user=1
-              VALUE_pleaserun_user="${arg#*=}"
+              OPT_pleaserun_user+=("${arg#*=}")
               continue;;
             --virtualenv-pypi)
-              HAVE_virtualenv_pypi=1
-              VALUE_virtualenv_pypi="${words[++argi]}"
+              OPT_virtualenv_pypi+=("${words[++argi]}")
               continue;;
             --virtualenv-pypi=*)
-              HAVE_virtualenv_pypi=1
-              VALUE_virtualenv_pypi="${arg#*=}"
+              OPT_virtualenv_pypi+=("${arg#*=}")
               continue;;
             --virtualenv-package-name-prefix)
-              HAVE_virtualenv_package_name_prefix=1
-              VALUE_virtualenv_package_name_prefix="${words[++argi]}"
+              OPT_virtualenv_package_name_prefix+=("${words[++argi]}")
               continue;;
             --virtualenv-package-name-prefix=*)
-              HAVE_virtualenv_package_name_prefix=1
-              VALUE_virtualenv_package_name_prefix="${arg#*=}"
+              OPT_virtualenv_package_name_prefix+=("${arg#*=}")
               continue;;
             --virtualenv-install-location)
-              HAVE_virtualenv_install_location=1
-              VALUE_virtualenv_install_location="${words[++argi]}"
+              OPT_virtualenv_install_location+=("${words[++argi]}")
               continue;;
             --virtualenv-install-location=*)
-              HAVE_virtualenv_install_location=1
-              VALUE_virtualenv_install_location="${arg#*=}"
+              OPT_virtualenv_install_location+=("${arg#*=}")
               continue;;
             --virtualenv-fix-name)
-              HAVE_virtualenv_fix_name=1
+              OPT_virtualenv_fix_name+=(_OPT_ISSET_)
               continue;;
             --no-virtualenv-fix-name)
-              HAVE_no_virtualenv_fix_name=1
+              OPT_no_virtualenv_fix_name+=(_OPT_ISSET_)
               continue;;
             --virtualenv-other-files-dir)
-              HAVE_virtualenv_other_files_dir=1
-              VALUE_virtualenv_other_files_dir="${words[++argi]}"
+              OPT_virtualenv_other_files_dir+=("${words[++argi]}")
               continue;;
             --virtualenv-other-files-dir=*)
-              HAVE_virtualenv_other_files_dir=1
-              VALUE_virtualenv_other_files_dir="${arg#*=}"
+              OPT_virtualenv_other_files_dir+=("${arg#*=}")
               continue;;
             --virtualenv-pypi-extra-url)
-              HAVE_virtualenv_pypi_extra_url=1
-              VALUE_virtualenv_pypi_extra_url="${words[++argi]}"
+              OPT_virtualenv_pypi_extra_url+=("${words[++argi]}")
               continue;;
             --virtualenv-pypi-extra-url=*)
-              HAVE_virtualenv_pypi_extra_url=1
-              VALUE_virtualenv_pypi_extra_url="${arg#*=}"
+              OPT_virtualenv_pypi_extra_url+=("${arg#*=}")
               continue;;
             --virtualenv-setup-install)
-              HAVE_virtualenv_setup_install=1
+              OPT_virtualenv_setup_install+=(_OPT_ISSET_)
               continue;;
             --no-virtualenv-setup-install)
-              HAVE_no_virtualenv_setup_install=1
+              OPT_no_virtualenv_setup_install+=(_OPT_ISSET_)
               continue;;
             --virtualenv-system-site-packages)
-              HAVE_virtualenv_system_site_packages=1
+              OPT_virtualenv_system_site_packages+=(_OPT_ISSET_)
               continue;;
             --no-virtualenv-system-site-packages)
-              HAVE_no_virtualenv_system_site_packages=1
+              OPT_no_virtualenv_system_site_packages+=(_OPT_ISSET_)
               continue;;
             --virtualenv-find-links)
-              HAVE_virtualenv_find_links=1
-              VALUE_virtualenv_find_links="${words[++argi]}"
+              OPT_virtualenv_find_links+=("${words[++argi]}")
               continue;;
             --virtualenv-find-links=*)
-              HAVE_virtualenv_find_links=1
-              VALUE_virtualenv_find_links="${arg#*=}"
+              OPT_virtualenv_find_links+=("${arg#*=}")
               continue;;
           esac
         esac
-
         for ((i=1; i < ${#arg}; ++i)); do
           char="${arg:$i:1}"
-          has_trailing_chars=$( (( i + 1 < ${#arg} )) && echo true || echo false)
-          case "$command" in fpm)
+          trailing_chars="${arg:$((i + 1))}"
+          case "$cmd" in fpm)
             case "$char" in
               t)
-                HAVE_output_type=1
-                if $has_trailing_chars
-                then VALUE_output_type="${arg:$((i + 1))}"
-                else VALUE_output_type="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_output_type+=("$trailing_chars")
+                else OPT_output_type+=("${words[++argi]}")
                 fi
                 continue 2;;
               s)
-                HAVE_input_type=1
-                if $has_trailing_chars
-                then VALUE_input_type="${arg:$((i + 1))}"
-                else VALUE_input_type="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_input_type+=("$trailing_chars")
+                else OPT_input_type+=("${words[++argi]}")
                 fi
                 continue 2;;
               C)
-                HAVE_chdir=1
-                if $has_trailing_chars
-                then VALUE_chdir="${arg:$((i + 1))}"
-                else VALUE_chdir="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_chdir+=("$trailing_chars")
+                else OPT_chdir+=("${words[++argi]}")
                 fi
                 continue 2;;
               p)
-                HAVE_package=1
-                if $has_trailing_chars
-                then VALUE_package="${arg:$((i + 1))}"
-                else VALUE_package="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_package+=("$trailing_chars")
+                else OPT_package+=("${words[++argi]}")
                 fi
                 continue 2;;
               f)
-                HAVE_force=1;;
+                OPT_force+=(_OPT_ISSET_);;
               n)
-                HAVE_name=1
-                if $has_trailing_chars
-                then VALUE_name="${arg:$((i + 1))}"
-                else VALUE_name="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_name+=("$trailing_chars")
+                else OPT_name+=("${words[++argi]}")
                 fi
                 continue 2;;
               v)
-                HAVE_version=1
-                if $has_trailing_chars
-                then VALUE_version="${arg:$((i + 1))}"
-                else VALUE_version="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_version+=("$trailing_chars")
+                else OPT_version+=("${words[++argi]}")
                 fi
                 continue 2;;
               d)
-                HAVE_depends=1
-                if $has_trailing_chars
-                then VALUE_depends="${arg:$((i + 1))}"
-                else VALUE_depends="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_depends+=("$trailing_chars")
+                else OPT_depends+=("${words[++argi]}")
                 fi
                 continue 2;;
               a)
-                HAVE_architecture=1
-                if $has_trailing_chars
-                then VALUE_architecture="${arg:$((i + 1))}"
-                else VALUE_architecture="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_architecture+=("$trailing_chars")
+                else OPT_architecture+=("${words[++argi]}")
                 fi
                 continue 2;;
               m)
-                HAVE_maintainer=1
-                if $has_trailing_chars
-                then VALUE_maintainer="${arg:$((i + 1))}"
-                else VALUE_maintainer="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_maintainer+=("$trailing_chars")
+                else OPT_maintainer+=("${words[++argi]}")
                 fi
                 continue 2;;
               S)
-                HAVE_package_name_suffix=1
-                if $has_trailing_chars
-                then VALUE_package_name_suffix="${arg:$((i + 1))}"
-                else VALUE_package_name_suffix="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_package_name_suffix+=("$trailing_chars")
+                else OPT_package_name_suffix+=("${words[++argi]}")
                 fi
                 continue 2;;
               e)
-                HAVE_edit=1;;
+                OPT_edit+=(_OPT_ISSET_);;
               x)
-                HAVE_exclude=1
-                if $has_trailing_chars
-                then VALUE_exclude="${arg:$((i + 1))}"
-                else VALUE_exclude="${words[++argi]}"
+                if [[ -n "$trailing_chars" ]]
+                then OPT_exclude+=("$trailing_chars")
+                else OPT_exclude+=("${words[++argi]}")
                 fi
                 continue 2;;
             esac
           esac
-
         done;;
       *)
         POSITIONALS[POSITIONAL_NUM++]="$arg"
@@ -1703,693 +1378,757 @@ _fpm() {
   _init_completion -n = || return
 
   local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM
-  local HAVE_output_type=0 HAVE_input_type=0 HAVE_chdir=0 HAVE_prefix=0 HAVE_package=0 HAVE_force=0 HAVE_name=0 HAVE_log=0 HAVE_verbose=0 HAVE_debug=0 HAVE_debug_workspace=0 HAVE_version=0 HAVE_iteration=0 HAVE_epoch=0 HAVE_license=0 HAVE_vendor=0 HAVE_category=0 HAVE_depends=0 HAVE_no_depends=0 HAVE_no_auto_depends=0 HAVE_provides=0 HAVE_conflicts=0 HAVE_replaces=0 HAVE_config_files=0 HAVE_directories=0 HAVE_architecture=0 HAVE_maintainer=0 HAVE_package_name_suffix=0 HAVE_edit=0 HAVE_exclude=0 HAVE_exclude_file=0 HAVE_description=0 HAVE_url=0 HAVE_inputs=0 HAVE_post_install=0 HAVE_pre_install=0 HAVE_post_uninstall=0 HAVE_pre_uninstall=0 HAVE_after_install=0 HAVE_before_install=0 HAVE_after_remove=0 HAVE_before_remove=0 HAVE_after_upgrade=0 HAVE_before_upgrade=0 HAVE_template_scripts=0 HAVE_template_value=0 HAVE_workdir=0 HAVE_source_date_epoch_from_changelog=0 HAVE_source_date_epoch_default=0 HAVE_fpm_options_file=0 HAVE_gem_bin_path=0 HAVE_gem_package_prefix=0 HAVE_gem_package_name_prefix=0 HAVE_gem_gem=0 HAVE_gem_shebang=0 HAVE_gem_fix_name=0 HAVE_no_gem_fix_name=0 HAVE_gem_fix_dependencies=0 HAVE_no_gem_fix_dependencies=0 HAVE_gem_env_shebang=0 HAVE_no_gem_env_shebang=0 HAVE_gem_prerelease=0 HAVE_no_gem_prerelease=0 HAVE_gem_disable_dependency=0 HAVE_gem_embed_dependencies=0 HAVE_no_gem_embed_dependencies=0 HAVE_gem_version_bins=0 HAVE_no_gem_version_bins=0 HAVE_gem_stagingdir=0 HAVE_gem_git_repo=0 HAVE_gem_git_branch=0 HAVE_cpan_perl_bin=0 HAVE_cpan_cpanm_bin=0 HAVE_cpan_mirror=0 HAVE_cpan_mirror_only=0 HAVE_no_cpan_mirror_only=0 HAVE_cpan_package_name_prefix=0 HAVE_cpan_test=0 HAVE_no_cpan_test=0 HAVE_cpan_verbose=0 HAVE_no_cpan_verbose=0 HAVE_cpan_perl_lib_path=0 HAVE_cpan_sandbox_non_core=0 HAVE_no_cpan_sandbox_non_core=0 HAVE_cpan_cpanm_force=0 HAVE_no_cpan_cpanm_force=0 HAVE_deb_ignore_iteration_in_dependencies=0 HAVE_no_deb_ignore_iteration_in_dependencies=0 HAVE_deb_build_depends=0 HAVE_deb_pre_depends=0 HAVE_deb_compression=0 HAVE_deb_dist=0 HAVE_deb_custom_control=0 HAVE_deb_config=0 HAVE_deb_templates=0 HAVE_deb_installed_size=0 HAVE_deb_priority=0 HAVE_deb_use_file_permissions=0 HAVE_no_deb_use_file_permissions=0 HAVE_deb_user=0 HAVE_deb_group=0 HAVE_deb_changelog=0 HAVE_deb_generate_changes=0 HAVE_no_deb_generate_changes=0 HAVE_deb_upstream_changelog=0 HAVE_deb_recommends=0 HAVE_deb_suggests=0 HAVE_deb_meta_file=0 HAVE_deb_interest=0 HAVE_deb_activate=0 HAVE_deb_interest_noawait=0 HAVE_deb_activate_noawait=0 HAVE_deb_field=0 HAVE_deb_no_default_config_files=0 HAVE_no_deb_no_default_config_files=0 HAVE_deb_auto_config_files=0 HAVE_no_deb_auto_config_files=0 HAVE_deb_shlibs=0 HAVE_deb_init=0 HAVE_deb_default=0 HAVE_deb_upstart=0 HAVE_deb_systemd=0 HAVE_deb_systemd_enable=0 HAVE_no_deb_systemd_enable=0 HAVE_deb_systemd_auto_start=0 HAVE_no_deb_systemd_auto_start=0 HAVE_deb_systemd_restart_after_upgrade=0 HAVE_no_deb_systemd_restart_after_upgrade=0 HAVE_deb_after_purge=0 HAVE_deb_maintainerscripts_force_errorchecks=0 HAVE_no_deb_maintainerscripts_force_errorchecks=0 HAVE_npm_bin=0 HAVE_npm_package_name_prefix=0 HAVE_npm_registry=0 HAVE_rpm_use_file_permissions=0 HAVE_no_rpm_use_file_permissions=0 HAVE_rpm_user=0 HAVE_rpm_group=0 HAVE_rpm_defattrfile=0 HAVE_rpm_defattrdir=0 HAVE_rpm_rpmbuild_define=0 HAVE_rpm_dist=0 HAVE_rpm_digest=0 HAVE_rpm_compression_level=0 HAVE_rpm_compression=0 HAVE_rpm_os=0 HAVE_rpm_changelog=0 HAVE_rpm_summary=0 HAVE_rpm_sign=0 HAVE_no_rpm_sign=0 HAVE_rpm_auto_add_directories=0 HAVE_no_rpm_auto_add_directories=0 HAVE_rpm_auto_add_exclude_directories=0 HAVE_rpm_autoreqprov=0 HAVE_no_rpm_autoreqprov=0 HAVE_rpm_autoreq=0 HAVE_no_rpm_autoreq=0 HAVE_rpm_autoprov=0 HAVE_no_rpm_autoprov=0 HAVE_rpm_attr=0 HAVE_rpm_init=0 HAVE_rpm_filter_from_provides=0 HAVE_rpm_filter_from_requires=0 HAVE_rpm_tag=0 HAVE_rpm_ignore_iteration_in_dependencies=0 HAVE_no_rpm_ignore_iteration_in_dependencies=0 HAVE_rpm_verbatim_gem_dependencies=0 HAVE_no_rpm_verbatim_gem_dependencies=0 HAVE_rpm_macro_expansion=0 HAVE_no_rpm_macro_expansion=0 HAVE_rpm_verifyscript=0 HAVE_rpm_pretrans=0 HAVE_rpm_posttrans=0 HAVE_rpm_trigger_before_install=0 HAVE_rpm_trigger_after_install=0 HAVE_rpm_trigger_before_uninstall=0 HAVE_rpm_trigger_after_target_uninstall=0 HAVE_pear_package_name_prefix=0 HAVE_pear_channel=0 HAVE_pear_channel_update=0 HAVE_no_pear_channel_update=0 HAVE_pear_bin_dir=0 HAVE_pear_php_bin=0 HAVE_pear_php_dir=0 HAVE_pear_data_dir=0 HAVE_python_bin=0 HAVE_python_easyinstall=0 HAVE_python_pip=0 HAVE_python_pypi=0 HAVE_python_trusted_host=0 HAVE_python_package_prefix=0 HAVE_python_package_name_prefix=0 HAVE_python_fix_name=0 HAVE_no_python_fix_name=0 HAVE_python_fix_dependencies=0 HAVE_no_python_fix_dependencies=0 HAVE_python_downcase_name=0 HAVE_no_python_downcase_name=0 HAVE_python_downcase_dependencies=0 HAVE_no_python_downcase_dependencies=0 HAVE_python_install_bin=0 HAVE_python_install_lib=0 HAVE_python_install_data=0 HAVE_python_dependencies=0 HAVE_no_python_dependencies=0 HAVE_python_obey_requirements_txt=0 HAVE_no_python_obey_requirements_txt=0 HAVE_python_scripts_executable=0 HAVE_python_disable_dependency=0 HAVE_python_setup_py_arguments=0 HAVE_python_internal_pip=0 HAVE_no_python_internal_pip=0 HAVE_osxpkg_identifier_prefix=0 HAVE_osxpkg_payload_free=0 HAVE_no_osxpkg_payload_free=0 HAVE_osxpkg_ownership=0 HAVE_osxpkg_postinstall_action=0 HAVE_osxpkg_dont_obsolete=0 HAVE_solaris_user=0 HAVE_solaris_group=0 HAVE_p5p_user=0 HAVE_p5p_group=0 HAVE_p5p_zonetype=0 HAVE_p5p_publisher=0 HAVE_p5p_lint=0 HAVE_no_p5p_lint=0 HAVE_p5p_validate=0 HAVE_no_p5p_validate=0 HAVE_freebsd_origin=0 HAVE_snap_yaml=0 HAVE_snap_confinement=0 HAVE_snap_grade=0 HAVE_pacman_optional_depends=0 HAVE_pacman_use_file_permissions=0 HAVE_no_pacman_use_file_permissions=0 HAVE_pacman_user=0 HAVE_pacman_group=0 HAVE_pacman_compression=0 HAVE_pleaserun_name=0 HAVE_pleaserun_chdir=0 HAVE_pleaserun_user=0 HAVE_virtualenv_pypi=0 HAVE_virtualenv_package_name_prefix=0 HAVE_virtualenv_install_location=0 HAVE_virtualenv_fix_name=0 HAVE_no_virtualenv_fix_name=0 HAVE_virtualenv_other_files_dir=0 HAVE_virtualenv_pypi_extra_url=0 HAVE_virtualenv_setup_install=0 HAVE_no_virtualenv_setup_install=0 HAVE_virtualenv_system_site_packages=0 HAVE_no_virtualenv_system_site_packages=0 HAVE_virtualenv_find_links=0
-  local VALUE_output_type VALUE_input_type VALUE_chdir VALUE_prefix VALUE_package VALUE_force VALUE_name VALUE_log VALUE_verbose VALUE_debug VALUE_debug_workspace VALUE_version VALUE_iteration VALUE_epoch VALUE_license VALUE_vendor VALUE_category VALUE_depends VALUE_no_depends VALUE_no_auto_depends VALUE_provides VALUE_conflicts VALUE_replaces VALUE_config_files VALUE_directories VALUE_architecture VALUE_maintainer VALUE_package_name_suffix VALUE_edit VALUE_exclude VALUE_exclude_file VALUE_description VALUE_url VALUE_inputs VALUE_post_install VALUE_pre_install VALUE_post_uninstall VALUE_pre_uninstall VALUE_after_install VALUE_before_install VALUE_after_remove VALUE_before_remove VALUE_after_upgrade VALUE_before_upgrade VALUE_template_scripts VALUE_template_value VALUE_workdir VALUE_source_date_epoch_from_changelog VALUE_source_date_epoch_default VALUE_fpm_options_file VALUE_gem_bin_path VALUE_gem_package_prefix VALUE_gem_package_name_prefix VALUE_gem_gem VALUE_gem_shebang VALUE_gem_fix_name VALUE_no_gem_fix_name VALUE_gem_fix_dependencies VALUE_no_gem_fix_dependencies VALUE_gem_env_shebang VALUE_no_gem_env_shebang VALUE_gem_prerelease VALUE_no_gem_prerelease VALUE_gem_disable_dependency VALUE_gem_embed_dependencies VALUE_no_gem_embed_dependencies VALUE_gem_version_bins VALUE_no_gem_version_bins VALUE_gem_stagingdir VALUE_gem_git_repo VALUE_gem_git_branch VALUE_cpan_perl_bin VALUE_cpan_cpanm_bin VALUE_cpan_mirror VALUE_cpan_mirror_only VALUE_no_cpan_mirror_only VALUE_cpan_package_name_prefix VALUE_cpan_test VALUE_no_cpan_test VALUE_cpan_verbose VALUE_no_cpan_verbose VALUE_cpan_perl_lib_path VALUE_cpan_sandbox_non_core VALUE_no_cpan_sandbox_non_core VALUE_cpan_cpanm_force VALUE_no_cpan_cpanm_force VALUE_deb_ignore_iteration_in_dependencies VALUE_no_deb_ignore_iteration_in_dependencies VALUE_deb_build_depends VALUE_deb_pre_depends VALUE_deb_compression VALUE_deb_dist VALUE_deb_custom_control VALUE_deb_config VALUE_deb_templates VALUE_deb_installed_size VALUE_deb_priority VALUE_deb_use_file_permissions VALUE_no_deb_use_file_permissions VALUE_deb_user VALUE_deb_group VALUE_deb_changelog VALUE_deb_generate_changes VALUE_no_deb_generate_changes VALUE_deb_upstream_changelog VALUE_deb_recommends VALUE_deb_suggests VALUE_deb_meta_file VALUE_deb_interest VALUE_deb_activate VALUE_deb_interest_noawait VALUE_deb_activate_noawait VALUE_deb_field VALUE_deb_no_default_config_files VALUE_no_deb_no_default_config_files VALUE_deb_auto_config_files VALUE_no_deb_auto_config_files VALUE_deb_shlibs VALUE_deb_init VALUE_deb_default VALUE_deb_upstart VALUE_deb_systemd VALUE_deb_systemd_enable VALUE_no_deb_systemd_enable VALUE_deb_systemd_auto_start VALUE_no_deb_systemd_auto_start VALUE_deb_systemd_restart_after_upgrade VALUE_no_deb_systemd_restart_after_upgrade VALUE_deb_after_purge VALUE_deb_maintainerscripts_force_errorchecks VALUE_no_deb_maintainerscripts_force_errorchecks VALUE_npm_bin VALUE_npm_package_name_prefix VALUE_npm_registry VALUE_rpm_use_file_permissions VALUE_no_rpm_use_file_permissions VALUE_rpm_user VALUE_rpm_group VALUE_rpm_defattrfile VALUE_rpm_defattrdir VALUE_rpm_rpmbuild_define VALUE_rpm_dist VALUE_rpm_digest VALUE_rpm_compression_level VALUE_rpm_compression VALUE_rpm_os VALUE_rpm_changelog VALUE_rpm_summary VALUE_rpm_sign VALUE_no_rpm_sign VALUE_rpm_auto_add_directories VALUE_no_rpm_auto_add_directories VALUE_rpm_auto_add_exclude_directories VALUE_rpm_autoreqprov VALUE_no_rpm_autoreqprov VALUE_rpm_autoreq VALUE_no_rpm_autoreq VALUE_rpm_autoprov VALUE_no_rpm_autoprov VALUE_rpm_attr VALUE_rpm_init VALUE_rpm_filter_from_provides VALUE_rpm_filter_from_requires VALUE_rpm_tag VALUE_rpm_ignore_iteration_in_dependencies VALUE_no_rpm_ignore_iteration_in_dependencies VALUE_rpm_verbatim_gem_dependencies VALUE_no_rpm_verbatim_gem_dependencies VALUE_rpm_macro_expansion VALUE_no_rpm_macro_expansion VALUE_rpm_verifyscript VALUE_rpm_pretrans VALUE_rpm_posttrans VALUE_rpm_trigger_before_install VALUE_rpm_trigger_after_install VALUE_rpm_trigger_before_uninstall VALUE_rpm_trigger_after_target_uninstall VALUE_pear_package_name_prefix VALUE_pear_channel VALUE_pear_channel_update VALUE_no_pear_channel_update VALUE_pear_bin_dir VALUE_pear_php_bin VALUE_pear_php_dir VALUE_pear_data_dir VALUE_python_bin VALUE_python_easyinstall VALUE_python_pip VALUE_python_pypi VALUE_python_trusted_host VALUE_python_package_prefix VALUE_python_package_name_prefix VALUE_python_fix_name VALUE_no_python_fix_name VALUE_python_fix_dependencies VALUE_no_python_fix_dependencies VALUE_python_downcase_name VALUE_no_python_downcase_name VALUE_python_downcase_dependencies VALUE_no_python_downcase_dependencies VALUE_python_install_bin VALUE_python_install_lib VALUE_python_install_data VALUE_python_dependencies VALUE_no_python_dependencies VALUE_python_obey_requirements_txt VALUE_no_python_obey_requirements_txt VALUE_python_scripts_executable VALUE_python_disable_dependency VALUE_python_setup_py_arguments VALUE_python_internal_pip VALUE_no_python_internal_pip VALUE_osxpkg_identifier_prefix VALUE_osxpkg_payload_free VALUE_no_osxpkg_payload_free VALUE_osxpkg_ownership VALUE_osxpkg_postinstall_action VALUE_osxpkg_dont_obsolete VALUE_solaris_user VALUE_solaris_group VALUE_p5p_user VALUE_p5p_group VALUE_p5p_zonetype VALUE_p5p_publisher VALUE_p5p_lint VALUE_no_p5p_lint VALUE_p5p_validate VALUE_no_p5p_validate VALUE_freebsd_origin VALUE_snap_yaml VALUE_snap_confinement VALUE_snap_grade VALUE_pacman_optional_depends VALUE_pacman_use_file_permissions VALUE_no_pacman_use_file_permissions VALUE_pacman_user VALUE_pacman_group VALUE_pacman_compression VALUE_pleaserun_name VALUE_pleaserun_chdir VALUE_pleaserun_user VALUE_virtualenv_pypi VALUE_virtualenv_package_name_prefix VALUE_virtualenv_install_location VALUE_virtualenv_fix_name VALUE_no_virtualenv_fix_name VALUE_virtualenv_other_files_dir VALUE_virtualenv_pypi_extra_url VALUE_virtualenv_setup_install VALUE_no_virtualenv_setup_install VALUE_virtualenv_system_site_packages VALUE_no_virtualenv_system_site_packages VALUE_virtualenv_find_links
+  local -a OPT_output_type OPT_input_type OPT_chdir OPT_prefix OPT_package OPT_force OPT_name OPT_log OPT_verbose OPT_debug OPT_debug_workspace OPT_version OPT_iteration OPT_epoch OPT_license OPT_vendor OPT_category OPT_depends OPT_no_depends OPT_no_auto_depends OPT_provides OPT_conflicts OPT_replaces OPT_config_files OPT_directories OPT_architecture OPT_maintainer OPT_package_name_suffix OPT_edit OPT_exclude OPT_exclude_file OPT_description OPT_url OPT_inputs OPT_post_install OPT_pre_install OPT_post_uninstall OPT_pre_uninstall OPT_after_install OPT_before_install OPT_after_remove OPT_before_remove OPT_after_upgrade OPT_before_upgrade OPT_template_scripts OPT_template_value OPT_workdir OPT_source_date_epoch_from_changelog OPT_source_date_epoch_default OPT_fpm_options_file OPT_gem_bin_path OPT_gem_package_prefix OPT_gem_package_name_prefix OPT_gem_gem OPT_gem_shebang OPT_gem_fix_name OPT_no_gem_fix_name OPT_gem_fix_dependencies OPT_no_gem_fix_dependencies OPT_gem_env_shebang OPT_no_gem_env_shebang OPT_gem_prerelease OPT_no_gem_prerelease OPT_gem_disable_dependency OPT_gem_embed_dependencies OPT_no_gem_embed_dependencies OPT_gem_version_bins OPT_no_gem_version_bins OPT_gem_stagingdir OPT_gem_git_repo OPT_gem_git_branch OPT_cpan_perl_bin OPT_cpan_cpanm_bin OPT_cpan_mirror OPT_cpan_mirror_only OPT_no_cpan_mirror_only OPT_cpan_package_name_prefix OPT_cpan_test OPT_no_cpan_test OPT_cpan_verbose OPT_no_cpan_verbose OPT_cpan_perl_lib_path OPT_cpan_sandbox_non_core OPT_no_cpan_sandbox_non_core OPT_cpan_cpanm_force OPT_no_cpan_cpanm_force OPT_deb_ignore_iteration_in_dependencies OPT_no_deb_ignore_iteration_in_dependencies OPT_deb_build_depends OPT_deb_pre_depends OPT_deb_compression OPT_deb_dist OPT_deb_custom_control OPT_deb_config OPT_deb_templates OPT_deb_installed_size OPT_deb_priority OPT_deb_use_file_permissions OPT_no_deb_use_file_permissions OPT_deb_user OPT_deb_group OPT_deb_changelog OPT_deb_generate_changes OPT_no_deb_generate_changes OPT_deb_upstream_changelog OPT_deb_recommends OPT_deb_suggests OPT_deb_meta_file OPT_deb_interest OPT_deb_activate OPT_deb_interest_noawait OPT_deb_activate_noawait OPT_deb_field OPT_deb_no_default_config_files OPT_no_deb_no_default_config_files OPT_deb_auto_config_files OPT_no_deb_auto_config_files OPT_deb_shlibs OPT_deb_init OPT_deb_default OPT_deb_upstart OPT_deb_systemd OPT_deb_systemd_enable OPT_no_deb_systemd_enable OPT_deb_systemd_auto_start OPT_no_deb_systemd_auto_start OPT_deb_systemd_restart_after_upgrade OPT_no_deb_systemd_restart_after_upgrade OPT_deb_after_purge OPT_deb_maintainerscripts_force_errorchecks OPT_no_deb_maintainerscripts_force_errorchecks OPT_npm_bin OPT_npm_package_name_prefix OPT_npm_registry OPT_rpm_use_file_permissions OPT_no_rpm_use_file_permissions OPT_rpm_user OPT_rpm_group OPT_rpm_defattrfile OPT_rpm_defattrdir OPT_rpm_rpmbuild_define OPT_rpm_dist OPT_rpm_digest OPT_rpm_compression_level OPT_rpm_compression OPT_rpm_os OPT_rpm_changelog OPT_rpm_summary OPT_rpm_sign OPT_no_rpm_sign OPT_rpm_auto_add_directories OPT_no_rpm_auto_add_directories OPT_rpm_auto_add_exclude_directories OPT_rpm_autoreqprov OPT_no_rpm_autoreqprov OPT_rpm_autoreq OPT_no_rpm_autoreq OPT_rpm_autoprov OPT_no_rpm_autoprov OPT_rpm_attr OPT_rpm_init OPT_rpm_filter_from_provides OPT_rpm_filter_from_requires OPT_rpm_tag OPT_rpm_ignore_iteration_in_dependencies OPT_no_rpm_ignore_iteration_in_dependencies OPT_rpm_verbatim_gem_dependencies OPT_no_rpm_verbatim_gem_dependencies OPT_rpm_macro_expansion OPT_no_rpm_macro_expansion OPT_rpm_verifyscript OPT_rpm_pretrans OPT_rpm_posttrans OPT_rpm_trigger_before_install OPT_rpm_trigger_after_install OPT_rpm_trigger_before_uninstall OPT_rpm_trigger_after_target_uninstall OPT_pear_package_name_prefix OPT_pear_channel OPT_pear_channel_update OPT_no_pear_channel_update OPT_pear_bin_dir OPT_pear_php_bin OPT_pear_php_dir OPT_pear_data_dir OPT_python_bin OPT_python_easyinstall OPT_python_pip OPT_python_pypi OPT_python_trusted_host OPT_python_package_prefix OPT_python_package_name_prefix OPT_python_fix_name OPT_no_python_fix_name OPT_python_fix_dependencies OPT_no_python_fix_dependencies OPT_python_downcase_name OPT_no_python_downcase_name OPT_python_downcase_dependencies OPT_no_python_downcase_dependencies OPT_python_install_bin OPT_python_install_lib OPT_python_install_data OPT_python_dependencies OPT_no_python_dependencies OPT_python_obey_requirements_txt OPT_no_python_obey_requirements_txt OPT_python_scripts_executable OPT_python_disable_dependency OPT_python_setup_py_arguments OPT_python_internal_pip OPT_no_python_internal_pip OPT_osxpkg_identifier_prefix OPT_osxpkg_payload_free OPT_no_osxpkg_payload_free OPT_osxpkg_ownership OPT_osxpkg_postinstall_action OPT_osxpkg_dont_obsolete OPT_solaris_user OPT_solaris_group OPT_p5p_user OPT_p5p_group OPT_p5p_zonetype OPT_p5p_publisher OPT_p5p_lint OPT_no_p5p_lint OPT_p5p_validate OPT_no_p5p_validate OPT_freebsd_origin OPT_snap_yaml OPT_snap_confinement OPT_snap_grade OPT_pacman_optional_depends OPT_pacman_use_file_permissions OPT_no_pacman_use_file_permissions OPT_pacman_user OPT_pacman_group OPT_pacman_compression OPT_pleaserun_name OPT_pleaserun_chdir OPT_pleaserun_user OPT_virtualenv_pypi OPT_virtualenv_package_name_prefix OPT_virtualenv_install_location OPT_virtualenv_fix_name OPT_no_virtualenv_fix_name OPT_virtualenv_other_files_dir OPT_virtualenv_pypi_extra_url OPT_virtualenv_setup_install OPT_no_virtualenv_setup_install OPT_virtualenv_system_site_packages OPT_no_virtualenv_system_site_packages OPT_virtualenv_find_links
 
   _fpm_parse_commandline
 
   __complete_option() {
     local opt="$1" cur="$2" mode="$3"
 
-    case "$opt" in --output-type|-t)
-      _fpm_compgen_w_replacement -- "$cur" apk cpan deb dir empty freebsd gem npm osxpkg p5p pacman pear pkgin pleaserun puppet python rpm sh snap solaris tar virtualenv zip
-      return 0;;
-    esac
-
-    case "$opt" in --input-type|-s)
-      _fpm_compgen_w_replacement -- "$cur" apk cpan deb dir empty freebsd gem npm osxpkg p5p pacman pear pkgin pleaserun puppet python rpm sh snap solaris tar virtualenv zip
-      return 0;;
-    esac
-
-    case "$opt" in --chdir|-C)
-      _filedir -d
-      return 0;;
-    esac
-
-    case "$opt" in --prefix)
-      return 0;;
-    esac
-
-    case "$opt" in --package|-p)
-      return 0;;
-    esac
-
-    case "$opt" in --name|-n)
-      return 0;;
-    esac
-
-    case "$opt" in --log)
-      _fpm_compgen_w_replacement -- "$cur" error warn info debug
-      return 0;;
-    esac
-
-    case "$opt" in --version|-v)
-      return 0;;
-    esac
-
-    case "$opt" in --iteration)
-      return 0;;
-    esac
-
-    case "$opt" in --epoch)
-      return 0;;
-    esac
-
-    case "$opt" in --license)
-      return 0;;
-    esac
-
-    case "$opt" in --vendor)
-      return 0;;
-    esac
-
-    case "$opt" in --category)
-      return 0;;
-    esac
-
-    case "$opt" in --depends|-d)
-      return 0;;
-    esac
-
-    case "$opt" in --provides)
-      return 0;;
-    esac
-
-    case "$opt" in --conflicts)
-      return 0;;
-    esac
-
-    case "$opt" in --replaces)
-      return 0;;
-    esac
-
-    case "$opt" in --config-files)
-      return 0;;
-    esac
-
-    case "$opt" in --directories)
-      return 0;;
-    esac
-
-    case "$opt" in --architecture|-a)
-      return 0;;
-    esac
-
-    case "$opt" in --maintainer|-m)
-      return 0;;
-    esac
-
-    case "$opt" in --package-name-suffix|-S)
-      return 0;;
-    esac
-
-    case "$opt" in --exclude|-x)
-      return 0;;
-    esac
-
-    case "$opt" in --exclude-file)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --description)
-      return 0;;
-    esac
-
-    case "$opt" in --url)
-      return 0;;
-    esac
-
-    case "$opt" in --inputs)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --post-install)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --pre-install)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --post-uninstall)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --pre-uninstall)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --after-install)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --before-install)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --after-remove)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --before-remove)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --after-upgrade)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --before-upgrade)
-      _filedir
-      return 0;;
-    esac
-
-    case "$opt" in --template-value)
-      return 0;;
-    esac
-
-    case "$opt" in --workdir)
-      _filedir -d
-      return 0;;
-    esac
-
-    case "$opt" in --source-date-epoch-default)
-      return 0;;
-    esac
-
-    case "$opt" in --fpm-options-file)
-      _filedir
-      return 0;;
+    case "$opt" in
+      --output-type|-t|--input-type|-s)
+        _fpm_compgen_w_replacement -- "$cur" apk cpan deb dir empty freebsd gem npm osxpkg p5p pacman pear pkgin pleaserun puppet python rpm sh snap solaris tar virtualenv zip
+        return 0;;
+      --chdir|-C|--workdir)
+        _filedir -d
+        return 0;;
+      --prefix|--package|-p|--name|-n|--version|-v|--iteration|--epoch|--license|--vendor|--category|--depends|-d|--provides|--conflicts|--replaces|--config-files|--directories|--architecture|-a|--maintainer|-m|--package-name-suffix|-S|--exclude|-x|--description|--url|--template-value|--source-date-epoch-default)
+        return 0;;
+      --log)
+        _fpm_compgen_w_replacement -- "$cur" error warn info debug
+        return 0;;
+      --exclude-file|--inputs|--post-install|--pre-install|--post-uninstall|--pre-uninstall|--after-install|--before-install|--after-remove|--before-remove|--after-upgrade|--before-upgrade|--fpm-options-file)
+        _filedir
+        return 0;;
     esac
 
     case "$opt" in --gem-bin-path)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-package-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-package-name-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-gem)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-shebang)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-disable-dependency)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-stagingdir)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-git-repo)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --gem-git-branch)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --cpan-perl-bin)
-      COMPREPLY=($(compgen -A command -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; }; then
+        COMPREPLY=($(compgen -A command -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --cpan-cpanm-bin)
-      COMPREPLY=($(compgen -A command -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; }; then
+        COMPREPLY=($(compgen -A command -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --cpan-mirror)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --cpan-package-name-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --cpan-perl-lib-path)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-build-depends)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-pre-depends)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-compression)
-      _fpm_compgen_w_replacement -- "$cur" gz bzip2 xz none
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _fpm_compgen_w_replacement -- "$cur" gz bzip2 xz none
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-dist)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-custom-control)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-config)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-templates)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-installed-size)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-priority)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-user)
-      COMPREPLY=($(compgen -A user -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        COMPREPLY=($(compgen -A user -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-group)
-      COMPREPLY=($(compgen -A group -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        COMPREPLY=($(compgen -A group -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-changelog)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-upstream-changelog)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-recommends)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-suggests)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-meta-file)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-interest)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-activate)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-interest-noawait)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-activate-noawait)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-field)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-shlibs)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-init)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-default)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-upstart)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-systemd)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --deb-after-purge)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --npm-bin)
-      COMPREPLY=($(compgen -A command -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == npm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == npm ]]; }; }; then
+        COMPREPLY=($(compgen -A command -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --npm-package-name-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == npm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == npm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --npm-registry)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == npm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == npm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-user)
-      COMPREPLY=($(compgen -A user -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        COMPREPLY=($(compgen -A user -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-group)
-      COMPREPLY=($(compgen -A group -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        COMPREPLY=($(compgen -A group -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-defattrfile)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-defattrdir)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-rpmbuild-define)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-dist)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-digest)
-      _fpm_compgen_w_replacement -- "$cur" md5 sha1 sha256 sha384 sha512
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        _fpm_compgen_w_replacement -- "$cur" md5 sha1 sha256 sha384 sha512
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-compression-level)
-      COMPREPLY=($(compgen -W '{0..9}' -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        COMPREPLY=($(compgen -W '{0..9}' -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-compression)
-      _fpm_compgen_w_replacement -- "$cur" none xz xzmt gzip bzip2
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        _fpm_compgen_w_replacement -- "$cur" none xz xzmt gzip bzip2
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-os)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-changelog)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-summary)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-auto-add-exclude-directories)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-attr)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-init)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-filter-from-provides)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-filter-from-requires)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-tag)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-verifyscript)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-pretrans)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-posttrans)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-trigger-before-install)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-trigger-after-install)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-trigger-before-uninstall)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --rpm-trigger-after-target-uninstall)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pear-package-name-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pear-channel)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pear-bin-dir)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pear-php-bin)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pear-php-dir)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pear-data-dir)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-bin)
-      COMPREPLY=($(compgen -A command -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        COMPREPLY=($(compgen -A command -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-easyinstall)
-      COMPREPLY=($(compgen -A command -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        COMPREPLY=($(compgen -A command -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-pip)
-      COMPREPLY=($(compgen -A command -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        COMPREPLY=($(compgen -A command -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-pypi)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-trusted-host)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-package-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-package-name-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-install-bin)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-install-lib)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-install-data)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-scripts-executable)
-      COMPREPLY=($(compgen -A command -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        COMPREPLY=($(compgen -A command -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-disable-dependency)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --python-setup-py-arguments)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --osxpkg-identifier-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --osxpkg-ownership)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --osxpkg-postinstall-action)
-      _fpm_compgen_w_replacement -- "$cur" logout restart shutdown
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; }; then
+        _fpm_compgen_w_replacement -- "$cur" logout restart shutdown
+        return 0
+      fi;;
     esac
 
     case "$opt" in --osxpkg-dont-obsolete)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --solaris-user)
-      COMPREPLY=($(compgen -A user -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == solaris ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == solaris ]]; }; }; then
+        COMPREPLY=($(compgen -A user -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --solaris-group)
-      COMPREPLY=($(compgen -A group -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == solaris ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == solaris ]]; }; }; then
+        COMPREPLY=($(compgen -A group -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --p5p-user)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --p5p-group)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --p5p-zonetype)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --p5p-publisher)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --freebsd-origin)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == freebsd ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == freebsd ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --snap-yaml)
-      _filedir
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == snap ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == snap ]]; }; }; then
+        _filedir
+        return 0
+      fi;;
     esac
 
     case "$opt" in --snap-confinement)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == snap ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == snap ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --snap-grade)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == snap ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == snap ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pacman-optional-depends)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pacman-user)
-      COMPREPLY=($(compgen -A user -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; }; then
+        COMPREPLY=($(compgen -A user -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pacman-group)
-      COMPREPLY=($(compgen -A group -- "$cur"))
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; }; then
+        COMPREPLY=($(compgen -A group -- "$cur"))
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pacman-compression)
-      _fpm_compgen_w_replacement -- "$cur" gz bzip2 xz zstd none
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; }; then
+        _fpm_compgen_w_replacement -- "$cur" gz bzip2 xz zstd none
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pleaserun-name)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pleaserun ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pleaserun ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pleaserun-chdir)
-      _filedir -d
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pleaserun ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pleaserun ]]; }; }; then
+        _filedir -d
+        return 0
+      fi;;
     esac
 
     case "$opt" in --pleaserun-user)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pleaserun ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pleaserun ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --virtualenv-pypi)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --virtualenv-package-name-prefix)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --virtualenv-install-location)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --virtualenv-other-files-dir)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --virtualenv-pypi-extra-url)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     case "$opt" in --virtualenv-find-links)
-      return 0;;
+      if { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; }; then
+        return 0
+      fi;;
     esac
 
     return 1
@@ -2408,278 +2147,279 @@ _fpm() {
     --*=*)
       __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0;;
     -*=*);;
+    --*);;
     -*)
         local i
         for ((i=2; i <= ${#cur}; ++i)); do
           local pre="${cur:0:$i}" value="${cur:$i}"
-          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && _fpm_prefix_compreply "$pre" && return 0
-        done
-      ;;
+          __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {
+            _fpm_prefix_compreply "$pre"
+            return 0
+          }
+        done;;
   esac
 
   if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then
     local -a opts=()
-    (( ! HAVE_output_type )) && opts+=(-t --output-type)
-    (( ! HAVE_input_type )) && opts+=(-s --input-type)
-    (( ! HAVE_chdir )) && opts+=(-C --chdir)
-    (( ! HAVE_prefix )) && opts+=(--prefix)
-    (( ! HAVE_package )) && opts+=(-p --package)
-    (( ! HAVE_force )) && opts+=(-f --force)
-    (( ! HAVE_name )) && opts+=(-n --name)
-    (( ! HAVE_log )) && opts+=(--log)
-    (( ! HAVE_verbose )) && opts+=(--verbose)
-    (( ! HAVE_debug )) && opts+=(--debug)
-    (( ! HAVE_debug_workspace )) && opts+=(--debug-workspace)
-    (( ! HAVE_version )) && opts+=(-v --version)
-    (( ! HAVE_iteration )) && opts+=(--iteration)
-    (( ! HAVE_epoch )) && opts+=(--epoch)
-    (( ! HAVE_license )) && opts+=(--license)
-    (( ! HAVE_vendor )) && opts+=(--vendor)
-    (( ! HAVE_category )) && opts+=(--category)
+    (( ! ${#OPT_output_type} )) && opts+=(-t --output-type)
+    (( ! ${#OPT_input_type} )) && opts+=(-s --input-type)
+    (( ! ${#OPT_chdir} )) && opts+=(-C --chdir)
+    (( ! ${#OPT_prefix} )) && opts+=(--prefix)
+    (( ! ${#OPT_package} )) && opts+=(-p --package)
+    (( ! ${#OPT_force} )) && opts+=(-f --force)
+    (( ! ${#OPT_name} )) && opts+=(-n --name)
+    (( ! ${#OPT_log} )) && opts+=(--log)
+    (( ! ${#OPT_verbose} )) && opts+=(--verbose)
+    (( ! ${#OPT_debug} )) && opts+=(--debug)
+    (( ! ${#OPT_debug_workspace} )) && opts+=(--debug-workspace)
+    (( ! ${#OPT_version} )) && opts+=(-v --version)
+    (( ! ${#OPT_iteration} )) && opts+=(--iteration)
+    (( ! ${#OPT_epoch} )) && opts+=(--epoch)
+    (( ! ${#OPT_license} )) && opts+=(--license)
+    (( ! ${#OPT_vendor} )) && opts+=(--vendor)
+    (( ! ${#OPT_category} )) && opts+=(--category)
     opts+=(-d --depends)
-    (( ! HAVE_no_depends )) && opts+=(--no-depends)
-    (( ! HAVE_no_auto_depends )) && opts+=(--no-auto-depends)
+    (( ! ${#OPT_no_depends} )) && opts+=(--no-depends)
+    (( ! ${#OPT_no_auto_depends} )) && opts+=(--no-auto-depends)
     opts+=(--provides)
     opts+=(--conflicts)
     opts+=(--replaces)
     opts+=(--config-files)
     opts+=(--directories)
-    (( ! HAVE_architecture )) && opts+=(-a --architecture)
-    (( ! HAVE_maintainer )) && opts+=(-m --maintainer)
-    (( ! HAVE_package_name_suffix )) && opts+=(-S --package-name-suffix)
-    (( ! HAVE_edit )) && opts+=(-e --edit)
+    (( ! ${#OPT_architecture} )) && opts+=(-a --architecture)
+    (( ! ${#OPT_maintainer} )) && opts+=(-m --maintainer)
+    (( ! ${#OPT_package_name_suffix} )) && opts+=(-S --package-name-suffix)
+    (( ! ${#OPT_edit} )) && opts+=(-e --edit)
     opts+=(-x --exclude)
-    (( ! HAVE_exclude_file )) && opts+=(--exclude-file)
-    (( ! HAVE_description )) && opts+=(--description)
-    (( ! HAVE_url )) && opts+=(--url)
-    (( ! HAVE_inputs )) && opts+=(--inputs)
-    (( ! HAVE_post_install )) && opts+=(--post-install)
-    (( ! HAVE_pre_install )) && opts+=(--pre-install)
-    (( ! HAVE_post_uninstall )) && opts+=(--post-uninstall)
-    (( ! HAVE_pre_uninstall )) && opts+=(--pre-uninstall)
-    (( ! HAVE_after_install )) && opts+=(--after-install)
-    (( ! HAVE_before_install )) && opts+=(--before-install)
-    (( ! HAVE_after_remove )) && opts+=(--after-remove)
-    (( ! HAVE_before_remove )) && opts+=(--before-remove)
-    (( ! HAVE_after_upgrade )) && opts+=(--after-upgrade)
-    (( ! HAVE_before_upgrade )) && opts+=(--before-upgrade)
-    (( ! HAVE_template_scripts )) && opts+=(--template-scripts)
-    (( ! HAVE_template_value )) && opts+=(--template-value)
-    (( ! HAVE_workdir )) && opts+=(--workdir)
-    (( ! HAVE_source_date_epoch_from_changelog )) && opts+=(--source-date-epoch-from-changelog)
-    (( ! HAVE_source_date_epoch_default )) && opts+=(--source-date-epoch-default)
-    (( ! HAVE_fpm_options_file )) && opts+=(--fpm-options-file)
-    (( ! HAVE_gem_bin_path )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-bin-path)
-    (( ! HAVE_gem_package_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-package-prefix)
-    (( ! HAVE_gem_package_name_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-package-name-prefix)
-    (( ! HAVE_gem_gem )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-gem)
-    (( ! HAVE_gem_shebang )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-shebang)
-    (( ! HAVE_gem_fix_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-fix-name)
-    (( ! HAVE_no_gem_fix_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--no-gem-fix-name)
-    (( ! HAVE_gem_fix_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-fix-dependencies)
-    (( ! HAVE_no_gem_fix_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--no-gem-fix-dependencies)
-    (( ! HAVE_gem_env_shebang )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-env-shebang)
-    (( ! HAVE_no_gem_env_shebang )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--no-gem-env-shebang)
-    (( ! HAVE_gem_prerelease )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-prerelease)
-    (( ! HAVE_no_gem_prerelease )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--no-gem-prerelease)
-    (( ! HAVE_gem_disable_dependency )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-disable-dependency)
-    (( ! HAVE_gem_embed_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-embed-dependencies)
-    (( ! HAVE_no_gem_embed_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--no-gem-embed-dependencies)
-    (( ! HAVE_gem_version_bins )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-version-bins)
-    (( ! HAVE_no_gem_version_bins )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--no-gem-version-bins)
-    (( ! HAVE_gem_stagingdir )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-stagingdir)
-    (( ! HAVE_gem_git_repo )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-git-repo)
-    (( ! HAVE_gem_git_branch )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == gem ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == gem ]]; }; } && opts+=(--gem-git-branch)
-    (( ! HAVE_cpan_perl_bin )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-perl-bin)
-    (( ! HAVE_cpan_cpanm_bin )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-cpanm-bin)
-    (( ! HAVE_cpan_mirror )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-mirror)
-    (( ! HAVE_cpan_mirror_only )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-mirror-only)
-    (( ! HAVE_no_cpan_mirror_only )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--no-cpan-mirror-only)
-    (( ! HAVE_cpan_package_name_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-package-name-prefix)
-    (( ! HAVE_cpan_test )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-test)
-    (( ! HAVE_no_cpan_test )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--no-cpan-test)
-    (( ! HAVE_cpan_verbose )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-verbose)
-    (( ! HAVE_no_cpan_verbose )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--no-cpan-verbose)
-    (( ! HAVE_cpan_perl_lib_path )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-perl-lib-path)
-    (( ! HAVE_cpan_sandbox_non_core )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-sandbox-non-core)
-    (( ! HAVE_no_cpan_sandbox_non_core )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--no-cpan-sandbox-non-core)
-    (( ! HAVE_cpan_cpanm_force )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--cpan-cpanm-force)
-    (( ! HAVE_no_cpan_cpanm_force )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == cpan ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == cpan ]]; }; } && opts+=(--no-cpan-cpanm-force)
-    (( ! HAVE_deb_ignore_iteration_in_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-ignore-iteration-in-dependencies)
-    (( ! HAVE_no_deb_ignore_iteration_in_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-ignore-iteration-in-dependencies)
-    (( ! HAVE_deb_build_depends )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-build-depends)
-    (( ! HAVE_deb_pre_depends )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-pre-depends)
-    (( ! HAVE_deb_compression )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-compression)
-    (( ! HAVE_deb_dist )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-dist)
-    (( ! HAVE_deb_custom_control )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-custom-control)
-    (( ! HAVE_deb_config )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-config)
-    (( ! HAVE_deb_templates )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-templates)
-    (( ! HAVE_deb_installed_size )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-installed-size)
-    (( ! HAVE_deb_priority )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-priority)
-    (( ! HAVE_deb_use_file_permissions )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-use-file-permissions)
-    (( ! HAVE_no_deb_use_file_permissions )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-use-file-permissions)
-    (( ! HAVE_deb_user )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-user)
-    (( ! HAVE_deb_group )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-group)
-    (( ! HAVE_deb_changelog )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-changelog)
-    (( ! HAVE_deb_generate_changes )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-generate-changes)
-    (( ! HAVE_no_deb_generate_changes )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-generate-changes)
-    (( ! HAVE_deb_upstream_changelog )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-upstream-changelog)
-    (( ! HAVE_deb_recommends )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-recommends)
-    (( ! HAVE_deb_suggests )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-suggests)
-    (( ! HAVE_deb_meta_file )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-meta-file)
-    (( ! HAVE_deb_interest )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-interest)
-    (( ! HAVE_deb_activate )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-activate)
-    (( ! HAVE_deb_interest_noawait )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-interest-noawait)
-    (( ! HAVE_deb_activate_noawait )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-activate-noawait)
-    (( ! HAVE_deb_field )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-field)
-    (( ! HAVE_deb_no_default_config_files )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-no-default-config-files)
-    (( ! HAVE_no_deb_no_default_config_files )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-no-default-config-files)
-    (( ! HAVE_deb_auto_config_files )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-auto-config-files)
-    (( ! HAVE_no_deb_auto_config_files )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-auto-config-files)
-    (( ! HAVE_deb_shlibs )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-shlibs)
-    (( ! HAVE_deb_init )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-init)
-    (( ! HAVE_deb_default )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-default)
-    (( ! HAVE_deb_upstart )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-upstart)
-    (( ! HAVE_deb_systemd )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-systemd)
-    (( ! HAVE_deb_systemd_enable )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-systemd-enable)
-    (( ! HAVE_no_deb_systemd_enable )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-systemd-enable)
-    (( ! HAVE_deb_systemd_auto_start )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-systemd-auto-start)
-    (( ! HAVE_no_deb_systemd_auto_start )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-systemd-auto-start)
-    (( ! HAVE_deb_systemd_restart_after_upgrade )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-systemd-restart-after-upgrade)
-    (( ! HAVE_no_deb_systemd_restart_after_upgrade )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-systemd-restart-after-upgrade)
-    (( ! HAVE_deb_after_purge )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-after-purge)
-    (( ! HAVE_deb_maintainerscripts_force_errorchecks )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--deb-maintainerscripts-force-errorchecks)
-    (( ! HAVE_no_deb_maintainerscripts_force_errorchecks )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == deb ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == deb ]]; }; } && opts+=(--no-deb-maintainerscripts-force-errorchecks)
-    (( ! HAVE_npm_bin )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == npm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == npm ]]; }; } && opts+=(--npm-bin)
-    (( ! HAVE_npm_package_name_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == npm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == npm ]]; }; } && opts+=(--npm-package-name-prefix)
-    (( ! HAVE_npm_registry )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == npm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == npm ]]; }; } && opts+=(--npm-registry)
-    (( ! HAVE_rpm_use_file_permissions )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-use-file-permissions)
-    (( ! HAVE_no_rpm_use_file_permissions )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-use-file-permissions)
-    (( ! HAVE_rpm_user )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-user)
-    (( ! HAVE_rpm_group )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-group)
-    (( ! HAVE_rpm_defattrfile )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-defattrfile)
-    (( ! HAVE_rpm_defattrdir )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-defattrdir)
-    (( ! HAVE_rpm_rpmbuild_define )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-rpmbuild-define)
-    (( ! HAVE_rpm_dist )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-dist)
-    (( ! HAVE_rpm_digest )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-digest)
-    (( ! HAVE_rpm_compression_level )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-compression-level)
-    (( ! HAVE_rpm_compression )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-compression)
-    (( ! HAVE_rpm_os )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-os)
-    (( ! HAVE_rpm_changelog )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-changelog)
-    (( ! HAVE_rpm_summary )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-summary)
-    (( ! HAVE_rpm_sign )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-sign)
-    (( ! HAVE_no_rpm_sign )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-sign)
-    (( ! HAVE_rpm_auto_add_directories )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-auto-add-directories)
-    (( ! HAVE_no_rpm_auto_add_directories )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-auto-add-directories)
-    (( ! HAVE_rpm_auto_add_exclude_directories )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-auto-add-exclude-directories)
-    (( ! HAVE_rpm_autoreqprov )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-autoreqprov)
-    (( ! HAVE_no_rpm_autoreqprov )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-autoreqprov)
-    (( ! HAVE_rpm_autoreq )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-autoreq)
-    (( ! HAVE_no_rpm_autoreq )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-autoreq)
-    (( ! HAVE_rpm_autoprov )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-autoprov)
-    (( ! HAVE_no_rpm_autoprov )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-autoprov)
-    (( ! HAVE_rpm_attr )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-attr)
-    (( ! HAVE_rpm_init )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-init)
-    (( ! HAVE_rpm_filter_from_provides )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-filter-from-provides)
-    (( ! HAVE_rpm_filter_from_requires )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-filter-from-requires)
-    (( ! HAVE_rpm_tag )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-tag)
-    (( ! HAVE_rpm_ignore_iteration_in_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-ignore-iteration-in-dependencies)
-    (( ! HAVE_no_rpm_ignore_iteration_in_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-ignore-iteration-in-dependencies)
-    (( ! HAVE_rpm_verbatim_gem_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-verbatim-gem-dependencies)
-    (( ! HAVE_no_rpm_verbatim_gem_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-verbatim-gem-dependencies)
-    (( ! HAVE_rpm_macro_expansion )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-macro-expansion)
-    (( ! HAVE_no_rpm_macro_expansion )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--no-rpm-macro-expansion)
-    (( ! HAVE_rpm_verifyscript )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-verifyscript)
-    (( ! HAVE_rpm_pretrans )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-pretrans)
-    (( ! HAVE_rpm_posttrans )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-posttrans)
-    (( ! HAVE_rpm_trigger_before_install )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-trigger-before-install)
-    (( ! HAVE_rpm_trigger_after_install )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-trigger-after-install)
-    (( ! HAVE_rpm_trigger_before_uninstall )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-trigger-before-uninstall)
-    (( ! HAVE_rpm_trigger_after_target_uninstall )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == rpm ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == rpm ]]; }; } && opts+=(--rpm-trigger-after-target-uninstall)
-    (( ! HAVE_pear_package_name_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--pear-package-name-prefix)
-    (( ! HAVE_pear_channel )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--pear-channel)
-    (( ! HAVE_pear_channel_update )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--pear-channel-update)
-    (( ! HAVE_no_pear_channel_update )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--no-pear-channel-update)
-    (( ! HAVE_pear_bin_dir )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--pear-bin-dir)
-    (( ! HAVE_pear_php_bin )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--pear-php-bin)
-    (( ! HAVE_pear_php_dir )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--pear-php-dir)
-    (( ! HAVE_pear_data_dir )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pear ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pear ]]; }; } && opts+=(--pear-data-dir)
-    (( ! HAVE_python_bin )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-bin)
-    (( ! HAVE_python_easyinstall )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-easyinstall)
-    (( ! HAVE_python_pip )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-pip)
-    (( ! HAVE_python_pypi )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-pypi)
-    (( ! HAVE_python_trusted_host )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-trusted-host)
-    (( ! HAVE_python_package_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-package-prefix)
-    (( ! HAVE_python_package_name_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-package-name-prefix)
-    (( ! HAVE_python_fix_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-fix-name)
-    (( ! HAVE_no_python_fix_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--no-python-fix-name)
-    (( ! HAVE_python_fix_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-fix-dependencies)
-    (( ! HAVE_no_python_fix_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--no-python-fix-dependencies)
-    (( ! HAVE_python_downcase_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-downcase-name)
-    (( ! HAVE_no_python_downcase_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--no-python-downcase-name)
-    (( ! HAVE_python_downcase_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-downcase-dependencies)
-    (( ! HAVE_no_python_downcase_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--no-python-downcase-dependencies)
-    (( ! HAVE_python_install_bin )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-install-bin)
-    (( ! HAVE_python_install_lib )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-install-lib)
-    (( ! HAVE_python_install_data )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-install-data)
-    (( ! HAVE_python_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-dependencies)
-    (( ! HAVE_no_python_dependencies )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--no-python-dependencies)
-    (( ! HAVE_python_obey_requirements_txt )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-obey-requirements-txt)
-    (( ! HAVE_no_python_obey_requirements_txt )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--no-python-obey-requirements-txt)
-    (( ! HAVE_python_scripts_executable )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-scripts-executable)
-    (( ! HAVE_python_disable_dependency )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-disable-dependency)
-    (( ! HAVE_python_setup_py_arguments )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-setup-py-arguments)
-    (( ! HAVE_python_internal_pip )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--python-internal-pip)
-    (( ! HAVE_no_python_internal_pip )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == python ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == python ]]; }; } && opts+=(--no-python-internal-pip)
-    (( ! HAVE_osxpkg_identifier_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == osxpkg ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == osxpkg ]]; }; } && opts+=(--osxpkg-identifier-prefix)
-    (( ! HAVE_osxpkg_payload_free )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == osxpkg ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == osxpkg ]]; }; } && opts+=(--osxpkg-payload-free)
-    (( ! HAVE_no_osxpkg_payload_free )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == osxpkg ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == osxpkg ]]; }; } && opts+=(--no-osxpkg-payload-free)
-    (( ! HAVE_osxpkg_ownership )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == osxpkg ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == osxpkg ]]; }; } && opts+=(--osxpkg-ownership)
-    (( ! HAVE_osxpkg_postinstall_action )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == osxpkg ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == osxpkg ]]; }; } && opts+=(--osxpkg-postinstall-action)
-    { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == osxpkg ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == osxpkg ]]; }; } && opts+=(--osxpkg-dont-obsolete)
-    (( ! HAVE_solaris_user )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == solaris ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == solaris ]]; }; } && opts+=(--solaris-user)
-    (( ! HAVE_solaris_group )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == solaris ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == solaris ]]; }; } && opts+=(--solaris-group)
-    (( ! HAVE_p5p_user )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--p5p-user)
-    (( ! HAVE_p5p_group )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--p5p-group)
-    (( ! HAVE_p5p_zonetype )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--p5p-zonetype)
-    (( ! HAVE_p5p_publisher )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--p5p-publisher)
-    (( ! HAVE_p5p_lint )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--p5p-lint)
-    (( ! HAVE_no_p5p_lint )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--no-p5p-lint)
-    (( ! HAVE_p5p_validate )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--p5p-validate)
-    (( ! HAVE_no_p5p_validate )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == p5p ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == p5p ]]; }; } && opts+=(--no-p5p-validate)
-    (( ! HAVE_freebsd_origin )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == freebsd ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == freebsd ]]; }; } && opts+=(--freebsd-origin)
-    (( ! HAVE_snap_yaml )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == snap ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == snap ]]; }; } && opts+=(--snap-yaml)
-    (( ! HAVE_snap_confinement )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == snap ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == snap ]]; }; } && opts+=(--snap-confinement)
-    (( ! HAVE_snap_grade )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == snap ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == snap ]]; }; } && opts+=(--snap-grade)
-    (( ! HAVE_pacman_optional_depends )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pacman ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pacman ]]; }; } && opts+=(--pacman-optional-depends)
-    (( ! HAVE_pacman_use_file_permissions )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pacman ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pacman ]]; }; } && opts+=(--pacman-use-file-permissions)
-    (( ! HAVE_no_pacman_use_file_permissions )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pacman ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pacman ]]; }; } && opts+=(--no-pacman-use-file-permissions)
-    (( ! HAVE_pacman_user )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pacman ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pacman ]]; }; } && opts+=(--pacman-user)
-    (( ! HAVE_pacman_group )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pacman ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pacman ]]; }; } && opts+=(--pacman-group)
-    (( ! HAVE_pacman_compression )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pacman ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pacman ]]; }; } && opts+=(--pacman-compression)
-    (( ! HAVE_pleaserun_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pleaserun ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pleaserun ]]; }; } && opts+=(--pleaserun-name)
-    (( ! HAVE_pleaserun_chdir )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pleaserun ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pleaserun ]]; }; } && opts+=(--pleaserun-chdir)
-    (( ! HAVE_pleaserun_user )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == pleaserun ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == pleaserun ]]; }; } && opts+=(--pleaserun-user)
-    (( ! HAVE_virtualenv_pypi )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-pypi)
-    (( ! HAVE_virtualenv_package_name_prefix )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-package-name-prefix)
-    (( ! HAVE_virtualenv_install_location )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-install-location)
-    (( ! HAVE_virtualenv_fix_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-fix-name)
-    (( ! HAVE_no_virtualenv_fix_name )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--no-virtualenv-fix-name)
-    (( ! HAVE_virtualenv_other_files_dir )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-other-files-dir)
-    (( ! HAVE_virtualenv_pypi_extra_url )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-pypi-extra-url)
-    (( ! HAVE_virtualenv_setup_install )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-setup-install)
-    (( ! HAVE_no_virtualenv_setup_install )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--no-virtualenv-setup-install)
-    (( ! HAVE_virtualenv_system_site_packages )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-system-site-packages)
-    (( ! HAVE_no_virtualenv_system_site_packages )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--no-virtualenv-system-site-packages)
-    (( ! HAVE_virtualenv_find_links )) && { { (( HAVE_output_type )) && [[ "$VALUE_output_type" == virtualenv ]]; } || { (( HAVE_input_type )) && [[ "$VALUE_input_type" == virtualenv ]]; }; } && opts+=(--virtualenv-find-links)
+    (( ! ${#OPT_exclude_file} )) && opts+=(--exclude-file)
+    (( ! ${#OPT_description} )) && opts+=(--description)
+    (( ! ${#OPT_url} )) && opts+=(--url)
+    (( ! ${#OPT_inputs} )) && opts+=(--inputs)
+    (( ! ${#OPT_post_install} )) && opts+=(--post-install)
+    (( ! ${#OPT_pre_install} )) && opts+=(--pre-install)
+    (( ! ${#OPT_post_uninstall} )) && opts+=(--post-uninstall)
+    (( ! ${#OPT_pre_uninstall} )) && opts+=(--pre-uninstall)
+    (( ! ${#OPT_after_install} )) && opts+=(--after-install)
+    (( ! ${#OPT_before_install} )) && opts+=(--before-install)
+    (( ! ${#OPT_after_remove} )) && opts+=(--after-remove)
+    (( ! ${#OPT_before_remove} )) && opts+=(--before-remove)
+    (( ! ${#OPT_after_upgrade} )) && opts+=(--after-upgrade)
+    (( ! ${#OPT_before_upgrade} )) && opts+=(--before-upgrade)
+    (( ! ${#OPT_template_scripts} )) && opts+=(--template-scripts)
+    (( ! ${#OPT_template_value} )) && opts+=(--template-value)
+    (( ! ${#OPT_workdir} )) && opts+=(--workdir)
+    (( ! ${#OPT_source_date_epoch_from_changelog} )) && opts+=(--source-date-epoch-from-changelog)
+    (( ! ${#OPT_source_date_epoch_default} )) && opts+=(--source-date-epoch-default)
+    (( ! ${#OPT_fpm_options_file} )) && opts+=(--fpm-options-file)
+    (( ! ${#OPT_gem_bin_path} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-bin-path)
+    (( ! ${#OPT_gem_package_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-package-prefix)
+    (( ! ${#OPT_gem_package_name_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-package-name-prefix)
+    (( ! ${#OPT_gem_gem} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-gem)
+    (( ! ${#OPT_gem_shebang} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-shebang)
+    (( ! ${#OPT_gem_fix_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-fix-name)
+    (( ! ${#OPT_no_gem_fix_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--no-gem-fix-name)
+    (( ! ${#OPT_gem_fix_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-fix-dependencies)
+    (( ! ${#OPT_no_gem_fix_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--no-gem-fix-dependencies)
+    (( ! ${#OPT_gem_env_shebang} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-env-shebang)
+    (( ! ${#OPT_no_gem_env_shebang} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--no-gem-env-shebang)
+    (( ! ${#OPT_gem_prerelease} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-prerelease)
+    (( ! ${#OPT_no_gem_prerelease} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--no-gem-prerelease)
+    (( ! ${#OPT_gem_disable_dependency} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-disable-dependency)
+    (( ! ${#OPT_gem_embed_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-embed-dependencies)
+    (( ! ${#OPT_no_gem_embed_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--no-gem-embed-dependencies)
+    (( ! ${#OPT_gem_version_bins} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-version-bins)
+    (( ! ${#OPT_no_gem_version_bins} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--no-gem-version-bins)
+    (( ! ${#OPT_gem_stagingdir} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-stagingdir)
+    (( ! ${#OPT_gem_git_repo} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-git-repo)
+    (( ! ${#OPT_gem_git_branch} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == gem ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == gem ]]; }; } && opts+=(--gem-git-branch)
+    (( ! ${#OPT_cpan_perl_bin} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-perl-bin)
+    (( ! ${#OPT_cpan_cpanm_bin} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-cpanm-bin)
+    (( ! ${#OPT_cpan_mirror} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-mirror)
+    (( ! ${#OPT_cpan_mirror_only} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-mirror-only)
+    (( ! ${#OPT_no_cpan_mirror_only} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--no-cpan-mirror-only)
+    (( ! ${#OPT_cpan_package_name_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-package-name-prefix)
+    (( ! ${#OPT_cpan_test} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-test)
+    (( ! ${#OPT_no_cpan_test} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--no-cpan-test)
+    (( ! ${#OPT_cpan_verbose} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-verbose)
+    (( ! ${#OPT_no_cpan_verbose} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--no-cpan-verbose)
+    (( ! ${#OPT_cpan_perl_lib_path} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-perl-lib-path)
+    (( ! ${#OPT_cpan_sandbox_non_core} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-sandbox-non-core)
+    (( ! ${#OPT_no_cpan_sandbox_non_core} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--no-cpan-sandbox-non-core)
+    (( ! ${#OPT_cpan_cpanm_force} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--cpan-cpanm-force)
+    (( ! ${#OPT_no_cpan_cpanm_force} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == cpan ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == cpan ]]; }; } && opts+=(--no-cpan-cpanm-force)
+    (( ! ${#OPT_deb_ignore_iteration_in_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-ignore-iteration-in-dependencies)
+    (( ! ${#OPT_no_deb_ignore_iteration_in_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-ignore-iteration-in-dependencies)
+    (( ! ${#OPT_deb_build_depends} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-build-depends)
+    (( ! ${#OPT_deb_pre_depends} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-pre-depends)
+    (( ! ${#OPT_deb_compression} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-compression)
+    (( ! ${#OPT_deb_dist} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-dist)
+    (( ! ${#OPT_deb_custom_control} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-custom-control)
+    (( ! ${#OPT_deb_config} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-config)
+    (( ! ${#OPT_deb_templates} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-templates)
+    (( ! ${#OPT_deb_installed_size} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-installed-size)
+    (( ! ${#OPT_deb_priority} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-priority)
+    (( ! ${#OPT_deb_use_file_permissions} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-use-file-permissions)
+    (( ! ${#OPT_no_deb_use_file_permissions} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-use-file-permissions)
+    (( ! ${#OPT_deb_user} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-user)
+    (( ! ${#OPT_deb_group} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-group)
+    (( ! ${#OPT_deb_changelog} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-changelog)
+    (( ! ${#OPT_deb_generate_changes} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-generate-changes)
+    (( ! ${#OPT_no_deb_generate_changes} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-generate-changes)
+    (( ! ${#OPT_deb_upstream_changelog} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-upstream-changelog)
+    (( ! ${#OPT_deb_recommends} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-recommends)
+    (( ! ${#OPT_deb_suggests} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-suggests)
+    (( ! ${#OPT_deb_meta_file} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-meta-file)
+    (( ! ${#OPT_deb_interest} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-interest)
+    (( ! ${#OPT_deb_activate} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-activate)
+    (( ! ${#OPT_deb_interest_noawait} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-interest-noawait)
+    (( ! ${#OPT_deb_activate_noawait} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-activate-noawait)
+    (( ! ${#OPT_deb_field} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-field)
+    (( ! ${#OPT_deb_no_default_config_files} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-no-default-config-files)
+    (( ! ${#OPT_no_deb_no_default_config_files} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-no-default-config-files)
+    (( ! ${#OPT_deb_auto_config_files} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-auto-config-files)
+    (( ! ${#OPT_no_deb_auto_config_files} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-auto-config-files)
+    (( ! ${#OPT_deb_shlibs} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-shlibs)
+    (( ! ${#OPT_deb_init} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-init)
+    (( ! ${#OPT_deb_default} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-default)
+    (( ! ${#OPT_deb_upstart} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-upstart)
+    (( ! ${#OPT_deb_systemd} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-systemd)
+    (( ! ${#OPT_deb_systemd_enable} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-systemd-enable)
+    (( ! ${#OPT_no_deb_systemd_enable} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-systemd-enable)
+    (( ! ${#OPT_deb_systemd_auto_start} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-systemd-auto-start)
+    (( ! ${#OPT_no_deb_systemd_auto_start} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-systemd-auto-start)
+    (( ! ${#OPT_deb_systemd_restart_after_upgrade} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-systemd-restart-after-upgrade)
+    (( ! ${#OPT_no_deb_systemd_restart_after_upgrade} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-systemd-restart-after-upgrade)
+    (( ! ${#OPT_deb_after_purge} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-after-purge)
+    (( ! ${#OPT_deb_maintainerscripts_force_errorchecks} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--deb-maintainerscripts-force-errorchecks)
+    (( ! ${#OPT_no_deb_maintainerscripts_force_errorchecks} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == deb ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == deb ]]; }; } && opts+=(--no-deb-maintainerscripts-force-errorchecks)
+    (( ! ${#OPT_npm_bin} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == npm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == npm ]]; }; } && opts+=(--npm-bin)
+    (( ! ${#OPT_npm_package_name_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == npm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == npm ]]; }; } && opts+=(--npm-package-name-prefix)
+    (( ! ${#OPT_npm_registry} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == npm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == npm ]]; }; } && opts+=(--npm-registry)
+    (( ! ${#OPT_rpm_use_file_permissions} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-use-file-permissions)
+    (( ! ${#OPT_no_rpm_use_file_permissions} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-use-file-permissions)
+    (( ! ${#OPT_rpm_user} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-user)
+    (( ! ${#OPT_rpm_group} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-group)
+    (( ! ${#OPT_rpm_defattrfile} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-defattrfile)
+    (( ! ${#OPT_rpm_defattrdir} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-defattrdir)
+    (( ! ${#OPT_rpm_rpmbuild_define} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-rpmbuild-define)
+    (( ! ${#OPT_rpm_dist} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-dist)
+    (( ! ${#OPT_rpm_digest} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-digest)
+    (( ! ${#OPT_rpm_compression_level} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-compression-level)
+    (( ! ${#OPT_rpm_compression} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-compression)
+    (( ! ${#OPT_rpm_os} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-os)
+    (( ! ${#OPT_rpm_changelog} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-changelog)
+    (( ! ${#OPT_rpm_summary} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-summary)
+    (( ! ${#OPT_rpm_sign} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-sign)
+    (( ! ${#OPT_no_rpm_sign} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-sign)
+    (( ! ${#OPT_rpm_auto_add_directories} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-auto-add-directories)
+    (( ! ${#OPT_no_rpm_auto_add_directories} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-auto-add-directories)
+    (( ! ${#OPT_rpm_auto_add_exclude_directories} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-auto-add-exclude-directories)
+    (( ! ${#OPT_rpm_autoreqprov} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-autoreqprov)
+    (( ! ${#OPT_no_rpm_autoreqprov} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-autoreqprov)
+    (( ! ${#OPT_rpm_autoreq} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-autoreq)
+    (( ! ${#OPT_no_rpm_autoreq} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-autoreq)
+    (( ! ${#OPT_rpm_autoprov} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-autoprov)
+    (( ! ${#OPT_no_rpm_autoprov} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-autoprov)
+    (( ! ${#OPT_rpm_attr} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-attr)
+    (( ! ${#OPT_rpm_init} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-init)
+    (( ! ${#OPT_rpm_filter_from_provides} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-filter-from-provides)
+    (( ! ${#OPT_rpm_filter_from_requires} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-filter-from-requires)
+    (( ! ${#OPT_rpm_tag} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-tag)
+    (( ! ${#OPT_rpm_ignore_iteration_in_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-ignore-iteration-in-dependencies)
+    (( ! ${#OPT_no_rpm_ignore_iteration_in_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-ignore-iteration-in-dependencies)
+    (( ! ${#OPT_rpm_verbatim_gem_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-verbatim-gem-dependencies)
+    (( ! ${#OPT_no_rpm_verbatim_gem_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-verbatim-gem-dependencies)
+    (( ! ${#OPT_rpm_macro_expansion} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-macro-expansion)
+    (( ! ${#OPT_no_rpm_macro_expansion} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--no-rpm-macro-expansion)
+    (( ! ${#OPT_rpm_verifyscript} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-verifyscript)
+    (( ! ${#OPT_rpm_pretrans} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-pretrans)
+    (( ! ${#OPT_rpm_posttrans} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-posttrans)
+    (( ! ${#OPT_rpm_trigger_before_install} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-trigger-before-install)
+    (( ! ${#OPT_rpm_trigger_after_install} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-trigger-after-install)
+    (( ! ${#OPT_rpm_trigger_before_uninstall} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-trigger-before-uninstall)
+    (( ! ${#OPT_rpm_trigger_after_target_uninstall} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == rpm ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == rpm ]]; }; } && opts+=(--rpm-trigger-after-target-uninstall)
+    (( ! ${#OPT_pear_package_name_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--pear-package-name-prefix)
+    (( ! ${#OPT_pear_channel} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--pear-channel)
+    (( ! ${#OPT_pear_channel_update} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--pear-channel-update)
+    (( ! ${#OPT_no_pear_channel_update} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--no-pear-channel-update)
+    (( ! ${#OPT_pear_bin_dir} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--pear-bin-dir)
+    (( ! ${#OPT_pear_php_bin} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--pear-php-bin)
+    (( ! ${#OPT_pear_php_dir} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--pear-php-dir)
+    (( ! ${#OPT_pear_data_dir} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pear ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pear ]]; }; } && opts+=(--pear-data-dir)
+    (( ! ${#OPT_python_bin} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-bin)
+    (( ! ${#OPT_python_easyinstall} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-easyinstall)
+    (( ! ${#OPT_python_pip} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-pip)
+    (( ! ${#OPT_python_pypi} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-pypi)
+    (( ! ${#OPT_python_trusted_host} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-trusted-host)
+    (( ! ${#OPT_python_package_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-package-prefix)
+    (( ! ${#OPT_python_package_name_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-package-name-prefix)
+    (( ! ${#OPT_python_fix_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-fix-name)
+    (( ! ${#OPT_no_python_fix_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--no-python-fix-name)
+    (( ! ${#OPT_python_fix_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-fix-dependencies)
+    (( ! ${#OPT_no_python_fix_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--no-python-fix-dependencies)
+    (( ! ${#OPT_python_downcase_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-downcase-name)
+    (( ! ${#OPT_no_python_downcase_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--no-python-downcase-name)
+    (( ! ${#OPT_python_downcase_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-downcase-dependencies)
+    (( ! ${#OPT_no_python_downcase_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--no-python-downcase-dependencies)
+    (( ! ${#OPT_python_install_bin} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-install-bin)
+    (( ! ${#OPT_python_install_lib} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-install-lib)
+    (( ! ${#OPT_python_install_data} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-install-data)
+    (( ! ${#OPT_python_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-dependencies)
+    (( ! ${#OPT_no_python_dependencies} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--no-python-dependencies)
+    (( ! ${#OPT_python_obey_requirements_txt} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-obey-requirements-txt)
+    (( ! ${#OPT_no_python_obey_requirements_txt} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--no-python-obey-requirements-txt)
+    (( ! ${#OPT_python_scripts_executable} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-scripts-executable)
+    (( ! ${#OPT_python_disable_dependency} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-disable-dependency)
+    (( ! ${#OPT_python_setup_py_arguments} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-setup-py-arguments)
+    (( ! ${#OPT_python_internal_pip} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--python-internal-pip)
+    (( ! ${#OPT_no_python_internal_pip} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == python ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == python ]]; }; } && opts+=(--no-python-internal-pip)
+    (( ! ${#OPT_osxpkg_identifier_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; } && opts+=(--osxpkg-identifier-prefix)
+    (( ! ${#OPT_osxpkg_payload_free} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; } && opts+=(--osxpkg-payload-free)
+    (( ! ${#OPT_no_osxpkg_payload_free} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; } && opts+=(--no-osxpkg-payload-free)
+    (( ! ${#OPT_osxpkg_ownership} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; } && opts+=(--osxpkg-ownership)
+    (( ! ${#OPT_osxpkg_postinstall_action} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; } && opts+=(--osxpkg-postinstall-action)
+    { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == osxpkg ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == osxpkg ]]; }; } && opts+=(--osxpkg-dont-obsolete)
+    (( ! ${#OPT_solaris_user} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == solaris ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == solaris ]]; }; } && opts+=(--solaris-user)
+    (( ! ${#OPT_solaris_group} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == solaris ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == solaris ]]; }; } && opts+=(--solaris-group)
+    (( ! ${#OPT_p5p_user} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--p5p-user)
+    (( ! ${#OPT_p5p_group} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--p5p-group)
+    (( ! ${#OPT_p5p_zonetype} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--p5p-zonetype)
+    (( ! ${#OPT_p5p_publisher} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--p5p-publisher)
+    (( ! ${#OPT_p5p_lint} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--p5p-lint)
+    (( ! ${#OPT_no_p5p_lint} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--no-p5p-lint)
+    (( ! ${#OPT_p5p_validate} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--p5p-validate)
+    (( ! ${#OPT_no_p5p_validate} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == p5p ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == p5p ]]; }; } && opts+=(--no-p5p-validate)
+    (( ! ${#OPT_freebsd_origin} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == freebsd ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == freebsd ]]; }; } && opts+=(--freebsd-origin)
+    (( ! ${#OPT_snap_yaml} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == snap ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == snap ]]; }; } && opts+=(--snap-yaml)
+    (( ! ${#OPT_snap_confinement} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == snap ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == snap ]]; }; } && opts+=(--snap-confinement)
+    (( ! ${#OPT_snap_grade} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == snap ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == snap ]]; }; } && opts+=(--snap-grade)
+    (( ! ${#OPT_pacman_optional_depends} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; } && opts+=(--pacman-optional-depends)
+    (( ! ${#OPT_pacman_use_file_permissions} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; } && opts+=(--pacman-use-file-permissions)
+    (( ! ${#OPT_no_pacman_use_file_permissions} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; } && opts+=(--no-pacman-use-file-permissions)
+    (( ! ${#OPT_pacman_user} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; } && opts+=(--pacman-user)
+    (( ! ${#OPT_pacman_group} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; } && opts+=(--pacman-group)
+    (( ! ${#OPT_pacman_compression} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pacman ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pacman ]]; }; } && opts+=(--pacman-compression)
+    (( ! ${#OPT_pleaserun_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pleaserun ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pleaserun ]]; }; } && opts+=(--pleaserun-name)
+    (( ! ${#OPT_pleaserun_chdir} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pleaserun ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pleaserun ]]; }; } && opts+=(--pleaserun-chdir)
+    (( ! ${#OPT_pleaserun_user} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == pleaserun ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == pleaserun ]]; }; } && opts+=(--pleaserun-user)
+    (( ! ${#OPT_virtualenv_pypi} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-pypi)
+    (( ! ${#OPT_virtualenv_package_name_prefix} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-package-name-prefix)
+    (( ! ${#OPT_virtualenv_install_location} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-install-location)
+    (( ! ${#OPT_virtualenv_fix_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-fix-name)
+    (( ! ${#OPT_no_virtualenv_fix_name} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--no-virtualenv-fix-name)
+    (( ! ${#OPT_virtualenv_other_files_dir} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-other-files-dir)
+    (( ! ${#OPT_virtualenv_pypi_extra_url} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-pypi-extra-url)
+    (( ! ${#OPT_virtualenv_setup_install} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-setup-install)
+    (( ! ${#OPT_no_virtualenv_setup_install} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--no-virtualenv-setup-install)
+    (( ! ${#OPT_virtualenv_system_site_packages} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-system-site-packages)
+    (( ! ${#OPT_no_virtualenv_system_site_packages} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--no-virtualenv-system-site-packages)
+    (( ! ${#OPT_virtualenv_find_links} )) && { { (( ${#OPT_output_type} )) && [[ "${OPT_output_type[-1]}" == virtualenv ]]; } || { (( ${#OPT_input_type} )) && [[ "${OPT_input_type[-1]}" == virtualenv ]]; }; } && opts+=(--virtualenv-find-links)
     _fpm_compgen_w_replacement -a -- "$cur" "${opts[@]}"
     return 1
   fi
 
   test "$POSITIONAL_NUM" -ge 1 && {
-    local -a COMPREPLY_BACK=("${COMPREPLY[@]}")
     _filedir
-    COMPREPLY=("${COMPREPLY_BACK[@]}" "${COMPREPLY[@]}")
     return 0;
   }
 

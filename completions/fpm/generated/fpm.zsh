@@ -4,7 +4,7 @@
 # crazy-complete: A tool that creates robust and reliable autocompletion scripts for Bash, Fish and Zsh.
 # For more information, visit: https://github.com/crazy-complete/crazy-complete
 
-_fpm_zsh_helper() {
+_fpm_zsh_query() {
   # ===========================================================================
   #
   # This function is for querying the command line.
@@ -28,16 +28,16 @@ _fpm_zsh_helper() {
   #     Prints out the positional argument number NUM (starting from 1)
   #
   #   has_option <OPTIONS...>
-  #     Checks if a option given in OPTIONS is passed on commandline.
+  #     Checks if an option given in OPTIONS is passed on commandline.
   #
   #   option_is <OPTIONS...> -- <VALUES...>
   #     Checks if one option in OPTIONS has a value of VALUES.
   #
   # EXAMPLE
   #   local POSITIONALS HAVING_OPTIONS OPTION_VALUES
-  #   zsh_helper setup '-f,-a=,-optional=?' program_name -f -optional -a foo bar
-  #   zsh_helper has_option -f
-  #   zsh_helper option_is -a -- foo
+  #   zsh_query setup '-f,-a=,-optional=?' program_name -f -optional -a foo bar
+  #   zsh_query has_option -f
+  #   zsh_query option_is -a -- foo
   #
   #   Here, -f is a flag, -a takes an argument, and -optional takes an optional
   #   argument.
@@ -46,32 +46,29 @@ _fpm_zsh_helper() {
   #
   # ===========================================================================
 
-  local FUNC="zsh_helper"
-  local CONTAINS="${FUNC}_contains"
-
-  $CONTAINS() {
-    local arg key="$1"; shift
+  __zsh_query_contains() {
+    local arg='' key="$1"; shift
     for arg; do [[ "$key" == "$arg" ]] && return 0; done
     return 1
   }
 
   if [[ $# == 0 ]]; then
-    echo "$FUNC: missing command" >&2
+    echo "_fpm_zsh_query: missing command" >&2
     return 1;
   fi
 
-  local cmd=$1
+  local cmd="$1"
   shift
 
   case "$cmd" in
     get_positional)
       if test $# -ne 1; then
-        echo "$FUNC: get_positional: takes exactly one argument" >&2
+        echo "_fpm_zsh_query: get_positional: takes exactly one argument" >&2
         return 1;
       fi
 
       if test "$1" -eq 0; then
-        echo "$FUNC: get_positional: positionals start at 1, not 0!" >&2
+        echo "_fpm_zsh_query: get_positional: positionals start at 1, not 0!" >&2
         return 1
       fi
 
@@ -80,49 +77,49 @@ _fpm_zsh_helper() {
       ;;
     has_option)
       if test $# -eq 0; then
-        echo "$FUNC: has_option: arguments required" >&2
+        echo "_fpm_zsh_query: has_option: arguments required" >&2
         return 1;
       fi
 
       local option=''
       for option in "${HAVING_OPTIONS[@]}"; do
-        $CONTAINS "$option" "$@" && return 0
+        __zsh_query_contains "$option" "$@" && return 0
       done
 
       return 1
       ;;
     option_is)
-      local -a CMD_option_IS_optionS CMD_option_IS_VALUES
-      local END_OF_optionS_NUM=0
+      local -a cmd_option_is_options cmd_option_is_values
+      local end_of_options_num=0
 
       while test $# -ge 1; do
         if [[ "$1" == "--" ]]; then
-          (( ++END_OF_optionS_NUM ))
-        elif test $END_OF_optionS_NUM -eq 0; then
-          CMD_option_IS_optionS+=("$1")
-        elif test $END_OF_optionS_NUM -eq 1; then
-          CMD_option_IS_VALUES+=("$1")
+          (( ++end_of_options_num ))
+        elif test $end_of_options_num -eq 0; then
+          cmd_option_is_options+=("$1")
+        elif test $end_of_options_num -eq 1; then
+          cmd_option_is_values+=("$1")
         fi
 
         shift
       done
 
-      if test ${#CMD_option_IS_optionS[@]} -eq 0; then
-        echo "$FUNC: option_is: missing options" >&2
+      if test ${#cmd_option_is_options[@]} -eq 0; then
+        echo "_fpm_zsh_query: option_is: missing options" >&2
         return 1
       fi
 
-      if test ${#CMD_option_IS_VALUES[@]} -eq 0; then
-        echo "$FUNC: option_is: missing values" >&2
+      if test ${#cmd_option_is_values[@]} -eq 0; then
+        echo "_fpm_zsh_query: option_is: missing values" >&2
         return 1
       fi
 
       local I=${#HAVING_OPTIONS[@]}
       while test $I -ge 1; do
         local option="${HAVING_OPTIONS[$I]}"
-        if $CONTAINS "$option" "${CMD_option_IS_optionS[@]}"; then
+        if __zsh_query_contains "$option" "${cmd_option_is_options[@]}"; then
           local VALUE="${OPTION_VALUES[$I]}"
-          $CONTAINS "$VALUE" "${CMD_option_IS_VALUES[@]}" && return 0
+          __zsh_query_contains "$VALUE" "${cmd_option_is_values[@]}" && return 0
         fi
 
         (( --I ))
@@ -137,7 +134,7 @@ _fpm_zsh_helper() {
       shift
       ;;
     *)
-      echo "$FUNC: argv[1]: invalid command" >&2
+      echo "_fpm_zsh_query: argv[1]: invalid command" >&2
       return 1
       ;;
   esac
@@ -148,7 +145,6 @@ _fpm_zsh_helper() {
   # Parsing of available options
   # ===========================================================================
 
-  local -a   old_opts_with_arg=()   old_opts_with_optional_arg=()   old_opts_without_arg=()
   local -a  long_opts_with_arg=()  long_opts_with_optional_arg=()  long_opts_without_arg=()
   local -a short_opts_with_arg=() short_opts_with_optional_arg=() short_opts_without_arg=()
 
@@ -158,16 +154,10 @@ _fpm_zsh_helper() {
       --?*=)    long_opts_with_arg+=("${option%=}");;
       --?*=\?)  long_opts_with_optional_arg+=("${option%=?}");;
       --?*)     long_opts_without_arg+=("$option");;
-
       -?=)      short_opts_with_arg+=("${option%=}");;
       -?=\?)    short_opts_with_optional_arg+=("${option%=?}");;
       -?)       short_opts_without_arg+=("$option");;
-
-      -??*=)    old_opts_with_arg+=("${option%=}");;
-      -??*=\?)  old_opts_with_optional_arg+=("${option%=?}");;
-      -??*)     old_opts_without_arg+=("$option");;
-
-      *) echo "$FUNC: $option: not a valid short, long or oldstyle option" >&2; return 1;;
+      *) echo "_fpm_zsh_query: $option: not a valid short, long or oldstyle option" >&2; return 1;;
     esac
   done
 
@@ -185,104 +175,61 @@ _fpm_zsh_helper() {
     local have_trailing_arg=$(test $argi -lt $# && echo true || echo false)
 
     case "$arg" in
-      (-)
+      -)
         POSITIONALS+=(-);;
-      (--)
+      --)
         for argi in $(seq $((argi + 1)) $#); do
           POSITIONALS+=("${@[$argi]}")
         done
         break;;
-      (--*)
-        for option in $long_opts_with_arg $long_opts_without_arg $long_opts_with_optional_arg; do
-          if [[ "$arg" == "$option="* ]]; then
-            HAVING_OPTIONS+=("$option")
-            OPTION_VALUES+=("${arg#$option=}")
-            break
-          elif [[ "$arg" == "$option" ]]; then
-            if $CONTAINS "$option" "${long_opts_with_arg[@]}"; then
-              if $have_trailing_arg; then
-                HAVING_OPTIONS+=("$option")
-                OPTION_VALUES+=("${@[$((argi + 1))]}")
-                (( argi++ ))
-              fi
-            else
-              HAVING_OPTIONS+=("$option")
-              OPTION_VALUES+=("")
-            fi
-            break
+      --*=*)
+        HAVING_OPTIONS+=("${arg%%=*}")
+        OPTION_VALUES+=("${arg#*=}");;
+      --*)
+        if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
+          if $have_trailing_arg; then
+            HAVING_OPTIONS+=("$arg")
+            OPTION_VALUES+=("${@[$((argi + 1))]}")
+            (( argi++ ))
           fi
-        done;;
-      (-*)
-        local have_match=false
+        else
+          HAVING_OPTIONS+=("$arg")
+          OPTION_VALUES+=("")
+        fi
+        ;;
+      -*)
+        local end_of_parsing=false
 
-        for option in $old_opts_with_arg $old_opts_without_arg $old_opts_with_optional_arg; do
-          if [[ "$arg" == "$option="* ]]; then
+        local arg_length=${#arg}
+        local i=1
+        while ! $end_of_parsing && test $i -lt $arg_length; do
+          local option="-${arg:$i:1}"
+          local trailing_chars="${arg:$((i+1))}"
+
+          if __zsh_query_contains "$option" "${short_opts_without_arg[@]}"; then
             HAVING_OPTIONS+=("$option")
-            OPTION_VALUES+=("${arg#$option=}")
-            have_match=true
-            break
-          elif [[ "$arg" == "$option" ]]; then
-            if $CONTAINS "$option" "${old_opts_with_arg[@]}"; then
-              if $have_trailing_arg; then
-                HAVING_OPTIONS+=("$option")
-                OPTION_VALUES+=("${@[$((argi + 1))]}")
-                (( argi++ ))
-              fi
-            else
-              HAVING_OPTIONS+=("$option")
-              OPTION_VALUES+=("")
-            fi
+            OPTION_VALUES+=("")
+          elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
+            end_of_parsing=true
 
-            have_match=true
-            break
+            if [[ -n "$trailing_chars" ]]; then
+              HAVING_OPTIONS+=("$option")
+              OPTION_VALUES+=("$trailing_chars")
+            else if $have_trailing_arg
+              HAVING_OPTIONS+=("$option")
+              OPTION_VALUES+=("${@[$((argi + 1))]}")
+              (( argi++ ))
+            fi
+          elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
+            end_of_parsing=true
+            HAVING_OPTIONS+=("$option")
+            OPTION_VALUES+=("$trailing_chars") # may be empty
           fi
+
+          (( i++ ))
         done
-
-        if ! $have_match; then
-          local arg_length=${#arg}
-          local i=1
-          local is_end=false
-          while ! $is_end && test $i -lt $arg_length; do
-            local arg_char="${arg:$i:1}"
-            local have_trailing_chars=$(test $((i+1)) -lt $arg_length && echo true || echo false)
-
-            for option in $short_opts_with_arg $short_opts_without_arg $short_opts_with_optional_arg; do
-              local option_char="${option:1:1}"
-
-              if test "$arg_char" = "$option_char"; then
-                if $CONTAINS "$option" "${short_opts_with_arg[@]}"; then
-                  if $have_trailing_chars; then
-                    HAVING_OPTIONS+=("$option")
-                    OPTION_VALUES+=("${arg:$((i+1))}")
-                    is_end=true
-                  elif $have_trailing_arg; then
-                    HAVING_OPTIONS+=("$option")
-                    OPTION_VALUES+=("${@[$((argi + 1))]}")
-                    (( argi++ ))
-                    is_end=true
-                  fi
-                elif $CONTAINS "$option" "${short_opts_with_optional_arg[@]}"; then
-                  HAVING_OPTIONS+=("$option")
-
-                  if $have_trailing_chars; then
-                    is_end=true
-                    OPTION_VALUES+=("${arg:$((i+1))}")
-                  else
-                    OPTION_VALUES+=("")
-                  fi
-                else
-                  HAVING_OPTIONS+=("$option")
-                  OPTION_VALUES+=("")
-                fi
-
-                break
-              fi
-            done
-
-            (( i++ ))
-          done
-        fi;;
-      (*)
+        ;;
+      *)
         POSITIONALS+=("$arg");;
     esac
 
@@ -293,7 +240,7 @@ _fpm_zsh_helper() {
 _fpm() {
   local opts=-t=,--output-type=,-s=,--input-type=,-C=,--chdir=,--prefix=,-p=,--package=,-f,--force,-n=,--name=,--log=,--verbose,--debug,--debug-workspace,-v=,--version=,--iteration=,--epoch=,--license=,--vendor=,--category=,-d=,--depends=,--no-depends,--no-auto-depends,--provides=,--conflicts=,--replaces=,--config-files=,--directories=,-a=,--architecture=,-m=,--maintainer=,-S=,--package-name-suffix=,-e,--edit,-x=,--exclude=,--exclude-file=,--description=,--url=,--inputs=,--post-install=,--pre-install=,--post-uninstall=,--pre-uninstall=,--after-install=,--before-install=,--after-remove=,--before-remove=,--after-upgrade=,--before-upgrade=,--template-scripts,--template-value=,--workdir=,--source-date-epoch-from-changelog,--source-date-epoch-default=,--fpm-options-file=,--gem-bin-path=,--gem-package-prefix=,--gem-package-name-prefix=,--gem-gem=,--gem-shebang=,--gem-fix-name,--no-gem-fix-name,--gem-fix-dependencies,--no-gem-fix-dependencies,--gem-env-shebang,--no-gem-env-shebang,--gem-prerelease,--no-gem-prerelease,--gem-disable-dependency=,--gem-embed-dependencies,--no-gem-embed-dependencies,--gem-version-bins,--no-gem-version-bins,--gem-stagingdir=,--gem-git-repo=,--gem-git-branch=,--cpan-perl-bin=,--cpan-cpanm-bin=,--cpan-mirror=,--cpan-mirror-only,--no-cpan-mirror-only,--cpan-package-name-prefix=,--cpan-test,--no-cpan-test,--cpan-verbose,--no-cpan-verbose,--cpan-perl-lib-path=,--cpan-sandbox-non-core,--no-cpan-sandbox-non-core,--cpan-cpanm-force,--no-cpan-cpanm-force,--deb-ignore-iteration-in-dependencies,--no-deb-ignore-iteration-in-dependencies,--deb-build-depends=,--deb-pre-depends=,--deb-compression=,--deb-dist=,--deb-custom-control=,--deb-config=,--deb-templates=,--deb-installed-size=,--deb-priority=,--deb-use-file-permissions,--no-deb-use-file-permissions,--deb-user=,--deb-group=,--deb-changelog=,--deb-generate-changes,--no-deb-generate-changes,--deb-upstream-changelog=,--deb-recommends=,--deb-suggests=,--deb-meta-file=,--deb-interest=,--deb-activate=,--deb-interest-noawait=,--deb-activate-noawait=,--deb-field=,--deb-no-default-config-files,--no-deb-no-default-config-files,--deb-auto-config-files,--no-deb-auto-config-files,--deb-shlibs=,--deb-init=,--deb-default=,--deb-upstart=,--deb-systemd=,--deb-systemd-enable,--no-deb-systemd-enable,--deb-systemd-auto-start,--no-deb-systemd-auto-start,--deb-systemd-restart-after-upgrade,--no-deb-systemd-restart-after-upgrade,--deb-after-purge=,--deb-maintainerscripts-force-errorchecks,--no-deb-maintainerscripts-force-errorchecks,--npm-bin=,--npm-package-name-prefix=,--npm-registry=,--rpm-use-file-permissions,--no-rpm-use-file-permissions,--rpm-user=,--rpm-group=,--rpm-defattrfile=,--rpm-defattrdir=,--rpm-rpmbuild-define=,--rpm-dist=,--rpm-digest=,--rpm-compression-level=,--rpm-compression=,--rpm-os=,--rpm-changelog=,--rpm-summary=,--rpm-sign,--no-rpm-sign,--rpm-auto-add-directories,--no-rpm-auto-add-directories,--rpm-auto-add-exclude-directories=,--rpm-autoreqprov,--no-rpm-autoreqprov,--rpm-autoreq,--no-rpm-autoreq,--rpm-autoprov,--no-rpm-autoprov,--rpm-attr=,--rpm-init=,--rpm-filter-from-provides=,--rpm-filter-from-requires=,--rpm-tag=,--rpm-ignore-iteration-in-dependencies,--no-rpm-ignore-iteration-in-dependencies,--rpm-verbatim-gem-dependencies,--no-rpm-verbatim-gem-dependencies,--rpm-macro-expansion,--no-rpm-macro-expansion,--rpm-verifyscript=,--rpm-pretrans=,--rpm-posttrans=,--rpm-trigger-before-install=,--rpm-trigger-after-install=,--rpm-trigger-before-uninstall=,--rpm-trigger-after-target-uninstall=,--pear-package-name-prefix=,--pear-channel=,--pear-channel-update,--no-pear-channel-update,--pear-bin-dir=,--pear-php-bin=,--pear-php-dir=,--pear-data-dir=,--python-bin=,--python-easyinstall=,--python-pip=,--python-pypi=,--python-trusted-host=,--python-package-prefix=,--python-package-name-prefix=,--python-fix-name,--no-python-fix-name,--python-fix-dependencies,--no-python-fix-dependencies,--python-downcase-name,--no-python-downcase-name,--python-downcase-dependencies,--no-python-downcase-dependencies,--python-install-bin=,--python-install-lib=,--python-install-data=,--python-dependencies,--no-python-dependencies,--python-obey-requirements-txt,--no-python-obey-requirements-txt,--python-scripts-executable=,--python-disable-dependency=,--python-setup-py-arguments=,--python-internal-pip,--no-python-internal-pip,--osxpkg-identifier-prefix=,--osxpkg-payload-free,--no-osxpkg-payload-free,--osxpkg-ownership=,--osxpkg-postinstall-action=,--osxpkg-dont-obsolete=,--solaris-user=,--solaris-group=,--p5p-user=,--p5p-group=,--p5p-zonetype=,--p5p-publisher=,--p5p-lint,--no-p5p-lint,--p5p-validate,--no-p5p-validate,--freebsd-origin=,--snap-yaml=,--snap-confinement=,--snap-grade=,--pacman-optional-depends=,--pacman-use-file-permissions,--no-pacman-use-file-permissions,--pacman-user=,--pacman-group=,--pacman-compression=,--pleaserun-name=,--pleaserun-chdir=,--pleaserun-user=,--virtualenv-pypi=,--virtualenv-package-name-prefix=,--virtualenv-install-location=,--virtualenv-fix-name,--no-virtualenv-fix-name,--virtualenv-other-files-dir=,--virtualenv-pypi-extra-url=,--virtualenv-setup-install,--no-virtualenv-setup-install,--virtualenv-system-site-packages,--no-virtualenv-system-site-packages,--virtualenv-find-links=
   local -a HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=()
-  _fpm_zsh_helper setup "$opts" "${words[@]}"
+  _fpm_zsh_query setup "$opts" "${words[@]}"
 
   local -a args=(
     '(--output-type -t)'{-t+,--output-type=}'[the type of package you want to create (deb, rpm, solaris, etc)]':OUTPUT_TYPE:'(apk cpan deb dir empty freebsd gem npm osxpkg p5p pacman pear pkgin pleaserun puppet python rpm sh snap solaris tar virtualenv zip)'
@@ -348,411 +295,411 @@ _fpm() {
     '(--fpm-options-file)'--fpm-options-file='[A file that contains additional fpm options. Any fpm flag format is valid in this file. This can be useful on build servers where you want to use a common configuration or inject other parameters from a file instead of from a command-line flag..]':FPM_OPTIONS_FILE:_files
     '*':' ':_files
   )
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-bin-path)'--gem-bin-path='[The directory to install gem executables]':DIRECTORY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-package-prefix)'--gem-package-prefix='[(DEPRECATED, use --package-name-prefix) Name to prefix the package name with.]':NAMEPREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-package-name-prefix)'--gem-package-name-prefix='[Name to prefix the package name with. (default\: "rubygem")]':PREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-gem)'--gem-gem='[The path to the '"'"'gem'"'"' tool (defaults to '"'"'gem'"'"' and searches your $PATH) (default\: "gem")]':PATH_TO_GEM:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-shebang)'--gem-shebang='[Replace the shebang in the executables in the bin path with a custom string (default\: nil)]':SHEBANG:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-fix-name)'--gem-fix-name'[Should the target package name be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--no-gem-fix-name)'--no-gem-fix-name'[Should the target package name be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-fix-dependencies)'--gem-fix-dependencies'[Should the package dependencies be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--no-gem-fix-dependencies)'--no-gem-fix-dependencies'[Should the package dependencies be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-env-shebang)'--gem-env-shebang'[Should the target package have the shebang rewritten to use env? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--no-gem-env-shebang)'--no-gem-env-shebang'[Should the target package have the shebang rewritten to use env? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-prerelease)'--gem-prerelease'[Allow prerelease versions of a gem (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--no-gem-prerelease)'--no-gem-prerelease'[Allow prerelease versions of a gem (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-disable-dependency)'--gem-disable-dependency='[The gem name to remove from dependency list]':GEM_NAME:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-embed-dependencies)'--gem-embed-dependencies'[Should the gem dependencies be installed? (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--no-gem-embed-dependencies)'--no-gem-embed-dependencies'[Should the gem dependencies be installed? (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-version-bins)'--gem-version-bins'[Append the version to the bins (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--no-gem-version-bins)'--no-gem-version-bins'[Append the version to the bins (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-stagingdir)'--gem-stagingdir='[The directory where fpm installs the gem temporarily before conversion. Normally a random subdirectory of workdir.]':STAGINGDIR:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-git-repo)'--gem-git-repo='[Use this git repo address as the source of the gem instead of rubygems.org. (default\: nil)]':GIT_REPO:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- gem &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- gem &&\
     args+=('(--gem-git-branch)'--gem-git-branch='[When using a git repo as the source of the gem instead of rubygems.org, use this git branch. (default\: nil)]':GIT_BRANCH:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-perl-bin)'--cpan-perl-bin='[The path to the perl executable you wish to run. (default\: "perl")]':PERL_EXECUTABLE:_command_names)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-cpanm-bin)'--cpan-cpanm-bin='[The path to the cpanm executable you wish to run. (default\: "cpanm")]':CPANM_EXECUTABLE:_command_names)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-mirror)'--cpan-mirror='[The CPAN mirror to use instead of the default.]':CPAN_MIRROR:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-mirror-only)'--cpan-mirror-only'[Only use the specified mirror for metadata. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--no-cpan-mirror-only)'--no-cpan-mirror-only'[Only use the specified mirror for metadata. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-package-name-prefix)'--cpan-package-name-prefix='[Name to prefix the package name with. (default\: "perl")]':NAME_PREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-test)'--cpan-test'[Run the tests before packaging? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--no-cpan-test)'--no-cpan-test'[Run the tests before packaging? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-verbose)'--cpan-verbose'[Produce verbose output from cpanm? (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--no-cpan-verbose)'--no-cpan-verbose'[Produce verbose output from cpanm? (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-perl-lib-path)'--cpan-perl-lib-path='[Path of target Perl Libraries]':PERL_LIB_PATH:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-sandbox-non-core)'--cpan-sandbox-non-core"[Sandbox all non-core modules, even if they're already installed (default\\: true)]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--no-cpan-sandbox-non-core)'--no-cpan-sandbox-non-core"[Sandbox all non-core modules, even if they're already installed (default\\: true)]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--cpan-cpanm-force)'--cpan-cpanm-force'[Pass the --force parameter to cpanm (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- cpan &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- cpan &&\
     args+=('(--no-cpan-cpanm-force)'--no-cpan-cpanm-force'[Pass the --force parameter to cpanm (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-ignore-iteration-in-dependencies)'--deb-ignore-iteration-in-dependencies"[For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-ignore-iteration-in-dependencies)'--no-deb-ignore-iteration-in-dependencies"[For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-build-depends)'--deb-build-depends='[Add DEPENDENCY as a Build-Depends]':DEPENDENCY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-pre-depends)'--deb-pre-depends='[Add DEPENDENCY as a Pre-Depends]':DEPENDENCY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-compression)'--deb-compression='[The compression type to use, must be one of gz, bzip2, xz, none. (default\: "gz")]':COMPRESSION:'(gz bzip2 xz none)')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-dist)'--deb-dist='[Set the deb distribution. (default\: "unstable")]':DIST-TAG:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-custom-control)'--deb-custom-control='[Custom version of the Debian control file.]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-config)'--deb-config='[Add SCRIPTPATH as debconf config file.]':SCRIPTPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-templates)'--deb-templates='[Add FILEPATH as debconf templates file.]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-installed-size)'--deb-installed-size='[The installed size, in kilobytes. If omitted, this will be calculated automatically]':KILOBYTES:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-priority)'--deb-priority='[The debian package '"'"'priority'"'"' value. (default\: "optional")]':PRIORITY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-use-file-permissions)'--deb-use-file-permissions'[Use existing file permissions when defining ownership and modes]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-use-file-permissions)'--no-deb-use-file-permissions'[Use existing file permissions when defining ownership and modes]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-user)'--deb-user='[The owner of files in this package (default\: "root")]':USER:_users)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-group)'--deb-group='[The group owner of files in this package (default\: "root")]':GROUP:_groups)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-changelog)'--deb-changelog='[Add FILEPATH as debian changelog]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-generate-changes)'--deb-generate-changes'[Generate PACKAGENAME.changes file. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-generate-changes)'--no-deb-generate-changes'[Generate PACKAGENAME.changes file. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-upstream-changelog)'--deb-upstream-changelog='[Add FILEPATH as upstream changelog]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-recommends)'--deb-recommends='[Add PACKAGE to Recommends]':PACKAGE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-suggests)'--deb-suggests='[Add PACKAGE to Suggests]':PACKAGE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-meta-file)'--deb-meta-file='[Add FILEPATH to DEBIAN directory]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-interest)'--deb-interest='[Package is interested in EVENT trigger]':EVENT:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-activate)'--deb-activate='[Package activates EVENT trigger]':EVENT:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-interest-noawait)'--deb-interest-noawait='[Package is interested in EVENT trigger without awaiting]':EVENT:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-activate-noawait)'--deb-activate-noawait='[Package activates EVENT trigger]':EVENT:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-field)'--deb-field="['FIELD\\: VALUE' Add custom field to the control file]":FIELD_AND_VALUE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-no-default-config-files)'--deb-no-default-config-files'[Do not add all files in /etc as configuration files by default for Debian packages. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-no-default-config-files)'--no-deb-no-default-config-files'[Do not add all files in /etc as configuration files by default for Debian packages. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-auto-config-files)'--deb-auto-config-files'[Init script and default configuration files will be labeled as configuration files for Debian packages. (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-auto-config-files)'--no-deb-auto-config-files'[Init script and default configuration files will be labeled as configuration files for Debian packages. (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-shlibs)'--deb-shlibs='[Include control/shlibs content. This flag expects a string that is used as the contents of the shlibs file. See the following url for a description of this file and its format\: http\://www.debian.org/doc/debian-policy/ch-sharedlibs.html#s-shlibs]':SHLIBS:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-init)'--deb-init='[Add FILEPATH as an init script]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-default)'--deb-default='[Add FILEPATH as /etc/default configuration]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-upstart)'--deb-upstart='[Add FILEPATH as an upstart script]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-systemd)'--deb-systemd='[Add FILEPATH as a systemd script]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-systemd-enable)'--deb-systemd-enable'[Enable service on install or upgrade (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-systemd-enable)'--no-deb-systemd-enable'[Enable service on install or upgrade (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-systemd-auto-start)'--deb-systemd-auto-start'[Start service after install or upgrade (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-systemd-auto-start)'--no-deb-systemd-auto-start'[Start service after install or upgrade (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-systemd-restart-after-upgrade)'--deb-systemd-restart-after-upgrade'[Restart service after upgrade (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-systemd-restart-after-upgrade)'--no-deb-systemd-restart-after-upgrade'[Restart service after upgrade (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-after-purge)'--deb-after-purge='[A script to be run after package removal to purge remaining (config) files (a.k.a. postrm purge within apt-get purge)]':FILE:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--deb-maintainerscripts-force-errorchecks)'--deb-maintainerscripts-force-errorchecks'[Activate errexit shell option according to lintian. https\://lintian.debian.org/tags/maintainer-script-ignores-errors.html (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- deb &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- deb &&\
     args+=('(--no-deb-maintainerscripts-force-errorchecks)'--no-deb-maintainerscripts-force-errorchecks'[Activate errexit shell option according to lintian. https\://lintian.debian.org/tags/maintainer-script-ignores-errors.html (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- npm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- npm &&\
     args+=('(--npm-bin)'--npm-bin='[The path to the npm executable you wish to run. (default\: "npm")]':NPM_EXECUTABLE:_command_names)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- npm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- npm &&\
     args+=('(--npm-package-name-prefix)'--npm-package-name-prefix='[Name to prefix the package name with. (default\: "node")]':PREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- npm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- npm &&\
     args+=('(--npm-registry)'--npm-registry='[The npm registry to use instead of the default.]':NPM_REGISTRY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-use-file-permissions)'--rpm-use-file-permissions'[Use existing file permissions when defining ownership and modes.]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-use-file-permissions)'--no-rpm-use-file-permissions'[Use existing file permissions when defining ownership and modes.]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-user)'--rpm-user='[Set the user to USER in the %files section. Overrides the user when used with use-file-permissions setting.]':USER:_users)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-group)'--rpm-group='[Set the group to GROUP in the %files section. Overrides the group when used with use-file-permissions setting.]':GROUP:_groups)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-defattrfile)'--rpm-defattrfile='[Set the default file mode (%defattr). (default\: "-")]':ATTR:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-defattrdir)'--rpm-defattrdir='[Set the default dir mode (%defattr). (default\: "-")]':ATTR:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-rpmbuild-define)'--rpm-rpmbuild-define='[Pass a --define argument to rpmbuild.]':DEFINITION:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-dist)'--rpm-dist='[Set the rpm distribution.]':DIST-TAG:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-digest)'--rpm-digest='[Select a digest algorithm. md5 works on the most platforms. md5|sha1|sha256|sha384|sha512 (default\: "md5")]':RPPM_DIGEST:'(md5 sha1 sha256 sha384 sha512)')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-compression-level)'--rpm-compression-level='[Select a compression level. 0 is store-only. 9 is max compression. (default\: "9")]':LEVEL:'({0..9})')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-compression)'--rpm-compression='[Select a compression method. gzip works on the most platforms. none|xz|xzmt|gzip|bzip2 (default\: "gzip")]':COMPRESSION:'(none xz xzmt gzip bzip2)')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-os)'--rpm-os="[The operating system to target this rpm for. You want to set this to 'linux' if you are using fpm on OS X, for example]":OS:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-changelog)'--rpm-changelog='[Add changelog from FILEPATH contents]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-summary)'--rpm-summary='[Set the RPM summary. Overrides the first line on the description if set]':SUMMARY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-sign)'--rpm-sign'[Pass --sign to rpmbuild]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-sign)'--no-rpm-sign'[Pass --sign to rpmbuild]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-auto-add-directories)'--rpm-auto-add-directories'[Auto add directories not part of filesystem]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-auto-add-directories)'--no-rpm-auto-add-directories'[Auto add directories not part of filesystem]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-auto-add-exclude-directories)'--rpm-auto-add-exclude-directories="[Additional directories ignored by '--rpm-auto-add-directories' flag]":DIRECTORIES:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-autoreqprov)'--rpm-autoreqprov"[Enable RPM's AutoReqProv option]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-autoreqprov)'--no-rpm-autoreqprov"[Enable RPM's AutoReqProv option]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-autoreq)'--rpm-autoreq"[Enable RPM's AutoReq option]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-autoreq)'--no-rpm-autoreq"[Enable RPM's AutoReq option]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-autoprov)'--rpm-autoprov"[Enable RPM's AutoProv option]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-autoprov)'--no-rpm-autoprov"[Enable RPM's AutoProv option]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-attr)'--rpm-attr='[Set the attribute for a file (%attr), e.g. --rpm-attr 750,user1,group1\:/some/file]':ATTRFILE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-init)'--rpm-init='[Add FILEPATH as an init script]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-filter-from-provides)'--rpm-filter-from-provides='[Set %filter_from_provides to the supplied REGEX.]':REGEX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-filter-from-requires)'--rpm-filter-from-requires='[Set %filter_from_requires to the supplied REGEX.]':REGEX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-tag)'--rpm-tag="[Adds a custom tag in the spec file as is. Example\\: --rpm-tag 'Requires(post)\\: /usr/sbin/alternatives']":TAG:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-ignore-iteration-in-dependencies)'--rpm-ignore-iteration-in-dependencies"[For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-ignore-iteration-in-dependencies)'--no-rpm-ignore-iteration-in-dependencies"[For '=' (equal) dependencies, allow iterations on the specified version. Default is to be specific. This option allows the same version of a package but any iteration is permitted]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-verbatim-gem-dependencies)'--rpm-verbatim-gem-dependencies"[When converting from a gem, leave the old (fpm 0.4.x) style dependency names. This flag will use the old 'rubygem-foo' names in rpm requires instead of the redhat style rubygem(foo). (default\\: false)]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-verbatim-gem-dependencies)'--no-rpm-verbatim-gem-dependencies"[When converting from a gem, leave the old (fpm 0.4.x) style dependency names. This flag will use the old 'rubygem-foo' names in rpm requires instead of the redhat style rubygem(foo). (default\\: false)]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-macro-expansion)'--rpm-macro-expansion'[install-time macro expansion in %pre %post %preun %postun scripts (see\: https\://rpm.org/user_doc/scriptlet_expansion.html) (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--no-rpm-macro-expansion)'--no-rpm-macro-expansion'[install-time macro expansion in %pre %post %preun %postun scripts (see\: https\://rpm.org/user_doc/scriptlet_expansion.html) (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-verifyscript)'--rpm-verifyscript='[a script to be run on verification]':FILE:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-pretrans)'--rpm-pretrans='[pretrans script]':FILE:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-posttrans)'--rpm-posttrans='[posttrans script]':FILE:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-trigger-before-install)'--rpm-trigger-before-install="['\\[OPT\\]PACKAGE\\: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See\\: http\\://rpm.org/api/4.4.2.2/triggers.html]":PACKAGE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-trigger-after-install)'--rpm-trigger-after-install="['\\[OPT\\]PACKAGE\\: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See\\: http\\://rpm.org/api/4.4.2.2/triggers.html]":PACKAGE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-trigger-before-uninstall)'--rpm-trigger-before-uninstall="['\\[OPT\\]PACKAGE\\: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See\\: http\\://rpm.org/api/4.4.2.2/triggers.html]":PACKAGE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- rpm &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- rpm &&\
     args+=('(--rpm-trigger-after-target-uninstall)'--rpm-trigger-after-target-uninstall="['\\[OPT\\]PACKAGE\\: FILEPATH' Adds a rpm trigger script located in FILEPATH, having 'OPT' options and linking to 'PACKAGE'. PACKAGE can be a comma seperated list of packages. See\\: http\\://rpm.org/api/4.4.2.2/triggers.html]":PACKAGE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--pear-package-name-prefix)'--pear-package-name-prefix='[Name prefix for pear package (default\: "php-pear")]':PREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--pear-channel)'--pear-channel='[The pear channel url to use instead of the default.]':CHANNEL_URL:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--pear-channel-update)'--pear-channel-update"[call 'pear channel-update' prior to installation]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--no-pear-channel-update)'--no-pear-channel-update"[call 'pear channel-update' prior to installation]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--pear-bin-dir)'--pear-bin-dir='[Directory to put binaries in]':BIN_DIR:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--pear-php-bin)'--pear-php-bin='[Specify php executable path if differs from the os used for packaging]':PHP_BIN:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--pear-php-dir)'--pear-php-dir='[Specify php dir relative to prefix if differs from pear default (pear/php)]':PHP_DIR:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pear &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pear &&\
     args+=('(--pear-data-dir)'--pear-data-dir='[Specify php dir relative to prefix if differs from pear default (pear/data)]':DATA_DIR:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-bin)'--python-bin='[The path to the python executable you wish to run. (default\: "python")]':PYTHON_EXECUTABLE:_command_names)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-easyinstall)'--python-easyinstall='[The path to the easy_install executable tool (default\: "easy_install")]':EASYINSTALL_EXECUTABLE:_command_names)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-pip)'--python-pip='[The path to the pip executable tool. If not specified, easy_install is used instead (default\: nil)]':PIP_EXECUTABLE:_command_names)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-pypi)'--python-pypi='[PyPi Server uri for retrieving packages. (default\: "https\://pypi.python.org/simple")]':PYPI_URL:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-trusted-host)'--python-trusted-host='[Mark this host or host\:port pair as trusted for pip (default\: nil)]':PYPI_TRUSTED:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-package-prefix)'--python-package-prefix='[(DEPRECATED, use --package-name-prefix) Name to prefix the package name with.]':NAMEPREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-package-name-prefix)'--python-package-name-prefix='[Name to prefix the package name with. (default\: "python")]':PREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-fix-name)'--python-fix-name'[Should the target package name be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--no-python-fix-name)'--no-python-fix-name'[Should the target package name be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-fix-dependencies)'--python-fix-dependencies'[Should the package dependencies be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--no-python-fix-dependencies)'--no-python-fix-dependencies'[Should the package dependencies be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-downcase-name)'--python-downcase-name'[Should the target package name be in lowercase? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--no-python-downcase-name)'--no-python-downcase-name'[Should the target package name be in lowercase? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-downcase-dependencies)'--python-downcase-dependencies'[Should the package dependencies be in lowercase? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--no-python-downcase-dependencies)'--no-python-downcase-dependencies'[Should the package dependencies be in lowercase? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-install-bin)'--python-install-bin='[The path to where python scripts should be installed to.]':BIN_PATH:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-install-lib)'--python-install-lib="[The path to where python libs should be installed to (default depends on your python installation). Want to find out what your target platform is using? Run this\\: python -c 'from distutils.sysconfig import get_python_lib; print get_python_lib()']":LIB_PATH:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-install-data)'--python-install-data="[The path to where data should be installed to. This is equivalent to 'python setup.py --install-data DATA_PATH]":DATA_PATH:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-dependencies)'--python-dependencies'[Include requirements defined in setup.py as dependencies. (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--no-python-dependencies)'--no-python-dependencies'[Include requirements defined in setup.py as dependencies. (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-obey-requirements-txt)'--python-obey-requirements-txt'[Use a requirements.txt file in the top-level directory of the python package for dependency detection. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--no-python-obey-requirements-txt)'--no-python-obey-requirements-txt'[Use a requirements.txt file in the top-level directory of the python package for dependency detection. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-scripts-executable)'--python-scripts-executable="[Set custom python interpreter in installing scripts. By default distutils will replace python interpreter in installing scripts (specified by shebang) with current python interpreter (sys.executable). This option is equivalent to appending 'build_scripts --executable PYTHON_EXECUTABLE' arguments to 'setup.py install' command.]":PYTHON_EXECUTABLE:_command_names)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-disable-dependency)'--python-disable-dependency='[The python package name to remove from dependency list (default\: \[\])]':PYTHON_PACKAGE_NAME:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-setup-py-arguments)'--python-setup-py-arguments='[Arbitrary argument(s) to be passed to setup.py (default\: \[\])]':SETUP_PY_ARGUMENT:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--python-internal-pip)'--python-internal-pip"[Use the pip module within python to install modules - aka 'python -m pip'. This is the recommended usage since Python 3.4 (2014) instead of invoking the 'pip' script (default\\: true)]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- python &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- python &&\
     args+=('(--no-python-internal-pip)'--no-python-internal-pip"[Use the pip module within python to install modules - aka 'python -m pip'. This is the recommended usage since Python 3.4 (2014) instead of invoking the 'pip' script (default\\: true)]")
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- osxpkg &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- osxpkg &&\
     args+=('(--osxpkg-identifier-prefix)'--osxpkg-identifier-prefix="[Reverse domain prefix prepended to package identifier, ie. 'org.great.my'. If this is omitted, the identifer will be the package name.]":IDENTIFIER_PREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- osxpkg &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- osxpkg &&\
     args+=('(--osxpkg-payload-free)'--osxpkg-payload-free'[Define no payload, assumes use of script options. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- osxpkg &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- osxpkg &&\
     args+=('(--no-osxpkg-payload-free)'--no-osxpkg-payload-free'[Define no payload, assumes use of script options. (default\: false)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- osxpkg &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- osxpkg &&\
     args+=('(--osxpkg-ownership)'--osxpkg-ownership='[--ownership option passed to pkgbuild. Defaults to '"'"'recommended'"'"'. See pkgbuild(1). (default\: "recommended")]':OWNERSHIP:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- osxpkg &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- osxpkg &&\
     args+=('(--osxpkg-postinstall-action)'--osxpkg-postinstall-action="[Post-install action provided in package metadata. Optionally one of 'logout', 'restart', 'shutdown'.]":POSTINSTALL_ACTION:'(logout restart shutdown)')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- osxpkg &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- osxpkg &&\
     args+=('*'--osxpkg-dont-obsolete="[A file path for which to 'dont-obsolete' in the built PackageInfo. Can be specified multiple times.]":DONT_OBSOLETE_PATH:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- solaris &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- solaris &&\
     args+=('(--solaris-user)'--solaris-user='[Set the user to USER in the prototype files. (default\: "root")]':USER:_users)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- solaris &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- solaris &&\
     args+=('(--solaris-group)'--solaris-group='[Set the group to GROUP in the prototype file. (default\: "root")]':GROUP:_groups)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--p5p-user)'--p5p-user='[Set the user to USER in the prototype files. (default\: "root")]':USER:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--p5p-group)'--p5p-group='[Set the group to GROUP in the prototype file. (default\: "root")]':GROUP:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--p5p-zonetype)'--p5p-zonetype='[Set the allowed zone types (global, nonglobal, both) (default\: "value=global value=nonglobal")]':ZONETYPE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--p5p-publisher)'--p5p-publisher='[Set the publisher name for the repository (default\: "FPM")]':PUBLISHER:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--p5p-lint)'--p5p-lint'[Check manifest with pkglint (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--no-p5p-lint)'--no-p5p-lint'[Check manifest with pkglint (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--p5p-validate)'--p5p-validate'[Validate with pkg install (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- p5p &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- p5p &&\
     args+=('(--no-p5p-validate)'--no-p5p-validate'[Validate with pkg install (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- freebsd &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- freebsd &&\
     args+=('(--freebsd-origin)'--freebsd-origin='[Sets the FreeBSD '"'"'origin'"'"' pkg field (default\: "fpm/<name>")]':ABI:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- snap &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- snap &&\
     args+=('(--snap-yaml)'--snap-yaml='[Custom version of the snap.yaml file.]':FILEPATH:_files)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- snap &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- snap &&\
     args+=('(--snap-confinement)'--snap-confinement='[Type of confinement to use for this snap. (default\: "devmode")]':CONFINEMENT:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- snap &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- snap &&\
     args+=('(--snap-grade)'--snap-grade='[Grade of this snap. (default\: "devel")]':GRADE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pacman &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pacman &&\
     args+=('(--pacman-optional-depends)'--pacman-optional-depends='[Add an optional dependency to the pacman package.]':PACKAGE:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pacman &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pacman &&\
     args+=('(--pacman-use-file-permissions)'--pacman-use-file-permissions'[Use existing file permissions when defining ownership and modes]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pacman &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pacman &&\
     args+=('(--no-pacman-use-file-permissions)'--no-pacman-use-file-permissions'[Use existing file permissions when defining ownership and modes]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pacman &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pacman &&\
     args+=('(--pacman-user)'--pacman-user='[The owner of files in this package (default\: "root")]':USER:_users)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pacman &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pacman &&\
     args+=('(--pacman-group)'--pacman-group='[The group owner of files in this package (default\: "root")]':GROUP:_groups)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pacman &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pacman &&\
     args+=('(--pacman-compression)'--pacman-compression='[The compression type to use, must be one of gz, bzip2, xz, zstd, none. (default\: "zstd")]':COMPRESSION:'(gz bzip2 xz zstd none)')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pleaserun &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pleaserun &&\
     args+=('(--pleaserun-name)'--pleaserun-name='[The name of the service you are creating]':SERVICE_NAME:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pleaserun &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pleaserun &&\
     args+=('(--pleaserun-chdir)'--pleaserun-chdir='[The working directory used by the service]':CHDIR:_directories)
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- pleaserun &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- pleaserun &&\
     args+=('(--pleaserun-user)'--pleaserun-user='[The user to use for executing this program.]':USER:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-pypi)'--virtualenv-pypi='[PyPi Server uri for retrieving packages. (default\: "https\://pypi.python.org/simple")]':PYPI_URL:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-package-name-prefix)'--virtualenv-package-name-prefix='[Name to prefix the package name with. (default\: "virtualenv")]':PREFIX:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-install-location)'--virtualenv-install-location='[DEPRECATED\: Use --prefix instead.  Location to which to install the virtualenv by default. (default\: "/usr/share/python")]':DIRECTORY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-fix-name)'--virtualenv-fix-name'[Should the target package name be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--no-virtualenv-fix-name)'--no-virtualenv-fix-name'[Should the target package name be prefixed? (default\: true)]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-other-files-dir)'--virtualenv-other-files-dir='[Optionally, the contents of the specified directory may be added to the package. This is useful if the virtualenv needs configuration files, etc. (default\: nil)]':DIRECTORY:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-pypi-extra-url)'--virtualenv-pypi-extra-url='[PyPi extra-index-url for pointing to your priviate PyPi (default\: nil)]':PYPI_EXTRA_URL:' ')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-setup-install)'--virtualenv-setup-install'[After building virtualenv run setup.py install useful when building a virtualenv for packages and including their requirements from]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--no-virtualenv-setup-install)'--no-virtualenv-setup-install'[After building virtualenv run setup.py install useful when building a virtualenv for packages and including their requirements from]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-system-site-packages)'--virtualenv-system-site-packages'[Give the virtual environment access to the global site-packages]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--no-virtualenv-system-site-packages)'--no-virtualenv-system-site-packages'[Give the virtual environment access to the global site-packages]')
-  _fpm_zsh_helper option_is -t --output-type -s --input-type -- virtualenv &&\
+  _fpm_zsh_query option_is -t --output-type -s --input-type -- virtualenv &&\
     args+=('(--virtualenv-find-links)'--virtualenv-find-links="[If a url or path to an html file, then parse for links to archives. If a local path or file\\:// url that's a directory, then look for archives in the directory listing. (default\\: nil)]":PIP_FIND_LINKS:' ')
   _arguments -S -s -w "${args[@]}"
 }
