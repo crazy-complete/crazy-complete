@@ -4,6 +4,7 @@ import os
 import sys
 import argparse
 
+from crazy_complete.errors import CrazyError
 from crazy_complete import bash, fish, zsh
 from crazy_complete import argparse_source, json_source, yaml_source
 from crazy_complete import argparse_mod # .complete() etc.
@@ -92,10 +93,10 @@ def load_definitions_file(opts):
         if extension in ('yaml', 'yml'):
             return yaml_source.load_from_file(opts.definition_file)
         if extension == 'py':
-            raise Exception('Reading Python files must be enabled by --input-type=python')
+            raise CrazyError('Reading Python files must be enabled by --input-type=python')
         if extension == '':
-            raise Exception('File has no extension. Please supply --input-type=json|yaml|python')
-        raise Exception(f'Unknown file extension `{extension}`. Please supply --input-type=json|yaml|python')
+            raise CrazyError('File has no extension. Please supply --input-type=json|yaml|python')
+        raise CrazyError(f'Unknown file extension `{extension}`. Please supply --input-type=json|yaml|python')
     if opts.input_type == 'json':
         return json_source.load_from_file(opts.definition_file)
     if opts.input_type == 'yaml':
@@ -116,11 +117,11 @@ def write_string_to_file(string, file):
 
 def generate(opts):
     if not os.path.exists(opts.definition_file):
-        raise FileNotFoundError(opts.definition_file)
+        raise CrazyError(f"File not found: {opts.definition_file}")
 
     if opts.input_type == 'help':
         if opts.shell != 'yaml':
-            raise Exception('The `help` input-type currently only supports YAML generation')
+            raise CrazyError('The `help` input-type currently only supports YAML generation')
         output = help_converter.from_file_to_yaml(opts.definition_file)
         write_string_to_file(output, opts.output_file)
         return
@@ -178,9 +179,9 @@ if __name__ == '__main__':
     opts = _crazy_complete_argument_parser.parse_args()
     try:
         generate(opts)
-    except Exception as e:
-        print('%s: %s' % (type(e).__name__, e), file=sys.stderr)
+    except CrazyError as e:
         if opts.debug:
             raise
+        print('Error:', e, file=sys.stderr)
         print('Pass --debug to see full stack trace', file=sys.stderr)
         sys.exit(1)

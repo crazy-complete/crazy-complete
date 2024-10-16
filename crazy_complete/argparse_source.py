@@ -8,6 +8,7 @@ from collections import OrderedDict
 
 from . import file_loader
 from . import utils
+from .errors import CrazyError
 from .cli import CommandLine, MutuallyExclusiveGroup
 
 # We have to use implementation details of the argparse module...
@@ -66,9 +67,9 @@ def get_complete(action):
         return None
 
     if isinstance(action, argparse.BooleanOptionalAction):
-        raise Exception("argparse.BooleanOptionalAction is not supported yet")
+        raise CrazyError("argparse.BooleanOptionalAction is not supported yet")
 
-    raise Exception(f'Unknown action type: {action}')
+    raise CrazyError(f'Unknown action type: {action}')
 
 def argumentparser_to_commandline(parser, prog=None, description=None):
     '''
@@ -211,18 +212,18 @@ def load_from_file(file, parser_variable=None, parser_blacklist=[]):
         try:
             parser = getattr(module, parser_variable)
         except AttributeError:
-            raise Exception(f"No variable named `{parser_variable}` found in `{file}`")
+            raise CrazyError(f"No variable named `{parser_variable}` found in `{file}`")
     else:
         parsers = find_root_argument_parsers(module)
         for blacklisted in parser_blacklist:
             try:
                 parsers.remove(blacklisted)
-            except:
+            except ValueError:
                 pass
         if len(parsers) == 0:
-            raise Exception(f"Could not find any ArgumentParser object in `{file}`")
+            raise CrazyError(f"Could not find any ArgumentParser object in `{file}`")
         if len(parsers) > 1:
-            raise Exception(f"Found too many ArgumentParser objects in `{file}`")
+            raise CrazyError(f"Found too many ArgumentParser objects in `{file}`")
         parser = parsers[0]
 
     return argumentparser_to_commandline(parser)

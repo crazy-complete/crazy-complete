@@ -1,5 +1,6 @@
 ''' Functions that are used in the generation process '''
 
+from .errors import CrazyError
 from . import completion_validator
 from . import cli
 from . import config as _config
@@ -62,8 +63,8 @@ def add_parsed_when(commandline):
         if option.when:
             try:
                 setattr(option, 'when_parsed', when.parse_when(option.when))
-            except Exception as e:
-                raise Exception('%s: %s: %s: %s' % (
+            except CrazyError as e:
+                raise CrazyError('%s: %s: %s: %s' % (
                     commandline.get_command_path(),
                     option.get_option_strings_key('|'),
                     option.when,

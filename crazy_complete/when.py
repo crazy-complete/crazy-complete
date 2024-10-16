@@ -2,6 +2,8 @@
 
 import shlex
 
+from .errors import CrazyError
+
 class OptionIs:
     def __init__(self, args):
         self.options = []
@@ -17,23 +19,23 @@ class OptionIs:
                 self.values.append(arg)
 
         if not self.options:
-            raise Exception('OptionIs: Empty options')
+            raise CrazyError('OptionIs: Empty options')
 
         if not self.values:
-            raise Exception('OptionIs: Empty values')
+            raise CrazyError('OptionIs: Empty values')
 
 class HasOption:
     def __init__(self, args):
         self.options = args
 
         if not self.options:
-            raise Exception('HasOption: Empty options')
+            raise CrazyError('HasOption: Empty options')
 
 def parse_when(s):
     split = shlex.split(s)
 
     if not split:
-        raise Exception("parse_when: Empty arguments")
+        raise CrazyError("parse_when: Empty arguments")
 
     cmd = split[0]
     del split[0]
@@ -44,4 +46,4 @@ def parse_when(s):
     if cmd == 'has_option':
         return HasOption(split)
 
-    raise Exception("parse_when: Invalid command: %r" % cmd)
+    raise CrazyError("parse_when: Invalid command: %r" % cmd)

@@ -1,20 +1,22 @@
 ''' This module contains code for validating the `complete` attribute '''
 
+from .errors import CrazyError
+
 def get_required_arg(l, name):
     try:
         return l.pop(0)
-    except:
-        raise Exception(f'Missing argument: {name}')
+    except IndexError:
+        raise CrazyError(f'Missing argument: {name}')
 
 def get_optional_arg(l, default=None):
     try:
         return l.pop(0)
-    except:
+    except IndexError:
         return default
 
 def require_no_more(l):
     if l:
-        raise Exception('Too many arguments')
+        raise CrazyError('Too many arguments')
 
 class CompletionValidator:
     @staticmethod
@@ -24,7 +26,7 @@ class CompletionValidator:
             command  = complete.pop(0)
 
             if not hasattr(CompletionValidator, command):
-                raise Exception(f"Unknown completion command: {command}")
+                raise CrazyError(f"Unknown command for `complete`: {command}")
 
             getattr(CompletionValidator, command)(complete)
 
@@ -33,8 +35,8 @@ class CompletionValidator:
         for option in cmdline.get_options():
             try:
                 CompletionValidator.validate_complete(option.complete)
-            except Exception as e:
-                raise Exception("%s: %s: %s" % (
+            except CrazyError as e:
+                raise CrazyError("%s: %s: %s" % (
                     cmdline.get_command_path(),
                     ' '.join(option.option_strings),
                     e))
@@ -42,8 +44,8 @@ class CompletionValidator:
         for positional in cmdline.get_positionals():
             try:
                 CompletionValidator.validate_complete(positional.complete)
-            except Exception as e:
-                raise Exception("%s: %d (%s): %s" % (
+            except CrazyError as e:
+                raise CrazyError("%s: %d (%s): %s" % (
                     cmdline.get_command_path(),
                     positional.number,
                     positional.metavar,
@@ -55,7 +57,7 @@ class CompletionValidator:
 
     @staticmethod
     def none(args):
-        return args
+        return ()
 
     @staticmethod
     def choices(args):
@@ -66,10 +68,10 @@ class CompletionValidator:
             new_choices = {}
             for item, desc in choices.items():
                 if not isinstance(item, (str, int, float)):
-                    raise Exception(f'Item not a str/int/float: {item}')
+                    raise CrazyError(f'Item not a str/int/float: {item}')
 
                 if not isinstance(desc, (str, int, float)):
-                    raise Exception(f'Description not a str/int/float: {desc}')
+                    raise CrazyError(f'Description not a str/int/float: {desc}')
 
                 new_choices[str(item)] = str(desc)
 
@@ -79,12 +81,12 @@ class CompletionValidator:
             new_choices = []
             for item in choices:
                 if not isinstance(item, (str, int, float)):
-                    raise Exception(f'Item not a str/int/float: {item}')
+                    raise CrazyError(f'Item not a str/int/float: {item}')
 
                 new_choices.append(item)
             return (new_choices,)
 
-        raise Exception('VALUES: Not a list, tuple or dictionary')
+        raise CrazyError('VALUES: Not a list, tuple or dictionary')
 
     @staticmethod
     def command(args):
@@ -100,11 +102,11 @@ class CompletionValidator:
         for name, value in opts.items():
             if name == 'directory':
                 if not isinstance(value, str):
-                    raise Exception(f"directory: Not a str: {value}")
+                    raise CrazyError(f"directory: Not a str: {value}")
 
                 directory = value
             else:
-                raise Exception(f'Unknown option: {name}')
+                raise CrazyError(f'Unknown option: {name}')
 
         return ({'directory': directory},)
 
@@ -117,11 +119,11 @@ class CompletionValidator:
         for name, value in opts.items():
             if name == 'directory':
                 if not isinstance(value, str):
-                    raise Exception(f"directory: Not a str: {value}")
+                    raise CrazyError(f"directory: Not a str: {value}")
 
                 directory = value
             else:
-                raise Exception(f'Unknown option: {name}')
+                raise CrazyError(f'Unknown option: {name}')
 
         return ({'directory': directory},)
 
@@ -153,22 +155,22 @@ class CompletionValidator:
         require_no_more(args)
 
         if not isinstance(start, int):
-            raise Exception(f"start: not an int: {start}")
+            raise CrazyError(f"start: not an int: {start}")
 
         if not isinstance(stop, int):
-            raise Exception(f"stop: not an int: {stop}")
+            raise CrazyError(f"stop: not an int: {stop}")
 
         if not isinstance(step, int):
-            raise Exception(f"step: not an int: {step}")
+            raise CrazyError(f"step: not an int: {step}")
 
         if step > 0:
             if start > stop:
-                raise Exception(f"start > stop: {start} > {stop} (step={step})")
+                raise CrazyError(f"start > stop: {start} > {stop} (step={step})")
         elif step < 0:
             if stop > start:
-                raise Exception(f"stop > start: {stop} > {start} (step={step})")
+                raise CrazyError(f"stop > start: {stop} > {start} (step={step})")
         else:
-            raise Exception(f"step: cannot be 0")
+            raise CrazyError(f"step: cannot be 0")
 
         return args
 
@@ -189,11 +191,10 @@ class CompletionValidator:
 
     @staticmethod
     def variable(args):
-        try:    option = args.pop(0)
-        except: option = None
+        option = get_optional_arg(args, None)
         require_no_more(args)
         if option not in (None, '-x'):
-            raise Exception(f'Invalid option: {option}')
+            raise CrazyError(f'Invalid option: {option}')
         return ()
 
     @staticmethod
@@ -202,7 +203,7 @@ class CompletionValidator:
         require_no_more(args)
 
         if not isinstance(cmd, str):
-            raise Exception(f"Command is not a str: {cmd}")
+            raise CrazyError(f"Command is not a str: {cmd}")
 
         return (cmd,)
 
@@ -220,19 +221,19 @@ class CompletionValidator:
             elif key == 'separator':
                 separator = value
             else:
-                raise Exception(f'Invalid key: {key}')
+                raise CrazyError(f'Invalid key: {key}')
 
         if values is None:
-            raise Exception(f'Missing `values` key: {opts}')
+            raise CrazyError(f'Missing `values` key: {opts}')
 
         if not isinstance(values, (list, tuple)):
-            raise Exception(f'Values: not a list: {values}')
+            raise CrazyError(f'Values: not a list: {values}')
 
         for value in values:
             if not isinstance(value, (str, int, float)):
-                raise Exception(f'Invalid value: {value}')
+                raise CrazyError(f'Invalid value: {value}')
 
         if len(separator) != 1:
-            raise Exception(f'Invalid length for separator: {separator}')
+            raise CrazyError(f'Invalid length for separator: {separator}')
 
         return ({'values': values, 'separator': separator},)

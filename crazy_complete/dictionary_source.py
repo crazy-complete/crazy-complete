@@ -5,6 +5,7 @@ dictionaries and vice versa.
 
 from collections import OrderedDict
 
+from .errors import CrazyError
 from .cli import CommandLine, ExtendedBool
 
 def dictionary_to_commandline(dictionary, prog):
@@ -67,10 +68,10 @@ class CommandlineTree:
 
     def get_root_commandline(self):
         if len(self.root.subcommands) == 0:
-            raise Exception("No programs defined")
+            raise CrazyError("No programs defined")
 
         if len(self.root.subcommands) > 1:
-            raise Exception("Too many programs defined")
+            raise CrazyError("Too many programs defined")
 
         return list(self.root.subcommands.values())[0]
 

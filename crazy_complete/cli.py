@@ -1,5 +1,6 @@
 ''' This module contains the CommandLine, Option and Positional classes '''
 
+import re
 from collections import OrderedDict
 
 class ExtendedBool:
@@ -7,11 +8,22 @@ class ExtendedBool:
     FALSE   = False
     INHERIT = 'INHERIT'
 
-def is_bool(obj):
+def _is_bool(obj):
     return isinstance(obj, bool)
 
-def is_extended_bool(obj):
+def _is_extended_bool(obj):
     return obj in (True, False, ExtendedBool.INHERIT)
+
+_VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
+
+def _validate_option_string(option_string):
+    if not _VALID_OPTION_STRING_RE.fullmatch(option_string):
+        return False
+
+    if option_string == '--':
+        return False
+
+    return True
 
 class CommandLine:
     '''
@@ -153,7 +165,7 @@ class CommandLine:
             SubCommandsOption: The newly created subcommands option.
 
         Raises:
-            Exception: If the command line object already has subcommands.
+            CrazyError: If the command line object already has subcommands.
         '''
         assert isinstance(name, str), \
             "CommandLine.add_subcommands: name: expected str, got %r" % name
@@ -162,7 +174,7 @@ class CommandLine:
             "CommandLine.add_subcommands: help: expected str, got %r" % help
 
         if self.subcommands:
-            raise Exception('CommandLine object already has subcommands')
+            raise CrazyError('CommandLine object already has subcommands')
 
         self.subcommands = SubCommandsOption(self, name, help)
         return self.subcommands
@@ -208,10 +220,10 @@ class CommandLine:
         Returns:
             list: A list of Option objects
         '''
-        assert is_bool(with_parent_options), \
+        assert _is_bool(with_parent_options), \
             "CommandLine.get_options: with_parent_options: expected bool, got %r" % with_parent_options
 
-        assert is_bool(only_with_arguments), \
+        assert _is_bool(only_with_arguments), \
             "CommandLine.get_options: only_with_arguments: expected bool, got %r" % only_with_arguments
 
         getter = CommandLine.OptionsGetter(self,
@@ -230,10 +242,10 @@ class CommandLine:
         Returns:
             list: A list of option strings
         '''
-        assert is_bool(with_parent_options), \
+        assert _is_bool(with_parent_options), \
             "CommandLine.get_option_strings: with_parent_options: expected bool, got %r" % with_parent_options
 
-        assert is_bool(only_with_arguments), \
+        assert _is_bool(only_with_arguments), \
             "CommandLine.get_option_strings: only_with_arguments: expected bool, got %r" % only_with_arguments
 
         option_strings = []
@@ -274,7 +286,7 @@ class CommandLine:
         Returns:
             list: A list of parent CommandLine objects.
         '''
-        assert is_bool(include_self), \
+        assert _is_bool(include_self), \
             "CommandLine.get_parents: include_self: expected bool, got %r" % include_self
 
         parents = []
@@ -301,7 +313,7 @@ class CommandLine:
                     found = True
                     break
             if not found:
-                raise Exception('Option %r not found' % option_string)
+                raise CrazyError('Option %r not found' % option_string)
 
         return result
 
@@ -452,7 +464,6 @@ class Positional:
         '''
         return self.get_positional_index() + 1
 
-
 class Option:
     def __init__(
             self,
@@ -475,14 +486,11 @@ class Option:
         self.when = when
 
         if not option_strings:
-            raise Exception('Empty option strings')
+            raise CrazyError('Empty option strings')
 
         for option_string in option_strings:
-            if ' ' in option_string:
-                raise Exception(f"Invalid option: {option_string}")
-
-            if not option_string.startswith('-'):
-                raise Exception(f"Invalid option: {option_string}")
+            if not _validate_option_string(option_string):
+                raise CrazyError(f"Invalid option string: {option_string}")
 
         if complete:
             self.complete = complete
@@ -490,7 +498,7 @@ class Option:
             self.complete = ('none',)
 
         if not self.takes_args and self.metavar:
-            raise Exception('Option does not take an argument but has metavar set')
+            raise CrazyError('Option does not take an argument but has metavar set')
 
     def get_option_strings(self):
         '''

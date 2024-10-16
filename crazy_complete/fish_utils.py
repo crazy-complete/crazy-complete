@@ -1,5 +1,6 @@
 ''' Fish utility functions '''
 
+from .errors import InternalError
 from . import shell
 
 class FishString:
@@ -120,10 +121,10 @@ class FishCompleteCommand:
             elif arg == '-a':
                 try:
                     self.set_arguments(args.pop(0))
-                except:
-                    raise Exception('Option `-a` requires an argument')
+                except IndexError as e:
+                    raise InternalError('Option `-a` requires an argument') from e
             else:
-                raise Exception('Unknown option for `complete`: %r' % arg)
+                raise InternalError(f'Unknown option for `complete`: {arg}')
 
     def get(self):
         r = ['complete']
