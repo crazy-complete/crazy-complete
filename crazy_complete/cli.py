@@ -3,6 +3,8 @@
 import re
 from collections import OrderedDict
 
+from .errors import CrazyError
+
 class ExtendedBool:
     TRUE    = True
     FALSE   = False
