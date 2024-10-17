@@ -95,8 +95,8 @@ def load_definitions_file(opts):
         if extension == 'py':
             raise CrazyError('Reading Python files must be enabled by --input-type=python')
         if extension == '':
-            raise CrazyError('File has no extension. Please supply --input-type=json|yaml|python')
-        raise CrazyError(f'Unknown file extension `{extension}`. Please supply --input-type=json|yaml|python')
+            raise CrazyError('File has no extension. Please supply --input-type=json|yaml|help|python')
+        raise CrazyError(f'Unknown file extension `{extension}`. Please supply --input-type=json|yaml|help|python')
     if opts.input_type == 'json':
         return json_source.load_from_file(opts.definition_file)
     if opts.input_type == 'yaml':
