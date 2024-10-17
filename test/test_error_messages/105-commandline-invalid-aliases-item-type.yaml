@@ -1,0 +1,4 @@
+prog: "test"
+aliases: ["foo", 1]
+---
+expected_error: "aliases: found non-str item: 1"

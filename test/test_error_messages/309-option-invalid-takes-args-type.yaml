@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    takes_args: ["wrong type"]
+---
+expected_error: "takes_args: expected bool or \"?\", got ['wrong type']"

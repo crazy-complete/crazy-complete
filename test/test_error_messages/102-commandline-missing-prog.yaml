@@ -1,0 +1,3 @@
+help: "test"
+---
+expected_error: "Missing `prog` field"

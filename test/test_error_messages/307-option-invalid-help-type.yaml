@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    help: false
+---
+expected_error: "help: expected str, got False"

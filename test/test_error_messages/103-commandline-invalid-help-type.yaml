@@ -1,0 +1,4 @@
+prog: "test"
+help: false
+---
+expected_error: "help: expected str, got False"

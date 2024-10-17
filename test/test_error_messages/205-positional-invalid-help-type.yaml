@@ -1,0 +1,6 @@
+prog: "test"
+positionals:
+  - number: 1
+    help: false
+---
+expected_error: "help: expected str, got False"

@@ -1,0 +1,5 @@
+prog: "test"
+positionals:
+  - number: "wrong type"
+---
+expected_error: "number: expected int, got wrong type"

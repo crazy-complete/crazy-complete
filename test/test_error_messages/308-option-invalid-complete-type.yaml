@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    complete: false
+---
+expected_error: "complete: expected list, got False"

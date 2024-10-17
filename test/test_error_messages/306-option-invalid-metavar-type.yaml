@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    metavar: false
+---
+expected_error: "metavar: expected str, got False"

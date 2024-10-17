@@ -1,0 +1,4 @@
+prog: "test"
+abbreviate_options: ['wrong type']
+---
+expected_error: "abbreviate_options: expected ExtendedBool, got ['wrong type']"

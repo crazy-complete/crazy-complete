@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - metavar: "test"
+---
+# TODO
+expected_error: "option_strings: expected list, got None"

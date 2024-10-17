@@ -33,7 +33,7 @@ class CommandLine:
     '''
 
     def __init__(self,
-                 program_name,
+                 prog,
                  parent=None,
                  help=None,
                  aliases=[],
@@ -45,7 +45,7 @@ class CommandLine:
         Initializes a CommandLine object with the specified parameters.
 
         Args:
-            program_name (str): The name of the program (or subcommand).
+            prog (str): The name of the program (or subcommand).
             help (str): The help message for the program (or subcommand).
             parent (CommandLine or None): The parent command line object, if any.
             aliases (list of str): Aliases for this command.
@@ -53,19 +53,33 @@ class CommandLine:
             abbreviate_options (ExtendedBool): Specifies if options can be abbreviated.
             inherit_options (ExtendedBool): Specifies if options are visible to subcommands.
         '''
-        assert isinstance(program_name, str), \
-            "CommandLine: program_name: expected str, got %r" % program_name
 
-        assert isinstance(help, (str, None.__class__)), \
-            "CommandLine: help: expected str, got %r" % help
+        if not isinstance(prog, str):
+            raise CrazyError(f'prog: expected str, got {prog}')
 
-        assert isinstance(parent, (CommandLine, None.__class__)), \
-            "CommandLine: parent: expected CommandLine, got %r" % parent
+        if not isinstance(help, (str, None.__class__)):
+            raise CrazyError(f'help: expected str, got {help}')
 
-        assert isinstance(aliases, list), \
-            "CommandLine: aliases: expected list, got %r" % aliases
+        if not isinstance(parent, (CommandLine, None.__class__)):
+            raise CrazyError(f'parent: expected CommandLine, got {parent}')
 
-        self.prog = program_name
+        if not isinstance(aliases, list):
+            raise CrazyError(f'aliases: expected list, got {aliases}')
+
+        for alias in aliases:
+            if not isinstance(alias, str):
+                raise CrazyError(f'aliases: found non-str item: {alias}')
+
+        if not _is_extended_bool(abbreviate_commands):
+            raise CrazyError(f'abbreviate_commands: expected ExtendedBool, got {abbreviate_commands}')
+
+        if not _is_extended_bool(abbreviate_options):
+            raise CrazyError(f'abbreviate_options: expected ExtendedBool, got {abbreviate_options}')
+
+        if not _is_extended_bool(inherit_options):
+            raise CrazyError(f'inherit_options: expected ExtendedBool, got {inherit_options}')
+
+        self.prog = prog
         self.parent = parent
         self.help = help
         self.aliases = aliases
@@ -93,7 +107,7 @@ class CommandLine:
             metavar (str): The metavar for the option.
             help (str): The help message for the option.
             complete (tuple): The completion specification for the option.
-            takes_args (bool): Specifies if the option takes arguments.
+            takes_args (bool or "?"): Specifies if the option takes arguments.
             group (str): Specify to which mutually exclusive group this option belongs to.
             multiple_option (ExtendedBool): Specifies if the option can be repeated.
             when (str): Specifies a condition for showing this option.
@@ -169,11 +183,11 @@ class CommandLine:
         Raises:
             CrazyError: If the command line object already has subcommands.
         '''
-        assert isinstance(name, str), \
-            "CommandLine.add_subcommands: name: expected str, got %r" % name
+        if not isinstance(name, str):
+            raise CrazyError(f'name: expected str, got {name}')
 
-        assert isinstance(help, (str, None.__class__)), \
-            "CommandLine.add_subcommands: help: expected str, got %r" % help
+        if not isinstance(help, (str, None.__class__)):
+            raise CrazyError(f'help: expected str, got {help}')
 
         if self.subcommands:
             raise CrazyError('CommandLine object already has subcommands')
@@ -418,19 +432,37 @@ class Positional:
             repeatable=False,
             when=None):
 
-        assert isinstance(number, int), "Positional: number: expected int, got %r" % number
+        if not isinstance(parent, (CommandLine, None.__class__)):
+            raise CrazyError(f'parent: expected CommandLine, got {parent}')
+
+        if not isinstance(number, int):
+            raise CrazyError(f'number: expected int, got {number}')
+
+        if not isinstance(metavar, (str, None.__class__)):
+            raise CrazyError(f'metavar: expected str, got {metavar}')
+
+        if not isinstance(help, (str, None.__class__)):
+            raise CrazyError(f'help: expected str, got {help}')
+
+        if not isinstance(complete, (list, tuple, None.__class__)):
+            raise CrazyError(f'complete: expected list, got {complete}')
+
+        if not isinstance(repeatable, bool):
+            raise CrazyError(f'repeatable: expected bool, got {repeatable}')
+
+        if not isinstance(when, (str, None.__class__)):
+            raise CrazyError(f'when: expected str, got {when}')
+
+        if number <= 0:
+            raise CrazyError(f'number: value ({number}) is invalid, number has to be >= 1')
 
         self.parent = parent
         self.number = number
         self.metavar = metavar
         self.help = help
         self.repeatable = repeatable
+        self.complete = complete if complete else ('none',)
         self.when = when
-
-        if complete:
-            self.complete = complete
-        else:
-            self.complete = ('none',)
 
     def get_positional_index(self):
         '''
@@ -478,14 +510,32 @@ class Option:
             takes_args=True,
             multiple_option=ExtendedBool.INHERIT,
             when=None):
-        self.parent = parent
-        self.option_strings = option_strings
-        self.metavar = metavar
-        self.help = help
-        self.group = group
-        self.takes_args = takes_args
-        self.multiple_option = multiple_option
-        self.when = when
+        if not isinstance(parent, (CommandLine, None.__class__)):
+            raise CrazyError(f'parent: expected CommandLine, got {parent}')
+
+        if not isinstance(option_strings, list):
+            raise CrazyError(f'option_strings: expected list, got {option_strings}')
+
+        if not isinstance(metavar, (str, None.__class__)):
+            raise CrazyError(f'metavar: expected str, got {metavar}')
+
+        if not isinstance(help, (str, None.__class__)):
+            raise CrazyError(f'help: expected str, got {help}')
+
+        if not isinstance(complete, (list, tuple, None.__class__)):
+            raise CrazyError(f'complete: expected list, got {complete}')
+
+        if not isinstance(group, (str, None.__class__)):
+            raise CrazyError(f'group: expected str, got {group}')
+
+        if not isinstance(takes_args, bool) and not takes_args == '?':
+            raise CrazyError(f'takes_args: expected bool or "?", got {takes_args}')
+
+        if not _is_extended_bool(multiple_option):
+            raise CrazyError(f'multiple_option: expected ExtendedBool, got {multiple_option}')
+
+        if not isinstance(when, (str, None.__class__)):
+            raise CrazyError(f'when: expected str, got {when}')
 
         if not option_strings:
             raise CrazyError('Empty option strings')
@@ -494,13 +544,18 @@ class Option:
             if not _validate_option_string(option_string):
                 raise CrazyError(f"Invalid option string: {option_string}")
 
-        if complete:
-            self.complete = complete
-        else:
-            self.complete = ('none',)
+        if not takes_args and metavar:
+            raise CrazyError(f'Option {option_strings} does not take an argument but has metavar set')
 
-        if not self.takes_args and self.metavar:
-            raise CrazyError('Option does not take an argument but has metavar set')
+        self.parent = parent
+        self.option_strings = option_strings
+        self.metavar = metavar
+        self.help = help
+        self.complete = complete if complete else ('none',)
+        self.group = group
+        self.takes_args = takes_args
+        self.multiple_option = multiple_option
+        self.when = when
 
     def get_option_strings(self):
         '''

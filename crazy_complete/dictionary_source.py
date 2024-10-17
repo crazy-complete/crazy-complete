@@ -8,9 +8,26 @@ from collections import OrderedDict
 from .errors import CrazyError
 from .cli import CommandLine, ExtendedBool
 
-def dictionary_to_commandline(dictionary, prog):
+def _dictionary_check_unknown_keys(dictionary, allowed_keys):
+    for key in dictionary.keys():
+        if key not in allowed_keys:
+            raise CrazyError(f'Unknown key: {key}')
+
+def dictionary_to_commandline(dictionary, prog=None):
+    _dictionary_check_unknown_keys(dictionary,
+        ['prog', 'help', 'aliases', 'abbreviate_commands', 'abbreviate_options',
+         'inherit_options', 'options', 'positionals'])
+
+    options = dictionary.get('options', [])
+    if not isinstance(options, list):
+        raise CrazyError(f'options: expected list, got {options}')
+
+    positionals = dictionary.get('positionals', [])
+    if not isinstance(positionals, list):
+        raise CrazyError(f'positionals: expected list, got {positionals}')
+
     commandline = CommandLine(
-        prog,
+        prog or dictionary['prog'],
         parent              = None,
         help                = dictionary.get('help', None),
         aliases             = dictionary.get('aliases', []),
@@ -18,9 +35,13 @@ def dictionary_to_commandline(dictionary, prog):
         abbreviate_options  = dictionary.get('abbreviate_options', ExtendedBool.INHERIT),
         inherit_options     = dictionary.get('inherit_options', ExtendedBool.INHERIT))
 
-    for option in dictionary.get('options', []):
+    for option in options:
+        _dictionary_check_unknown_keys(option,
+            ['option_strings', 'metavar', 'help', 'takes_args', 'group',
+             'multiple_option', 'complete', 'when'])
+
         commandline.add_option(
-            option['option_strings'],
+            option.get('option_strings',  None),
             metavar         = option.get('metavar',         None),
             help            = option.get('help',            None),
             takes_args      = option.get('takes_args',      True),
@@ -29,9 +50,12 @@ def dictionary_to_commandline(dictionary, prog):
             complete        = option.get('complete',        None),
             when            = option.get('when',            None))
 
-    for positional in dictionary.get('positionals', []):
+    for positional in positionals:
+        _dictionary_check_unknown_keys(positional,
+            ['number', 'metavar', 'help', 'repeatable', 'complete', 'when'])
+
         commandline.add_positional(
-            positional['number'],
+            positional.get('number', None),
             metavar    = positional.get('metavar',    None),
             help       = positional.get('help',       None),
             repeatable = positional.get('repeatable', False),
@@ -62,7 +86,12 @@ class CommandlineTree:
         node = self.root
 
         for previous_command in previous_commands:
-            node = node.subcommands[previous_command]
+            try:
+                node = node.subcommands[previous_command]
+            except KeyError:
+                msg  = "Previous commands %r are missing. " % previous_commands
+                msg += "Cannot define command %r" % command
+                raise CrazyError(msg)
 
         node.subcommands[command] = CommandlineTree.Node(dictionary_to_commandline(commandline, command), {})
 
@@ -85,6 +114,12 @@ def dictionaries_to_commandline(dictionaries):
     commandline_tree = CommandlineTree()
 
     for dictionary in dictionaries:
+        if 'prog' not in dictionary:
+            raise CrazyError('Missing `prog` field')
+
+        if not isinstance(dictionary['prog'], str):
+            raise CrazyError(f'prog: expected str, got {dictionary["prog"]}')
+
         commandline_tree.add_commandline(dictionary)
 
     root = commandline_tree.get_root_commandline()

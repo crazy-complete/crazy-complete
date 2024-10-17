@@ -1,0 +1,4 @@
+prog: "test"
+inherit_options: ['wrong type']
+---
+expected_error: "inherit_options: expected ExtendedBool, got ['wrong type']"

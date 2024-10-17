@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    when: false
+---
+expected_error: "when: expected str, got False"

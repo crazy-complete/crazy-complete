@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    complete: ['invalid_command']
+---
+expected_error: "test: -o: Unknown command for `complete`: invalid_command"

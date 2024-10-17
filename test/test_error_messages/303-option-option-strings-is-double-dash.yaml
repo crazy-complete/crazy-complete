@@ -1,0 +1,5 @@
+prog: "test"
+options:
+  - option_strings: ["--"]
+---
+expected_error: "Invalid option string: --"

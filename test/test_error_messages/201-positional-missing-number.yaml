@@ -1,0 +1,5 @@
+prog: "test"
+positionals:
+  - metavar: "FOO"
+---
+expected_error: "number: expected int, got None"

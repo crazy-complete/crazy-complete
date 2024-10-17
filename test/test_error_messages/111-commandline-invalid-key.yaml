@@ -1,0 +1,4 @@
+prog: "test"
+positionals: false
+---
+expected_error: "positionals: expected list, got False"

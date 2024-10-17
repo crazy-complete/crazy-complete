@@ -1,0 +1,6 @@
+prog: "test"
+positionals:
+  - number: 1
+    complete: false
+---
+expected_error: "complete: expected list, got False"
