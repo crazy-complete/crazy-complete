@@ -3,4 +3,4 @@ options:
   - metavar: "test"
 ---
 # TODO
-expected_error: "option_strings: expected list, got None"
+expected_error: "Parameter `option_strings` has an invalid type. Expected types: list. Received: None (NoneType)"

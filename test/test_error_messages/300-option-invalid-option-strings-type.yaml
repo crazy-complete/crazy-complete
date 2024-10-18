@@ -2,4 +2,4 @@ prog: "test"
 options:
   - option_strings: false
 ---
-expected_error: "option_strings: expected list, got False"
+expected_error: "Parameter `option_strings` has an invalid type. Expected types: list. Received: False (bool)"

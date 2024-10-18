@@ -3,4 +3,4 @@ options:
   - option_strings: ["-o"]
     metavar: false
 ---
-expected_error: "metavar: expected str, got False"
+expected_error: "Parameter `metavar` has an invalid type. Expected types: str|None. Received: False (bool)"

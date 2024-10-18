@@ -2,4 +2,4 @@ prog: "test"
 positionals:
   - metavar: "FOO"
 ---
-expected_error: "number: expected int, got None"
+expected_error: "Parameter `number` has an invalid type. Expected types: int. Received: None (NoneType)"

@@ -3,15 +3,12 @@
 import re
 from collections import OrderedDict
 
-from .errors import CrazyError
+from .errors import CrazyError, CrazyTypeError
 
 class ExtendedBool:
     TRUE    = True
     FALSE   = False
     INHERIT = 'INHERIT'
-
-def _is_bool(obj):
-    return isinstance(obj, bool)
 
 def _is_extended_bool(obj):
     return obj in (True, False, ExtendedBool.INHERIT)
@@ -55,29 +52,29 @@ class CommandLine:
         '''
 
         if not isinstance(prog, str):
-            raise CrazyError(f'prog: expected str, got {prog}')
-
-        if not isinstance(help, (str, None.__class__)):
-            raise CrazyError(f'help: expected str, got {help}')
+            raise CrazyTypeError('prog', 'str', prog)
 
         if not isinstance(parent, (CommandLine, None.__class__)):
-            raise CrazyError(f'parent: expected CommandLine, got {parent}')
+            raise CrazyTypeError('parent', 'CommandLine|None', parent)
+
+        if not isinstance(help, (str, None.__class__)):
+            raise CrazyTypeError('help', 'str|None', help)
 
         if not isinstance(aliases, list):
-            raise CrazyError(f'aliases: expected list, got {aliases}')
+            raise CrazyTypeError('aliases', 'list', aliases)
 
-        for alias in aliases:
+        for index, alias in enumerate(aliases):
             if not isinstance(alias, str):
-                raise CrazyError(f'aliases: found non-str item: {alias}')
+                raise CrazyTypeError(f'aliases[{index}]', 'str', alias)
 
         if not _is_extended_bool(abbreviate_commands):
-            raise CrazyError(f'abbreviate_commands: expected ExtendedBool, got {abbreviate_commands}')
+            raise CrazyTypeError('abbreviate_commands', 'ExtendedBool', abbreviate_commands)
 
         if not _is_extended_bool(abbreviate_options):
-            raise CrazyError(f'abbreviate_options: expected ExtendedBool, got {abbreviate_options}')
+            raise CrazyTypeError('abbreviate_options', 'ExtendedBool', abbreviate_options)
 
         if not _is_extended_bool(inherit_options):
-            raise CrazyError(f'inherit_options: expected ExtendedBool, got {inherit_options}')
+            raise CrazyTypeError('inherit_options', 'ExtendedBool', inherit_options)
 
         self.prog = prog
         self.parent = parent
@@ -184,10 +181,10 @@ class CommandLine:
             CrazyError: If the command line object already has subcommands.
         '''
         if not isinstance(name, str):
-            raise CrazyError(f'name: expected str, got {name}')
+            raise CrazyTypeError('name', 'str', name)
 
         if not isinstance(help, (str, None.__class__)):
-            raise CrazyError(f'help: expected str, got {help}')
+            raise CrazyTypeError('help', 'str|None', help)
 
         if self.subcommands:
             raise CrazyError('CommandLine object already has subcommands')
@@ -236,10 +233,10 @@ class CommandLine:
         Returns:
             list: A list of Option objects
         '''
-        assert _is_bool(with_parent_options), \
+        assert isinstance(with_parent_options, bool), \
             "CommandLine.get_options: with_parent_options: expected bool, got %r" % with_parent_options
 
-        assert _is_bool(only_with_arguments), \
+        assert isinstance(only_with_arguments, bool), \
             "CommandLine.get_options: only_with_arguments: expected bool, got %r" % only_with_arguments
 
         getter = CommandLine.OptionsGetter(self,
@@ -258,10 +255,10 @@ class CommandLine:
         Returns:
             list: A list of option strings
         '''
-        assert _is_bool(with_parent_options), \
+        assert isinstance(with_parent_options, bool), \
             "CommandLine.get_option_strings: with_parent_options: expected bool, got %r" % with_parent_options
 
-        assert _is_bool(only_with_arguments), \
+        assert isinstance(only_with_arguments, bool), \
             "CommandLine.get_option_strings: only_with_arguments: expected bool, got %r" % only_with_arguments
 
         option_strings = []
@@ -302,7 +299,7 @@ class CommandLine:
         Returns:
             list: A list of parent CommandLine objects.
         '''
-        assert _is_bool(include_self), \
+        assert isinstance(include_self, bool), \
             "CommandLine.get_parents: include_self: expected bool, got %r" % include_self
 
         parents = []
@@ -433,25 +430,25 @@ class Positional:
             when=None):
 
         if not isinstance(parent, (CommandLine, None.__class__)):
-            raise CrazyError(f'parent: expected CommandLine, got {parent}')
+            raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
         if not isinstance(number, int):
-            raise CrazyError(f'number: expected int, got {number}')
+            raise CrazyTypeError('number', 'int', number)
 
         if not isinstance(metavar, (str, None.__class__)):
-            raise CrazyError(f'metavar: expected str, got {metavar}')
+            raise CrazyTypeError('metavar', 'str|None', metavar)
 
         if not isinstance(help, (str, None.__class__)):
-            raise CrazyError(f'help: expected str, got {help}')
+            raise CrazyTypeError('help', 'str|None', help)
 
         if not isinstance(complete, (list, tuple, None.__class__)):
-            raise CrazyError(f'complete: expected list, got {complete}')
+            raise CrazyTypeError('complete', 'list', complete)
 
         if not isinstance(repeatable, bool):
-            raise CrazyError(f'repeatable: expected bool, got {repeatable}')
+            raise CrazyTypeError('repeatable', 'bool', repeatable)
 
         if not isinstance(when, (str, None.__class__)):
-            raise CrazyError(f'when: expected str, got {when}')
+            raise CrazyTypeError('when', 'str|None', when)
 
         if number <= 0:
             raise CrazyError(f'number: value ({number}) is invalid, number has to be >= 1')
@@ -511,31 +508,31 @@ class Option:
             multiple_option=ExtendedBool.INHERIT,
             when=None):
         if not isinstance(parent, (CommandLine, None.__class__)):
-            raise CrazyError(f'parent: expected CommandLine, got {parent}')
+            raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
         if not isinstance(option_strings, list):
-            raise CrazyError(f'option_strings: expected list, got {option_strings}')
+            raise CrazyTypeError('option_strings', 'list', option_strings)
 
         if not isinstance(metavar, (str, None.__class__)):
-            raise CrazyError(f'metavar: expected str, got {metavar}')
+            raise CrazyTypeError('metavar', 'str|None', metavar)
 
         if not isinstance(help, (str, None.__class__)):
-            raise CrazyError(f'help: expected str, got {help}')
+            raise CrazyTypeError('help', 'str|None', help)
 
         if not isinstance(complete, (list, tuple, None.__class__)):
-            raise CrazyError(f'complete: expected list, got {complete}')
+            raise CrazyTypeError('complete', 'list|None', complete)
 
         if not isinstance(group, (str, None.__class__)):
-            raise CrazyError(f'group: expected str, got {group}')
+            raise CrazyTypeError('group', 'str|None', group)
 
         if not isinstance(takes_args, bool) and not takes_args == '?':
-            raise CrazyError(f'takes_args: expected bool or "?", got {takes_args}')
+            raise CrazyTypeError('takes_args', 'bool|"?"', takes_args)
 
         if not _is_extended_bool(multiple_option):
-            raise CrazyError(f'multiple_option: expected ExtendedBool, got {multiple_option}')
+            raise CrazyTypeError('multiple_option', 'ExtendedBool', multiple_option)
 
         if not isinstance(when, (str, None.__class__)):
-            raise CrazyError(f'when: expected str, got {when}')
+            raise CrazyTypeError('when', 'str|None', when)
 
         if not option_strings:
             raise CrazyError('Empty option strings')

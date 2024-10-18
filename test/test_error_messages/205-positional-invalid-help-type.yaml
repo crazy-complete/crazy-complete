@@ -3,4 +3,4 @@ positionals:
   - number: 1
     help: false
 ---
-expected_error: "help: expected str, got False"
+expected_error: "Parameter `help` has an invalid type. Expected types: str|None. Received: False (bool)"

@@ -1,5 +1,5 @@
 prog: "test"
 positionals:
-  - number: "wrong type"
+  - number: "wrong-type"
 ---
-expected_error: "number: expected int, got wrong type"
+expected_error: "Parameter `number` has an invalid type. Expected types: int. Received: 'wrong-type' (str)"

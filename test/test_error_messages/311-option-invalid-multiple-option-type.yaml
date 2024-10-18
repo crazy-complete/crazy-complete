@@ -3,4 +3,4 @@ options:
   - option_strings: ["-o"]
     multiple_option: ["wrong type"]
 ---
-expected_error: "multiple_option: expected ExtendedBool, got ['wrong type']"
+expected_error: "Parameter `multiple_option` has an invalid type. Expected types: ExtendedBool. Received: ['wrong type'] (list)"

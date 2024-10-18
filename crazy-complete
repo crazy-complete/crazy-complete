@@ -1,8 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import os
 import sys
 import argparse
+import traceback
 
 from crazy_complete.errors import CrazyError
 from crazy_complete import bash, fish, zsh
@@ -13,7 +14,7 @@ from crazy_complete import config
 from crazy_complete import paths
 
 
-def parse_bool(s):
+def boolean(s):
     try:
         return {'true': True, 'false': False}[s.lower()]
     except KeyError:
@@ -27,51 +28,62 @@ p.add_argument('shell', choices=('bash', 'fish', 'zsh', 'json', 'yaml'),
     help='Specify the shell type for the completion script')
 
 p.add_argument('definition_file',
-    help='The file containing the command line definitions').complete('file')
+    help='The file containing the command line definitions'
+).complete('file')
 
 p.add_argument('--parser-variable', default=None,
-    help='Specify the variable name of the ArgumentParser object')
+    help='Specify the variable name of the ArgumentParser object (for --input-type=python)')
 
-p.add_argument('--input-type', choices=['yaml', 'json', 'python', 'help', 'auto'], default='auto',
+p.add_argument('--input-type', choices=('yaml', 'json', 'python', 'help', 'auto'), default='auto',
     help='Specify input file type')
 
 p.add_argument('--program-name', default=None,
     help='Specify program name')
 
-p.add_argument('--abbreviate-commands', metavar='BOOL', default=False, type=parse_bool,
-    help='Sets whether commands can be abbreviated')
+p.add_argument('--abbreviate-commands', metavar='BOOL', default=False, type=boolean,
+    help='Sets whether commands can be abbreviated'
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--abbreviate-options', metavar='BOOL', default=False, type=parse_bool,
-    help='Sets whether options can be abbreviated')
+p.add_argument('--abbreviate-options', metavar='BOOL', default=False, type=boolean,
+    help='Sets whether options can be abbreviated'
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--multiple-options', metavar='BOOL', default=False, type=parse_bool,
-    help='Sets whether options are suggested multiple times during completion')
+p.add_argument('--multiple-options', metavar='BOOL', default=False, type=boolean,
+    help='Sets whether options are suggested multiple times during completion'
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--inherit-options', metavar='BOOL', default=False, type=parse_bool,
-    help='Sets whether parent options are visible to subcommands')
+p.add_argument('--inherit-options', metavar='BOOL', default=False, type=boolean,
+    help='Sets whether parent options are visible to subcommands'
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--vim-modeline', metavar='BOOL', default=True, type=parse_bool,
-    help='Sets whether a vim modeline comment shall be appended to the generated code')
+p.add_argument('--vim-modeline', metavar='BOOL', default=True, type=boolean,
+    help='Sets whether a vim modeline comment shall be appended to the generated code'
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--zsh-compdef', metavar='BOOL', default=True, type=parse_bool,
-    help='Sets whether #compdef is used in zsh scripts')
+p.add_argument('--zsh-compdef', metavar='BOOL', default=True, type=boolean,
+    help='Sets whether #compdef is used in zsh scripts'
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--fish-fast', metavar='BOOL', default=False, type=parse_bool,
-    help='Use faster commandline parsing at the cost of correctness')
+p.add_argument('--fish-fast', metavar='BOOL', default=False, type=boolean,
+    help='Use faster commandline parsing at the cost of correctness'
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--fish-inline-conditions', metavar='BOOL', default=False, type=parse_bool,
-    help="Don't store conditions in a variable")
+p.add_argument('--fish-inline-conditions', metavar='BOOL', default=False, type=boolean,
+    help="Don't store conditions in a variable"
+).complete('choices', ('True', 'False'))
 
-p.add_argument('--include-file', action='append',
-    help='Include file in output').complete('file')
+p.add_argument('--include-file', metavar='FILE', action='append',
+    help='Include file in output'
+).complete('file')
 
-p.add_argument('--debug', action='store_true',
+p.add_argument('--debug', action='store_true', default=False,
     help='Enable debug mode')
 
 grp = p.add_mutually_exclusive_group()
 
-grp.add_argument('-o', '--output', default=None, dest='output_file',
-    help='Write output to destination file [default: stdout]').complete('file')
+grp.add_argument('-o', '--output', metavar='FILE', default=None, dest='output_file',
+    help='Write output to destination file [default: stdout]'
+).complete('file')
 
 grp.add_argument('-i', '--install-system-wide', default=False, action='store_true',
     help='Write output to the system-wide completions dir of shell')
@@ -116,9 +128,6 @@ def write_string_to_file(string, file):
         print(string)
 
 def generate(opts):
-    if not os.path.exists(opts.definition_file):
-        raise CrazyError(f"File not found: {opts.definition_file}")
-
     if opts.input_type == 'help':
         if opts.shell != 'yaml':
             raise CrazyError('The `help` input-type currently only supports YAML generation')
@@ -174,14 +183,29 @@ def generate(opts):
     else:
         write_string_to_file(output, opts.output_file)
 
+def print_err(*a):
+    print(*a, file=sys.stderr)
 
 if __name__ == '__main__':
-    opts = _crazy_complete_argument_parser.parse_args()
+    options = _crazy_complete_argument_parser.parse_args()
     try:
-        generate(opts)
-    except CrazyError as e:
-        if opts.debug:
-            raise
-        print('Error:', e, file=sys.stderr)
-        print('Pass --debug to see full stack trace', file=sys.stderr)
+        generate(options)
+    except (CrazyError, FileNotFoundError) as e:
+        print_err('Error:', e)
+        if options.debug:
+            traceback.print_exc()
+        else:
+            print_err('Pass --debug to see full stack trace')
         sys.exit(1)
+    except:
+        traceback.print_exc()
+        print_err()
+        print_err('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        print_err('!!!                                                      !!!')
+        print_err('!!!   THIS IS PROBABLY AN ERROR IN THE PROGRAM!          !!!')
+        print_err("!!!   Don't hesitate to open an issue on GitHub:         !!!")
+        print_err('!!!   https://github.com/crazy-complete/crazy-complete   !!!')
+        print_err('!!!                                                      !!!')
+        print_err('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        print_err()
+        sys.exit(2)

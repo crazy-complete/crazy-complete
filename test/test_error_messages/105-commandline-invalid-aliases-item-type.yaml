@@ -1,4 +1,4 @@
 prog: "test"
 aliases: ["foo", 1]
 ---
-expected_error: "aliases: found non-str item: 1"
+expected_error: "Parameter `aliases[1]` has an invalid type. Expected types: str. Received: 1 (int)"

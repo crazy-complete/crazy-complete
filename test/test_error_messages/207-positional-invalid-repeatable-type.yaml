@@ -3,4 +3,4 @@ positionals:
   - number: 1
     repeatable: ["wrong type"]
 ---
-expected_error: "repeatable: expected bool, got ['wrong type']"
+expected_error: "Parameter `repeatable` has an invalid type. Expected types: bool. Received: ['wrong type'] (list)"

@@ -1,4 +1,4 @@
 prog: "test"
 positionals: false
 ---
-expected_error: "positionals: expected list, got False"
+expected_error: "Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)"

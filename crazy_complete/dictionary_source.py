@@ -5,7 +5,7 @@ dictionaries and vice versa.
 
 from collections import OrderedDict
 
-from .errors import CrazyError
+from .errors import CrazyError, CrazyTypeError
 from .cli import CommandLine, ExtendedBool
 
 def _dictionary_check_unknown_keys(dictionary, allowed_keys):
@@ -20,11 +20,11 @@ def dictionary_to_commandline(dictionary, prog=None):
 
     options = dictionary.get('options', [])
     if not isinstance(options, list):
-        raise CrazyError(f'options: expected list, got {options}')
+        raise CrazyTypeError('options', 'list', options)
 
     positionals = dictionary.get('positionals', [])
     if not isinstance(positionals, list):
-        raise CrazyError(f'positionals: expected list, got {positionals}')
+        raise CrazyTypeError('positionals', 'list', positionals)
 
     commandline = CommandLine(
         prog or dictionary['prog'],
@@ -118,7 +118,7 @@ def dictionaries_to_commandline(dictionaries):
             raise CrazyError('Missing `prog` field')
 
         if not isinstance(dictionary['prog'], str):
-            raise CrazyError(f'prog: expected str, got {dictionary["prog"]}')
+            raise CrazyTypeError('prog', 'str', dictionary["prog"])
 
         commandline_tree.add_commandline(dictionary)
 

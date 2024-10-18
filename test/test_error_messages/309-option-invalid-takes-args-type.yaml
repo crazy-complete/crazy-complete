@@ -3,4 +3,4 @@ options:
   - option_strings: ["-o"]
     takes_args: ["wrong type"]
 ---
-expected_error: "takes_args: expected bool or \"?\", got ['wrong type']"
+expected_error: "Parameter `takes_args` has an invalid type. Expected types: bool|\"?\". Received: ['wrong type'] (list)"
