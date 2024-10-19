@@ -80,9 +80,9 @@ class FishCompleter(shell.ShellCompleter):
 
     def range(self, ctxt, start, stop, step=1):
         if step == 1:
-            return FishCompletionCommand(f"seq {start} {stop}")
+            return FishCompletionCommand(f"command seq {start} {stop}")
         else:
-            return FishCompletionCommand(f"seq {start} {step} {stop}")
+            return FishCompletionCommand(f"command seq {start} {step} {stop}")
 
     def service(self, ctxt):
         return FishCompletionCommand("__fish_systemctl_services")
@@ -90,11 +90,11 @@ class FishCompleter(shell.ShellCompleter):
     def user(self, ctxt):
         return FishCompletionCommand("__fish_complete_users")
 
-    def variable(self, ctxt, option=None):
-        if option == '-x':
-            return FishCompletionCommand("set -n -x")
-        else:
-            return FishCompletionCommand("set -n")
+    def variable(self, ctxt):
+        return FishCompletionCommand("set -n")
+
+    def environment(self, ctxt):
+        return FishCompletionCommand("set -n -x")
 
     def exec(self, ctxt, command):
         return FishCompletionCommand(command)

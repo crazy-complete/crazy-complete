@@ -167,8 +167,11 @@ class ShellCompleter:
     def command(self, ctxt):
         return self.fallback(ctxt, 'command', 'file')
 
-    def variable(self, ctxt, option):
+    def variable(self, ctxt):
         return self.fallback(ctxt, 'variable', 'none')
+
+    def environment(self, ctxt):
+        return self.fallback(ctxt, 'environment', 'none')
 
     def service(self, ctxt):
         return self.fallback(ctxt, 'service', 'none')

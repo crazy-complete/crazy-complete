@@ -205,7 +205,7 @@ def load_from_file(file, parser_variable=None, parser_blacklist=[]):
         module = file_loader.import_file(file)
     except Exception as e:
         utils.warn(e)
-        utils.warn(f"Failed to load `{file}` using importlib, falling back to `exec`")
+        utils.warn(f"Failed to load `{file}` using importlib, falling back to exec")
         module = file_loader.execute_file(file)
 
     if parser_variable is not None:

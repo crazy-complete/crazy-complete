@@ -8,13 +8,13 @@ from collections import OrderedDict
 from .errors import CrazyError, CrazyTypeError
 from .cli import CommandLine, ExtendedBool
 
-def _dictionary_check_unknown_keys(dictionary, allowed_keys):
+def _validate_keys(dictionary, allowed_keys):
     for key in dictionary.keys():
         if key not in allowed_keys:
             raise CrazyError(f'Unknown key: {key}')
 
 def dictionary_to_commandline(dictionary, prog=None):
-    _dictionary_check_unknown_keys(dictionary,
+    _validate_keys(dictionary,
         ['prog', 'help', 'aliases', 'abbreviate_commands', 'abbreviate_options',
          'inherit_options', 'options', 'positionals'])
 
@@ -36,7 +36,7 @@ def dictionary_to_commandline(dictionary, prog=None):
         inherit_options     = dictionary.get('inherit_options', ExtendedBool.INHERIT))
 
     for option in options:
-        _dictionary_check_unknown_keys(option,
+        _validate_keys(option,
             ['option_strings', 'metavar', 'help', 'takes_args', 'group',
              'multiple_option', 'complete', 'when'])
 
@@ -51,7 +51,7 @@ def dictionary_to_commandline(dictionary, prog=None):
             when            = option.get('when',            None))
 
     for positional in positionals:
-        _dictionary_check_unknown_keys(positional,
+        _validate_keys(positional,
             ['number', 'metavar', 'help', 'repeatable', 'complete', 'when'])
 
         commandline.add_positional(
@@ -72,9 +72,8 @@ class CommandlineTree:
 
         def visit(self, callback):
             callback(self)
-            if self.subcommands:
-                for subcommand in self.subcommands.values():
-                    subcommand.visit(callback)
+            for subcommand in self.subcommands.values():
+                subcommand.visit(callback)
 
     def __init__(self):
         self.root = CommandlineTree.Node(None, {})
@@ -93,20 +92,23 @@ class CommandlineTree:
                 msg += "Cannot define command %r" % command
                 raise CrazyError(msg)
 
+        if command in node.subcommands:
+            raise CrazyError(f"Multiple definition of program `{command}`")
         node.subcommands[command] = CommandlineTree.Node(dictionary_to_commandline(commandline, command), {})
 
     def get_root_commandline(self):
-        if len(self.root.subcommands) == 0:
+        if not self.root.subcommands:
             raise CrazyError("No programs defined")
 
         if len(self.root.subcommands) > 1:
-            raise CrazyError("Too many programs defined")
+            progs = [node.commandline.prog for node in self.root.subcommands.values()]
+            raise CrazyError(f"Too many main programs defined: {progs}")
 
-        return list(self.root.subcommands.values())[0]
+        return next(iter(self.root.subcommands.values()))
 
 def dictionaries_to_commandline(dictionaries):
     def add_subcommands(node):
-        if len(node.subcommands):
+        if node.subcommands:
             subp = node.commandline.add_subcommands()
             for subcommand in node.subcommands.values():
                 subp.add_commandline_object(subcommand.commandline)
@@ -128,6 +130,7 @@ def dictionaries_to_commandline(dictionaries):
 
 def option_to_dictionary(self):
     r = OrderedDict()
+
     r['option_strings'] = self.option_strings
 
     if self.metavar is not None:
@@ -196,14 +199,14 @@ def commandline_to_dictionary(commandline):
         r['inherit_options'] = commandline.inherit_options
 
     if commandline.options:
-        r['options'] = []
+        r['options'] = options = []
         for option in commandline.options:
-            r['options'].append(option_to_dictionary(option))
+            options.append(option_to_dictionary(option))
 
     if commandline.positionals:
-        r['positionals'] = []
+        r['positionals'] = positionals = []
         for positional in commandline.positionals:
-            r['positionals'].append(positional_to_dictionary(positional))
+            positionals.append(positional_to_dictionary(positional))
 
     return r
 

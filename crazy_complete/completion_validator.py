@@ -191,10 +191,12 @@ class CompletionValidator:
 
     @staticmethod
     def variable(args):
-        option = get_optional_arg(args, None)
         require_no_more(args)
-        if option not in (None, '-x'):
-            raise CrazyError(f'Invalid option: {option}')
+        return ()
+
+    @staticmethod
+    def environment(args):
+        require_no_more(args)
         return ()
 
     @staticmethod

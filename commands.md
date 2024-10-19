@@ -252,20 +252,32 @@ TODO
 **variable**
 
 > Complete a shell variable name.
-> If "-x" is passed as an argument, only complete environment variables.
+> To complete a environment variable, use **environment**.
 
 ```
 prog: "example"
 options:
   - option_strings: ["--variable"]
     complete: ["variable"]
-  - option_strings: ["--environment"]
-    complete: ["variable", "-x"]
 ```
 
 ```
  ~ > example --variable=HO<TAB>
 HOME      HOSTNAME  HOSTTYPE
+```
+
+**environment**
+
+> Complete a shell environment variable name.
+
+```
+prog: "example"
+options:
+  - option_strings: ["--environment"]
+    complete: ["environment"]
+```
+
+```
  ~ > example --environment=X<TAB>
 XDG_RUNTIME_DIR  XDG_SEAT  XDG_SESSION_CLASS  XDG_SESSION_ID
 XDG_SESSION_TYPE XDG_VTNR

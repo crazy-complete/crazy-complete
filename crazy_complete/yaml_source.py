@@ -10,93 +10,106 @@ from . import utils
 from . import dictionary_source
 from .cli import ExtendedBool
 
-def str_to_yaml(s):
-    return json.dumps(s)
+def option_to_yaml(dictionary):
+    option_strings  = dictionary['option_strings']
+    metavar         = dictionary.get('metavar',         None)
+    help            = dictionary.get('help',            None)
+    takes_args      = dictionary.get('takes_args',      True)
+    group           = dictionary.get('group',           None)
+    multiple_option = dictionary.get('multiple_option', ExtendedBool.INHERIT)
+    complete        = dictionary.get('complete',        None)
+    when            = dictionary.get('when',            None)
 
-def bool_to_yaml(b):
-    try:
-        return {True: 'true', False: 'false'}[b]
-    except KeyError:
-        raise ValueError(f'Not a bool: {b}')
+    r = '- option_strings: %s\n' % json.dumps(option_strings)
 
-def option_to_yaml(obj):
-    r = '- option_strings: %s\n' % json.dumps(obj['option_strings'])
+    if metavar is not None:
+        r += '  metavar: %s\n' % json.dumps(metavar)
 
-    if obj.get('metavar', None):
-        r += '  metavar: %s\n' % str_to_yaml(obj['metavar'])
+    if help is not None:
+        r += '  help: %s\n' % json.dumps(help)
 
-    if obj.get('help', None):
-        r += '  help: %s\n' % str_to_yaml(obj['help'])
+    if takes_args in (False, '?'):
+        r += '  takes_args: %s\n' % json.dumps(takes_args)
 
-    if obj.get('takes_args', True) is not True:
-        try:
-            r += '  takes_args: %s\n' % bool_to_yaml(obj['takes_args'])
-        except ValueError: # takes_args may be "?"
-            r += '  takes_args: %s\n' % str_to_yaml(obj['takes_args'])
+    if group is not None:
+        r += '  group: %s\n' % json.dumps(group)
 
-    if obj.get('group', None):
-        r += '  group: %s\n' % str_to_yaml(obj['group'])
+    if multiple_option != ExtendedBool.INHERIT:
+        r += '  multiple_option: %s\n' % json.dumps(multiple_option)
 
-    if obj.get('multiple_option', ExtendedBool.INHERIT) !=  ExtendedBool.INHERIT:
-        r += '  multiple_option: %s\n' % bool_to_yaml(obj['multiple_option'])
+    if complete is not None:
+        r += '  complete: %s\n' % json.dumps(complete)
 
-    if obj.get('complete', None):
-        r += '  complete: %s\n' % json.dumps(obj['complete'])
+    if when is not None:
+        r += '  when: %s\n' % json.dumps(when)
 
-    if obj.get('when', None):
-        r += '  when: %s\n' % str_to_yaml(obj['when'])
+    return r.rstrip()
 
-    return r
+def positional_to_yaml(dictionary):
+    number     = dictionary['number']
+    metavar    = dictionary.get('metavar',    None)
+    help       = dictionary.get('help',       None)
+    repeatable = dictionary.get('repeatable', False)
+    complete   = dictionary.get('complete',   None)
+    when       = dictionary.get('when',       None)
 
-def positional_to_yaml(obj):
-    r = '- number: %d\n' % obj['number']
+    r = '- number: %d\n' % number
 
-    if obj.get('metavar', None):
-        r += '  metavar: %s\n' % str_to_yaml(obj['metavar'])
+    if metavar is not None:
+        r += '  metavar: %s\n' % json.dumps(metavar)
 
-    if obj.get('help', None):
-        r += '  help: %s\n' % str_to_yaml(obj['help'])
+    if help is not None:
+        r += '  help: %s\n' % json.dumps(help)
 
-    if obj.get('repeatable', False) is not False:
-        r += '  repeatable: %s\n' % bool_to_yaml(obj['repeatable'])
+    if repeatable is not False:
+        r += '  repeatable: %s\n' % json.dumps(repeatable)
 
-    if obj.get('complete', None):
-        r += '  complete: %s\n' % json.dumps(obj['complete'])
+    if complete is not None:
+        r += '  complete: %s\n' % json.dumps(complete)
 
-    if obj.get('when', None):
-        r += '  when: %s\n' % str_to_yaml(obj['when'])
+    if when is not None:
+        r += '  when: %s\n' % json.dumps(when)
 
-    return r
+    return r.rstrip()
 
-def to_yaml(obj):
-    r = 'prog: %s\n' % str_to_yaml(obj['prog'])
+def to_yaml(dictionary):
+    prog                = dictionary['prog']
+    aliases             = dictionary.get('aliases',             None)
+    help                = dictionary.get('help',                None)
+    abbreviate_commands = dictionary.get('abbreviate_commands', ExtendedBool.INHERIT)
+    abbreviate_options  = dictionary.get('abbreviate_options',  ExtendedBool.INHERIT)
+    inherit_options     = dictionary.get('inherit_options',     ExtendedBool.INHERIT)
+    options             = dictionary.get('options',             None)
+    positionals         = dictionary.get('positionals',         None)
 
-    if obj.get('aliases', None):
-        r += 'aliases: %s\n' % json.dumps(obj['aliases'])
+    r = 'prog: %s\n' % json.dumps(prog)
 
-    if obj.get('help', None):
-        r += 'help: %s\n' % str_to_yaml(obj['help'])
+    if aliases is not None:
+        r += 'aliases: %s\n' % json.dumps(aliases)
 
-    if obj.get('abbreviate_commands', ExtendedBool.INHERIT) != ExtendedBool.INHERIT:
-        r += 'abbreviate_commands: %s\n' % bool_to_yaml(obj['abbreviate_commands'])
+    if help is not None:
+        r += 'help: %s\n' % json.dumps(help)
 
-    if obj.get('abbreviate_options', ExtendedBool.INHERIT) != ExtendedBool.INHERIT:
-        r += 'abbreviate_options: %s\n' % bool_to_yaml(obj['abbreviate_options'])
+    if abbreviate_commands != ExtendedBool.INHERIT:
+        r += 'abbreviate_commands: %s\n' % json.dumps(abbreviate_commands)
 
-    if obj.get('inherit_options', ExtendedBool.INHERIT) != ExtendedBool.INHERIT:
-        r += 'inherit_options: %s\n' % bool_to_yaml(obj['inherit_options'])
+    if abbreviate_options != ExtendedBool.INHERIT:
+        r += 'abbreviate_options: %s\n' % json.dumps(abbreviate_options)
 
-    if obj.get('options', None):
+    if inherit_options != ExtendedBool.INHERIT:
+        r += 'inherit_options: %s\n' % json.dumps(inherit_options)
+
+    if options:
         r += 'options:\n'
-        for option in obj['options']:
+        for option in options:
             r += utils.indent(option_to_yaml(option), 2)
-            r += '\n'
+            r += '\n\n'
 
-    if obj.get('positionals', None):
+    if positionals:
         r += 'positionals:\n'
-        for positional in obj['positionals']:
+        for positional in positionals:
             r += utils.indent(positional_to_yaml(positional), 2)
-            r += '\n'
+            r += '\n\n'
 
     return r.rstrip()
 

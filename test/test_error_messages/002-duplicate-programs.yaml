@@ -1,0 +1,5 @@
+prog: "test"
+---
+prog: "test"
+---
+expected_error: "Multiple definition of program `test`"

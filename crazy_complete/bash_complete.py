@@ -83,9 +83,9 @@ class BashCompleter(shell.ShellCompleter):
     def directory(self, ctxt, opts={}):
         directory = opts.get('directory', None)
         if directory:
-            cmd =  'pushd %s &>/dev/null && {\n' % shell.escape(directory)
+            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  _filedir -d\n'
-            cmd += '  popd &>/dev/null\n'
+            cmd += '  builtin popd &>/dev/null\n'
             cmd += '}'
             return BashCompletionCommand(ctxt, cmd)
         else:
@@ -94,9 +94,9 @@ class BashCompleter(shell.ShellCompleter):
     def file(self, ctxt, opts={}):
         directory = opts.get('directory', None)
         if directory:
-            cmd =  'pushd %s &>/dev/null && {\n' % shell.escape(directory)
+            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  _filedir\n'
-            cmd += '  popd &>/dev/null\n'
+            cmd += '  builtin popd &>/dev/null\n'
             cmd += '}'
             return BashCompletionCommand(ctxt, cmd)
         else:
@@ -126,11 +126,11 @@ class BashCompleter(shell.ShellCompleter):
     def user(self, ctxt):
         return BashCompletionCompgen(ctxt, '-A user')
 
-    def variable(self, ctxt, option=None):
-        if option == '-x':
-            return BashCompletionCompgen(ctxt, '-A export')
-        else:
-            return BashCompletionCompgen(ctxt, '-A variable')
+    def variable(self, ctxt):
+        return BashCompletionCompgen(ctxt, '-A variable')
+
+    def environment(self, ctxt):
+        return BashCompletionCompgen(ctxt, '-A export')
 
     def exec(self, ctxt, command):
         funcname = ctxt.helpers.use_function('exec')
