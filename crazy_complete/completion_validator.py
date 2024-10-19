@@ -2,21 +2,21 @@
 
 from .errors import CrazyError
 
-def get_required_arg(l, name):
+def get_required_arg(args, name):
     try:
-        return l.pop(0)
+        return args.pop(0)
     except IndexError:
         raise CrazyError(f'Missing argument: {name}')
 
-def get_optional_arg(l, default=None):
+def get_optional_arg(args, default=None):
     try:
-        return l.pop(0)
+        return args.pop(0)
     except IndexError:
         return default
 
-def require_no_more(l):
-    if l:
-        raise CrazyError('Too many arguments')
+def require_no_more(args):
+    if args:
+        raise CrazyError(f'Too many arguments: {args}')
 
 class CompletionValidator:
     @staticmethod
@@ -24,6 +24,9 @@ class CompletionValidator:
         if complete:
             complete = list(complete)
             command  = complete.pop(0)
+
+            if not isinstance(command, str):
+                raise CrazyError(f"Command is not a string: {command}")
 
             if not hasattr(CompletionValidator, command):
                 raise CrazyError(f"Unknown command for `complete`: {command}")
@@ -38,7 +41,7 @@ class CompletionValidator:
             except CrazyError as e:
                 raise CrazyError("%s: %s: %s" % (
                     cmdline.get_command_path(),
-                    ' '.join(option.option_strings),
+                    '|'.join(option.option_strings),
                     e))
 
         for positional in cmdline.get_positionals():
@@ -61,17 +64,17 @@ class CompletionValidator:
 
     @staticmethod
     def choices(args):
-        choices = get_required_arg(args, 'VALUES')
+        choices = get_required_arg(args, 'values')
         require_no_more(args)
 
         if hasattr(choices, 'items'):
             new_choices = {}
             for item, desc in choices.items():
                 if not isinstance(item, (str, int, float)):
-                    raise CrazyError(f'Item not a str/int/float: {item}')
+                    raise CrazyError(f'Item not a string/int/float: {item}')
 
                 if not isinstance(desc, (str, int, float)):
-                    raise CrazyError(f'Description not a str/int/float: {desc}')
+                    raise CrazyError(f'Description not a string/int/float: {desc}')
 
                 new_choices[str(item)] = str(desc)
 
@@ -81,12 +84,12 @@ class CompletionValidator:
             new_choices = []
             for item in choices:
                 if not isinstance(item, (str, int, float)):
-                    raise CrazyError(f'Item not a str/int/float: {item}')
+                    raise CrazyError(f'Item not a string/int/float: {item}')
 
                 new_choices.append(item)
             return (new_choices,)
 
-        raise CrazyError('VALUES: Not a list, tuple or dictionary')
+        raise CrazyError('values: Not a list or dictionary')
 
     @staticmethod
     def command(args):
@@ -99,14 +102,14 @@ class CompletionValidator:
         require_no_more(args)
 
         directory = None
-        for name, value in opts.items():
-            if name == 'directory':
+        for key, value in opts.items():
+            if key == 'directory':
                 if not isinstance(value, str):
-                    raise CrazyError(f"directory: Not a str: {value}")
+                    raise CrazyError(f"directory: Not a string: {value}")
 
                 directory = value
             else:
-                raise CrazyError(f'Unknown option: {name}')
+                raise CrazyError(f'Unknown option: {key}')
 
         return ({'directory': directory},)
 
@@ -116,14 +119,14 @@ class CompletionValidator:
         require_no_more(args)
 
         directory = None
-        for name, value in opts.items():
-            if name == 'directory':
+        for key, value in opts.items():
+            if key == 'directory':
                 if not isinstance(value, str):
-                    raise CrazyError(f"directory: Not a str: {value}")
+                    raise CrazyError(f"directory: Not a string: {value}")
 
                 directory = value
             else:
-                raise CrazyError(f'Unknown option: {name}')
+                raise CrazyError(f'Unknown option: {key}')
 
         return ({'directory': directory},)
 
@@ -201,20 +204,20 @@ class CompletionValidator:
 
     @staticmethod
     def exec(args):
-        cmd = get_required_arg(args, 'COMMAND')
+        cmd = get_required_arg(args, 'command')
         require_no_more(args)
 
         if not isinstance(cmd, str):
-            raise CrazyError(f"Command is not a str: {cmd}")
+            raise CrazyError(f"Command is not a string: {cmd}")
 
         return (cmd,)
 
     @staticmethod
     def value_list(args):
-        opts = get_required_arg(args, 'OPTIONS')
+        opts = get_required_arg(args, 'options')
         require_no_more(args)
 
-        values    = None
+        values = None
         separator = ','
 
         for key, value in opts.items():
@@ -223,17 +226,23 @@ class CompletionValidator:
             elif key == 'separator':
                 separator = value
             else:
-                raise CrazyError(f'Invalid key: {key}')
+                raise CrazyError(f'Unknown option: {key}')
 
         if values is None:
-            raise CrazyError(f'Missing `values` key: {opts}')
+            raise CrazyError(f'Missing `values` option: {opts}')
 
         if not isinstance(values, (list, tuple)):
-            raise CrazyError(f'Values: not a list: {values}')
+            raise CrazyError(f'values: not a list: {values}')
 
-        for value in values:
+        if len(values) == 0:
+            raise CrazyError(f'values: empty list')
+
+        for index, value in enumerate(values):
             if not isinstance(value, (str, int, float)):
-                raise CrazyError(f'Invalid value: {value}')
+                raise CrazyError(f'values[{index}]: Not a string/int/float: {value}')
+
+        if not isinstance(separator, str):
+            raise CrazyError(f'separator: Not a string: {separator}')
 
         if len(separator) != 1:
             raise CrazyError(f'Invalid length for separator: {separator}')

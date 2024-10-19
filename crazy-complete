@@ -14,11 +14,11 @@ from crazy_complete import config
 from crazy_complete import paths
 
 
-def boolean(s):
+def boolean(string):
     try:
-        return {'true': True, 'false': False}[s.lower()]
+        return {'true': True, 'false': False}[string.lower()]
     except KeyError:
-        raise ValueError(f"Not a bool: {s}")
+        raise ValueError(f"Not a bool: {string}")
 
 
 p = argparse.ArgumentParser('crazy-complete',
@@ -96,7 +96,7 @@ grp.add_argument('-u', '--uninstall-system-wide', default=False, action='store_t
 _crazy_complete_argument_parser = p
 del p
 
-def load_definitions_file(opts):
+def load_definition_file(opts):
     if opts.input_type == 'auto':
         basename = os.path.basename(opts.definition_file)
         extension = os.path.splitext(basename)[1].lower().strip('.')
@@ -127,6 +127,9 @@ def write_string_to_file(string, file):
     else:
         print(string)
 
+def print_err(*a):
+    print(*a, file=sys.stderr)
+
 def generate(opts):
     if opts.input_type == 'help':
         if opts.shell != 'yaml':
@@ -135,7 +138,7 @@ def generate(opts):
         write_string_to_file(output, opts.output_file)
         return
 
-    cmdline = load_definitions_file(opts)
+    cmdline = load_definition_file(opts)
 
     if opts.shell == 'json':
         output = json_source.commandline_to_json(cmdline)
@@ -175,16 +178,13 @@ def generate(opts):
         }[opts.shell](opts.program_name)
 
         if opts.install_system_wide:
-            print(f'Installing to {file}', file=sys.stderr)
+            print_err(f'Installing to {file}')
             write_string_to_file(output, file)
         else:
-            print(f'Removing {file}', file=sys.stderr)
+            print_err(f'Removing {file}')
             os.remove(file)
     else:
         write_string_to_file(output, opts.output_file)
-
-def print_err(*a):
-    print(*a, file=sys.stderr)
 
 if __name__ == '__main__':
     options = _crazy_complete_argument_parser.parse_args()

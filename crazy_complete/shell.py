@@ -81,14 +81,9 @@ def make_completion_funcname(cmdline, prefix='_', suffix=''):
         "make_completion_funcname: cmdline: expected CommandLine, got %r" % cmdline
 
     commandlines = cmdline.get_parents(include_self=True)
+    identifier = make_identifier('_'.join(p.prog for p in commandlines))
 
-    r = '%s%s%s' % (
-        prefix,
-        make_identifier('_'.join(p.prog for p in commandlines)),
-        suffix
-    )
-
-    return r
+    return f'{prefix}{identifier}{suffix}'
 
 def make_completion_funcname_for_context(ctxt):
     commandlines = ctxt.commandline.get_parents(include_self=True)

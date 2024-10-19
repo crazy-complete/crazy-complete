@@ -58,4 +58,6 @@ def from_file_to_yaml(file):
                 utils.indent(yaml_source.option_to_yaml(option_dict), 2)
             )
 
+            output.append('')
+
     return '\n'.join(output)
