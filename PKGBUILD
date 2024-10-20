@@ -3,11 +3,11 @@
 pkgname=python-crazy-complete
 pkgver=0.0.0
 pkgrel=1
-pkgdesc='Generate shell completion files using pythons argparse module'
+pkgdesc='Generate shell completion files for all major shells'
 arch=('any')
 url='https://github.com/crazy-complete/crazy-complete'
 license=('GPL-3')
-depends=('python')
+depends=('python' 'python-yaml')
 makedepends=(
   'git'
   'python-build'
