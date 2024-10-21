@@ -1,77 +1,15 @@
-crazy-complete
-==============
+Here is the comparison of popular shell completion generators:
 
-https://github.com/crazy-complete/crazy-complete
+| Feature            | [crazy-complete](https://github.com/crazy-complete/crazy-complete) | [argpcomplete](argpcomplete) | [auto-auto-complete](https://codeberg.org/maandree/auto-auto-complete)[^1] | [complete-shell](https://github.com/complete-shell/complete-shell) | [completely](https://github.com/DannyBen/completely) | [complgen](https://github.com/adaszko/complgen) |
+| ------------------ | -------- | -------- | -------- | ---- | ---- | ---- |
+| Standalone scripts | yes      | no       | yes      | no   | yes  | yes  |
+| Robust scripts     | yes      | yes      | no       | n/a  | no   | yes  |
+| Extensible scripts | yes      | yes      | yes      | no   | no   | yes  |
+| Bash support       | yes      | yes      | yes      | yes  | yes  | yes  |
+| Fish support       | yes      | no       | yes      | no   | no   | yes  |
+| Zsh support        | yes      | yes      | yes      | no   | no   | yes  |
+| Dependencies       | Python 3 | Python 3 | Python 3 | Bash | Ruby | Rust |
 
-| Feature            | Supported  |
-| ------------------ | ---------- |
-| Standalone scripts | yes        |
-| Robust scripts     | yes        |
-| Extensible scripts | yes        |
-| Bash support       | yes        |
-| Fish support       | yes        |
-| Zsh support        | yes        |
-| Dependencies       | Python 3   |
-
-argpcomplete
-============
-
-https://pypi.org/project/argcomplete/
-
-| Feature            | Supported  |
-| ------------------ | ---------- |
-| Standalone scripts | no         |
-| Robust scripts     | yes        |
-| Extensible scripts | yes        |
-| Bash support       | yes        |
-| Fish support       | no         |
-| Zsh support        | yes        |
-| Dependencies       | Python 3   |
-
-auto-auto-complete
-==================
-
-https://codeberg.org/maandree/auto-auto-complete
-
-| Feature            | Supported  |
-| ------------------ | ---------- |
-| Standalone scripts | yes        |
-| Robust scripts     | no         |
-| Extensible scripts | yes        |
-| Bash support       | yes        |
-| Fish support       | yes        |
-| Zsh support        | yes        |
-| Dependencies       | Python 3   |
-
-Notes: The domain specific language for this project is insane, have a look at the [example](https://codeberg.org/maandree/auto-auto-complete/src/branch/master/doc/example).
-
-complete-shell
-==============
-
-https://github.com/complete-shell/complete-shell
-
-| Feature            | Supported  |
-| ------------------ | ---------- |
-| Standalone scripts | no         |
-| Robust scripts     | n/a        |
-| Extensible scripts | no         |
-| Bash support       | yes        |
-| Fish support       | no         |
-| Zsh support        | no         |
-| Dependencies       | Bash       |
-
-completely
-==========
-
-https://github.com/DannyBen/completely
-
-| Feature            | Supported  |
-| ------------------ | ---------- |
-| Standalone scripts | yes        |
-| Robust scripts     | no         |
-| Extensible scripts | no         |
-| Bash support       | yes        |
-| Fish support       | no         |
-| Zsh support        | no         |
-| Dependencies       | Ruby       |
-
+[^1]: The domain specific language for this project is insane, have a look
+at the
+[example](https://codeberg.org/maandree/auto-auto-complete/src/branch/master/doc/example).
