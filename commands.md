@@ -71,6 +71,26 @@ options:
 Item 1  (Description 1)  Item 2  (Description 2)
 ```
 
+**value_list**
+
+> Complete one or more items from a list of items. Similar to `mount -o`. Arguments
+> with assignable values (`mount -o uid=1000`) aren't supported.
+> Arguments are supplied by adding {"values": ...}
+
+```
+prog: "example"
+options:
+  - option_strings: ["-o"]
+    complete: ["value_list", {"values": ["exec", "noexec"]}]
+```
+
+```
+ ~ > example -o=<TAB>
+exec    noexec
+ ~ > example -o=exec,<TAB>
+exec    noexec
+```
+
 **exec**
 
 > Execute commandline and parse the output.
