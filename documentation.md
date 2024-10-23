@@ -35,6 +35,7 @@ options:
     takes_args: <BOOL>
     complete: <COMPLETE ACTION>
     multiple_option: <BOOL>
+    group: <GROUP>
     when: "<CONDITION>"
 [...]
 ```
@@ -45,6 +46,7 @@ options:
 - *takes\_args* (optional): Indicates if the option takes arguments (true or false, default: true)
 - *complete* (optional): The method used to generate possible completions for this option
 - *multiple\_option* (optional): Indicates whether an option can be suggested multiple times (true or false, default: false)
+- *group* (optional): Add this option into the specified group. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags.
 - *when* (optional): Only enable this option if CONDITION evaluates to true
 
 **Defining a Positional Argument**
