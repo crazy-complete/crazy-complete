@@ -120,18 +120,19 @@ def generate(commandline):
 
 def make_long_option_case(
         long_options,
-        takes_args,
+        complete,
+        optional_arg,
         value_variable):
     r = ''
 
-    if takes_args == '?':
+    if complete and optional_arg is True:
         r += '%s)\n'                        % CasePatterns.for_long_without_arg(long_options)
         r += '  %s+=(%s);\n'                % (value_variable, _OPT_ISSET)
         r += '  continue;;\n'
         r += '%s)\n'                        % CasePatterns.for_long_with_arg(long_options)
         r += '  %s+=("${arg#*=}")\n'        % value_variable
         r += '  continue;;'
-    elif takes_args:
+    elif complete:
         r += '%s)\n'                        % CasePatterns.for_long_without_arg(long_options)
         r += '  %s+=("${words[++argi]}")\n' % value_variable
         r += '  continue;;\n'
@@ -147,18 +148,19 @@ def make_long_option_case(
 
 def make_short_option_case(
         short_options,
-        takes_args,
+        complete,
+        optional_arg,
         value_variable):
     r = ''
 
-    if takes_args == '?':
+    if complete and optional_arg is True:
         r += '%s)\n'    % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
         r += '  then %s+=("$trailing_chars")\n' % value_variable
         r += '  else %s+=(%s)\n'                % (value_variable,_OPT_ISSET)
         r += '  fi\n'
         r += '  continue 2;;'
-    elif takes_args:
+    elif complete:
         r += '%s)\n'    % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
         r += '  then %s+=("$trailing_chars")\n'   % value_variable
@@ -191,10 +193,10 @@ def generate_option_cases(commandline):
 
         if long_options:
             option_cases.long_options.append(
-                make_long_option_case(long_options, option.takes_args, value_variable))
+                make_long_option_case(long_options, option.complete, option.optional_arg, value_variable))
 
         if short_options:
             option_cases.short_options.append(
-                make_short_option_case(short_options, option.takes_args, value_variable))
+                make_short_option_case(short_options, option.complete, option.optional_arg, value_variable))
 
     return option_cases

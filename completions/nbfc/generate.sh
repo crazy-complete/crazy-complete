@@ -30,4 +30,4 @@ fi
   exit 1
 }
 
-$crazy_complete --allow-python $2 $1.yaml
+$crazy_complete $2 $1.yaml

@@ -39,9 +39,9 @@ class MasterCompletionFunction:
         options_with_required_arg = []
 
         for option in options:
-            if option.takes_args == '?':
+            if option.complete and option.optional_arg is True:
                 options_with_optional_arg.append(option)
-            elif option.takes_args is True:
+            elif option.complete:
                 options_with_required_arg.append(option)
 
         self.add_options(options_with_required_arg)
@@ -252,22 +252,22 @@ class BashCompletionGenerator:
 
         for option in options:
             if option.get_long_option_strings():
-                if option.takes_args is True:
-                    LR = True
-                elif option.takes_args == '?':
+                if option.complete and option.optional_arg is True:
                     LO = True
+                elif option.complete:
+                    LR = True
 
             if option.get_old_option_strings():
-                if option.takes_args is True:
-                    OR = True
-                elif option.takes_args == '?':
+                if option.complete and option.optional_arg is True:
                     OO = True
+                elif option.complete:
+                    OR = True
 
             if option.get_short_option_strings():
-                if option.takes_args is True:
-                    SR = True
-                elif option.takes_args == '?':
+                if option.complete and option.optional_arg is True:
                     SO = True
+                elif option.complete:
+                    SR = True
 
         G0 = LR or OR or SR
         G1 = LR or LO or OR or OO or SR or SO
@@ -294,9 +294,9 @@ __is_oldstyle_option() {
         short_no_args = ''
         short_required_args = ''
         for option in self.commandline.get_options(with_parent_options=True):
-            if option.takes_args is True:
+            if option.complete and option.optional_arg is False:
                 short_required_args += ''.join(o.lstrip('-') for o in option.get_short_option_strings())
-            elif option.takes_args is False:
+            elif option.complete is None:
                 short_no_args += ''.join(o.lstrip('-') for o in option.get_short_option_strings())
 
         code = [

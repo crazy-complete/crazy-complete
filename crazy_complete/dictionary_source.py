@@ -37,14 +37,14 @@ def dictionary_to_commandline(dictionary, prog=None):
 
     for option in options:
         _validate_keys(option,
-            ['option_strings', 'metavar', 'help', 'takes_args', 'group',
+            ['option_strings', 'metavar', 'help', 'optional_arg', 'group',
              'multiple_option', 'complete', 'when'])
 
         commandline.add_option(
             option.get('option_strings',  None),
             metavar         = option.get('metavar',         None),
             help            = option.get('help',            None),
-            takes_args      = option.get('takes_args',      True),
+            optional_arg    = option.get('optional_arg',    False),
             group           = option.get('group',           None),
             multiple_option = option.get('multiple_option', ExtendedBool.INHERIT),
             complete        = option.get('complete',        None),
@@ -139,8 +139,8 @@ def option_to_dictionary(self):
     if self.help is not None:
         r['help'] = self.help
 
-    if self.takes_args is not True:
-        r['takes_args'] = self.takes_args
+    if self.optional_arg is not False:
+        r['optional_arg'] = self.optional_arg
 
     if self.group is not None:
         r['group'] = self.group
@@ -148,7 +148,7 @@ def option_to_dictionary(self):
     if self.multiple_option != ExtendedBool.INHERIT:
         r['multiple_option'] = self.multiple_option
 
-    if self.complete and self.complete[0] != 'none':
+    if self.complete:
         r['complete'] = self.complete
 
     if self.when is not None:
@@ -170,7 +170,7 @@ def positional_to_dictionary(self):
     if self.repeatable is not False:
         r['repeatable'] = self.repeatable
 
-    if self.complete and self.complete[0] != 'none':
+    if self.complete:
         r['complete'] = self.complete
 
     if self.when is not None:

@@ -390,7 +390,7 @@ complete -c $prog -n $C004 -l rpm-defattrdir -d 'Set the default dir mode (%defa
 complete -c $prog -n $C004 -l rpm-rpmbuild-define -d 'Pass a --define argument to rpmbuild.' -x
 complete -c $prog -n $C004 -l rpm-dist -d 'Set the rpm distribution.' -x
 complete -c $prog -n $C004 -l rpm-digest -d 'Select a digest algorithm. md5 works on the most platforms. md5|sha1|sha256|sha384|sha512 (default: "md5")' -x -a 'md5 sha1 sha256 sha384 sha512'
-complete -c $prog -n $C004 -l rpm-compression-level -d 'Select a compression level. 0 is store-only. 9 is max compression. (default: "9")' -x -a '(seq 0 9)'
+complete -c $prog -n $C004 -l rpm-compression-level -d 'Select a compression level. 0 is store-only. 9 is max compression. (default: "9")' -x -a '(command seq 0 9)'
 complete -c $prog -n $C004 -l rpm-compression -d 'Select a compression method. gzip works on the most platforms. none|xz|xzmt|gzip|bzip2 (default: "gzip")' -x -a 'none xz xzmt gzip bzip2'
 complete -c $prog -n $C004 -l rpm-os -d "The operating system to target this rpm for. You want to set this to 'linux' if you are using fpm on OS X, for example" -x
 complete -c $prog -n $C004 -l rpm-changelog -d 'Add changelog from FILEPATH contents' -Fr

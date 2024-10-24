@@ -3,7 +3,6 @@ help: "Probing tool for embedded controllers"
 options:
   - option_strings: ["-h", "--help"]
     help: "show this help message and exit"
-    takes_args: false
 
   - option_strings: ["-e", "--embedded-controller"]
     metavar: "EC"
@@ -16,11 +15,9 @@ help: "Dump all EC registers"
 options:
   - option_strings: ["-c", "--color"]
     help: "Force colored output"
-    takes_args: false
 
   - option_strings: ["-C", "--no-color"]
     help: "Disable colored output"
-    takes_args: false
 
 ---
 prog: "ec_probe load"
@@ -36,7 +33,6 @@ help: "Read a byte from a EC register"
 options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
-    takes_args: false
 
 positionals:
   - number: 1
@@ -50,7 +46,6 @@ help: "Write a byte to a EC register"
 options:
   - option_strings: ["-w", "--word"]
     help: "Combine two registers into one"
-    takes_args: false
 
 positionals:
   - number: 1
@@ -69,10 +64,12 @@ options:
   - option_strings: ["-i", "--interval"]
     metavar: "seconds"
     help: "Monitored timespan"
+    complete: ["none"]
 
   - option_strings: ["-t", "--timespan"]
     metavar: "seconds"
     help: "Set poll intervall"
+    complete: ["none"]
 
   - option_strings: ["-r", "--report"]
     metavar: "report"
@@ -81,11 +78,9 @@ options:
 
   - option_strings: ["-c", "--clearly"]
     help: "Blanks out consecutive duplicate readings"
-    takes_args: false
 
   - option_strings: ["-d", "--decimal"]
     help: "Output readings in decimal format instead of hexadecimal format"
-    takes_args: false
 
 ---
 prog: "ec_probe watch"
@@ -94,7 +89,9 @@ options:
   - option_strings: ["-i", "--interval"]
     metavar: "seconds"
     help: "Sets the update interval in seconds"
+    complete: ["none"]
 
   - option_strings: ["-t", "--timespan"]
     metavar: "seconds"
     help: "Sets how many seconds the program will run"
+    complete: ["none"]

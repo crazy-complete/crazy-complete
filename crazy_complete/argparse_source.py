@@ -62,9 +62,9 @@ def get_complete(action):
         if action.choices:
             if isinstance(action.choices, range):
                 return range_to_complete(action.choices)
-            return ('choices', action.choices)
+            return ['choices', action.choices]
 
-        return None
+        return ['none']
 
     if isinstance(action, argparse.BooleanOptionalAction):
         raise CrazyError("argparse.BooleanOptionalAction is not supported yet")
@@ -128,26 +128,24 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
                 when       = action.get_when()
             )
         else:
-            if action.nargs is None or action.nargs == 1:
-                takes_args = True
-            elif action.nargs == '?':
-                takes_args = '?'
-            elif action.nargs == 0:
-                takes_args = False
-            else:
-                takes_args = True
+            complete = get_complete(action)
+            optional_arg = False
+
+            if action.nargs == '?':
+                optional_arg = True
+            elif action.nargs not in (None, 0, 1, True):
                 utils.warn(f'Truncating nargs={action.nargs} of {action}')
 
             metavar = None
-            if takes_args:
+            if complete:
                 metavar = action.metavar or action.dest
 
             commandline.add_option(
                 action.option_strings,
                 metavar         = metavar,
-                complete        = get_complete(action),
+                complete        = complete,
                 help            = action.help,
-                takes_args      = takes_args,
+                optional_arg    = optional_arg,
                 multiple_option = action.get_multiple_option(),
                 when            = action.get_when()
             )

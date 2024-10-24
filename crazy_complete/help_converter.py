@@ -35,24 +35,19 @@ def from_file_to_yaml(file):
             option_dict = {
                 'option_strings': [],
                 'metavar':        None,
-                'takes_args':     True,
+                'optional_arg':   False,
                 'help':           fix_description(obj.description or '')
             }
-
-            takes_args = False
 
             for option in obj.options:
                 option_dict['option_strings'].append(option.option)
 
                 if option.optional:
-                    takes_args = '?'
+                    option_dict['optional_arg'] = True
 
                 if option.metavar:
                     option_dict['metavar'] = option.metavar
-                    if takes_args != '?':
-                        takes_args = True
-
-            option_dict['takes_args'] = takes_args
+                    option_dict['complete'] = ['none']
 
             output.append(
                 utils.indent(yaml_source.option_to_yaml(option_dict), 2)

@@ -1,10 +1,8 @@
 prog: crazy-complete-test
 options:
   - option_strings: ['--files']
-    takes_args: false
 
   - option_strings: ['--directories']
-    takes_args: false
 
   - option_strings: ['--complete']
     complete: ['choices', ['file1', 'file2', 'file3']]

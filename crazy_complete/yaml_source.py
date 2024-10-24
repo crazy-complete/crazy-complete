@@ -14,7 +14,7 @@ def option_to_yaml(dictionary):
     option_strings  = dictionary['option_strings']
     metavar         = dictionary.get('metavar',         None)
     help            = dictionary.get('help',            None)
-    takes_args      = dictionary.get('takes_args',      True)
+    optional_arg    = dictionary.get('optional_arg',    False)
     group           = dictionary.get('group',           None)
     multiple_option = dictionary.get('multiple_option', ExtendedBool.INHERIT)
     complete        = dictionary.get('complete',        None)
@@ -28,8 +28,8 @@ def option_to_yaml(dictionary):
     if help is not None:
         r += '  help: %s\n' % json.dumps(help)
 
-    if takes_args in (False, '?'):
-        r += '  takes_args: %s\n' % json.dumps(takes_args)
+    if optional_arg is True:
+        r += '  optional_arg: %s\n' % json.dumps(optional_arg)
 
     if group is not None:
         r += '  group: %s\n' % json.dumps(group)
