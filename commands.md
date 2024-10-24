@@ -6,7 +6,7 @@ Completion commands
 > Do not add any completion code.
 > This is the default.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--none"]
@@ -18,7 +18,7 @@ options:
 > Complete a file.
 > A directory can be supplied by adding {"directory": ...}
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--file"]
@@ -37,7 +37,7 @@ options:
 > Complete a directory.
 > A directory can be supplied by adding {"directory": ...}
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--directory"]
@@ -57,7 +57,7 @@ options:
 > If a dictionary is supplied, the keys are used as items and the values are used
 > as description.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--choices1"]
@@ -77,7 +77,7 @@ Item 1  (Description 1)  Item 2  (Description 2)
 > with assignable values (`mount -o uid=1000`) aren't supported.
 > Arguments are supplied by adding {"values": ...}
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["-o"]
@@ -103,7 +103,7 @@ exec    noexec
 > An item and its description are delimited by a tabulator.
 > These pairs are delimited by a newline.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--exec"]
@@ -119,7 +119,7 @@ Item 1  (Description 1)  Item 2  (Description 2)
 
 > Complete a range of integers.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--range-1"]
@@ -139,7 +139,7 @@ options:
 
 > Complete signal names (INT, KILL, TERM, etc.).
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--signal"]
@@ -164,7 +164,7 @@ INT     -- Terminal interrupt signal
 
 > List process names.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--process"]
@@ -182,7 +182,7 @@ systemd-journald  systemd-logind  systemd-udevd
 
 > List PIDs.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--pid"]
@@ -200,7 +200,7 @@ options:
 
 > Complete a command.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--command"]
@@ -216,7 +216,7 @@ base32    base64    basename  basenc    bash      bashbug
 
 > Complete a username.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--user"]
@@ -235,7 +235,7 @@ dhcpcd                  ftp                     git
 
 > Complete a group.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--group"]
@@ -256,7 +256,7 @@ games                   git                     groups
 
 > Complete a SystemD service.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--service"]
@@ -274,7 +274,7 @@ TODO
 > Complete a shell variable name.
 > To complete a environment variable, use **environment**.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--variable"]
@@ -290,7 +290,7 @@ HOME      HOSTNAME  HOSTTYPE
 
 > Complete a shell environment variable name.
 
-```
+```yaml
 prog: "example"
 options:
   - option_strings: ["--environment"]
