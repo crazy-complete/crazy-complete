@@ -442,7 +442,7 @@ class Positional:
             raise CrazyTypeError('help', 'str|None', help)
 
         if not isinstance(complete, (list, tuple, None.__class__)):
-            raise CrazyTypeError('complete', 'list', complete)
+            raise CrazyTypeError('complete', 'list|None', complete)
 
         if not isinstance(repeatable, bool):
             raise CrazyTypeError('repeatable', 'bool', repeatable)
@@ -458,7 +458,7 @@ class Positional:
         self.metavar = metavar
         self.help = help
         self.repeatable = repeatable
-        self.complete = complete
+        self.complete = complete if complete else ['none']
         self.when = when
 
     def get_positional_index(self):
