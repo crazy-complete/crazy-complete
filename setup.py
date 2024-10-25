@@ -4,12 +4,12 @@ from setuptools import setup
 
 setup(
     name='crazy-complete',
-    version='0.0.0',
+    version='0.1.0',
     author='Benjamin Abendroth',
     author_email='braph93@gmx.de',
     packages=['crazy_complete'],
     scripts=['crazy-complete'],
-    description='Create shell completion scripts from pythons argument parser',
+    description='Generate shell completion files for all major shells',
     url='https://github.com/crazy-complete/crazy-complete',
     classifiers=[
         'Programming Language :: Python :: 3',
