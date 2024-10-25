@@ -203,7 +203,7 @@ class CommandLine:
             commandlines = commandline.get_parents(include_self=True) if with_parent_options else [commandline]
             for commandline in reversed(commandlines):
                 for option in commandline.options:
-                    if not only_with_arguments or option.complete: # TODO?
+                    if not only_with_arguments or option.complete:
                         self.add(option, commandline)
 
         def add(self, option, commandline):
@@ -541,11 +541,11 @@ class Option:
             if not _validate_option_string(option_string):
                 raise CrazyError(f"Invalid option string: {option_string}")
 
-        if not complete and metavar:
-            raise CrazyError(f'Option {option_strings} does not take an argument but has metavar set')
+        if metavar and not complete:
+            raise CrazyError(f'Option {option_strings} has metavar set, but has no complete')
 
-        if optional_arg and not complete: # TODO write test
-            raise CrazyError(f'Option {option_strings} has optional_arg=True, but does not take an argument')
+        if optional_arg and not complete:
+            raise CrazyError(f'Option {option_strings} has optional_arg=True, but has no complete')
 
         self.parent = parent
         self.option_strings = option_strings
