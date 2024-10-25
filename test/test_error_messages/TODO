@@ -1,2 +1,4 @@
 positional: check for double repeat
 test for invalid `when`
+test for `metavar` is set, but has no `complete`
+test for `optional_arg` is `true`, but has no `complete`

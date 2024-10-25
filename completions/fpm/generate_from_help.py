@@ -138,7 +138,9 @@ def process(line):
 
     compl = find_complete_by_opts(opts)
     if compl:
-        complete = compl.get('complete', None)
+        complete = compl['complete']
+    elif metavar:
+        complete = ["none"]
 
     if '[no-]' not in opts[0]:
         add_option(opts, metavar, description, complete, when, multiple_option)
@@ -155,7 +157,6 @@ def add_option(opts, metavar, description, complete, when, multiple_option):
     COMMANDLINE.add_option(opts,
                            metavar=metavar,
                            help=description,
-                           takes_args=bool(metavar),
                            complete=complete,
                            when=when,
                            multiple_option=multiple_option)

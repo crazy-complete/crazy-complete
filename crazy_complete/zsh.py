@@ -21,7 +21,8 @@ def make_argument_option_spec(
         option_strings,
         conflicting_options = [],
         description = None,
-        takes_args = False,
+        complete = None,
+        optional_arg = False,
         multiple_option = False,
         metavar = None,
         action = None
@@ -51,9 +52,9 @@ def make_argument_option_spec(
         result.append("'*'")
 
     # Option strings ==========================================================
-    if takes_args == '?':
+    if complete and optional_arg is True:
         opts = [o+'-' if len(o) == 2 else o+'=-' for o in option_strings]
-    elif takes_args:
+    elif complete:
         opts = [o+'+' if len(o) == 2 else o+'=' for o in option_strings]
     else:
         opts = option_strings
@@ -67,7 +68,7 @@ def make_argument_option_spec(
     if description is not None:
         result.append(shell.escape('[%s]' % escape_colon(escape_square_brackets(description))))
 
-    if takes_args is True or takes_args == '?':
+    if complete:
         if metavar is None:
             metavar = ' '
 
@@ -89,9 +90,9 @@ class ZshCompletionGenerator:
     def _get_option_strings(self):
         r = []
         for o in self.commandline.get_options(with_parent_options=True):
-            if o.takes_args == '?':
+            if o.complete and o.optional_arg is True:
                 r.extend('%s=?' % s for s in o.option_strings)
-            elif o.takes_args:
+            elif o.complete:
                 r.extend('%s=' % s for s in o.option_strings)
             else:
                 r.extend('%s' % s for s in o.option_strings)
@@ -102,14 +103,20 @@ class ZshCompletionGenerator:
         return self.completer.complete(context, command, *args)
 
     def complete_option(self, option):
+        if option.complete:
+            action = self.complete(option, *option.complete)
+        else:
+            action = None
+
         option_spec = make_argument_option_spec(
             option.option_strings,
             conflicting_options = option.get_conflicting_option_strings(),
             description = option.help,
-            takes_args = option.takes_args,
+            complete = option.complete,
+            optional_arg = option.optional_arg,
             multiple_option = option.multiple_option,
             metavar = option.metavar,
-            action = self.complete(option, *option.complete)
+            action = action
         )
 
         return (option.when, option_spec)

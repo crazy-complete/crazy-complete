@@ -3,12 +3,10 @@
     "help": "Example program",
     "options": [{
         "option_strings": ["-h", "--help"],
-        "help": "show this help message and exit",
-        "takes_args": false
+        "help": "show this help message and exit"
     }, {
         "option_strings": ["--version"],
-        "help": "show program's version number and exit",
-        "takes_args": false
+        "help": "show program's version number and exit"
     }]
 }, {
     "prog": "example start",
@@ -16,8 +14,7 @@
     "help": "Start a process",
     "options": [{
         "option_strings": ["-h", "--help"],
-        "help": "show this help message and exit",
-        "takes_args": false
+        "help": "show this help message and exit"
     }, {
         "option_strings": ["--change-dir"],
         "metavar": "change_dir",
@@ -41,11 +38,9 @@
     "help": "Stop a process",
     "options": [{
         "option_strings": ["-h", "--help"],
-        "help": "show this help message and exit",
-        "takes_args": false
+        "help": "show this help message and exit"
     }, {
         "option_strings": ["--force", "-f"],
-        "help": "Force stopping the process",
-        "takes_args": false
+        "help": "Force stopping the process"
     }]
 }]

@@ -15,7 +15,7 @@ def get_msg_ids():
 MUTEX_GROUP = '--help --rcfile --output --help-msg --list-msgs --list-msgs-enabled --list-groups --list-conf-levels --list-extensions --full-documentation --generate-rcfile --generate-toml-config --long-help'.split()
 
 # These options take a file as argument
-FILE_OPTIONS = '--import-graph --ext-import-graph --int-import-graph --rcfile --output'.split()
+FILE_OPTIONS = '--import-graph --ext-import-graph --int-import-graph --rcfile --output --spelling-private-dict-file'.split()
 
 try:
     in_file = sys.argv[1]
@@ -51,8 +51,11 @@ for option in cmdline.options:
     elif "--logging-format-style" in option.option_strings:
         option.complete = ['choices', ['new', 'old']]
 
+    if option.metavar and not option.complete:
+        option.complete = ["none"]
+
 for option in cmdline.options:
-    if option.takes_args and option.complete[0] == 'none':
+    if option.metavar and option.complete[0] == 'none':
         print('Option %r=%s has no complete' % (option.option_strings, option.metavar), file=sys.stderr)
 
 output = crazy_complete.yaml_source.commandline_to_yaml(cmdline)

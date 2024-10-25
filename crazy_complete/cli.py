@@ -92,7 +92,7 @@ class CommandLine:
             metavar=None,
             help=None,
             complete=None,
-            takes_args=True,
+            optional_arg=False,
             group=None,
             multiple_option=ExtendedBool.INHERIT,
             when=None):
@@ -104,7 +104,7 @@ class CommandLine:
             metavar (str): The metavar for the option.
             help (str): The help message for the option.
             complete (tuple): The completion specification for the option.
-            takes_args (bool or "?"): Specifies if the option takes arguments.
+            optional_arg (bool): Specifies if option's argument is optional.
             group (str): Specify to which mutually exclusive group this option belongs to.
             multiple_option (ExtendedBool): Specifies if the option can be repeated.
             when (str): Specifies a condition for showing this option.
@@ -118,7 +118,7 @@ class CommandLine:
                    metavar=metavar,
                    help=help,
                    complete=complete,
-                   takes_args=takes_args,
+                   optional_arg=optional_arg,
                    group=group,
                    multiple_option=multiple_option,
                    when=when)
@@ -203,7 +203,7 @@ class CommandLine:
             commandlines = commandline.get_parents(include_self=True) if with_parent_options else [commandline]
             for commandline in reversed(commandlines):
                 for option in commandline.options:
-                    if not only_with_arguments or option.takes_args:
+                    if not only_with_arguments or option.complete:
                         self.add(option, commandline)
 
         def add(self, option, commandline):
@@ -377,7 +377,7 @@ class CommandLine:
                 metavar         = option.metavar,
                 help            = option.help,
                 complete        = option.complete,
-                takes_args      = option.takes_args,
+                optional_arg    = option.optional_arg,
                 group           = option.group,
                 multiple_option = option.multiple_option,
                 when            = option.when
@@ -442,7 +442,7 @@ class Positional:
             raise CrazyTypeError('help', 'str|None', help)
 
         if not isinstance(complete, (list, tuple, None.__class__)):
-            raise CrazyTypeError('complete', 'list', complete)
+            raise CrazyTypeError('complete', 'list|None', complete)
 
         if not isinstance(repeatable, bool):
             raise CrazyTypeError('repeatable', 'bool', repeatable)
@@ -458,7 +458,7 @@ class Positional:
         self.metavar = metavar
         self.help = help
         self.repeatable = repeatable
-        self.complete = complete if complete else ('none',)
+        self.complete = complete if complete else ['none']
         self.when = when
 
     def get_positional_index(self):
@@ -504,7 +504,7 @@ class Option:
             help=None,
             complete=None,
             group=None,
-            takes_args=True,
+            optional_arg=False,
             multiple_option=ExtendedBool.INHERIT,
             when=None):
         if not isinstance(parent, (CommandLine, None.__class__)):
@@ -525,8 +525,8 @@ class Option:
         if not isinstance(group, (str, None.__class__)):
             raise CrazyTypeError('group', 'str|None', group)
 
-        if not isinstance(takes_args, bool) and not takes_args == '?':
-            raise CrazyTypeError('takes_args', 'bool|"?"', takes_args)
+        if not isinstance(optional_arg, bool):
+            raise CrazyTypeError('optional_arg', 'bool', optional_arg)
 
         if not _is_extended_bool(multiple_option):
             raise CrazyTypeError('multiple_option', 'ExtendedBool', multiple_option)
@@ -541,16 +541,19 @@ class Option:
             if not _validate_option_string(option_string):
                 raise CrazyError(f"Invalid option string: {option_string}")
 
-        if not takes_args and metavar:
-            raise CrazyError(f'Option {option_strings} does not take an argument but has metavar set')
+        if metavar and not complete:
+            raise CrazyError(f'Option {option_strings} has metavar set, but has no complete')
+
+        if optional_arg and not complete:
+            raise CrazyError(f'Option {option_strings} has optional_arg=True, but has no complete')
 
         self.parent = parent
         self.option_strings = option_strings
         self.metavar = metavar
         self.help = help
-        self.complete = complete if complete else ('none',)
+        self.complete = complete
         self.group = group
-        self.takes_args = takes_args
+        self.optional_arg = optional_arg
         self.multiple_option = multiple_option
         self.when = when
 
@@ -628,7 +631,7 @@ class Option:
             self.option_strings  == other.option_strings and
             self.metavar         == other.metavar and
             self.help            == other.help and
-            self.takes_args      == other.takes_args and
+            self.optional_arg    == other.optional_arg and
             self.multiple_option == other.multiple_option and
             self.complete        == other.complete and
             self.group           == other.group
@@ -695,7 +698,7 @@ class MutuallyExclusiveGroup:
             metavar=None,
             help=None,
             complete=None,
-            takes_args=True,
+            optional_arg=False,
             multiple_option=ExtendedBool.INHERIT):
         ''' Creates and adds a new option '''
         return self.parent.add_option(
@@ -703,7 +706,7 @@ class MutuallyExclusiveGroup:
             metavar=metavar,
             help=help,
             complete=complete,
-            takes_args=takes_args,
+            optional_arg=optional_arg,
             group=self.group,
             multiple_option=multiple_option)
 

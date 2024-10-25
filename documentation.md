@@ -32,7 +32,7 @@ options:
   - option_strings: ["<OPTION STRING>", ...]
     metavar: "<METAVAR>"
     help: "<OPTION DESCRIPTION>"
-    takes_args: <BOOL>
+    optional_arg: <BOOL>
     complete: <COMPLETE ACTION>
     multiple_option: <BOOL>
     group: <GROUP>
@@ -43,10 +43,10 @@ options:
 - *option\_strings*: A list of option strings (e.g., ["-h", "--help"])
 - *metavar* (optional): The placeholder used for the argument (e.g., "FILE")
 - *help* (optional): A description of the option
-- *takes\_args* (optional): Indicates if the option takes arguments (true or false, default: true)
-- *complete* (optional): The method used to generate possible completions for this option
+- *optional\_arg* (optional): Indicates if the option's argument is optional (default: false)
+- *complete* (optional): Defines the method used to provide possible completions for this option. If not set, the option does not take an argument. Use `["none"]` if the option accepts an argument but no specific completion method applies
 - *multiple\_option* (optional): Indicates whether an option can be suggested multiple times (true or false, default: false)
-- *group* (optional): Add this option into the specified group. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags.
+- *group* (optional): Add this option into the specified group. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags
 - *when* (optional): Only enable this option if CONDITION evaluates to true
 
 **Defining a Positional Argument**
@@ -69,7 +69,7 @@ positionals:
 - *metavar* (optional): A placeholder for the positional argument in the help text
 - *help* (optional): A description of the positional argument
 - *repeatable* (optional): Indicates if this positional argument can be repeated (true or false, default: false)
-- *complete* (optional): The method used to generate possible completions for this positional argument
+- *complete* (optional): The method used to generate possible completions for this positional argument. Default `["none"]`
 - *when* (optional): Only enable this positional if CONDITION evaluates to true
 
 **Defining Subcommands**

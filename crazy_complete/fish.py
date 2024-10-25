@@ -185,9 +185,9 @@ class FishCompletionGenerator:
     def _get_option_strings_for_query(self):
         r = []
         for option in self.commandline.get_options(with_parent_options=True):
-            if option.takes_args == '?':
+            if option.complete and option.optional_arg is True:
                 r.extend('%s=?' % s for s in option.option_strings)
-            elif option.takes_args:
+            elif option.complete:
                 r.extend('%s=' % s for s in option.option_strings)
             else:
                 r.extend(option.option_strings)
@@ -195,14 +195,18 @@ class FishCompletionGenerator:
 
     def _complete_option(self, option):
         context = self.ctxt.getOptionGenerationContext(self.commandline, option)
-        completion_args = self.completer.complete(context, *option.complete).get_args()
+
+        if option.complete:
+            completion_args = self.completer.complete(context, *option.complete).get_args()
+        else:
+            completion_args = self.completer.complete(context, 'none').get_args()
 
         definition = FishCompletionDefinition(
             self.ctxt,
             short_options       = option.get_short_option_strings(),
             long_options        = option.get_long_option_strings(),
             old_options         = option.get_old_option_strings(),
-            requires_argument   = (option.takes_args is True),
+            requires_argument   = (option.complete and not option.optional_arg),
             description         = option.help,
             completion_args     = completion_args)
 
@@ -225,7 +229,11 @@ class FishCompletionGenerator:
 
     def _complete_positional(self, option):
         context = self.ctxt.getOptionGenerationContext(self.commandline, option)
-        completion_args = self.completer.complete(context, *option.complete).get_args()
+
+        if option.complete:
+            completion_args = self.completer.complete(context, *option.complete).get_args()
+        else:
+            completion_args = self.completer.complete(context, 'none').get_args()
 
         definition = FishCompletionDefinition(
             self.ctxt,
