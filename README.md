@@ -17,6 +17,10 @@ Installation
 ============
 
 - Using Arch Linux:
+
+  Use the \*.pkg.tar.zst file that has been released in this repository.
+
+  Or use:
   ```
   git clone https://github.com/crazy-complete/crazy-complete
   cd crazy-complete
@@ -24,14 +28,12 @@ Installation
   ```
 
 - Using Debian:
-  ```
-  # Ensure Python 3 is installed or install it with:
-  apt install python3
 
-  git clone https://github.com/crazy-complete/packages
-  cd packages
-  sudo dpkg -i $(ls|grep -F .deb|tail -1)
-  ```
+  Use the \*.deb file that has been released in this repository.
+
+- Using Fedora / OpenSuse:
+
+  Use the \*.rpm file that has been released in this repository.
 
 - For other Linux distributions:
   ```
