@@ -73,22 +73,28 @@ Item 1  (Description 1)  Item 2  (Description 2)
 
 **value_list**
 
-> Complete one or more items from a list of items. Similar to `mount -o`. Arguments
-> with assignable values (`mount -o uid=1000`) aren't supported.
+> Complete one or more items from a list of items. Similar to `mount -o`.
+> Arguments with assignable values (`mount -o uid=1000`) aren't supported.
 > Arguments are supplied by adding {"values": ...}
+> A separator can be supplied by adding {"separator": ...} (the default is ",")
 
 ```yaml
 prog: "example"
 options:
-  - option_strings: ["-o"]
+  - option_strings: ["--value-list-1"]
     complete: ["value_list", {"values": ["exec", "noexec"]}]
+  - option_strings: ["--value-list-2"]
+    complete: ["value_list", {"values": {"one": "Description 1", "two": "Description 2"}}]
 ```
 
 ```
- ~ > example -o=<TAB>
+ ~ > example --value-list-1=<TAB>
 exec    noexec
- ~ > example -o=exec,<TAB>
+ ~ > example --value-list-1=exec,<TAB>
 exec    noexec
+ ~ > example --value-list-2=<TAB>
+one  -- Description 1
+two  -- Description 2
 ```
 
 **exec**
