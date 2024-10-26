@@ -101,12 +101,19 @@ class FishCompleter(shell.ShellCompleter):
 
     def value_list(self, ctxt, opts):
         separator = opts.get('separator', ',')
-
+        values = opts['values']
         funcname = shell.make_completion_funcname_for_context(ctxt)
-        code = 'printf "%s\\n" \\\n'
-        for value in opts['values']:
-            code += '  %s \\\n' % shell.escape(str(value))
-        code = code.rstrip(' \\\n')
+
+        if hasattr(values, 'items'):
+            code = 'printf "%s\\t%s\\n" \\\n'
+            for item, desc in values.items():
+                code += '  %s %s \\\n' % (shell.escape(item), shell.escape(desc))
+            code = code.rstrip(' \\\n')
+        else:
+            code = 'printf "%s\\n" \\\n'
+            for value in values:
+                code += '  %s \\\n' % shell.escape(value)
+            code = code.rstrip(' \\\n')
 
         ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
         funcname = ctxt.helpers.use_function(funcname)

@@ -610,6 +610,21 @@ zsh_expected: |
   > crazy-complete-test complete --value-list foo,baz,bar,
 ---
 number: 42
+description: "complete: Check --value-list-2"
+send: "crazy-complete-test complete --value-list-2 "
+bash_expected: |
+  > crazy-complete-test complete --value-list-2
+  bar  foo
+  > crazy-complete-test complete --value-list-2
+fish_expected: |
+  > crazy-complete-test complete --value-list-2
+  bar  (Some bar)  foo  (Some foo)
+zsh_expected: |
+  > crazy-complete-test complete --value-list-2
+  bar  -- Some bar
+  foo  -- Some foo
+---
+number: 43
 description: "complete: Check --range-1"
 send: "crazy-complete-test complete --range-1 "
 bash_expected: |
@@ -625,7 +640,7 @@ zsh_expected: |
   > crazy-complete-test complete --range-1
   1  2  3  4  5  6  7  8  9
 ---
-number: 43
+number: 44
 description: "complete: Check --range-2"
 send: "crazy-complete-test complete --range-2 "
 bash_expected: |
@@ -640,7 +655,7 @@ zsh_expected: |
   > crazy-complete-test complete --range-2
   1  3  5  7  9
 ---
-number: 44
+number: 45
 description: "Check if positionals are working (1st positional)"
 send: "crazy-complete-test test "
 bash_expected: |
@@ -654,7 +669,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first
 ---
-number: 45
+number: 46
 description: "Check if positionals are working (2nd positional)"
 send: "crazy-complete-test test first1 "
 bash_expected: |
@@ -667,7 +682,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first1 second
 ---
-number: 46
+number: 47
 description: "Check if positionals are working (3rd positional)"
 send: "crazy-complete-test test first1 second1 "
 bash_expected: |
@@ -680,7 +695,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first1 second1 repeated
 ---
-number: 47
+number: 48
 description: "Check if positionals are working (repeated positional)"
 send: "crazy-complete-test test first1 second1 repeated1 "
 bash_expected: |
@@ -693,7 +708,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first1 second1 repeated1 repeated
 ---
-number: 48
+number: 49
 description: "Check if aliases are working (alias1)"
 send: "crazy-complete-test alias1 --arg "
 bash_expected: |
@@ -707,7 +722,7 @@ zsh_expected: |
   > crazy-complete-test alias1 --arg
   1  2  3
 ---
-number: 49
+number: 50
 description: "Check if aliases are working (alias2)"
 send: "crazy-complete-test alias2 --arg "
 bash_expected: |
@@ -723,7 +738,7 @@ zsh_expected: |
 ---
 generate-scripts: {"args": ["--input-type=yaml"], "definition_file": "when-test.yaml"}
 ---
-number: 50
+number: 51
 description: "Check --complete with --files"
 send: "crazy-complete-test --files --complete "
 bash_expected: |
@@ -736,7 +751,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --files --complete file
 ---
-number: 51
+number: 52
 description: "Check --complete with --directories"
 send: "crazy-complete-test --directories --complete "
 bash_expected: |
@@ -749,7 +764,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --directories --complete dir
 ---
-number: 52
+number: 53
 description: "Check positional with --files"
 send: "crazy-complete-test --files "
 bash_expected: |
@@ -762,7 +777,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --files file
 ---
-number: 53
+number: 54
 description: "Check positional with --directories"
 send: "crazy-complete-test --directories "
 bash_expected: |

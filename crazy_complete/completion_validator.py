@@ -231,15 +231,23 @@ class CompletionValidator:
         if values is None:
             raise CrazyError(f'Missing `values` option: {opts}')
 
-        if not isinstance(values, (list, tuple)):
-            raise CrazyError(f'values: not a list: {values}')
+        if not isinstance(values, (list, tuple)) and not hasattr(values, 'items'):
+            raise CrazyError(f'values: not a list|dictionary: {values}')
 
         if len(values) == 0:
-            raise CrazyError(f'values: empty list')
+            raise CrazyError(f'values: cannot be empty')
 
-        for index, value in enumerate(values):
-            if not isinstance(value, (str, int, float)):
-                raise CrazyError(f'values[{index}]: Not a string/int/float: {value}')
+        if hasattr(values, 'items'):
+            for item, desc in values.items():
+                if not isinstance(item, str):
+                    raise CrazyError(f'values: Not a string: {item}')
+
+                if not isinstance(desc, str):
+                    raise CrazyError(f'values: Not a string: {desc}')
+        else:
+            for index, value in enumerate(values):
+                if not isinstance(value, str):
+                    raise CrazyError(f'values[{index}]: Not a string: {value}')
 
         if not isinstance(separator, str):
             raise CrazyError(f'separator: Not a string: {separator}')

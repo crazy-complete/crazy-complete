@@ -138,7 +138,12 @@ class BashCompleter(shell.ShellCompleter):
 
     def value_list(self, ctxt, opts):
         funcname = ctxt.helpers.use_function('value_list')
+        separator = opts.get('separator', ',')
+        values = opts['values']
+        if hasattr(values, 'items'):
+            values = list(values.keys())
+
         return BashCompletionCommand(ctxt, '%s %s %s' % (
             funcname,
-            shell.escape(opts.get('separator', ',')),
-            ' '.join(shell.escape(v) for v in opts['values'])))
+            shell.escape(separator),
+            ' '.join(shell.escape(v) for v in values)))

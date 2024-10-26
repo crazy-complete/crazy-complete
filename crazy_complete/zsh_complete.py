@@ -6,6 +6,9 @@ from . import helpers
 def escape_colon(s):
     return s.replace(':', '\\:')
 
+def escape_square_brackets(s):
+    return s.replace('[', '\\[').replace(']', '\\]')
+
 class ZshCompleter(shell.ShellCompleter):
     def none(self, ctxt, *a):
         return "' '"
@@ -76,9 +79,20 @@ class ZshCompleter(shell.ShellCompleter):
 
     def value_list(self, ctxt, opts):
         desc = ctxt.option.metavar or ''
+        values = opts['values']
+        if hasattr(values, 'items'):
+            values_arg = ' '.join(
+                shell.escape('%s[%s]' % (
+                    escape_square_brackets(item),
+                    escape_square_brackets(desc))
+                ) for item, desc in values.items()
+            )
+        else:
+            values_arg = ' '.join(shell.escape(escape_square_brackets(i)) for i in values)
+
         cmd = '_values -s %s %s %s' % (
             shell.escape(opts.get('separator', ',')),
             shell.escape(desc),
-            ' '.join(shell.escape(i) for i in opts['values'])
+            values_arg
         )
         return shell.escape(cmd)
