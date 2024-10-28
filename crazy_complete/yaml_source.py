@@ -17,6 +17,7 @@ def option_to_yaml(dictionary):
     optional_arg    = dictionary.get('optional_arg',    False)
     group           = dictionary.get('group',           None)
     multiple_option = dictionary.get('multiple_option', ExtendedBool.INHERIT)
+    final           = dictionary.get('final',           False)
     complete        = dictionary.get('complete',        None)
     when            = dictionary.get('when',            None)
 
@@ -36,6 +37,9 @@ def option_to_yaml(dictionary):
 
     if multiple_option != ExtendedBool.INHERIT:
         r += '  multiple_option: %s\n' % json.dumps(multiple_option)
+
+    if final is not False:
+        r += '  final: %s\n' % json.dumps(final)
 
     if complete is not None:
         r += '  complete: %s\n' % json.dumps(complete)

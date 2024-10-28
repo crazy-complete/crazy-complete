@@ -24,6 +24,7 @@ def make_argument_option_spec(
         complete = None,
         optional_arg = False,
         multiple_option = False,
+        final = False,
         metavar = None,
         action = None
     ):
@@ -43,6 +44,9 @@ def make_argument_option_spec(
     if not multiple_option:
         for o in sorted(option_strings):
             not_options.append(escape_colon(o))
+
+    if final:
+        not_options = ['- *']
 
     if not_options:
         result.append(shell.escape('(%s)' % ' '.join(not_options)))
@@ -115,6 +119,7 @@ class ZshCompletionGenerator:
             complete = option.complete,
             optional_arg = option.optional_arg,
             multiple_option = option.multiple_option,
+            final = option.final,
             metavar = option.metavar,
             action = action
         )

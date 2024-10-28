@@ -1,7 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    takes_args: false
-    metavar: "FOO"
----
-expected_error: "Option ['-o'] does not take an argument but has metavar set"

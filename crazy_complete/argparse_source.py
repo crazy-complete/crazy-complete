@@ -71,6 +71,12 @@ def get_complete(action):
 
     raise CrazyError(f'Unknown action type: {action}')
 
+def get_final(action):
+    if isinstance(action, (argparse._HelpAction, argparse._VersionAction)):
+        return True
+
+    return action.get_final()
+
 def argumentparser_to_commandline(parser, prog=None, description=None):
     '''
     Converts an ArgumentParser object to a CommandLine object.
@@ -147,6 +153,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
                 help            = action.help,
                 optional_arg    = optional_arg,
                 multiple_option = action.get_multiple_option(),
+                final           = get_final(action),
                 when            = action.get_when()
             )
 

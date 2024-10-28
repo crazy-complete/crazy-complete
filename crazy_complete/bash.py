@@ -207,8 +207,11 @@ class BashCompletionGenerator:
             for exclusive_option in option.get_conflicting_options():
                 option_guard += ["! ${#%s}" % self.captured_variables.make_value_variable(exclusive_option)]
 
+            for final_option in self.commandline.get_final_options():
+                option_guard += ["! ${#%s}" % self.captured_variables.make_value_variable(final_option)]
+
             if option_guard:
-                option_guard = '(( %s )) && ' % ' && '.join(option_guard)
+                option_guard = '(( %s )) && ' % ' && '.join(utils.uniq(option_guard))
             else:
                 option_guard = ''
 

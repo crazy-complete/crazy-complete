@@ -37,6 +37,15 @@ def _action_get_multiple_option(self):
     return getattr(self, '_multiple_option', ExtendedBool.INHERIT)
 
 
+def _action_set_final(self, enable=True):
+    setattr(self, '_final', enable)
+    return self
+
+
+def _action_get_final(self):
+    return getattr(self, '_final', False)
+
+
 def _parser_alias(self, alias):
     setattr(self, '_aliases', [alias])
     return self
@@ -63,6 +72,8 @@ argparse.Action.when = _action_when
 argparse.Action.get_when = _action_get_when
 argparse.Action.set_multiple_option = _action_set_multiple_option
 argparse.Action.get_multiple_option = _action_get_multiple_option
+argparse.Action.set_final = _action_set_final
+argparse.Action.get_final = _action_get_final
 argparse.ArgumentParser.alias = _parser_alias
 argparse.ArgumentParser.aliases = _parser_aliases
 argparse.ArgumentParser.get_aliases = _parser_get_aliases

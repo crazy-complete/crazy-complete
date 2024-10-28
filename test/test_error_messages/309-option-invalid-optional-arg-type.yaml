@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    optional_arg: ["wrong type"]
+---
+expected_error: "Parameter `optional_arg` has an invalid type. Expected types: bool. Received: ['wrong type'] (list)"

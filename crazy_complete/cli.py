@@ -95,6 +95,7 @@ class CommandLine:
             optional_arg=False,
             group=None,
             multiple_option=ExtendedBool.INHERIT,
+            final=False,
             when=None):
         '''
         Adds a new option to the command line.
@@ -121,6 +122,7 @@ class CommandLine:
                    optional_arg=optional_arg,
                    group=group,
                    multiple_option=multiple_option,
+                   final=final,
                    when=when)
         self.options.append(o)
         return o
@@ -268,6 +270,19 @@ class CommandLine:
 
         return option_strings
 
+    def get_final_options(self):
+        r = []
+        for option in self.options:
+            if option.final:
+                r.append(option)
+        return r
+
+    def get_final_option_strings(self):
+        r = []
+        for option in self.get_final_options():
+            r.extend(option.option_strings)
+        return r
+
     def get_positionals(self):
         '''
         Gets a list of positional arguments associated with the command line.
@@ -380,6 +395,7 @@ class CommandLine:
                 optional_arg    = option.optional_arg,
                 group           = option.group,
                 multiple_option = option.multiple_option,
+                final           = option.final,
                 when            = option.when
             )
 
@@ -495,6 +511,17 @@ class Positional:
         '''
         return self.get_positional_index() + 1
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, Positional) and
+            self.number          == other.number and
+            self.metavar         == other.metavar and
+            self.help            == other.help and
+            self.repeatable      == other.repeatable and
+            self.complete        == other.complete and
+            self.when            == other.when
+        )
+
 class Option:
     def __init__(
             self,
@@ -506,6 +533,7 @@ class Option:
             group=None,
             optional_arg=False,
             multiple_option=ExtendedBool.INHERIT,
+            final=False,
             when=None):
         if not isinstance(parent, (CommandLine, None.__class__)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
@@ -531,6 +559,9 @@ class Option:
         if not _is_extended_bool(multiple_option):
             raise CrazyTypeError('multiple_option', 'ExtendedBool', multiple_option)
 
+        if not isinstance(final, bool):
+            raise CrazyTypeError('final', 'bool', final)
+
         if not isinstance(when, (str, None.__class__)):
             raise CrazyTypeError('when', 'str|None', when)
 
@@ -555,6 +586,7 @@ class Option:
         self.group = group
         self.optional_arg = optional_arg
         self.multiple_option = multiple_option
+        self.final = final
         self.when = when
 
     def get_option_strings(self):
@@ -633,8 +665,10 @@ class Option:
             self.help            == other.help and
             self.optional_arg    == other.optional_arg and
             self.multiple_option == other.multiple_option and
+            self.final           == other.final and
             self.complete        == other.complete and
-            self.group           == other.group
+            self.group           == other.group and
+            self.when            == other.when
         )
 
     def __repr__(self):
@@ -699,7 +733,9 @@ class MutuallyExclusiveGroup:
             help=None,
             complete=None,
             optional_arg=False,
-            multiple_option=ExtendedBool.INHERIT):
+            multiple_option=ExtendedBool.INHERIT,
+            final=False,
+            when=None):
         ''' Creates and adds a new option '''
         return self.parent.add_option(
             option_strings,
@@ -708,7 +744,9 @@ class MutuallyExclusiveGroup:
             complete=complete,
             optional_arg=optional_arg,
             group=self.group,
-            multiple_option=multiple_option)
+            multiple_option=multiple_option,
+            final=final,
+            when=when)
 
     def add_option(self, option):
         ''' Adds an option object '''

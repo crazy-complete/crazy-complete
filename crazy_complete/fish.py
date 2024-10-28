@@ -213,8 +213,13 @@ class FishCompletionGenerator:
         conflicting_options = option.get_conflicting_option_strings()
         definition.conditions.not_has_option.extend(conflicting_options)
 
+        final_options = self.commandline.get_final_option_strings()
+        definition.conditions.not_has_option.extend(final_options)
+
         if not option.multiple_option:
             definition.conditions.not_has_option.extend(option.option_strings)
+
+        definition.conditions.not_has_option = utils.uniq(definition.conditions.not_has_option)
 
         # If we don't inherit options, add a condition to the option that
         # ensures that we're in the right (sub)command.

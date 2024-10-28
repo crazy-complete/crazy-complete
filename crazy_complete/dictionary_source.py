@@ -38,7 +38,7 @@ def dictionary_to_commandline(dictionary, prog=None):
     for option in options:
         _validate_keys(option,
             ['option_strings', 'metavar', 'help', 'optional_arg', 'group',
-             'multiple_option', 'complete', 'when'])
+             'multiple_option', 'final', 'complete', 'when'])
 
         commandline.add_option(
             option.get('option_strings',  None),
@@ -47,6 +47,7 @@ def dictionary_to_commandline(dictionary, prog=None):
             optional_arg    = option.get('optional_arg',    False),
             group           = option.get('group',           None),
             multiple_option = option.get('multiple_option', ExtendedBool.INHERIT),
+            final           = option.get('final',           False),
             complete        = option.get('complete',        None),
             when            = option.get('when',            None))
 
@@ -147,6 +148,9 @@ def option_to_dictionary(self):
 
     if self.multiple_option != ExtendedBool.INHERIT:
         r['multiple_option'] = self.multiple_option
+
+    if self.final != False:
+        r['final'] = self.final
 
     if self.complete:
         r['complete'] = self.complete

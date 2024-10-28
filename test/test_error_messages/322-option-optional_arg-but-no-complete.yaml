@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    optional_arg: true
+---
+expected_error: "Option ['-o'] has optional_arg=True, but has no complete"
