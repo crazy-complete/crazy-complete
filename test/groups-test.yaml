@@ -1,0 +1,10 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ['-A']
+    groups: ['AB']
+
+  - option_strings: ['-B']
+    groups: ['AB', 'BC']
+
+  - option_strings: ['-C']
+    groups: ['BC']

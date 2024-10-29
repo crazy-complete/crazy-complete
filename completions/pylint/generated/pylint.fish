@@ -672,7 +672,7 @@ complete -c $prog -l notes-rgx -d 'Regular expression of note tags to take in co
 complete -c $prog -l timeout-methods -d "List of qualified names (i.e., library.method) which require a timeout parameter e.g. 'requests.api.get,requests.api.post' (default: ('requests.api.delete', 'requests.api.get', 'requests.api.head', 'requests.api.options', 'requests.api.patch', 'requests.api.post', 'requests.api.put', 'requests.api.request'))" -x
 complete -c $prog -l spelling-dict -d 'Spelling dictionary name. No available dictionaries : You need to install both the python package and the system dependency for enchant to work. (default: )' -x
 complete -c $prog -l spelling-ignore-words -d 'List of comma separated words that should not be checked. (default: )' -x
-complete -c $prog -l spelling-private-dict-file -d 'A path to a file that contains the private dictionary; one word per line. (default: )' -x
+complete -c $prog -l spelling-private-dict-file -d 'A path to a file that contains the private dictionary; one word per line. (default: )' -Fr
 complete -c $prog -l spelling-store-unknown-words -d 'Tells whether to store unknown words to the private dictionary (see the --spelling-private-dict-file option) instead of raising a message. (default: n)' -x -a 'y n'
 complete -c $prog -l max-spelling-suggestions -d 'Limits count of emitted suggestions for spelling mistakes. (default: 4)' -x
 complete -c $prog -l spelling-ignore-comment-directives -d 'List of comma separated words that should be considered directives if they appear at the beginning of a comment and should not be checked. (default: fmt: on,fmt: off,noqa:,noqa,nosec,isort:skip,mypy:)' -x
@@ -742,7 +742,7 @@ complete -c $prog -l variable-rgx -d 'Regular expression matching correct variab
 complete -c $prog -l no-docstring-rgx -d "Regular expression which should only match function or class names that do not require a docstring. (default: re.compile('^_'))" -x
 complete -c $prog -l docstring-min-length -d 'Minimum line length for functions/classes that require docstrings, shorter ones are exempt. (default: -1)' -x
 complete -c $prog -l init-import -d 'Tells whether we should check for unused import in __init__ files. (default: False)' -x -a 'y n'
-complete -c $prog -l dummy-variables-rgx -d 'A regular expression matching the name of dummy variables (i.e. expected to not be used). (default: _+ $|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_)' -x
+complete -c $prog -l dummy-variables-rgx -d 'A regular expression matching the name of dummy variables (i.e. expected to not be used). (default: _+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_)' -x
 complete -c $prog -l additional-builtins -d 'List of additional names supposed to be defined in builtins. Remember that you should avoid defining new builtins when possible. (default: ())' -x
 complete -c $prog -l callbacks -d "List of strings which can identify a callback function by name. A callback name must start or end with one of those strings. (default: ('cb_', '_cb'))" -x
 complete -c $prog -l redefining-builtins-modules -d "List of qualified module names which can have objects that can redefine builtins. (default: ('six.moves', 'past.builtins', 'future.builtins', 'builtins', 'io'))" -x

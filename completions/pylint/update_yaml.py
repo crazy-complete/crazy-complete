@@ -31,7 +31,7 @@ cmdline.add_positional(1, metavar='FILE', repeatable=True, complete=['file'])
 for option in cmdline.options:
     for option_string in option.option_strings:
         if option_string in MUTEX_GROUP:
-            option.group = 'group1'
+            option.groups = ['group1']
 
         if option_string in FILE_OPTIONS:
             option.complete = ['file']

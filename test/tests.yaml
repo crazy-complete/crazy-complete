@@ -799,3 +799,35 @@ fish_expected: |
   dir1  dir2  dir3
 zsh_expected: |
   > crazy-complete-test --directories dir
+---
+generate-scripts: {"args": ["--input-type=yaml"], "definition_file": "groups-test.yaml"}
+---
+number: 56
+description: "Check -A"
+send: "crazy-complete-test -A -"
+bash_expected: |
+  > crazy-complete-test -A -C
+fish_expected: |
+  > crazy-complete-test -A -C
+zsh_expected: |
+  > crazy-complete-test -A -C
+---
+number: 57
+description: "Check -B"
+send: "crazy-complete-test -B -"
+bash_expected: |
+  > crazy-complete-test -B -
+fish_expected: |
+  > crazy-complete-test -B -
+zsh_expected: |
+  > crazy-complete-test -B -
+---
+number: 58
+description: "Check -C"
+send: "crazy-complete-test -C -"
+bash_expected: |
+  > crazy-complete-test -C -A
+fish_expected: |
+  > crazy-complete-test -C -A
+zsh_expected: |
+  > crazy-complete-test -C -A

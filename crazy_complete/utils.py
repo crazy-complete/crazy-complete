@@ -183,21 +183,6 @@ def indent(string, num_spaces):
     indented_lines = [((' ' * num_spaces) + line) if line.strip() else line for line in lines]
     return '\n'.join(indented_lines)
 
-def flatten(iterable):
-    r = []
-    for l in iterable:
-        r.extend(l)
-    return r
-
-def uniq(iterable):
-    r = []
-    seen = set()
-    for item in iterable:
-        if item not in seen:
-            seen.add(item)
-            r.append(item)
-    return r
-
 def warn(*a):
     print('WARNING:', *a, file=sys.stderr)
 

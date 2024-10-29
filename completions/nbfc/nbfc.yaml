@@ -31,16 +31,16 @@ help: "Show the service status"
 options:
   - option_strings: ["-a", "--all"]
     help: "Show service and fan status (default)"
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["-s", "--service"]
     help: "Show service status"
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["-f", "--fan"]
     metavar: "FAN INDEX"
     help: "Show status of fan (zero based)"
-    group: "group1"
+    groups: ["group1"]
     complete: ["none"]
 
   - option_strings: ["-w", "--watch"]
@@ -54,23 +54,23 @@ help: "List or apply configs"
 options:
   - option_strings: ["-l", "--list"]
     help: "List all available configs (default)"
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["-s", "--set"]
     metavar: "config"
     help: "Set a config"
-    group: "group1"
+    groups: ["group1"]
     complete: ["file", {"directory": "@DATADIR@/nbfc/configs"}]
 
   - option_strings: ["-a", "--apply"]
     metavar: "config"
     help: "Set a config and enable fan control"
-    group: "group1"
+    groups: ["group1"]
     complete: ["file", {"directory": "@DATADIR@/nbfc/configs"}]
 
   - option_strings: ["-r", "--recommend"]
     help: "List configs which may work for your device"
-    group: "group1"
+    groups: ["group1"]
 
 ---
 prog: "nbfc set"
@@ -78,12 +78,12 @@ help: "Control fan speed"
 options:
   - option_strings: ["-a", "--auto"]
     help: "Set fan speed to 'auto'"
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["-s", "--speed"]
     metavar: "PERCENT"
     help: "Set fan speed to PERCENT"
-    group: "group1"
+    groups: ["group1"]
     complete: ["none"]
 
   - option_strings: ["-f", "--fan"]

@@ -5,9 +5,9 @@ pylint.yaml: update_yaml.py
 
 generate_completions:
 	mkdir -p generated
-	crazy-complete bash pylint.yaml > generated/pylint.bash
-	crazy-complete --multiple-options=True fish pylint.yaml > generated/pylint.fish
-	crazy-complete zsh  pylint.yaml > generated/pylint.zsh
+	crazy-complete bash pylint.yaml -o generated/pylint.bash
+	crazy-complete --multiple-options=True fish pylint.yaml -o generated/pylint.fish
+	crazy-complete zsh  pylint.yaml -o generated/pylint.zsh
 
 install_completions:
 	crazy-complete -i bash pylint.yaml

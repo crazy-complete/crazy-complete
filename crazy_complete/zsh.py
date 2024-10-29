@@ -7,6 +7,7 @@ from . import generation
 from . import generation_notice
 from . import modeline
 from . import shell
+from . import algo
 from . import utils
 from . import zsh_complete
 from . import zsh_helpers
@@ -49,7 +50,7 @@ def make_argument_option_spec(
         not_options = ['- *']
 
     if not_options:
-        result.append(shell.escape('(%s)' % ' '.join(not_options)))
+        result.append(shell.escape('(%s)' % ' '.join(algo.uniq(not_options))))
 
     # Multiple option =========================================================
     if multiple_option:
@@ -144,7 +145,7 @@ class ZshCompletionGenerator:
             positional_num = "'*'"
         option_spec = "%s:%s:%s" % (
             positional_num,
-            shell.escape(escape_colon(option.help or ' ')),
+            shell.escape(escape_colon(option.help or option.metavar or ' ')),
             self.complete(option, *option.complete)
         )
 

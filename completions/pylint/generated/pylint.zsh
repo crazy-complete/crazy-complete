@@ -74,7 +74,7 @@ _pylint() {
     '(--timeout-methods)'--timeout-methods="[List of qualified names (i.e., library.method) which require a timeout parameter e.g. 'requests.api.get,requests.api.post' (default\\: ('requests.api.delete', 'requests.api.get', 'requests.api.head', 'requests.api.options', 'requests.api.patch', 'requests.api.post', 'requests.api.put', 'requests.api.request'))]":'<comma separated list>':' '
     '(--spelling-dict)'--spelling-dict='[Spelling dictionary name. No available dictionaries \: You need to install both the python package and the system dependency for enchant to work. (default\: )]':'<dict name>':' '
     '(--spelling-ignore-words)'--spelling-ignore-words='[List of comma separated words that should not be checked. (default\: )]':'<comma separated words>':' '
-    '(--spelling-private-dict-file)'--spelling-private-dict-file='[A path to a file that contains the private dictionary; one word per line. (default\: )]':'<path to file>':' '
+    '(--spelling-private-dict-file)'--spelling-private-dict-file='[A path to a file that contains the private dictionary; one word per line. (default\: )]':'<path to file>':_files
     '(--spelling-store-unknown-words)'--spelling-store-unknown-words='[Tells whether to store unknown words to the private dictionary (see the --spelling-private-dict-file option) instead of raising a message. (default\: n)]':'<y or n>':'(y n)'
     '(--max-spelling-suggestions)'--max-spelling-suggestions='[Limits count of emitted suggestions for spelling mistakes. (default\: 4)]':N:' '
     '(--spelling-ignore-comment-directives)'--spelling-ignore-comment-directives='[List of comma separated words that should be considered directives if they appear at the beginning of a comment and should not be checked. (default\: fmt\: on,fmt\: off,noqa\:,noqa,nosec,isort\:skip,mypy\:)]':'<comma separated words>':' '
@@ -144,7 +144,7 @@ _pylint() {
     '(--no-docstring-rgx)'--no-docstring-rgx="[Regular expression which should only match function or class names that do not require a docstring. (default\\: re.compile('^_'))]":'<regexp>':' '
     '(--docstring-min-length)'--docstring-min-length='[Minimum line length for functions/classes that require docstrings, shorter ones are exempt. (default\: -1)]':'<int>':' '
     '(--init-import)'--init-import='[Tells whether we should check for unused import in __init__ files. (default\: False)]':'<y or n>':'(y n)'
-    '(--dummy-variables-rgx)'--dummy-variables-rgx='[A regular expression matching the name of dummy variables (i.e. expected to not be used). (default\: _+ $|(_\[a-zA-Z0-9_\]*\[a-zA-Z0-9\]+?$)|dummy|^ignored_|^unused_)]':'<regexp>':' '
+    '(--dummy-variables-rgx)'--dummy-variables-rgx='[A regular expression matching the name of dummy variables (i.e. expected to not be used). (default\: _+$|(_\[a-zA-Z0-9_\]*\[a-zA-Z0-9\]+?$)|dummy|^ignored_|^unused_)]':'<regexp>':' '
     '(--additional-builtins)'--additional-builtins='[List of additional names supposed to be defined in builtins. Remember that you should avoid defining new builtins when possible. (default\: ())]':'<comma separated list>':' '
     '(--callbacks)'--callbacks="[List of strings which can identify a callback function by name. A callback name must start or end with one of those strings. (default\\: ('cb_', '_cb'))]":'<callbacks>':' '
     '(--redefining-builtins-modules)'--redefining-builtins-modules="[List of qualified module names which can have objects that can redefine builtins. (default\\: ('six.moves', 'past.builtins', 'future.builtins', 'builtins', 'io'))]":'<comma separated list>':' '

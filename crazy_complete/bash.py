@@ -8,6 +8,7 @@ from . import config as config_
 from . import generation_notice
 from . import modeline
 from . import shell
+from . import algo
 from . import utils
 from . import when
 from . import helpers
@@ -211,7 +212,7 @@ class BashCompletionGenerator:
                 option_guard += ["! ${#%s}" % self.captured_variables.make_value_variable(final_option)]
 
             if option_guard:
-                option_guard = '(( %s )) && ' % ' && '.join(utils.uniq(option_guard))
+                option_guard = '(( %s )) && ' % ' && '.join(algo.uniq(option_guard))
             else:
                 option_guard = ''
 
@@ -282,7 +283,7 @@ class BashCompletionGenerator:
 
         is_oldstyle_option = None
         if G2:
-            all_options = utils.flatten(abbreviations.get_many_abbreviations(
+            all_options = algo.flatten(abbreviations.get_many_abbreviations(
                 o.get_old_option_strings()) for o in self.commandline.get_options(with_parent_options=True))
             if all_options:
                 is_oldstyle_option = '''\

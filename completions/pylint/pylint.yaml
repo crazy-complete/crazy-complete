@@ -3,61 +3,61 @@ help: "static code analyser for Python 2 or 3"
 options:
   - option_strings: ["-h", "--help"]
     help: "show this help message and exit"
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--rcfile"]
     metavar: "RCFILE"
     help: "Specify a configuration file to load."
-    group: "group1"
+    groups: ["group1"]
     complete: ["file"]
 
   - option_strings: ["--output"]
     metavar: "OUTPUT"
     help: "Specify an output file."
-    group: "group1"
+    groups: ["group1"]
     complete: ["file"]
 
   - option_strings: ["--help-msg"]
     metavar: "HELP_MSG"
     help: "Display a help message for the given message id and exit. The value may be a comma separated list of message ids."
-    group: "group1"
+    groups: ["group1"]
     complete: ["none"]
 
   - option_strings: ["--list-msgs"]
     help: "Display a list of all pylint's messages divided by whether they are emittable with the given interpreter."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--list-msgs-enabled"]
     help: "Display a list of what messages are enabled, disabled and non-emittable with the given configuration."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--list-groups"]
     help: "List pylint's message groups."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--list-conf-levels"]
     help: "Generate pylint's confidence levels."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--list-extensions"]
     help: "List available extensions."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--full-documentation"]
     help: "Generate pylint's full documentation."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--generate-rcfile"]
     help: "Generate a sample configuration file according to the current configuration. You can put other options before this one to get them in the generated configuration."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--generate-toml-config"]
     help: "Generate a sample configuration file according to the current configuration. You can put other options before this one to get them in the generated configuration. The config is in the .toml format."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--long-help"]
     help: "Show more verbose help."
-    group: "group1"
+    groups: ["group1"]
 
   - option_strings: ["--init-hook"]
     metavar: "INIT_HOOK"
@@ -676,7 +676,7 @@ options:
 
   - option_strings: ["--dummy-variables-rgx"]
     metavar: "<regexp>"
-    help: "A regular expression matching the name of dummy variables (i.e. expected to not be used). (default: _+ $|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_)"
+    help: "A regular expression matching the name of dummy variables (i.e. expected to not be used). (default: _+$|(_[a-zA-Z0-9_]*[a-zA-Z0-9]+?$)|dummy|^ignored_|^unused_)"
     complete: ["none"]
 
   - option_strings: ["--additional-builtins"]

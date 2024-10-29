@@ -8,6 +8,7 @@ from . import config as config_
 from . import generation_notice
 from . import modeline
 from . import utils
+from . import algo
 from . import fish_complete
 from . import fish_helpers
 from .fish_utils import *
@@ -219,7 +220,7 @@ class FishCompletionGenerator:
         if not option.multiple_option:
             definition.conditions.not_has_option.extend(option.option_strings)
 
-        definition.conditions.not_has_option = utils.uniq(definition.conditions.not_has_option)
+        definition.conditions.not_has_option = algo.uniq(definition.conditions.not_has_option)
 
         # If we don't inherit options, add a condition to the option that
         # ensures that we're in the right (sub)command.

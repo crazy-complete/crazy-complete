@@ -102,7 +102,7 @@ function __fish_query
 #ifdef short_options
           case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
           case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
-          case '-?';      set -a short_opts_with_arg          $option
+          case '-?';      set -a short_opts_without_arg       $option
 #endif
 #ifdef old_options
           case '-??*=';   set -a old_opts_with_arg            (string replace -- '='  '' $option)

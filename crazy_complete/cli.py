@@ -3,6 +3,7 @@
 import re
 from collections import OrderedDict
 
+from . import algo
 from .errors import CrazyError, CrazyTypeError
 
 class ExtendedBool:
@@ -93,7 +94,7 @@ class CommandLine:
             help=None,
             complete=None,
             optional_arg=False,
-            group=None,
+            groups=None,
             multiple_option=ExtendedBool.INHERIT,
             final=False,
             when=None):
@@ -106,7 +107,7 @@ class CommandLine:
             help (str): The help message for the option.
             complete (tuple): The completion specification for the option.
             optional_arg (bool): Specifies if option's argument is optional.
-            group (str): Specify to which mutually exclusive group this option belongs to.
+            groups (list of str): Specify to which mutually exclusive groups this option belongs to.
             multiple_option (ExtendedBool): Specifies if the option can be repeated.
             when (str): Specifies a condition for showing this option.
 
@@ -120,7 +121,7 @@ class CommandLine:
                    help=help,
                    complete=complete,
                    optional_arg=optional_arg,
-                   group=group,
+                   groups=groups,
                    multiple_option=multiple_option,
                    final=final,
                    when=when)
@@ -393,7 +394,7 @@ class CommandLine:
                 help            = option.help,
                 complete        = option.complete,
                 optional_arg    = option.optional_arg,
-                group           = option.group,
+                groups          = option.groups,
                 multiple_option = option.multiple_option,
                 final           = option.final,
                 when            = option.when
@@ -530,7 +531,7 @@ class Option:
             metavar=None,
             help=None,
             complete=None,
-            group=None,
+            groups=None,
             optional_arg=False,
             multiple_option=ExtendedBool.INHERIT,
             final=False,
@@ -550,8 +551,13 @@ class Option:
         if not isinstance(complete, (list, tuple, None.__class__)):
             raise CrazyTypeError('complete', 'list|None', complete)
 
-        if not isinstance(group, (str, None.__class__)):
-            raise CrazyTypeError('group', 'str|None', group)
+        if not isinstance(groups, (list, None.__class__)):
+            raise CrazyTypeError('groups', 'list|None', groups)
+
+        if groups is not None:
+            for index, group in enumerate(groups):
+                if not isinstance(group, str):
+                    raise CrazyTypeError(f'groups[{index}]', 'str', group)
 
         if not isinstance(optional_arg, bool):
             raise CrazyTypeError('optional_arg', 'bool', optional_arg)
@@ -583,7 +589,7 @@ class Option:
         self.metavar = metavar
         self.help = help
         self.complete = complete
-        self.group = group
+        self.groups = groups
         self.optional_arg = optional_arg
         self.multiple_option = multiple_option
         self.final = final
@@ -630,24 +636,26 @@ class Option:
 
     def get_conflicting_options(self):
         '''
-        Returns a list of conflicting options within the same mutually exclusive group.
+        Returns a list of conflicting options within the same mutually exclusive groups.
 
         Returns:
             list: A list of Option objects representing conflicting options.
         '''
-        if not self.group:
+        if not self.groups:
             return []
         r = []
-        for option in self.parent.options:
-            if option.group == self.group:
-                r.append(option)
+        for group in self.groups:
+            for option in self.parent.options:
+                if option.groups is not None and group in option.groups:
+                    if option not in r:
+                        r.append(option)
         r.remove(self)
         return r
 
     def get_conflicting_option_strings(self):
         '''
         Returns a list of option strings conflicting with the current option
-        within the same mutually exclusive group.
+        within the same mutually exclusive groups.
 
         Returns:
             list: A list of option strings representing conflicting options.
@@ -667,7 +675,7 @@ class Option:
             self.multiple_option == other.multiple_option and
             self.final           == other.final and
             self.complete        == other.complete and
-            self.group           == other.group and
+            self.groups          == other.groups and
             self.when            == other.when
         )
 
@@ -743,7 +751,7 @@ class MutuallyExclusiveGroup:
             help=help,
             complete=complete,
             optional_arg=optional_arg,
-            group=self.group,
+            groups=[self.group],
             multiple_option=multiple_option,
             final=final,
             when=when)
@@ -751,4 +759,4 @@ class MutuallyExclusiveGroup:
     def add_option(self, option):
         ''' Adds an option object '''
         option.parent = self.parent
-        option.group = self.group
+        option.groups = [self.group]

@@ -36,7 +36,7 @@ options:
     complete: <COMPLETE ACTION>
     multiple_option: <BOOL>
     final: <BOOL>
-    group: <GROUP>
+    groups: ["<GROUP>", ...]
     when: "<CONDITION>"
 [...]
 ```
@@ -48,7 +48,7 @@ options:
 - *complete* (optional): Defines the method used to provide possible completions for this option. If not set, the option does not take an argument. Use `["none"]` if the option accepts an argument but no specific completion method applies
 - *multiple\_option* (optional): Indicates whether an option can be suggested multiple times (true or false, default: false)
 - *final* (optional): The final parameter indicates that no further options are shown after this one if it is passed on commandline. Mostly used for --help and --version (default: false)
-- *group* (optional): Add this option into the specified group. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags
+- *groups* (optional): Add this option into the specified groups. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags
 - *when* (optional): Only enable this option if CONDITION evaluates to true
 
 **Defining a Positional Argument**
