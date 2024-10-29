@@ -195,7 +195,11 @@ if __name__ == '__main__':
     options = _crazy_complete_argument_parser.parse_args()
     try:
         generate(options)
-    except (CrazyError, FileNotFoundError, yaml.scanner.ScannerError, json.decoder.JSONDecodeError) as e:
+    except (CrazyError,
+            FileNotFoundError,
+            yaml.scanner.ScannerError,
+            yaml.parser.ParserError,
+            json.decoder.JSONDecodeError) as e:
         print_err('Error:', e)
         if options.debug:
             traceback.print_exc()
