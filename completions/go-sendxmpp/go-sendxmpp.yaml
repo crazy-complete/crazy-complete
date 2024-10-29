@@ -1,0 +1,143 @@
+prog: "go-sendxmpp"
+help: "A tool to send messages to an XMPP contact or MUC"
+options:
+  - option_strings: ["--help"]
+    help: "Show help"
+    final: true
+
+  - option_strings: ["--version"]
+    help: "Show version information"
+    final: true
+
+  - option_strings: ["-a", "--alias"]
+    metavar: "alias"
+    help: "Set alias/nickname for chatrooms"
+    complete: ["none"]
+
+  - option_strings: ["-c", "--chatroom"]
+    help: "Send message to a chatroom"
+    groups: ["OX_NO_CHATROOM", "CHATROOM_NO_HEADLINE"]
+
+  - option_strings: ["-d", "--debug"]
+    help: "Show debugging info"
+
+  - option_strings: ["--fast-off"]
+    help: "Disable XEP-0484: Fast Authentication Streamlining Tokens"
+
+  - option_strings: ["-f", "--file"]
+    metavar: "config-file"
+    help: "Set configuration file (Default: ~/.config/go-sendxmpp/sendxmpprc)"
+    complete: ["file"]
+
+  - option_strings: ["--headline"]
+    help: "Send message as type headline"
+    groups: ["OX_NO_HEADLINE", "CHATROOM_NO_HEADLINE"]
+
+  - option_strings: ["-h", "--http-upload"]
+    metavar: "file"
+    help: "Send a file via http-upload"
+    complete: ["file"]
+    groups: ["OX_NO_HTTP_UPLOAD", "HTTP_UPLOAD_OR_INTERACTIVE", "HTTP_UPLOAD_OR_MESSAGE_FILE"]
+
+  - option_strings: ["-i", "--interactive"]
+    help: "Interactive mode (for use with e.g. 'tail -f')"
+    groups: ["HTTP_UPLOAD_OR_INTERACTIVE"]
+
+  - option_strings: ["-j", "--jserver"]
+    metavar: "address"
+    help: "XMPP server address"
+    complete: ["none"]
+
+  - option_strings: ["-l", "--listen"]
+    help: "Listen for messages and print them to stdout"
+
+  - option_strings: ["-m", "--message"]
+    metavar: "message-file"
+    help: "Set file including the message"
+    complete: ["file"]
+    groups: ["HTTP_UPLOAD_OR_MESSAGE_FILE"]
+
+  - option_strings: ["--muc-password"]
+    metavar: "muc-password"
+    help: "Password for password protected MUCs"
+    complete: ["none"]
+
+  - option_strings: ["-n", "--no-tls-verify"]
+    help: "Skip verification of TLS certificates (not recommended)"
+
+  - option_strings: ["--oob-file"]
+    metavar: "url"
+    help: "URL to send a file as out of band data"
+    complete: ["none"]
+    groups: ["OX_NO_OOB_FILE"]
+
+  - option_strings: ["--ox"]
+    help: "Use \"OpenPGP for XMPP\" encryption (experimental)"
+    groups: ["OX_NO_HTTP_UPLOAD", "OX_NO_CHATROOM", "OX_NO_OOB_FILE", "OX_NO_HEADLINE"]
+
+  - option_strings: ["--ox-delete-nodes"]
+    help: "Delete existing OpenPGP nodes on the server"
+
+  - option_strings: ["--ox-genprivkey-rsa"]
+    help: "Generate a private OpenPGP key (RSA 4096 bit) for the given JID and publish the corresponding public key"
+
+  - option_strings: ["--ox-genprivkey-x25519"]
+    help: "Generate a private OpenPGP key (x25519) for the given JID and publish the corresponding public key"
+
+  - option_strings: ["--ox-import-privkey"]
+    metavar: "file"
+    help: "Import an existing private OpenPGP key"
+    complete: ["file"]
+
+  - option_strings: ["--ox-passphrase"]
+    metavar: "passphrase"
+    help: "Passphrase for locking and unlocking the private OpenPGP key"
+    complete: ["none"]
+
+  - option_strings: ["-p", "--password"]
+    metavar: "password"
+    help: "Password for XMPP account"
+    complete: ["none"]
+
+  - option_strings: ["--raw"]
+    help: "Send raw XML"
+
+  - option_strings: ["--scram-mech-pinning"]
+    metavar: "value"
+    help: "Enforce the use of a certain SCRAM authentication mechanism"
+    complete: ["choices", ["SCRAM-SHA-1", "SCRAM-SHA-1-PLUS", "SCRAM-SHA-256",
+                           "SCRAM-SHA-256-PLUS", "SCRAM-SHA-512", "SCRAM-SHA-512-PLUS"]]
+
+  - option_strings: ["--ssdp-off"]
+    help: "Disable XEP-0474: SASL SCRAM Downgrade Protection"
+
+  - option_strings: ["-s", "--subject"]
+    metavar: "subject"
+    help: "Set message subject"
+    complete: ["none"]
+
+  - option_strings: ["--timeout"]
+    metavar: "seconds"
+    help: "Connection timeout in seconds [default: 10]"
+    complete: ["none"]
+
+  - option_strings: ["-t", "--tls"]
+    help: "Use direct TLS"
+
+  - option_strings: ["--tls-version"]
+    metavar: "version"
+    help: "Minimal TLS version: 10 (TLSv1.0), 11 (TLSv1.1), 12 (TLSv1.2) or 13 (TLSv1.3) [default: 12]"
+    complete: ["choices", {"10": "TLSv1.0", "11": "TLSv1.1", "12": "TLSv1.2", "13": "TLSv1.3"}]
+
+  - option_strings: ["-u", "--username"]
+    metavar: "username"
+    help: "Username for XMPP account"
+    complete: ["none"]
+
+positionals:
+  - number: 1
+    metavar: "JID"
+    help: "Specify JID"
+    repeatable: true
+    complete: ["exec", "_go-sendxmpp_jid_from_history"]
+
