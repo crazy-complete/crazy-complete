@@ -12,7 +12,7 @@ class Config:
     def __init__(self):
         self.abbreviate_commands = False
         self.abbreviate_options = False
-        self.multiple_options = False
+        self.repeatable_options = False
         self.inherit_options = False
         self.vim_modeline = True
         self.include_files = []
@@ -78,7 +78,7 @@ class Config:
 
         self.abbreviate_options = enable
 
-    def set_multiple_options(self, enable):
+    def set_repeatable_options(self, enable):
         '''
         Sets whether options are suggested multiple times during completion.
 
@@ -92,21 +92,21 @@ class Config:
 
             Implementation status for shells:
                 Bash:
-                    - set_multiple_options(True): works
-                    - set_multiple_options(False): works
+                    - set_repeatable_options(True): works
+                    - set_repeatable_options(False): works
                 Fish:
-                    - set_multiple_options(True): works
-                    - set_multiple_options(False): works
+                    - set_repeatable_options(True): works
+                    - set_repeatable_options(False): works
                 Zsh:
-                    - set_multiple_options(True): works
-                    - set_multiple_options(False): works
+                    - set_repeatable_options(True): works
+                    - set_repeatable_options(False): works
 
         See also:
-            cli.CommandLine.add_option(..., multiple_option=BOOL, ...)
+            cli.CommandLine.add_option(..., repeatable=BOOL, ...)
         '''
-        _assert_is_bool(enable, "set_multiple_options", "enable")
+        _assert_is_bool(enable, "set_repeatable_options", "enable")
 
-        self.multiple_options = enable
+        self.repeatable_options = enable
 
     def set_inherit_options(self, enable):
         '''

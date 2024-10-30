@@ -81,7 +81,7 @@ options:
   - option_strings: ["-d", "--depends"]
     metavar: "DEPENDENCY"
     help: "A dependency. This flag can be specified multiple times. Value is usually in the form of: -d 'name' or -d 'name > version'"
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
 
   - option_strings: ["--no-depends"]
@@ -93,31 +93,31 @@ options:
   - option_strings: ["--provides"]
     metavar: "PROVIDES"
     help: "What this package provides (usually a name). This flag can be specified multiple times."
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
 
   - option_strings: ["--conflicts"]
     metavar: "CONFLICTS"
     help: "Other packages/versions this package conflicts with. This flag can be specified multiple times."
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
 
   - option_strings: ["--replaces"]
     metavar: "REPLACES"
     help: "Other packages/versions this package replaces. Equivalent of rpm's 'Obsoletes'. This flag can be specified multiple times."
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
 
   - option_strings: ["--config-files"]
     metavar: "CONFIG_FILES"
     help: "Mark a file in the package as being a config file. This uses 'conffiles' in debs and %config in rpm. If you have multiple files to mark as configuration files, specify this flag multiple times.  If argument is directory all files inside it will be recursively marked as config files."
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
 
   - option_strings: ["--directories"]
     metavar: "DIRECTORIES"
     help: "Recursively mark a directory as being owned by the package. Use this flag multiple times if you have multiple directories and they are not under the same parent directory"
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
 
   - option_strings: ["-a", "--architecture"]
@@ -141,7 +141,7 @@ options:
   - option_strings: ["-x", "--exclude"]
     metavar: "EXCLUDE_PATTERN"
     help: "Exclude paths matching pattern (shell wildcard globs valid here). If you have multiple file patterns to exclude, specify this flag multiple times."
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
 
   - option_strings: ["--exclude-file"]
@@ -1093,7 +1093,7 @@ options:
   - option_strings: ["--osxpkg-dont-obsolete"]
     metavar: "DONT_OBSOLETE_PATH"
     help: "A file path for which to 'dont-obsolete' in the built PackageInfo. Can be specified multiple times."
-    multiple_option: true
+    repeatable: true
     complete: ["none"]
     when: "option_is -t --output-type -s --input-type -- osxpkg"
 

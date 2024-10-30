@@ -217,7 +217,7 @@ class FishCompletionGenerator:
         final_options = self.commandline.get_final_option_strings()
         definition.conditions.not_has_option.extend(final_options)
 
-        if not option.multiple_option:
+        if not option.repeatable:
             definition.conditions.not_has_option.extend(option.option_strings)
 
         definition.conditions.not_has_option = algo.uniq(definition.conditions.not_has_option)

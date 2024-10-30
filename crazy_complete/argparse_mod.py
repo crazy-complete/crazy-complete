@@ -28,13 +28,13 @@ def _action_get_when(self):
     return getattr(self, '_when', None)
 
 
-def _action_set_multiple_option(self, enable=True):
-    setattr(self, '_multiple_option', enable)
+def _action_set_repeatable(self, enable=True):
+    setattr(self, '_repeatable', enable)
     return self
 
 
-def _action_get_multiple_option(self):
-    return getattr(self, '_multiple_option', ExtendedBool.INHERIT)
+def _action_get_repeatable(self):
+    return getattr(self, '_repeatable', ExtendedBool.INHERIT)
 
 
 def _action_set_final(self, enable=True):
@@ -70,8 +70,8 @@ argparse.Action.complete = _action_complete
 argparse.Action.get_complete = _action_get_complete
 argparse.Action.when = _action_when
 argparse.Action.get_when = _action_get_when
-argparse.Action.set_multiple_option = _action_set_multiple_option
-argparse.Action.get_multiple_option = _action_get_multiple_option
+argparse.Action.set_repeatable = _action_set_repeatable
+argparse.Action.get_repeatable = _action_get_repeatable
 argparse.Action.set_final = _action_set_final
 argparse.Action.get_final = _action_get_final
 argparse.ArgumentParser.alias = _parser_alias

@@ -81,7 +81,7 @@ function _fpm_fish_query
           case '--?*';    set -a long_opts_without_arg        $option
           case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
           case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
-          case '-?';      set -a short_opts_with_arg          $option
+          case '-?';      set -a short_opts_without_arg       $option
         end
       end
     end

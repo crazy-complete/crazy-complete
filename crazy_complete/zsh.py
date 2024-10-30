@@ -24,7 +24,7 @@ def make_argument_option_spec(
         description = None,
         complete = None,
         optional_arg = False,
-        multiple_option = False,
+        repeatable = False,
         final = False,
         metavar = None,
         action = None
@@ -42,7 +42,7 @@ def make_argument_option_spec(
     for o in sorted(conflicting_options):
         not_options.append(escape_colon(o))
 
-    if not multiple_option:
+    if not repeatable:
         for o in sorted(option_strings):
             not_options.append(escape_colon(o))
 
@@ -52,8 +52,8 @@ def make_argument_option_spec(
     if not_options:
         result.append(shell.escape('(%s)' % ' '.join(algo.uniq(not_options))))
 
-    # Multiple option =========================================================
-    if multiple_option:
+    # Repeatable option =======================================================
+    if repeatable:
         result.append("'*'")
 
     # Option strings ==========================================================
@@ -119,7 +119,7 @@ class ZshCompletionGenerator:
             description = option.help,
             complete = option.complete,
             optional_arg = option.optional_arg,
-            multiple_option = option.multiple_option,
+            repeatable = option.repeatable,
             final = option.final,
             metavar = option.metavar,
             action = action

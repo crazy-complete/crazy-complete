@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    group: false
----
-expected_error: "Parameter `group` has an invalid type. Expected types: str|None. Received: False (bool)"

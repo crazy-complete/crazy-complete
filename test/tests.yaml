@@ -39,11 +39,11 @@ bash_expected: |
   > crazy-complete-test test -
   -A                               -h
   --arg=                           --help
-  -arg=                            --multiple-arg=
-  --exclusive-1                    --multiple-flag
-  --exclusive-2                    -O
-  -F                               --optional=
-  --flag                           -optional=
+  -arg=                            -O
+  --exclusive-1                    --optional=
+  --exclusive-2                    -optional=
+  -F                               --repeatable-arg=
+  --flag                           --repeatable-flag
   -flag                            --special-chars-in-description=
   > crazy-complete-test test -
 fish_expected: |
@@ -54,12 +54,12 @@ fish_expected: |
   -O  -optional  --optional  --optional=        (Option with optional arg)
   --exclusive-1
   --exclusive-2
-  --multiple-arg
-  --multiple-flag
+  --repeatable-arg
+  --repeatable-flag
   --special-chars-in-description  (Here are some special chars: $"'\[]*`))
 zsh_expected: |
   > crazy-complete-test test -
-  --exclusive-1      --exclusive-2      --multiple-arg     --multiple-flag
+  --exclusive-1      --exclusive-2      --repeatable-arg   --repeatable-flag
   --arg
   -arg                            -A  -- Option with arg
   --flag
@@ -212,18 +212,18 @@ zsh_expected: |
   > crazy-complete-test test --exclusive-1 --exclusive
 ---
 number: 14
-description: "Check if multiple options work"
-send: "crazy-complete-test test --multiple-flag --multiple-"
+description: "Check if repeatable options work"
+send: "crazy-complete-test test --repeatable-flag --repeatable-"
 bash_expected: |
-  > crazy-complete-test test --multiple-flag --multiple-
-  --multiple-arg=  --multiple-flag
-  > crazy-complete-test test --multiple-flag --multiple-
+  > crazy-complete-test test --repeatable-flag --repeatable-
+  --repeatable-arg=  --repeatable-flag
+  > crazy-complete-test test --repeatable-flag --repeatable-
 fish_expected: |
-  > crazy-complete-test test --multiple-flag --multiple-
-  …multiple-arg  …multiple-flag
+  > crazy-complete-test test --repeatable-flag --repeatable-
+  …peatable-arg  …peatable-flag
 zsh_expected: |
-  > crazy-complete-test test --multiple-flag --multiple-
-  --multiple-arg   --multiple-flag
+  > crazy-complete-test test --repeatable-flag --repeatable-
+  --repeatable-arg   --repeatable-flag
 ---
 number: 15
 description: "Check if final works"

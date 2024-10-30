@@ -33,7 +33,7 @@ p.add_argument('definition_file',
     help='The file containing the command line definitions'
 ).complete('file')
 
-p.add_argument('--version', action='version', version='%(prog)s 0.2.0',
+p.add_argument('--version', action='version', version='%(prog)s 0.3.0',
     help='Show program version')
 
 p.add_argument('--parser-variable', default=None,
@@ -53,7 +53,12 @@ p.add_argument('--abbreviate-options', metavar='BOOL', default=False, type=boole
     help='Sets whether options can be abbreviated'
 ).complete('choices', ('True', 'False'))
 
+# Be backwards compatible
 p.add_argument('--multiple-options', metavar='BOOL', default=False, type=boolean,
+    help=argparse.SUPPRESS, dest='repeatable_options',
+).complete('choices', ('True', 'False'))
+
+p.add_argument('--repeatable-options', metavar='BOOL', default=False, type=boolean,
     help='Sets whether options are suggested multiple times during completion'
 ).complete('choices', ('True', 'False'))
 
@@ -161,7 +166,7 @@ def generate(opts):
     conf = config.Config()
     conf.set_abbreviate_commands(opts.abbreviate_commands)
     conf.set_abbreviate_options(opts.abbreviate_options)
-    conf.set_multiple_options(opts.multiple_options)
+    conf.set_repeatable_options(opts.repeatable_options)
     conf.set_inherit_options(opts.inherit_options)
     conf.set_vim_modeline(opts.vim_modeline)
     conf.set_zsh_compdef(opts.zsh_compdef)

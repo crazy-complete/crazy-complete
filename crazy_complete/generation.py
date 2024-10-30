@@ -55,8 +55,8 @@ def apply_config(commandline, config):
         commandline.inherit_options = config.inherit_options
 
     for option in commandline.options:
-        if option.multiple_option == cli.ExtendedBool.INHERIT:
-            option.multiple_option = config.multiple_options
+        if option.repeatable == cli.ExtendedBool.INHERIT:
+            option.repeatable = config.repeatable_options
 
 def add_parsed_when(commandline):
     for option in commandline.options:

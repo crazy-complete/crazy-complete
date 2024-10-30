@@ -163,7 +163,7 @@ _pylint() {
     '(--allow-reexport-from-package)'--allow-reexport-from-package='[Allow explicit reexports by alias from a package __init__. (default\: False)]':'<y or n>':'(y n)'
     '(--logging-modules)'--logging-modules="[Logging modules to check that the string format arguments are in logging function parameter format. (default\\: ('logging',))]":'<comma separated list>':' '
     '(--logging-format-style)'--logging-format-style='[The type of string formatting that logging methods do. `old` means using % formatting, `new` is for `{}` formatting. (default\: old)]':'<old (%) or new ({)>':'(new old)'
-    '*':' ':_files
+    '*':FILE:_files
   )
   _arguments -S -s -w "${args[@]}"
 }

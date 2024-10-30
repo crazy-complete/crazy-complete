@@ -64,7 +64,7 @@ Options
 > Sets whether options can be abbreviated.
 > Note: abbreviated options are not supported by FISH and ZSH.
 
-**--multiple-options={True,False}**
+**--repeatable-options={True,False}**
 
 > Sets whether options are suggested multiple times during completion.
 

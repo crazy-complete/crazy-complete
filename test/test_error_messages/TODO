@@ -1,3 +1,3 @@
 positional: check for double repeat
 test for invalid `when`
-test for `multiple_option` and `final`
+test for `repeatable` and `final`

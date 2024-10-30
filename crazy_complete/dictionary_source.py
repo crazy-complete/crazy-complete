@@ -39,7 +39,7 @@ def dictionary_to_commandline(dictionary, prog=None):
     for option in options:
         _validate_keys(option,
             ['option_strings', 'metavar', 'help', 'optional_arg', 'groups',
-             'multiple_option', 'final', 'complete', 'when'])
+             'repeatable', 'final', 'complete', 'when'])
 
         commandline.add_option(
             option.get('option_strings',  None),
@@ -47,7 +47,7 @@ def dictionary_to_commandline(dictionary, prog=None):
             help            = option.get('help',            None),
             optional_arg    = option.get('optional_arg',    False),
             groups          = option.get('groups',          None),
-            multiple_option = option.get('multiple_option', ExtendedBool.INHERIT),
+            repeatable      = option.get('repeatable',      ExtendedBool.INHERIT),
             final           = option.get('final',           False),
             complete        = option.get('complete',        None),
             when            = option.get('when',            None))
@@ -149,8 +149,8 @@ def option_to_dictionary(self):
     if self.groups is not None:
         r['groups'] = self.groups
 
-    if self.multiple_option != ExtendedBool.INHERIT:
-        r['multiple_option'] = self.multiple_option
+    if self.repeatable != ExtendedBool.INHERIT:
+        r['repeatable'] = self.repeatable
 
     if self.final != False:
         r['final'] = self.final

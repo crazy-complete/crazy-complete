@@ -152,7 +152,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
                 complete        = complete,
                 help            = action.help,
                 optional_arg    = optional_arg,
-                multiple_option = action.get_multiple_option(),
+                repeatable      = action.get_repeatable(),
                 final           = get_final(action),
                 when            = action.get_when()
             )

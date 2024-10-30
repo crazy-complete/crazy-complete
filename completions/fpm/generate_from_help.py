@@ -115,7 +115,7 @@ def process(line):
     opts = []
     metavar = None
     when = None
-    multiple_option = crazy_complete.cli.ExtendedBool.INHERIT
+    repeatable = crazy_complete.cli.ExtendedBool.INHERIT
     complete = None
 
     while words[0].startswith('-'):
@@ -134,7 +134,7 @@ def process(line):
         description = re.sub(r'\((\w+) only\) ', '', description)
 
     if 'multiple times' in description:
-        multiple_option = True
+        repeatable = True
 
     compl = find_complete_by_opts(opts)
     if compl:
@@ -143,14 +143,14 @@ def process(line):
         complete = ["none"]
 
     if '[no-]' not in opts[0]:
-        add_option(opts, metavar, description, complete, when, multiple_option)
+        add_option(opts, metavar, description, complete, when, repeatable)
     else:
         opts_without_no = [opts[0].replace('[no-]', '')]
         opts_with_no = [opts[0].replace('[no-]', 'no-')]
-        add_option(opts_without_no, metavar, description, complete, when, multiple_option)
-        add_option(opts_with_no, metavar, description, complete, when, multiple_option)
+        add_option(opts_without_no, metavar, description, complete, when, repeatable)
+        add_option(opts_with_no, metavar, description, complete, when, repeatable)
 
-def add_option(opts, metavar, description, complete, when, multiple_option):
+def add_option(opts, metavar, description, complete, when, repeatable):
     if when:
         when = 'option_is -t --output-type -s --input-type -- %s' % when
 
@@ -159,7 +159,7 @@ def add_option(opts, metavar, description, complete, when, multiple_option):
                            help=description,
                            complete=complete,
                            when=when,
-                           multiple_option=multiple_option)
+                           repeatable=repeatable)
 
 # =============================================================================
 # Main

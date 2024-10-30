@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='crazy-complete',
-    version='0.2.0',
+    version='0.3.0',
     author='Benjamin Abendroth',
     author_email='braph93@gmx.de',
     packages=['crazy_complete'],

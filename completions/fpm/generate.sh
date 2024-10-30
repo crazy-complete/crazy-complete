@@ -2,6 +2,7 @@
 
 if [[ -x ../../crazy-complete ]]; then
   crazy_complete='../../crazy-complete'
+  echo "Using development version of crazy-complete" >&2
 elif which crazy-complete; then
   crazy_complete=crazy-complete
 else
@@ -21,9 +22,9 @@ fi
 
 opts=''
 if [[ "$1" == 'fish' ]]; then
-  # --multiple-options=False (which is the default) makes the
+  # --repeatable-options=False (which is the default) makes the
   # commpletion slower.
-  opts='--multiple-options=True'
+  opts='--repeatable-options=True'
 fi
 
 $crazy_complete $opts "$@" fpm.yaml

@@ -90,8 +90,8 @@ cmdp.add_argument('-F', '-flag',     '--flag',       help='A option flag', actio
 cmdp.add_argument('-O', '-optional', '--optional',   help='Option with optional arg', nargs='?', choices=(1,2,3))
 cmdp.add_argument('-A', '-arg',      '--arg',        help='Option with arg', choices=(1,2,3))
 cmdp.add_argument('--special-chars-in-description',  help='Here are some special chars: $"\'\\[]*`)')
-cmdp.add_argument('--multiple-flag', action='store_true').set_multiple_option()
-cmdp.add_argument('--multiple-arg').set_multiple_option()
+cmdp.add_argument('--repeatable-flag', action='store_true').set_repeatable()
+cmdp.add_argument('--repeatable-arg').set_repeatable()
 
 group = cmdp.add_mutually_exclusive_group()
 group.add_argument('--exclusive-1', action='store_true')

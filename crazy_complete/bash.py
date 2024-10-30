@@ -211,7 +211,7 @@ class BashCompletionGenerator:
         for option in self.options:
             option_guard = []
 
-            if not option.multiple_option:
+            if not option.repeatable:
                 option_guard += ["! ${#%s}" % self.captured_variables.make_value_variable(option)]
 
             for exclusive_option in option.get_conflicting_options():

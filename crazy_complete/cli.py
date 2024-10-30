@@ -95,7 +95,7 @@ class CommandLine:
             complete=None,
             optional_arg=False,
             groups=None,
-            multiple_option=ExtendedBool.INHERIT,
+            repeatable=ExtendedBool.INHERIT,
             final=False,
             when=None):
         '''
@@ -108,7 +108,7 @@ class CommandLine:
             complete (tuple): The completion specification for the option.
             optional_arg (bool): Specifies if option's argument is optional.
             groups (list of str): Specify to which mutually exclusive groups this option belongs to.
-            multiple_option (ExtendedBool): Specifies if the option can be repeated.
+            repeatable (ExtendedBool): Specifies if the option can be repeated.
             when (str): Specifies a condition for showing this option.
 
         Returns:
@@ -122,7 +122,7 @@ class CommandLine:
                    complete=complete,
                    optional_arg=optional_arg,
                    groups=groups,
-                   multiple_option=multiple_option,
+                   repeatable=repeatable,
                    final=final,
                    when=when)
         self.options.append(o)
@@ -395,7 +395,7 @@ class CommandLine:
                 complete        = option.complete,
                 optional_arg    = option.optional_arg,
                 groups          = option.groups,
-                multiple_option = option.multiple_option,
+                repeatable      = option.repeatable,
                 final           = option.final,
                 when            = option.when
             )
@@ -533,7 +533,7 @@ class Option:
             complete=None,
             groups=None,
             optional_arg=False,
-            multiple_option=ExtendedBool.INHERIT,
+            repeatable=ExtendedBool.INHERIT,
             final=False,
             when=None):
         if not isinstance(parent, (CommandLine, None.__class__)):
@@ -562,8 +562,8 @@ class Option:
         if not isinstance(optional_arg, bool):
             raise CrazyTypeError('optional_arg', 'bool', optional_arg)
 
-        if not _is_extended_bool(multiple_option):
-            raise CrazyTypeError('multiple_option', 'ExtendedBool', multiple_option)
+        if not _is_extended_bool(repeatable):
+            raise CrazyTypeError('repeatable', 'ExtendedBool', repeatable)
 
         if not isinstance(final, bool):
             raise CrazyTypeError('final', 'bool', final)
@@ -591,7 +591,7 @@ class Option:
         self.complete = complete
         self.groups = groups
         self.optional_arg = optional_arg
-        self.multiple_option = multiple_option
+        self.repeatable = repeatable
         self.final = final
         self.when = when
 
@@ -672,7 +672,7 @@ class Option:
             self.metavar         == other.metavar and
             self.help            == other.help and
             self.optional_arg    == other.optional_arg and
-            self.multiple_option == other.multiple_option and
+            self.repeatable      == other.repeatable and
             self.final           == other.final and
             self.complete        == other.complete and
             self.groups          == other.groups and
@@ -741,7 +741,7 @@ class MutuallyExclusiveGroup:
             help=None,
             complete=None,
             optional_arg=False,
-            multiple_option=ExtendedBool.INHERIT,
+            repeatable=ExtendedBool.INHERIT,
             final=False,
             when=None):
         ''' Creates and adds a new option '''
@@ -752,7 +752,7 @@ class MutuallyExclusiveGroup:
             complete=complete,
             optional_arg=optional_arg,
             groups=[self.group],
-            multiple_option=multiple_option,
+            repeatable=repeatable,
             final=final,
             when=when)
 
