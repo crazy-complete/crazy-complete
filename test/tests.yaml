@@ -37,14 +37,14 @@ description: "Check if all options are listed"
 send: "crazy-complete-test test -"
 bash_expected: |
   > crazy-complete-test test -
-  -A                              -h
-  --arg                           --help
-  -arg                            --multiple-arg
-  --exclusive-1                   --multiple-flag
-  --exclusive-2                   -O
-  -F                              --optional
-  --flag                          -optional
-  -flag                           --special-chars-in-description
+  -A                               -h
+  --arg=                           --help
+  -arg=                            --multiple-arg=
+  --exclusive-1                    --multiple-flag
+  --exclusive-2                    -O
+  -F                               --optional=
+  --flag                           -optional=
+  -flag                            --special-chars-in-description=
   > crazy-complete-test test -
 fish_expected: |
   > crazy-complete-test test -
@@ -216,7 +216,7 @@ description: "Check if multiple options work"
 send: "crazy-complete-test test --multiple-flag --multiple-"
 bash_expected: |
   > crazy-complete-test test --multiple-flag --multiple-
-  --multiple-arg   --multiple-flag
+  --multiple-arg=  --multiple-flag
   > crazy-complete-test test --multiple-flag --multiple-
 fish_expected: |
   > crazy-complete-test test --multiple-flag --multiple-
@@ -301,8 +301,8 @@ description: "when: Check if none of --if-* options are listed"
 send: "crazy-complete-test when -"
 bash_expected: |
   > crazy-complete-test when -
-  -h          -O          -optional   --var
-  --help      --optional  -V          -var
+  -h           -O           -optional=   --var=
+  --help       --optional=  -V           -var=
   > crazy-complete-test when -
 fish_expected: |
   > crazy-complete-test when -
@@ -318,7 +318,7 @@ number: 21
 description: "when: Check if --if-var appears (with --var)"
 send: "crazy-complete-test when --var value --if-"
 bash_expected: |
-  > crazy-complete-test when --var value --if-var
+  > crazy-complete-test when --var value --if-var=
 fish_expected: |
   > crazy-complete-test when --var value --if-var
 zsh_expected: |
@@ -328,7 +328,7 @@ number: 22
 description: "when: Check if --if-var appears (with -V)"
 send: "crazy-complete-test when -V value --if-"
 bash_expected: |
-  > crazy-complete-test when -V value --if-var
+  > crazy-complete-test when -V value --if-var=
 fish_expected: |
   > crazy-complete-test when -V value --if-var
 zsh_expected: |
@@ -338,7 +338,7 @@ number: 23
 description: "when: Check if --if-var appears (with -var)"
 send: "crazy-complete-test when -var value --if-"
 bash_expected: |
-  > crazy-complete-test when -var value --if-var
+  > crazy-complete-test when -var value --if-var=
 fish_expected: |
   > crazy-complete-test when -var value --if-var
 zsh_expected: |
@@ -349,7 +349,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with -V foo)"
 send: "crazy-complete-test when -V foo --if-"
 bash_expected: |
   > crazy-complete-test when -V foo --if-
-  --if-var         --if-var-is-foo
+  --if-var=         --if-var-is-foo=
   > crazy-complete-test when -V foo --if-var
 fish_expected: |
   > crazy-complete-test when -V foo --if-var
@@ -366,7 +366,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with -Vfoo)"
 send: "crazy-complete-test when -Vfoo --if-"
 bash_expected: |
   > crazy-complete-test when -Vfoo --if-
-  --if-var         --if-var-is-foo
+  --if-var=         --if-var-is-foo=
   > crazy-complete-test when -Vfoo --if-var
 fish_expected: |
   > crazy-complete-test when -Vfoo --if-var
@@ -383,7 +383,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with --var fo
 send: "crazy-complete-test when --var foo --if-"
 bash_expected: |
   > crazy-complete-test when --var foo --if-
-  --if-var         --if-var-is-foo
+  --if-var=         --if-var-is-foo=
   > crazy-complete-test when --var foo --if-var
 fish_expected: |
   > crazy-complete-test when --var foo --if-var
@@ -400,7 +400,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with --var=fo
 send: "crazy-complete-test when --var=foo --if-"
 bash_expected: |
   > crazy-complete-test when --var=foo --if-
-  --if-var         --if-var-is-foo
+  --if-var=         --if-var-is-foo=
   > crazy-complete-test when --var=foo --if-var
 fish_expected: |
   > crazy-complete-test when --var=foo --if-var
@@ -417,7 +417,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with -var foo
 send: "crazy-complete-test when -var foo --if-"
 bash_expected: |
   > crazy-complete-test when -var foo --if-
-  --if-var         --if-var-is-foo
+  --if-var=         --if-var-is-foo=
   > crazy-complete-test when -var foo --if-var
 fish_expected: |
   > crazy-complete-test when -var foo --if-var
@@ -434,7 +434,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with -var=foo
 send: "crazy-complete-test when -var=foo --if-"
 bash_expected: |
   > crazy-complete-test when -var=foo --if-
-  --if-var         --if-var-is-foo
+  --if-var=         --if-var-is-foo=
   > crazy-complete-test when -var=foo --if-var
 fish_expected: |
   > crazy-complete-test when -var=foo --if-var
@@ -451,7 +451,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with --var ba
 send: "crazy-complete-test when --var bar --if-"
 bash_expected: |
   > crazy-complete-test when --var bar --if-
-  --if-var         --if-var-is-foo
+  --if-var=         --if-var-is-foo=
   > crazy-complete-test when --var bar --if-var
 fish_expected: |
   > crazy-complete-test when --var bar --if-var
@@ -467,7 +467,7 @@ number: 31
 description: "when: Check if --if-optional appears (with -O)"
 send: "crazy-complete-test when -O --if-"
 bash_expected: |
-  > crazy-complete-test when -O --if-optional
+  > crazy-complete-test when -O --if-optional=
 fish_expected: |
   > crazy-complete-test when -O --if-optional
 zsh_expected: |
@@ -477,7 +477,7 @@ number: 32
 description: "when: Check if --if-optional appears (with --optional)"
 send: "crazy-complete-test when --optional --if-"
 bash_expected: |
-  > crazy-complete-test when --optional --if-optional
+  > crazy-complete-test when --optional --if-optional=
 fish_expected: |
   > crazy-complete-test when --optional --if-optional
 zsh_expected: |
@@ -487,7 +487,7 @@ number: 33
 description: "when: Check if --if-optional appears (with -optional)"
 send: "crazy-complete-test when -optional --if-"
 bash_expected: |
-  > crazy-complete-test when -optional --if-optional
+  > crazy-complete-test when -optional --if-optional=
 fish_expected: |
   > crazy-complete-test when -optional --if-optional
 zsh_expected: |
@@ -498,7 +498,7 @@ description: "when: Check if --if-optional and --if-optional-is-foo appears (wit
 send: "crazy-complete-test when -Ofoo --if-"
 bash_expected: |
   > crazy-complete-test when -Ofoo --if-
-  --if-optional         --if-optional-is-foo
+  --if-optional=         --if-optional-is-foo=
   > crazy-complete-test when -Ofoo --if-optional
 fish_expected: |
   > crazy-complete-test when -Ofoo --if-optional
@@ -515,7 +515,7 @@ description: "when: Check if --if-optional and --if-optional-is-foo appears (wit
 send: "crazy-complete-test when --optional=foo --if-"
 bash_expected: |
   > crazy-complete-test when --optional=foo --if-
-  --if-optional         --if-optional-is-foo
+  --if-optional=         --if-optional-is-foo=
   > crazy-complete-test when --optional=foo --if-optional
 fish_expected: |
   > crazy-complete-test when --optional=foo --if-optional
@@ -532,7 +532,7 @@ description: "when: Check if --if-optional and --if-optional-is-foo appears (wit
 send: "crazy-complete-test when -optional=foo --if-"
 bash_expected: |
   > crazy-complete-test when -optional=foo --if-
-  --if-optional         --if-optional-is-foo
+  --if-optional=         --if-optional-is-foo=
   > crazy-complete-test when -optional=foo --if-optional
 fish_expected: |
   > crazy-complete-test when -optional=foo --if-optional

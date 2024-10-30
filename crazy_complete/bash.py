@@ -197,6 +197,15 @@ class BashCompletionGenerator:
             raise AssertionError('invalid instance of `parse`')
 
     def _generate_option_strings_completion(self):
+        def make_option_strings(option):
+            r = []
+            for option_string in option.option_strings:
+                if len(option_string) != 2 and option.complete:
+                    r.append(f'{option_string}=')
+                else:
+                    r.append(option_string)
+            return ' '.join(shell.escape(option_string) for option_string in r)
+
         r  = 'if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then\n'
         r += '  local -a opts=()\n'
         for option in self.options:
@@ -221,8 +230,9 @@ class BashCompletionGenerator:
                 when_guard = self._generate_when_conditions(option.when)
                 when_guard = '%s && ' % when_guard
 
-            r += '  %s%sopts+=(%s)\n' % (option_guard, when_guard, ' '.join(shell.escape(o) for o in option.option_strings))
+            r += '  %s%sopts+=(%s)\n' % (option_guard, when_guard, make_option_strings(option))
         r += '  %s -a -- "$cur" "${opts[@]}"\n' % self.ctxt.helpers.use_function('compgen_w_replacement')
+        r += '  [[ ${COMPREPLY-} == *= ]] && compopt -o nospace\n'
         r += '  return 1\n'
         r += 'fi'
         return r
