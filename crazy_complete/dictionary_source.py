@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 from .errors import CrazyError, CrazyTypeError
 from .cli import CommandLine, ExtendedBool
+from . import compat
 
 def _validate_keys(dictionary, allowed_keys):
     for key in dictionary.keys():
@@ -108,6 +109,8 @@ class CommandlineTree:
         return next(iter(self.root.subcommands.values()))
 
 def dictionaries_to_commandline(dictionaries):
+    compat.fix_commandline_dictionaries(dictionaries)
+
     def add_subcommands(node):
         if node.subcommands:
             subp = node.commandline.add_subcommands()
