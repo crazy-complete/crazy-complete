@@ -24,6 +24,7 @@ done
 
 _EXEC = helpers.ShellFunction('exec', r'''
 local item desc
+COMP_WORDBREAKS=$'\n\t '
 
 while IFS=$'\t' read -r item desc; do
   if [[ "$item" == "$cur"* ]]; then
