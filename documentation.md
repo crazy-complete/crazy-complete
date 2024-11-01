@@ -36,6 +36,7 @@ options:
     complete: <COMPLETE ACTION>
     repeatable: <BOOL>
     final: <BOOL>
+    hidden: <BOOL>
     groups: ["<GROUP>", ...]
     when: "<CONDITION>"
 [...]
@@ -48,6 +49,7 @@ options:
 - *complete* (optional): Defines the method used to provide possible completions for this option. If not set, the option does not take an argument. Use `["none"]` if the option accepts an argument but no specific completion method applies
 - *repeatable* (optional): Indicates whether an option can be suggested multiple times (true or false, default: false)
 - *final* (optional): The final parameter indicates that no further options are shown after this one if it is passed on commandline. Mostly used for --help and --version (default: false)
+- *hidden* (optional): Specifies whether an option should be excluded from the auto-completion suggestions, though it remains usable when typed manually. (default: false)
 - *groups* (optional): Add this option into the specified groups. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags
 - *when* (optional): Only enable this option if CONDITION evaluates to true
 

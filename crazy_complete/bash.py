@@ -209,6 +209,9 @@ class BashCompletionGenerator:
         r  = 'if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then\n'
         r += '  local -a opts=()\n'
         for option in self.options:
+            if option.hidden:
+                continue
+
             option_guard = []
 
             if not option.repeatable:

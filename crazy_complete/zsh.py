@@ -2,6 +2,8 @@
 Code for generating a zsh auto completion file
 '''
 
+from collections import namedtuple
+
 from . import config as config_
 from . import generation
 from . import generation_notice
@@ -81,6 +83,8 @@ def make_argument_option_spec(
 
     return ''.join(result)
 
+Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
+
 class ZshCompletionGenerator:
     def __init__(self, ctxt, commandline):
         self.commandline = commandline
@@ -125,7 +129,7 @@ class ZshCompletionGenerator:
             action = action
         )
 
-        return (option.when, option_spec)
+        return Arg(option, option.when, option.hidden, option_spec)
 
     def complete_subcommands(self, option):
         choices = option.get_choices()
@@ -137,7 +141,7 @@ class ZshCompletionGenerator:
             self.complete(option, 'choices', choices)
         )
 
-        return (None, option_spec)
+        return Arg(option, None, False, option_spec)
 
     def complete_positional(self, option):
         positional_num = option.get_positional_num()
@@ -149,7 +153,7 @@ class ZshCompletionGenerator:
             self.complete(option, *option.complete)
         )
 
-        return (option.when, option_spec)
+        return Arg(option, option.when, False, option_spec)
 
     def _generate_completion_function(self):
         code = []
@@ -162,7 +166,7 @@ class ZshCompletionGenerator:
         if self.query_used:
             zsh_query = self.ctxt.helpers.use_function('zsh_query')
             r  = 'local opts=%s\n' % shell.escape(self._get_option_strings())
-            r += 'local -a HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=()\n'
+            r += "local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''\n"
             r += '%s setup "$opts" "${words[@]}"' % zsh_query
             code.append(r)
 
@@ -224,7 +228,7 @@ class ZshCompletionGenerator:
         args_with_when = []
         args_without_when = []
         for arg in args:
-            if arg[0] is None:
+            if arg.when is None and arg.hidden is False:
                 args_without_when.append(arg)
             else:
                 args_with_when.append(arg)
@@ -235,15 +239,23 @@ class ZshCompletionGenerator:
             r += 'local -a args=()\n'
         else:
             r += 'local -a args=(\n'
-            for when, option_spec in args_without_when:
-                r += '  %s\n' % option_spec
+            for arg in args_without_when:
+                r += '  %s\n' % arg.option_spec
             r += ')\n'
 
-        for when, option_spec in args_with_when:
-            self.query_used = True
-            zsh_query = self.ctxt.helpers.use_function('zsh_query')
-            r += '%s %s &&\\\n' % (zsh_query, when)
-            r += '  args+=(%s)\n' % option_spec
+        for arg in args_with_when:
+            if arg.hidden:
+                self.query_used = True
+                func = self.ctxt.helpers.use_function('zsh_query', 'with_incomplete')
+                r += '%s has_option WITH_INCOMPLETE %s &&\\\n' % (func,
+                    ' '.join(shell.escape(o) for o in arg.option.option_strings))
+
+            if arg.when:
+                self.query_used = True
+                func = self.ctxt.helpers.use_function('zsh_query')
+                r += '%s %s &&\\\n' % (func, arg.when)
+
+            r += '  args+=(%s)\n' % arg.option_spec
 
         r += '_arguments -S -s -w "${args[@]}"'
         return r

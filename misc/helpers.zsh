@@ -23,8 +23,11 @@ zsh_query() {
   #   get_positional <NUM>
   #     Prints out the positional argument number NUM (starting from 1)
   #
-  #   has_option <OPTIONS...>
+  #   has_option [WITH_INCOMPLETE] <OPTIONS...>
   #     Checks if an option given in OPTIONS is passed on commandline.
+  #     If an option requires an argument, this command returns true only if the
+  #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
+  #     returns true for options missing their arguments.
   #
   #   option_is <OPTIONS...> -- <VALUES...>
   #     Checks if one option in OPTIONS has a value of VALUES.
@@ -41,53 +44,63 @@ zsh_query() {
   #   Both queries return true.
   #
   # ===========================================================================
-  
+
   __zsh_query_contains() {
     local arg='' key="$1"; shift
     for arg; do [[ "$key" == "$arg" ]] && return 0; done
     return 1
   }
-  
+
   if [[ $# == 0 ]]; then
     echo "%FUNCNAME%: missing command" >&2
     return 1;
   fi
-  
+
   local cmd="$1"
   shift
-  
+
   case "$cmd" in
     get_positional)
       if test $# -ne 1; then
         echo "%FUNCNAME%: get_positional: takes exactly one argument" >&2
         return 1;
       fi
-  
+
       if test "$1" -eq 0; then
         echo "%FUNCNAME%: get_positional: positionals start at 1, not 0!" >&2
         return 1
       fi
-  
+
       printf "%s" "${POSITIONALS[$1]}"
       return 0
       ;;
     has_option)
+#ifdef with_incomplete
+      local with_incomplete=0
+      [[ "$1" == "WITH_INCOMPLETE" ]] && { with_incomplete=1; shift; }
+
+#endif
       if test $# -eq 0; then
         echo "%FUNCNAME%: has_option: arguments required" >&2
         return 1;
       fi
-  
+
       local option=''
       for option in "${HAVING_OPTIONS[@]}"; do
         __zsh_query_contains "$option" "$@" && return 0
       done
-  
+
+#ifdef with_incomplete
+      (( with_incomplete )) && \
+        __zsh_query_contains "$INCOMPLETE_OPTION" "$@" && return 0
+
+#endif
       return 1
       ;;
     option_is)
       local -a cmd_option_is_options cmd_option_is_values
       local end_of_options_num=0
-  
+
       while test $# -ge 1; do
         if [[ "$1" == "--" ]]; then
           (( ++end_of_options_num ))
@@ -96,20 +109,20 @@ zsh_query() {
         elif test $end_of_options_num -eq 1; then
           cmd_option_is_values+=("$1")
         fi
-  
+
         shift
       done
-  
+
       if test ${#cmd_option_is_options[@]} -eq 0; then
         echo "%FUNCNAME%: option_is: missing options" >&2
         return 1
       fi
-  
+
       if test ${#cmd_option_is_values[@]} -eq 0; then
         echo "%FUNCNAME%: option_is: missing values" >&2
         return 1
       fi
-  
+
       local I=${#HAVING_OPTIONS[@]}
       while test $I -ge 1; do
         local option="${HAVING_OPTIONS[$I]}"
@@ -117,10 +130,10 @@ zsh_query() {
           local VALUE="${OPTION_VALUES[$I]}"
           __zsh_query_contains "$VALUE" "${cmd_option_is_values[@]}" && return 0
         fi
-  
+
         (( --I ))
       done
-  
+
       return 1
       ;;
     setup)
@@ -134,13 +147,13 @@ zsh_query() {
       return 1
       ;;
   esac
-  
+
   # continuing setup....
-  
+
   # ===========================================================================
   # Parsing of available options
   # ===========================================================================
-  
+
 #ifdef old_options
   local -a   old_opts_with_arg=()   old_opts_with_optional_arg=()   old_opts_without_arg=()
 #endif
@@ -150,7 +163,7 @@ zsh_query() {
 #ifdef short_options
   local -a short_opts_with_arg=() short_opts_with_optional_arg=() short_opts_without_arg=()
 #endif
-  
+
   local option=''
   for option in "${options[@]}"; do
     case "$option" in
@@ -172,20 +185,21 @@ zsh_query() {
       *) echo "%FUNCNAME%: $option: not a valid short, long or oldstyle option" >&2; return 1;;
     esac
   done
-  
+
   # ===========================================================================
   # Parsing of command line options
   # ===========================================================================
-  
+
   POSITIONALS=()
   HAVING_OPTIONS=()
   OPTION_VALUES=()
-  
+  INCOMPLETE_OPTION=''
+
   local argi=2 # argi[1] is program name
   while [[ $argi -le $# ]]; do
     local arg="${@[$argi]}"
     local have_trailing_arg=$(test $argi -lt $# && echo true || echo false)
-  
+
     case "$arg" in
       -)
         POSITIONALS+=(-);;
@@ -204,6 +218,10 @@ zsh_query() {
             HAVING_OPTIONS+=("$arg")
             OPTION_VALUES+=("${@[$((argi + 1))]}")
             (( argi++ ))
+#ifdef with_incomplete
+          else
+            INCOMPLETE_OPTION="$arg"
+#endif
           fi
         else
           HAVING_OPTIONS+=("$arg")
@@ -229,6 +247,10 @@ zsh_query() {
             HAVING_OPTIONS+=("$arg")
             OPTION_VALUES+=("${@[$((argi + 1))]}")
             (( argi++ ))
+#ifdef with_incomplete
+          else
+            INCOMPLETE_OPTION="$arg"
+#endif
           fi
         elif __zsh_query_contains "$arg" "${old_opts_without_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
           HAVING_OPTIONS+=("$arg")
@@ -236,7 +258,7 @@ zsh_query() {
           end_of_parsing=true
         fi
 #endif
-  
+
 #ifdef short_options
         local arg_length=${#arg}
         local i=1
@@ -253,10 +275,14 @@ zsh_query() {
             if [[ -n "$trailing_chars" ]]; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("$trailing_chars")
-            else if $have_trailing_arg
+            elif $have_trailing_arg; then
               HAVING_OPTIONS+=("$option")
               OPTION_VALUES+=("${@[$((argi + 1))]}")
               (( argi++ ))
+#ifdef with_incomplete
+            else
+              INCOMPLETE_OPTION="$option"
+#endif
             fi
           elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
             end_of_parsing=true
@@ -271,7 +297,7 @@ zsh_query() {
       *)
         POSITIONALS+=("$arg");;
     esac
-  
+
     (( argi++ ))
   done
 }
@@ -286,6 +312,23 @@ _exec() {
   done < <(eval "$1")
 
   _describe '' describe
+}
+
+_has_hidden_option() {
+  local option=''
+
+  for option; do
+    case "$option" in
+      -?) option="${option:1:1}"
+          [[ "${words[-1]}" != --* ]] && [[ "${words[-1]}" == -*$option* ]] && return 0
+          [[ "${words[-2]}" != --* ]] && [[ "${words[-2]}" == -*$option  ]] && return 0;;
+       *)
+          [[ "${words[-1]}" == $option* ]] && return 0
+          [[ "${words[-2]}" == $option  ]] && return 0;;
+      esac
+  done
+
+  return 1
 }
 
 # =============================================================================
@@ -369,13 +412,38 @@ test_case 28 -false has_option -f --flag -flag :SETUP: "$opts" prog -- --flag
 test_case 29 -false has_option -f --flag -flag :SETUP: "$opts" prog -- -flag
 test_case 30 -false has_option -f --flag -flag :SETUP: "$opts" prog --arg --flag
 test_case 31 -false has_option -f --flag -flag :SETUP: "$opts" prog -a --flag
-test_case 32 -true  option_is -a --arg -arg -- foo bar :SETUP: "$opts" prog -a foo
-test_case 33 -true  option_is -a --arg -arg -- foo bar :SETUP: "$opts" prog --arg foo
-test_case 34 -true  option_is -a --arg -arg -- foo bar :SETUP: "$opts" prog -arg foo
-test_case 41 -false option_is -a --arg -arg -- foo     :SETUP: "$opts" prog -flag
-test_case 35 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -ofoo
-test_case 36 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog --optional=foo
-test_case 37 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -optional=foo
-test_case 38 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -obar
-test_case 39 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog --optional=bar
-test_case 40 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -optional=bar
+test_case 32 -true  has_option -a --arg -arg :SETUP: "$opts" prog -afoo
+test_case 33 -true  has_option -a --arg -arg :SETUP: "$opts" prog -a foo
+test_case 34 -true  has_option -a --arg -arg :SETUP: "$opts" prog -arg foo
+test_case 35 -true  has_option -a --arg -arg :SETUP: "$opts" prog -arg=foo
+test_case 36 -true  has_option -a --arg -arg :SETUP: "$opts" prog --arg foo
+test_case 37 -true  has_option -a --arg -arg :SETUP: "$opts" prog --arg=foo
+test_case 38 -false has_option -a --arg -arg :SETUP: "$opts" prog -a
+test_case 39 -false has_option -a --arg -arg :SETUP: "$opts" prog -arg
+test_case 40 -false has_option -a --arg -arg :SETUP: "$opts" prog --arg
+test_case 41 -true  has_option WITH_INCOMPLETE -a --arg -arg :SETUP: "$opts" prog -a
+test_case 42 -true  has_option WITH_INCOMPLETE -a --arg -arg :SETUP: "$opts" prog -arg
+test_case 43 -true  has_option WITH_INCOMPLETE -a --arg -arg :SETUP: "$opts" prog --arg
+test_case 44 -true  option_is -a --arg -arg -- foo bar :SETUP: "$opts" prog -a foo
+test_case 45 -true  option_is -a --arg -arg -- foo bar :SETUP: "$opts" prog --arg foo
+test_case 46 -true  option_is -a --arg -arg -- foo bar :SETUP: "$opts" prog -arg foo
+test_case 47 -false option_is -a --arg -arg -- foo     :SETUP: "$opts" prog -flag
+test_case 48 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -ofoo
+test_case 49 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog --optional=foo
+test_case 50 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -optional=foo
+test_case 51 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -obar
+test_case 52 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog --optional=bar
+test_case 53 -true  option_is -o --optional -optional -- foo bar :SETUP: "$opts" prog -optional=bar
+
+words=(-o)           _has_hidden_option -o --option -option || echo "01: failed"
+words=(-o arg)       _has_hidden_option -o --option -option || echo "02: failed"
+words=(-oarg)        _has_hidden_option -o --option -option || echo "03: failed"
+words=(-fo arg)      _has_hidden_option -o --option -option || echo "04: failed"
+words=(-foarg)       _has_hidden_option -o --option -option || echo "05: failed"
+words=(--option)     _has_hidden_option -o --option -option || echo "06: failed"
+words=(--option arg) _has_hidden_option -o --option -option || echo "07: failed"
+words=(--option=arg) _has_hidden_option -o --option -option || echo "08: failed"
+words=(-option)      _has_hidden_option -o --option -option || echo "09: failed"
+words=(-option arg)  _has_hidden_option -o --option -option || echo "10: failed"
+words=(-option=arg)  _has_hidden_option -o --option -option || echo "11: failed"
+words=(-o 1 2)       _has_hidden_option -o --option -option && echo "12: failed"

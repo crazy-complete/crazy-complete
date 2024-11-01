@@ -28,8 +28,11 @@ _FISH_QUERY = helpers.FishFunction('fish_query', r'''
 #     Checks if the positional argument number NUM is one of WORDS.
 #     NUM counts from one.
 #
-#   has_option <OPTIONS...>
+#   has_option [WITH_INCOMPLETE] <OPTIONS...>
 #     Checks if an option given in OPTIONS is passed on commandline.
+#     If an option requires an argument, this command returns true only if the
+#     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
+#     returns true for options missing their arguments.
 #
 #   option_is <OPTIONS...> -- <VALUES...>
 #     Checks if any option in OPTIONS has a value of VALUES.
@@ -206,8 +209,8 @@ else
               set argi (math $argi + 1)
             end
           else if contains -- $option $short_opts_with_optional_arg
-            set -a having_options $option
             set end_of_parsing true
+            set -a having_options $option
             set -a option_values "$trailing_chars" # may be empty
           end
 
@@ -245,10 +248,38 @@ switch $cmd
 #endif
 #ifdef has_option
   case 'has_option'
+#ifdef with_incomplete
+    set -l with_incomplete false
+
+    if test $argv[1] = "WITH_INCOMPLETE"
+      set with_incomplete true
+      set -e argv[1]
+    end
+
+#endif
     for option in $having_options
       contains -- $option $argv && return 0
     end
 
+#ifdef with_incomplete
+    if $with_incomplete
+      set -l tokens (commandline -po)
+      set -e tokens[1]
+      for option in $argv
+        switch $option
+          case '-?'
+            set option (string sub -l 1 -s 2 -- $option)
+            string match -q -r -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
+            string match -q -r -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
+          case '*'
+            string match -q -r -- "^$option\$"       $tokens[-2] && return 0
+            string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
+            contains -- $tokens[-1] $argv && return 0
+        end
+      end
+    end
+
+#endif
     return 1
 #endif
 #ifdef num_of_positionals

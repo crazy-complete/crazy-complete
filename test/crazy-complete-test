@@ -92,6 +92,8 @@ cmdp.add_argument('-A', '-arg',      '--arg',        help='Option with arg', cho
 cmdp.add_argument('--special-chars-in-description',  help='Here are some special chars: $"\'\\[]*`)')
 cmdp.add_argument('--repeatable-flag', action='store_true').set_repeatable()
 cmdp.add_argument('--repeatable-arg').set_repeatable()
+cmdp.add_argument('-H', '-hidden', '--hidden', help=argparse.SUPPRESS, choices=[1,2,3])
+cmdp.add_argument('--hidden-flag',             help=argparse.SUPPRESS, action='store_true')
 
 group = cmdp.add_mutually_exclusive_group()
 group.add_argument('--exclusive-1', action='store_true')

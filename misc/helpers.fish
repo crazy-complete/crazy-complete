@@ -24,8 +24,11 @@ function __fish_query
   #     Checks if the positional argument number NUM is one of WORDS.
   #     NUM counts from one.
   #
-  #   has_option <OPTIONS...>
+  #   has_option [WITH_INCOMPLETE] <OPTIONS...>
   #     Checks if an option given in OPTIONS is passed on commandline.
+  #     If an option requires an argument, this command returns true only if the
+  #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
+  #     returns true for options missing their arguments.
   #
   #   option_is <OPTIONS...> -- <VALUES...>
   #     Checks if any option in OPTIONS has a value of VALUES.
@@ -241,10 +244,38 @@ function __fish_query
 #endif
 #ifdef has_option
     case 'has_option'
+#ifdef with_incomplete
+      set -l with_incomplete false
+
+      if test $argv[1] = "WITH_INCOMPLETE"
+        set with_incomplete true
+        set -e argv[1]
+      end
+
+#endif
       for option in $having_options
         contains -- $option $argv && return 0
       end
-  
+
+#ifdef with_incomplete
+      if $with_incomplete
+        set -l tokens (commandline -po)
+        set -e tokens[1]
+        for option in $argv
+          switch $option
+            case '-?'
+              set option (string sub -l 1 -s 2 -- $option)
+              string match -q -r -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
+              string match -q -r -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
+            case '*'
+              string match -q -r -- "^$option\$"       $tokens[-2] && return 0
+              string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
+              contains -- $tokens[-1] $argv && return 0
+          end
+        end
+      end
+
+#endif
       return 1
 #endif
 #ifdef num_of_positionals
@@ -411,6 +442,27 @@ function simple_values
   end
 end
 
+function _has_hidden_option
+  set -l option
+  set -l tokens (commandline -po)
+  set -e tokens[1]
+
+  for option in $argv
+    switch $option
+      case '-?'
+        set option (string sub -l 1 -s 2 -- $option)
+        string match -q -r -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
+        string match -q -r -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
+      case '*'
+        string match -q -r -- "^$option\$"       $tokens[-2] && return 0
+        string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
+    end
+  end
+
+        echo not enabled >> /tmp/trace
+  return 1
+end
+
 # =============================================================================
 # Test code
 # =============================================================================
@@ -418,6 +470,7 @@ end
 set -l options "--arg=,-a=,-oldarg=,-optional=?,--flag,-f,-flag"
 
 complete -c foo -e
+complete -c foo -l flag -o flag -s f -f
 complete -c foo -n "__fish_query '$options' num_of_positionals -eq 0" -x -a 'first'
 complete -c foo -n "__fish_query '$options' positional_contains 1 first && not __fish_query '$options' has_option -a --arg -oldarg" -f -s a -l arg -o oldarg -r -a '1 2 3'
 complete -c foo -n "__fish_query '$options' positional_contains 1 first && not __fish_query '$options' has_option -optional" -f -o optional -a '1 2 3'
@@ -429,3 +482,5 @@ complete -c foo -l temp-dirs  -x -a '(__fish_complete_filedir -D -C /tmp)'
 complete -c foo -l desc-files -x -a '(__fish_complete_filedir -d Foo)'
 
 complete -c foo -l simple-values -x -a '(simple_values , foo bar baz)'
+
+complete -c foo -l hidden -o hidden -s h -x -a 'one two three' -n '_has_hidden_option -h --hidden -hidden'

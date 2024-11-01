@@ -136,24 +136,29 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
         else:
             complete = get_complete(action)
             optional_arg = False
+            metavar = None
+            help = None
 
             if action.nargs == '?':
                 optional_arg = True
             elif action.nargs not in (None, 0, 1, True):
                 utils.warn(f'Truncating nargs={action.nargs} of {action}')
 
-            metavar = None
             if complete:
                 metavar = action.metavar or action.dest
+
+            if action.help != argparse.SUPPRESS:
+                help = action.help
 
             commandline.add_option(
                 action.option_strings,
                 metavar         = metavar,
                 complete        = complete,
-                help            = action.help,
+                help            = help,
                 optional_arg    = optional_arg,
                 repeatable      = action.get_repeatable(),
                 final           = get_final(action),
+                hidden          = (action.help == argparse.SUPPRESS),
                 when            = action.get_when()
             )
 

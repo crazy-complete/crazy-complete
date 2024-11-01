@@ -1,0 +1,6 @@
+prog: "test"
+options:
+  - option_strings: ["-o"]
+    hidden: ["wrong type"]
+---
+expected_error: "Parameter `hidden` has an invalid type. Expected types: bool. Received: ['wrong type'] (list)"

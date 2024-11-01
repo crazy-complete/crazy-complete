@@ -56,6 +56,7 @@ class Conditions:
         self.positional_contains = {}
         self.not_has_option = []
         self.num_of_positionals = None
+        self.has_hidden_option = []
         self.when = None
 
     def get(self, unsafe=False):
@@ -89,6 +90,13 @@ class Conditions:
             else:
                 guard = self.fish_query.num_of_positionals(
                     self.num_of_positionals.operator, self.num_of_positionals.value - 1)
+            conditions += [guard]
+
+        if self.has_hidden_option:
+            func = self.ctxt.helpers.use_function('fish_query', 'with_incomplete')
+            func = self.ctxt.helpers.use_function('fish_query', 'has_option')
+            guard = "$query '$opts' has_option WITH_INCOMPLETE %s" % (
+                ' '.join(shell.escape(o) for o in self.has_hidden_option))
             conditions += [guard]
 
         if self.when is not None:
@@ -211,14 +219,17 @@ class FishCompletionGenerator:
             description         = option.help,
             completion_args     = completion_args)
 
-        conflicting_options = option.get_conflicting_option_strings()
-        definition.conditions.not_has_option.extend(conflicting_options)
-
         final_options = self.commandline.get_final_option_strings()
         definition.conditions.not_has_option.extend(final_options)
 
+        conflicting_options = option.get_conflicting_option_strings()
+        definition.conditions.not_has_option.extend(conflicting_options)
+
         if not option.repeatable:
             definition.conditions.not_has_option.extend(option.option_strings)
+
+        if option.hidden:
+            definition.conditions.has_hidden_option = option.option_strings
 
         definition.conditions.not_has_option = algo.uniq(definition.conditions.not_has_option)
 

@@ -18,6 +18,7 @@ def option_to_yaml(dictionary):
     groups          = dictionary.get('groups',          None)
     repeatable      = dictionary.get('repeatable',      ExtendedBool.INHERIT)
     final           = dictionary.get('final',           False)
+    hidden          = dictionary.get('hidden',          False)
     complete        = dictionary.get('complete',        None)
     when            = dictionary.get('when',            None)
 
@@ -40,6 +41,9 @@ def option_to_yaml(dictionary):
 
     if final is not False:
         r += '  final: %s\n' % json.dumps(final)
+
+    if hidden is not False:
+        r += '  hidden: %s\n' % json.dumps(hidden)
 
     if complete is not None:
         r += '  complete: %s\n' % json.dumps(complete)

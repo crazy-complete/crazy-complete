@@ -97,6 +97,7 @@ class CommandLine:
             groups=None,
             repeatable=ExtendedBool.INHERIT,
             final=False,
+            hidden=False,
             when=None):
         '''
         Adds a new option to the command line.
@@ -124,6 +125,7 @@ class CommandLine:
                    groups=groups,
                    repeatable=repeatable,
                    final=final,
+                   hidden=hidden,
                    when=when)
         self.options.append(o)
         return o
@@ -397,6 +399,7 @@ class CommandLine:
                 groups          = option.groups,
                 repeatable      = option.repeatable,
                 final           = option.final,
+                hidden          = option.hidden,
                 when            = option.when
             )
 
@@ -535,6 +538,7 @@ class Option:
             optional_arg=False,
             repeatable=ExtendedBool.INHERIT,
             final=False,
+            hidden=False,
             when=None):
         if not isinstance(parent, (CommandLine, None.__class__)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
@@ -568,6 +572,9 @@ class Option:
         if not isinstance(final, bool):
             raise CrazyTypeError('final', 'bool', final)
 
+        if not isinstance(hidden, bool):
+            raise CrazyTypeError('hidden', 'bool', hidden)
+
         if not isinstance(when, (str, None.__class__)):
             raise CrazyTypeError('when', 'str|None', when)
 
@@ -593,6 +600,7 @@ class Option:
         self.optional_arg = optional_arg
         self.repeatable = repeatable
         self.final = final
+        self.hidden = hidden
         self.when = when
 
     def get_option_strings(self):
@@ -674,6 +682,7 @@ class Option:
             self.optional_arg    == other.optional_arg and
             self.repeatable      == other.repeatable and
             self.final           == other.final and
+            self.hidden          == other.hidden and
             self.complete        == other.complete and
             self.groups          == other.groups and
             self.when            == other.when
@@ -743,6 +752,7 @@ class MutuallyExclusiveGroup:
             optional_arg=False,
             repeatable=ExtendedBool.INHERIT,
             final=False,
+            hidden=False,
             when=None):
         ''' Creates and adds a new option '''
         return self.parent.add_option(
@@ -754,6 +764,7 @@ class MutuallyExclusiveGroup:
             groups=[self.group],
             repeatable=repeatable,
             final=final,
+            hidden=hidden,
             when=when)
 
     def add_option(self, option):
