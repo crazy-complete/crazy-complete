@@ -2,6 +2,7 @@
 
 import re
 from collections import OrderedDict
+from types import NoneType
 
 from . import algo
 from .errors import CrazyError, CrazyTypeError
@@ -55,10 +56,10 @@ class CommandLine:
         if not isinstance(prog, str):
             raise CrazyTypeError('prog', 'str', prog)
 
-        if not isinstance(parent, (CommandLine, None.__class__)):
+        if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
-        if not isinstance(help, (str, None.__class__)):
+        if not isinstance(help, (str, NoneType)):
             raise CrazyTypeError('help', 'str|None', help)
 
         if not isinstance(aliases, list):
@@ -142,7 +143,7 @@ class CommandLine:
         if not isinstance(name, str):
             raise CrazyTypeError('name', 'str', name)
 
-        if not isinstance(help, (str, None.__class__)):
+        if not isinstance(help, (str, NoneType)):
             raise CrazyTypeError('help', 'str|None', help)
 
         if self.subcommands:
@@ -414,25 +415,25 @@ class Positional:
             when (str): Specifies a condition for showing this positional.
         '''
 
-        if not isinstance(parent, (CommandLine, None.__class__)):
+        if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
         if not isinstance(number, int):
             raise CrazyTypeError('number', 'int', number)
 
-        if not isinstance(metavar, (str, None.__class__)):
+        if not isinstance(metavar, (str, NoneType)):
             raise CrazyTypeError('metavar', 'str|None', metavar)
 
-        if not isinstance(help, (str, None.__class__)):
+        if not isinstance(help, (str, NoneType)):
             raise CrazyTypeError('help', 'str|None', help)
 
-        if not isinstance(complete, (list, tuple, None.__class__)):
+        if not isinstance(complete, (list, tuple, NoneType)):
             raise CrazyTypeError('complete', 'list|None', complete)
 
         if not isinstance(repeatable, bool):
             raise CrazyTypeError('repeatable', 'bool', repeatable)
 
-        if not isinstance(when, (str, None.__class__)):
+        if not isinstance(when, (str, NoneType)):
             raise CrazyTypeError('when', 'str|None', when)
 
         if number <= 0:
@@ -522,22 +523,22 @@ class Option:
             Option: The newly added Option object.
         '''
 
-        if not isinstance(parent, (CommandLine, None.__class__)):
+        if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
         if not isinstance(option_strings, list):
             raise CrazyTypeError('option_strings', 'list', option_strings)
 
-        if not isinstance(metavar, (str, None.__class__)):
+        if not isinstance(metavar, (str, NoneType)):
             raise CrazyTypeError('metavar', 'str|None', metavar)
 
-        if not isinstance(help, (str, None.__class__)):
+        if not isinstance(help, (str, NoneType)):
             raise CrazyTypeError('help', 'str|None', help)
 
-        if not isinstance(complete, (list, tuple, None.__class__)):
+        if not isinstance(complete, (list, tuple, NoneType)):
             raise CrazyTypeError('complete', 'list|None', complete)
 
-        if not isinstance(groups, (list, None.__class__)):
+        if not isinstance(groups, (list, NoneType)):
             raise CrazyTypeError('groups', 'list|None', groups)
 
         if groups is not None:
@@ -557,7 +558,7 @@ class Option:
         if not isinstance(hidden, bool):
             raise CrazyTypeError('hidden', 'bool', hidden)
 
-        if not isinstance(when, (str, None.__class__)):
+        if not isinstance(when, (str, NoneType)):
             raise CrazyTypeError('when', 'str|None', when)
 
         if not option_strings:
