@@ -14,6 +14,9 @@ def _validate_keys(dictionary, allowed_keys):
         if key not in allowed_keys:
             raise CrazyError(f'Unknown key: {key}')
 
+def _is_empty_or_whitespace(string):
+    return not string.strip()
+
 def dictionary_to_commandline(dictionary, prog=None):
     _validate_keys(dictionary,
         ['prog', 'help', 'aliases', 'abbreviate_commands', 'abbreviate_options',
@@ -126,6 +129,9 @@ def dictionaries_to_commandline(dictionaries):
 
         if not isinstance(dictionary['prog'], str):
             raise CrazyTypeError('prog', 'str', dictionary["prog"])
+
+        if _is_empty_or_whitespace(dictionary['prog']):
+            raise CrazyError('The `prog` field must not be empty')
 
         commandline_tree.add_commandline(dictionary)
 
