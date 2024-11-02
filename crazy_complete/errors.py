@@ -1,8 +1,5 @@
 ''' This module contains Exception classes for crazy-complete '''
 
-def _get_class(obj):
-    return str(type(obj)).replace("<class '", '').replace("'>", '')
-
 class CrazyError(Exception):
     '''
     Exception class for handling predictable or expected errors.
@@ -31,7 +28,7 @@ class CrazyTypeError(CrazyError):
 
     def __str__(self):
         return 'Parameter `%s` has an invalid type. Expected types: %s. Received: %r (%s)' % (
-            self.name, self.expected, self.value, _get_class(self.value))
+            self.name, self.expected, self.value, type(self.value).__name__)
 
 class InternalError(Exception):
     '''
