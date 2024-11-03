@@ -13,9 +13,10 @@ from collections import OrderedDict
 from utils import *
 
 SHELLS = ['bash', 'fish', 'zsh']
-TMUX_SESSION_NAME = 'crazy-complete-test'
+TMUX_SESSION_PREFIX = 'crazy-complete-test'
 TESTS_INFILE = 'tests.yaml'
 TESTS_OUTFILE = 'tests.new.yaml'
+CRAZY_COMPLETE = '../../crazy-complete'
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -27,7 +28,7 @@ opts = argp.parse_args()
 def generate_completion(shell, outfile, args):
     definition_file = args['definition_file']
     args = args['args']
-    cmd = ['../crazy-complete', '--debug', '--zsh-compdef=False', *args, shell, '-o', outfile, definition_file]
+    cmd = [CRAZY_COMPLETE, '--debug', '--zsh-compdef=False', *args, shell, '-o', outfile, definition_file]
     print('RUNNING:', cmd)
     run(cmd)
 
@@ -103,7 +104,7 @@ class Tests:
             fh.write(r)
 
 def do_tests(tests, shell, result_queue):
-    tmux = TmuxClient(TMUX_SESSION_NAME + '-' + shell)
+    tmux = TmuxClient(TMUX_SESSION_PREFIX + '-' + shell)
     tmux_shell = {'bash': BashShell, 'fish': FishShell, 'zsh': ZshShell}[shell](tmux)
 
     for test in tests:
