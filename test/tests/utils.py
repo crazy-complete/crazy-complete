@@ -17,6 +17,7 @@ class TmuxClient:
     def run(self, args):
         env = os.environ.copy()
         env.pop('TMUX', None)
+        env['INPUTRC'] = '/dev/null' # disable readline's rcfile for bash
         return run(['tmux'] + args, env)
 
     def new_session(self, command_args=[]):
@@ -52,13 +53,15 @@ class ShellBase:
 
 class BashShell(ShellBase):
     def start(self):
-        self.tmux.new_session(['bash', '--norc'])
+        self.tmux.new_session(['bash', '--norc', '--noprofile'])
 
     def set_prompt(self):
         self.tmux.send_keys("PS1='> '\n")
 
     def init_completion(self):
         self.tmux.send_keys('source /usr/share/bash-completion/bash_completion\n')
+        self.tmux.send_keys('bind "set show-all-if-ambiguous on"\n')
+        self.tmux.send_keys('bind "set show-all-if-unmodified on"\n')
 
     def load_completion(self, file):
         self.tmux.send_keys('source %s\n' % file)
