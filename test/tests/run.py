@@ -25,6 +25,17 @@ argp.add_argument('-f', '--fast', action='store_true', default=False,
                   help='Enable fast testing mode. For tests where the input matches the expected output, these tests will always pass.')
 opts = argp.parse_args()
 
+for program in ['tmux', 'bash', 'fish', 'zsh']:
+    try:
+        run(['sh', '-c', f'which {program}'])
+    except:
+        print(f'Program `{program}` not found')
+        sys.exit(2)
+
+if not os.path.exists('/usr/share/bash-completion'):
+    print('Directory `/usr/share/bash-completion` not found. Is bash-completion installed?')
+    sys.exit(2)
+
 def generate_completion(shell, outfile, args):
     definition_file = args['definition_file']
     args = args['args']
