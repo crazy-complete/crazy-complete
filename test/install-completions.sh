@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")"
 
-CRAZY_COMPLETE_TEST=./crazy-complete-test
+CRAZY_COMPLETE_TEST=./tests/crazy-complete-test
 CRAZY_COMPLETE_TEST_BIN_FILE=/bin/crazy-complete-test
 SHELLS=(bash fish zsh)
 
@@ -50,20 +50,20 @@ install-completions() {
   for SHELL_ in ${SHELLS[@]}; do
     case "$SHELL_" in
       bash)
-        $CRAZY_COMPLETE -i --input-type=python --include-file include.bash \
-          bash crazy-complete-test || {
+        $CRAZY_COMPLETE -i --input-type=python \
+          bash "$CRAZY_COMPLETE_TEST" || {
           echo "$CRAZY_COMPLETE bash failed" >&2
           exit 1
         };;
       fish)
-        $CRAZY_COMPLETE -i --input-type=python --include-file include.fish \
-          fish crazy-complete-test || {
+        $CRAZY_COMPLETE -i --input-type=python \
+          fish "$CRAZY_COMPLETE_TEST" || {
           echo "$CRAZY_COMPLETE fish failed" >&2
           exit 1
         };;
       zsh)
-        $CRAZY_COMPLETE -i --input-type=python --include-file include.zsh \
-          zsh  crazy-complete-test || {
+        $CRAZY_COMPLETE -i --input-type=python \
+          zsh  "$CRAZY_COMPLETE_TEST" || {
           echo "$CRAZY_COMPLETE zsh failed" >&2
           exit 1
         };;
@@ -76,9 +76,9 @@ uninstall-completions() {
 
   for SHELL_ in ${SHELLS[@]}; do
     case "$SHELL_" in
-      bash) $CRAZY_COMPLETE -u --input-type=python bash crazy-complete-test;;
-      fish) $CRAZY_COMPLETE -u --input-type=python fish crazy-complete-test;;
-      zsh)  $CRAZY_COMPLETE -u --input-type=python zsh  crazy-complete-test;;
+      bash) $CRAZY_COMPLETE -u --input-type=python bash "$CRAZY_COMPLETE_TEST";;
+      fish) $CRAZY_COMPLETE -u --input-type=python fish "$CRAZY_COMPLETE_TEST";;
+      zsh)  $CRAZY_COMPLETE -u --input-type=python zsh  "$CRAZY_COMPLETE_TEST";;
     esac
   done
 }
