@@ -88,77 +88,31 @@ class CommandLine:
         self.positionals = []
         self.subcommands = None
 
-    def add_option(self,
-            option_strings,
-            metavar=None,
-            help=None,
-            complete=None,
-            optional_arg=False,
-            groups=None,
-            repeatable=ExtendedBool.INHERIT,
-            final=False,
-            hidden=False,
-            when=None):
+    def add_option(self, option_strings, **parameters):
         '''
         Adds a new option to the command line.
 
-        Args:
-            option_strings (list of str): The list of option strings.
-            metavar (str): The metavar for the option.
-            help (str): The help message for the option.
-            complete (tuple): The completion specification for the option.
-            optional_arg (bool): Specifies if option's argument is optional.
-            groups (list of str): Specify to which mutually exclusive groups this option belongs to.
-            repeatable (ExtendedBool): Specifies if the option can be repeated.
-            when (str): Specifies a condition for showing this option.
+        For a list of valid parameters, see `class Option`.
 
         Returns:
             Option: The newly added Option object.
         '''
 
-        o = Option(self,
-                   option_strings,
-                   metavar=metavar,
-                   help=help,
-                   complete=complete,
-                   optional_arg=optional_arg,
-                   groups=groups,
-                   repeatable=repeatable,
-                   final=final,
-                   hidden=hidden,
-                   when=when)
+        o = Option(self, option_strings, **parameters)
         self.options.append(o)
         return o
 
-    def add_positional(self,
-            number,
-            metavar=None,
-            help=None,
-            repeatable=False,
-            complete=None,
-            when=None):
+    def add_positional(self, number, **parameters):
         '''
         Adds a new positional argument to the command line.
 
-        Args:
-            number (int): The number of the positional argument (starting from 1)
-            metavar (str): The metavar for the positional.
-            help (str): The help message for the positional.
-            repeatable (bool): Specifies if positional can be specified more times
-            complete (tuple): The completion specification for the positional.
-            when (str): Specifies a condition for showing this positional.
+        For a list of valid parameters, see `class Positional`.
 
         Returns:
             Positional: The newly added Positional object.
         '''
 
-        p = Positional(self,
-                       number,
-                       metavar=metavar,
-                       help=help,
-                       repeatable=repeatable,
-                       complete=complete,
-                       when=when)
+        p = Positional(self, number, **parameters)
         self.positionals.append(p)
         return p
 
@@ -448,6 +402,17 @@ class Positional:
             complete=None,
             repeatable=False,
             when=None):
+        '''
+        Initializes a Positional object with the specified parameters.
+
+        Args:
+            number (int): The number of the positional argument (starting from 1)
+            metavar (str): The metavar for the positional.
+            help (str): The help message for the positional.
+            repeatable (bool): Specifies if positional can be specified more times
+            complete (list): The completion specification for the positional.
+            when (str): Specifies a condition for showing this positional.
+        '''
 
         if not isinstance(parent, (CommandLine, None.__class__)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
@@ -540,6 +505,23 @@ class Option:
             final=False,
             hidden=False,
             when=None):
+        '''
+        Initializes an Option object with the specified parameters.
+
+        Args:
+            option_strings (list of str): The list of option strings.
+            metavar (str): The metavar for the option.
+            help (str): The help message for the option.
+            complete (tuple): The completion specification for the option.
+            optional_arg (bool): Specifies if option's argument is optional.
+            groups (list of str): Specify to which mutually exclusive groups this option belongs to.
+            repeatable (ExtendedBool): Specifies if the option can be repeated.
+            when (str): Specifies a condition for showing this option.
+
+        Returns:
+            Option: The newly added Option object.
+        '''
+
         if not isinstance(parent, (CommandLine, None.__class__)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
@@ -744,28 +726,23 @@ class MutuallyExclusiveGroup:
         self.parent = parent
         self.group = group
 
-    def add(self,
-            option_strings,
-            metavar=None,
-            help=None,
-            complete=None,
-            optional_arg=False,
-            repeatable=ExtendedBool.INHERIT,
-            final=False,
-            hidden=False,
-            when=None):
-        ''' Creates and adds a new option '''
+    def add(self, option_strings, **parameters):
+        '''
+        Creates and adds a new option.
+
+        For a list of valid parameters, see `class Option`.
+        '''
+
+        if 'groups' in parameters:
+            raise CrazyError('Paramter `groups` not allowed')
+
+        if 'group' in parameters:
+            raise CrazyError('Paramter `group` not allowed')
+
         return self.parent.add_option(
             option_strings,
-            metavar=metavar,
-            help=help,
-            complete=complete,
-            optional_arg=optional_arg,
             groups=[self.group],
-            repeatable=repeatable,
-            final=final,
-            hidden=hidden,
-            when=when)
+            **parameters)
 
     def add_option(self, option):
         ''' Adds an option object '''
