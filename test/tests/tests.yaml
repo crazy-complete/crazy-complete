@@ -37,14 +37,14 @@ description: "Check if all options are listed"
 send: "crazy-complete-test test -"
 bash_expected: |
   > crazy-complete-test test -
-  -A                               -h
-  --arg=                           --help
-  -arg=                            -O
-  --exclusive-1                    --optional=
-  --exclusive-2                    -optional=
-  -F                               --repeatable-arg=
-  --flag                           --repeatable-flag
-  -flag                            --special-chars-in-description=
+  --arg=                           --special-chars-in-description=
+  --exclusive-1                    -A
+  --exclusive-2                    -F
+  --flag                           -O
+  --help                           -arg=
+  --optional=                      -flag
+  --repeatable-arg=                -h
+  --repeatable-flag                -optional=
   > crazy-complete-test test -
 fish_expected: |
   > crazy-complete-test test -
@@ -360,8 +360,8 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test -F
   -A  -- Option with arg
-  -h  -- show this help message and exit
   -O  -- Option with optional arg
+  -h  -- show this help message and exit
 ---
 number: 25
 description: "Check option stacking (with required argument and no space)"
@@ -413,8 +413,8 @@ description: "when: Check if none of --if-* options are listed"
 send: "crazy-complete-test when -"
 bash_expected: |
   > crazy-complete-test when -
-  -h           -O           -optional=   --var=
-  --help       --optional=  -V           -var=
+  --help       --var=       -V           -optional=
+  --optional=  -O           -h           -var=
   > crazy-complete-test when -
 fish_expected: |
   > crazy-complete-test when -
@@ -461,7 +461,7 @@ description: "when: Check if --if-var and --if-var-is-foo appears (with -V foo)"
 send: "crazy-complete-test when -V foo --if-"
 bash_expected: |
   > crazy-complete-test when -V foo --if-
-  --if-var=         --if-var-is-foo=
+  --if-var-is-foo=  --if-var=
   > crazy-complete-test when -V foo --if-var
 fish_expected: |
   > crazy-complete-test when -V foo --if-var
@@ -470,15 +470,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when -V foo --if-var
-  --if-var-is-foo  -- Only show option if --var is foo or bar
   --if-var         -- Only show option if --var is given
+  --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 33
 description: "when: Check if --if-var and --if-var-is-foo appears (with -Vfoo)"
 send: "crazy-complete-test when -Vfoo --if-"
 bash_expected: |
   > crazy-complete-test when -Vfoo --if-
-  --if-var=         --if-var-is-foo=
+  --if-var-is-foo=  --if-var=
   > crazy-complete-test when -Vfoo --if-var
 fish_expected: |
   > crazy-complete-test when -Vfoo --if-var
@@ -487,15 +487,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when -Vfoo --if-var
-  --if-var-is-foo  -- Only show option if --var is foo or bar
   --if-var         -- Only show option if --var is given
+  --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 34
 description: "when: Check if --if-var and --if-var-is-foo appears (with --var foo)"
 send: "crazy-complete-test when --var foo --if-"
 bash_expected: |
   > crazy-complete-test when --var foo --if-
-  --if-var=         --if-var-is-foo=
+  --if-var-is-foo=  --if-var=
   > crazy-complete-test when --var foo --if-var
 fish_expected: |
   > crazy-complete-test when --var foo --if-var
@@ -504,15 +504,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when --var foo --if-var
-  --if-var-is-foo  -- Only show option if --var is foo or bar
   --if-var         -- Only show option if --var is given
+  --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 35
 description: "when: Check if --if-var and --if-var-is-foo appears (with --var=foo)"
 send: "crazy-complete-test when --var=foo --if-"
 bash_expected: |
   > crazy-complete-test when --var=foo --if-
-  --if-var=         --if-var-is-foo=
+  --if-var-is-foo=  --if-var=
   > crazy-complete-test when --var=foo --if-var
 fish_expected: |
   > crazy-complete-test when --var=foo --if-var
@@ -521,15 +521,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when --var=foo --if-var
-  --if-var-is-foo  -- Only show option if --var is foo or bar
   --if-var         -- Only show option if --var is given
+  --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 36
 description: "when: Check if --if-var and --if-var-is-foo appears (with -var foo)"
 send: "crazy-complete-test when -var foo --if-"
 bash_expected: |
   > crazy-complete-test when -var foo --if-
-  --if-var=         --if-var-is-foo=
+  --if-var-is-foo=  --if-var=
   > crazy-complete-test when -var foo --if-var
 fish_expected: |
   > crazy-complete-test when -var foo --if-var
@@ -538,15 +538,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when -var foo --if-var
-  --if-var-is-foo  -- Only show option if --var is foo or bar
   --if-var         -- Only show option if --var is given
+  --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 37
 description: "when: Check if --if-var and --if-var-is-foo appears (with -var=foo)"
 send: "crazy-complete-test when -var=foo --if-"
 bash_expected: |
   > crazy-complete-test when -var=foo --if-
-  --if-var=         --if-var-is-foo=
+  --if-var-is-foo=  --if-var=
   > crazy-complete-test when -var=foo --if-var
 fish_expected: |
   > crazy-complete-test when -var=foo --if-var
@@ -555,15 +555,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when -var=foo --if-var
-  --if-var-is-foo  -- Only show option if --var is foo or bar
   --if-var         -- Only show option if --var is given
+  --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 38
 description: "when: Check if --if-var and --if-var-is-foo appears (with --var bar)"
 send: "crazy-complete-test when --var bar --if-"
 bash_expected: |
   > crazy-complete-test when --var bar --if-
-  --if-var=         --if-var-is-foo=
+  --if-var-is-foo=  --if-var=
   > crazy-complete-test when --var bar --if-var
 fish_expected: |
   > crazy-complete-test when --var bar --if-var
@@ -572,8 +572,8 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when --var bar --if-var
-  --if-var-is-foo  -- Only show option if --var is foo or bar
   --if-var         -- Only show option if --var is given
+  --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 39
 description: "when: Check if --if-optional appears (with -O)"
@@ -610,7 +610,7 @@ description: "when: Check if --if-optional and --if-optional-is-foo appears (wit
 send: "crazy-complete-test when -Ofoo --if-"
 bash_expected: |
   > crazy-complete-test when -Ofoo --if-
-  --if-optional=         --if-optional-is-foo=
+  --if-optional-is-foo=  --if-optional=
   > crazy-complete-test when -Ofoo --if-optional
 fish_expected: |
   > crazy-complete-test when -Ofoo --if-optional
@@ -619,15 +619,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when -Ofoo --if-optional
-  --if-optional-is-foo  -- Only show option if --optional is foo
   --if-optional         -- Only show option if --optional is given
+  --if-optional-is-foo  -- Only show option if --optional is foo
 ---
 number: 43
 description: "when: Check if --if-optional and --if-optional-is-foo appears (with --optional=foo)"
 send: "crazy-complete-test when --optional=foo --if-"
 bash_expected: |
   > crazy-complete-test when --optional=foo --if-
-  --if-optional=         --if-optional-is-foo=
+  --if-optional-is-foo=  --if-optional=
   > crazy-complete-test when --optional=foo --if-optional
 fish_expected: |
   > crazy-complete-test when --optional=foo --if-optional
@@ -636,15 +636,15 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when --optional=foo --if-optional
-  --if-optional-is-foo  -- Only show option if --optional is foo
   --if-optional         -- Only show option if --optional is given
+  --if-optional-is-foo  -- Only show option if --optional is foo
 ---
 number: 44
 description: "when: Check if --if-optional and --if-optional-is-foo appears (with -optional=foo)"
 send: "crazy-complete-test when -optional=foo --if-"
 bash_expected: |
   > crazy-complete-test when -optional=foo --if-
-  --if-optional=         --if-optional-is-foo=
+  --if-optional-is-foo=  --if-optional=
   > crazy-complete-test when -optional=foo --if-optional
 fish_expected: |
   > crazy-complete-test when -optional=foo --if-optional
@@ -653,8 +653,8 @@ fish_expected: |
 zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test when -optional=foo --if-optional
-  --if-optional-is-foo  -- Only show option if --optional is foo
   --if-optional         -- Only show option if --optional is given
+  --if-optional-is-foo  -- Only show option if --optional is foo
 ---
 number: 45
 description: "complete: Check --exec"

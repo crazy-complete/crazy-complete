@@ -17,11 +17,38 @@ class TmuxClient:
     def run(self, args):
         env = os.environ.copy()
         env.pop('TMUX', None)
-        env['INPUTRC'] = '/dev/null' # disable readline's rcfile for bash
         return run(['tmux'] + args, env)
 
     def new_session(self, command_args=[]):
-        self.run(['new-session', '-d', '-s', self.session] + command_args)
+        tmux_env = {
+            # disable readline's rcfile for bash
+            'INPUTRC': '/dev/null',
+
+            # set locale to C to ensure same ordering of options
+            'LANG':              'C',
+            'LC_CTYPE':          'C',
+            'LC_NUMERIC':        'C',
+            'LC_TIME':           'C',
+            'LC_COLLATE':        'C',
+            'LC_MONETARY':       'C',
+            'LC_MESSAGES':       'C',
+            'LC_PAPER':          'C',
+            'LC_NAME':           'C',
+            'LC_ADDRESS':        'C',
+            'LC_TELEPHONE':      'C',
+            'LC_MEASUREMENT':    'C',
+            'LC_IDENTIFICATION': 'C',
+            'LC_ALL':            'C'
+        }
+
+        tmux_env_args = []
+        for var, value in tmux_env.items():
+            tmux_env_args.append(f'-e{var}={value}')
+
+        cmd = ['new-session', '-d', '-s', self.session]
+        cmd.extend(tmux_env_args)
+        cmd.extend(command_args)
+        self.run(cmd)
 
     def kill_session(self):
         self.run(['kill-session', '-t', self.session])
@@ -53,7 +80,7 @@ class ShellBase:
 
 class BashShell(ShellBase):
     def start(self):
-        self.tmux.new_session(['bash', '--norc', '--noprofile'])
+        self.tmux.new_session(['bash', '--norc', '--noprofile', '+o', 'history'])
 
     def set_prompt(self):
         self.tmux.send_keys("PS1='> '\n")
