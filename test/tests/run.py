@@ -32,8 +32,8 @@ for program in ['tmux', 'bash', 'fish', 'zsh']:
         print(f'Program `{program}` not found')
         sys.exit(2)
 
-if not os.path.exists('/usr/share/bash-completion'):
-    print('Directory `/usr/share/bash-completion` not found. Is bash-completion installed?')
+if not os.path.exists('/usr/share/bash-completion/bash_completion'):
+    print('Directory `/usr/share/bash-completion/bash_completion` not found. Is bash-completion installed?')
     sys.exit(2)
 
 def generate_completion(shell, outfile, args):
