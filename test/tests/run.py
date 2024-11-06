@@ -8,9 +8,10 @@ import yaml
 import queue
 import argparse
 import threading
+import subprocess
 from collections import OrderedDict
 
-from utils import *
+from shells import *
 
 SHELLS = ['bash', 'fish', 'zsh']
 TMUX_SESSION_PREFIX = 'crazy-complete-test'
@@ -22,10 +23,31 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 argp = argparse.ArgumentParser()
 argp.add_argument('-f', '--fast', action='store_true', default=False,
-                  help='Enable fast testing mode. For tests where the input matches the expected output, these tests will always pass.')
+    help='Enable fast testing mode. For tests where the input matches the expected output, these tests will always pass')
+argp.add_argument('-d', '--driver', default='pyte', choices=['pyte', 'tmux'],
+    help='Select driver for tests')
 opts = argp.parse_args()
 
-for program in ['tmux', 'bash', 'fish', 'zsh']:
+if opts.driver == 'pyte':
+    try:
+        from pyte_driver import *
+    except ImportError as e:
+        print(e)
+        print('Please install the missing modules.')
+        print('Alternatively, you can use --driver=tmux if you have tmux installed')
+        sys.exit(2)
+elif opts.driver == 'tmux':
+    from tmux_driver import *
+
+def run(args, env=None):
+    result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+
+    if result.returncode != 0:
+        raise Exception("Command %r failed: %s" % (args, result.stderr))
+
+    return result.stdout
+
+for program in SHELLS:
     try:
         run(['sh', '-c', f'which {program}'])
     except:
@@ -33,7 +55,7 @@ for program in ['tmux', 'bash', 'fish', 'zsh']:
         sys.exit(2)
 
 if not os.path.exists('/usr/share/bash-completion/bash_completion'):
-    print('Directory `/usr/share/bash-completion/bash_completion` not found. Is bash-completion installed?')
+    print('File `/usr/share/bash-completion/bash_completion` not found. Is `bash-completion` installed?')
     sys.exit(2)
 
 def generate_completion(shell, outfile, args):
@@ -115,36 +137,40 @@ class Tests:
             fh.write(r)
 
 def do_tests(tests, shell, result_queue):
-    tmux = TmuxClient(TMUX_SESSION_PREFIX + '-' + shell)
-    tmux_shell = {'bash': BashShell, 'fish': FishShell, 'zsh': ZshShell}[shell](tmux)
+    if opts.driver == 'tmux':
+        term = TmuxTerminal(TMUX_SESSION_PREFIX + '-' + shell)
+    elif opts.driver == 'pyte':
+        term = PyteTerminal()
+
+    term_shell = {'bash': BashShell, 'fish': FishShell, 'zsh': ZshShell}[shell](term)
 
     for test in tests:
         test = test.copy()
         if 'generate-scripts' in test:
-            try:    tmux_shell.stop()
+            try:    term_shell.stop()
             except: pass
             completion_file = 'out.%s' % shell
             generate_completion(shell, completion_file, test['generate-scripts'])
-            tmux_shell.start()
-            tmux.resize_window(80, 100)
-            tmux_shell.set_prompt()
-            tmux_shell.init_completion()
-            tmux_shell.load_completion(completion_file)
+            term_shell.start()
+            term.resize_window(80, 100)
+            term_shell.set_prompt()
+            term_shell.init_completion()
+            term_shell.load_completion(completion_file)
             time.sleep(0.5)
 
         else:
             result = {
                 'number': test['number'],
                 'shell':  shell,
-                'result': complete(tmux, test['send'],
-                                         test.get(shell+'_tabs', 1),
-                                         test[shell+'_expected'],
-                                         opts.fast)
+                'result': term.complete(test['send'],
+                                        test.get(shell+'_tabs', 1),
+                                        test[shell+'_expected'],
+                                        opts.fast)
             }
             result_queue.put(result)
 
     try:
-        tmux_shell.stop()
+        term_shell.stop()
     except:
         pass
 
