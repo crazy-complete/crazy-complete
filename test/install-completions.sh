@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 CRAZY_COMPLETE_TEST=./tests/crazy-complete-test
 CRAZY_COMPLETE_TEST_BIN_FILE=/bin/crazy-complete-test
-SHELLS=(bash fish zsh)
+SHELLS="bash fish zsh"
 
 usage() {
   cat << EOF
@@ -16,27 +16,27 @@ Install or uninstall system-wide completions for 'crazy-complete-test'
 EOF
 }
 
-if [[ $# -ne 1 ]]; then
+if [ $# -ne 1 ]; then
   usage
   exit 1
-elif [[ "$1" == 'install' ]]; then
-  cmd='install-completions'
-elif [[ "$1" == 'uninstall' ]]; then
-  cmd='uninstall-completions'
+elif [ "$1" = 'install' ]; then
+  cmd='install_completions'
+elif [ "$1" = 'uninstall' ]; then
+  cmd='uninstall_completions'
 else
   usage
   exit 1
 fi
 
-if [[ $EUID -ne 0 ]]; then
+if [ "$(id -u)" -ne 0 ]; then
   echo 'This script must be run as root' >&2
   exit 1
 fi
 
-if [[ -x ../crazy-complete ]]; then
+if [ -x ../crazy-complete ]; then
   CRAZY_COMPLETE='../crazy-complete'
   printf '%s\n\n' 'Using development version of crazy-complete' >&2
-elif which crazy-complete &>/dev/null; then
+elif type crazy-complete >/dev/null; then
   CRAZY_COMPLETE='crazy-complete'
   printf '%s\n\n' 'Using installed version of crazy-complete' >&2
 else
@@ -44,10 +44,10 @@ else
   exit 1
 fi
 
-install-completions() {
+install_completions() {
   cp -v "$CRAZY_COMPLETE_TEST" "$CRAZY_COMPLETE_TEST_BIN_FILE"
 
-  for SHELL_ in ${SHELLS[@]}; do
+  for SHELL_ in $SHELLS; do
     case "$SHELL_" in
       bash)
         $CRAZY_COMPLETE -i --input-type=python \
@@ -71,10 +71,10 @@ install-completions() {
   done
 }
 
-uninstall-completions() {
+uninstall_completions() {
   rm -vf "$CRAZY_COMPLETE_TEST_BIN_FILE"
 
-  for SHELL_ in ${SHELLS[@]}; do
+  for SHELL_ in $SHELLS; do
     case "$SHELL_" in
       bash) $CRAZY_COMPLETE -u --input-type=python bash "$CRAZY_COMPLETE_TEST";;
       fish) $CRAZY_COMPLETE -u --input-type=python fish "$CRAZY_COMPLETE_TEST";;

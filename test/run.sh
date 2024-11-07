@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -16,14 +16,14 @@ Usage: $0 [-f|--fast]
 EOF
 }
 
-if (( $# == 1 )); then
-  if [[ "$1" == "-f" ]] || [[ "$1" == "--fast" ]]; then
+if [ $# -eq 1 ]; then
+  if [ "$1" = "-f" ] || [ "$1" = "--fast" ]; then
     TEST_ARGS="$1"
   else
     usage
     exit 1
   fi
-elif (( $# )); then
+elif [ $# -ge 2 ]; then
   usage
   exit 1
 fi
@@ -32,4 +32,5 @@ set -x
 
 ./conversion/run.sh
 ./error_messages/run.py
+# shellcheck disable=SC2086
 ./tests/run.py $TEST_ARGS
