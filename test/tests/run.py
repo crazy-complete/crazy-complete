@@ -13,31 +13,42 @@ from collections import OrderedDict
 
 from shells import *
 
-SHELLS = ['bash', 'fish', 'zsh']
+# =============================================================================
+# Script configuration
+# =============================================================================
+
+SHELLS              = ['bash', 'fish', 'zsh']
 TMUX_SESSION_PREFIX = 'crazy-complete-test'
-TESTS_INFILE = 'tests.yaml'
-TESTS_OUTFILE = 'tests.new.yaml'
-CRAZY_COMPLETE = '../../crazy-complete'
+TESTS_INFILE        = 'tests.yaml'
+TESTS_OUTFILE       = 'tests.new.yaml'
+CRAZY_COMPLETE      = '../../crazy-complete'
+COMPLETIONS_OUTDIR  = 'output'
+
+# =============================================================================
+# Switch to the script's directory
+# =============================================================================
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+# =============================================================================
+# Commandline parser
+# =============================================================================
 
 argp = argparse.ArgumentParser()
 argp.add_argument('-f', '--fast', action='store_true', default=False,
     help='Enable fast testing mode. For tests where the input matches the expected output, these tests will always pass')
 argp.add_argument('-d', '--driver', default='pyte', choices=['pyte', 'tmux'],
     help='Select driver for tests')
+argp.add_argument('-t', '--threads', default=1, type=int,
+    help='Set the number of threads per shell')
 opts = argp.parse_args()
 
-if opts.driver == 'pyte':
-    try:
-        from pyte_driver import *
-    except ImportError as e:
-        print(e)
-        print('Please install the missing modules.')
-        print('Alternatively, you can use --driver=tmux if you have tmux installed')
-        sys.exit(2)
-elif opts.driver == 'tmux':
-    from tmux_driver import *
+# =============================================================================
+# Helper functions
+# =============================================================================
+
+def print_err(*args):
+    print(*args, file=sys.stderr)
 
 def run(args, env=None):
     result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
@@ -46,24 +57,6 @@ def run(args, env=None):
         raise Exception("Command %r failed: %s" % (args, result.stderr))
 
     return result.stdout
-
-for program in SHELLS:
-    try:
-        run(['sh', '-c', f'which {program}'])
-    except:
-        print(f'Program `{program}` not found')
-        sys.exit(2)
-
-if not os.path.exists('/usr/share/bash-completion/bash_completion'):
-    print('File `/usr/share/bash-completion/bash_completion` not found. Is `bash-completion` installed?')
-    sys.exit(2)
-
-def generate_completion(shell, outfile, args):
-    definition_file = args['definition_file']
-    args = args['args']
-    cmd = [CRAZY_COMPLETE, '--debug', '--zsh-compdef=False', *args, shell, '-o', outfile, definition_file]
-    print('RUNNING:', cmd)
-    run(cmd)
 
 def indent(string, num_spaces):
     lines = string.split('\n')
@@ -75,99 +68,167 @@ def make_yaml_block_string(s):
 
 def test_to_yaml(test):
     r = OrderedDict()
-    r['number']         = str(test['number'])
-    r['description']    = json.dumps(test['description'])
+
+    r['number']          = str(test['number'])
+    r['definition_file'] = json.dumps(test['definition_file'])
+    r['description']     = json.dumps(test['description'])
     if 'comment' in test:
-        r['comment']    = json.dumps(test['comment'])
-    r['send']           = json.dumps(test['send'])
+        r['comment']     = json.dumps(test['comment'])
+    r['send']            = json.dumps(test['send'])
     if test.get('bash_tabs', 1) != 1:
-        r['bash_tabs']  = str(test['bash_tabs'])
-    r['bash_expected']  = make_yaml_block_string(test['bash_result'])
+        r['bash_tabs']   = str(test['bash_tabs'])
+    r['bash_expected']   = make_yaml_block_string(test['bash_result'])
     if test.get('fish_tabs', 1) != 1:
-        r['fish_tabs']  = str(test['fish_tabs'])
-    r['fish_expected']  = make_yaml_block_string(test['fish_result'])
+        r['fish_tabs']   = str(test['fish_tabs'])
+    r['fish_expected']   = make_yaml_block_string(test['fish_result'])
     if test.get('zsh_tabs', 1) != 1:
-        r['zsh_tabs']   = str(test['zsh_tabs'])
-    r['zsh_expected']   = make_yaml_block_string(test['zsh_result'])
-    return '\n'.join('%s: %s' % o for o in r.items())
+        r['zsh_tabs']    = str(test['zsh_tabs'])
+    r['zsh_expected']    = make_yaml_block_string(test['zsh_result'])
+
+    return '\n'.join('%s: %s' % key_value for key_value in r.items())
+
+# =============================================================================
+# Import driver depending on command line arguments
+# =============================================================================
+
+if opts.driver == 'pyte':
+    try:
+        from pyte_driver import *
+    except ImportError as e:
+        print_err(e)
+        print_err('Please install the missing modules.')
+        print_err('Alternatively, you can use --driver=tmux if you have tmux installed')
+        sys.exit(2)
+elif opts.driver == 'tmux':
+    from tmux_driver import *
+
+# =============================================================================
+# Ensure all dependencies are available
+# =============================================================================
+
+for program in SHELLS:
+    try:
+        run(['sh', '-c', f'type {program}'])
+    except:
+        print_err(f'Program `{program}` not found')
+        sys.exit(2)
+
+if not os.path.exists('/usr/share/bash-completion/bash_completion'):
+    print_err('File `/usr/share/bash-completion/bash_completion` not found. Is `bash-completion` installed?')
+    sys.exit(2)
+
+# =============================================================================
+# Test code
+# =============================================================================
 
 class Tests:
     def __init__(self, tests):
+        self.definition_files = tests.pop(0)
         self.tests = tests
-
-    def strip_expected(self):
-        for test in self.tests:
-            for key in ['bash_expected', 'zsh_expected', 'fish_expected']:
-                if key in test:
-                    test[key] = test[key].strip()
 
     def enumerate_tests(self):
         number = 1
         for test in self.tests:
-            if 'send' in test:
-                test['number'] = number
-                number += 1
+            test['number'] = number
+            number += 1
 
     def add_empty_expected(self):
         for test in self.tests:
-            if 'generate-scripts' in test:
-                continue
             test.setdefault('bash_expected', '')
             test.setdefault('fish_expected', '')
             test.setdefault('zsh_expected',  '')
 
+    def strip_expected(self):
+        for test in self.tests:
+            for key in ['bash_expected', 'fish_expected', 'zsh_expected']:
+                test[key] = test[key].strip()
+
     def find_test_by_number(self, num):
         for test in self.tests:
-            if 'number' in test and test['number'] == num:
+            if test['number'] == num:
                 return test
 
-        raise Exception("No test with number %r found" % num)
+        raise Exception(f"No test with number {num} found")
 
-    def write_tests_file(self, file):
+    def write_tests_file(self, outfile):
         r = []
+
+        files = ''
+        for file, args in self.definition_files.items():
+            files += '%s: %s\n' % (file, json.dumps(args))
+        r += [files.strip()]
+
         for test in self.tests:
-            if 'generate-scripts' in test:
-                r += ['generate-scripts: %s' % json.dumps(test['generate-scripts'])]
-            else:
-                r += [test_to_yaml(test)]
+            r += [test_to_yaml(test)]
 
         r = '\n---\n'.join(r)
 
-        with open(file, 'w') as fh:
+        with open(outfile, 'w') as fh:
             fh.write(r)
 
-def do_tests(tests, shell, result_queue):
+    def generate_completion_files(self):
+        try:
+            os.mkdir(COMPLETIONS_OUTDIR)
+        except FileExistsError:
+            if not os.path.isdir(COMPLETIONS_OUTDIR):
+                raise NotADirectoryError(COMPLETIONS_OUTDIR)
+
+        print_err('Generating completion files ...')
+        for file, args in self.definition_files.items():
+            for shell in SHELLS:
+                cmd =  [CRAZY_COMPLETE, '--debug', '--zsh-compdef=False']
+                cmd += args['args']
+                cmd += ['-o', f'{COMPLETIONS_OUTDIR}/{file}.{shell}']
+                cmd += [shell, args['definition_file']]
+                print_err('Running', ' '.join(cmd))
+                run(cmd)
+
+def tests_worker_thread(thread_id, shell, input_queue, result_queue):
     if opts.driver == 'tmux':
-        term = TmuxTerminal(TMUX_SESSION_PREFIX + '-' + shell)
+        term = TmuxTerminal(f'{TMUX_SESSION_PREFIX}-{shell}-{thread_id}')
     elif opts.driver == 'pyte':
         term = PyteTerminal()
 
-    term_shell = {'bash': BashShell, 'fish': FishShell, 'zsh': ZshShell}[shell](term)
+    term_shell = {
+        'bash': BashShell,
+        'fish': FishShell,
+        'zsh':  ZshShell
+    }[shell](term)
 
-    for test in tests:
-        test = test.copy()
-        if 'generate-scripts' in test:
+    old_definition_file = None
+
+    while True:
+        try:
+            test = input_queue.get_nowait()
+        except queue.Empty:
+            break
+
+        if old_definition_file != test['definition_file']:
+            old_definition_file = test['definition_file']
+
             try:    term_shell.stop()
             except: pass
-            completion_file = 'out.%s' % shell
-            generate_completion(shell, completion_file, test['generate-scripts'])
+            completion_file = '%s/%s.%s' % (COMPLETIONS_OUTDIR, test['definition_file'], shell)
             term_shell.start()
             term.resize_window(80, 100)
             term_shell.set_prompt()
             term_shell.init_completion()
             term_shell.load_completion(completion_file)
-            time.sleep(0.5)
+            time.sleep(1.5)
 
-        else:
-            result = {
-                'number': test['number'],
-                'shell':  shell,
-                'result': term.complete(test['send'],
-                                        test.get(shell+'_tabs', 1),
-                                        test[shell+'_expected'],
-                                        opts.fast)
-            }
-            result_queue.put(result)
+        output = term.complete(
+            test['send'],
+            test.get(shell+'_tabs', 1),
+            test[shell+'_expected'],
+            opts.fast)
+
+        result = {
+            'number': test['number'],
+            'shell':  shell,
+            'result': output
+        }
+
+        result_queue.put(result)
 
     try:
         term_shell.stop()
@@ -178,14 +239,25 @@ class Tester():
     def __init__(self, tests):
         self.tests = tests
         self.result_queue = queue.Queue()
+        self.input_queues = {}
         self.threads = []
-        self.failed = False
+        self.num_failed = 0
 
     def run(self):
         for shell in SHELLS:
-            thread = threading.Thread(target=do_tests, args=(self.tests.tests, shell, self.result_queue))
-            thread.start()
-            self.threads.append(thread)
+            self.input_queues[shell] = queue.Queue()
+            for test in self.tests.tests:
+                self.input_queues[shell].put(test)
+
+        for thread_id in range(opts.threads):
+            for shell in SHELLS:
+                thread = threading.Thread(
+                    target=tests_worker_thread,
+                    args=(thread_id, shell, self.input_queues[shell], self.result_queue)
+                )
+
+                thread.start()
+                self.threads.append(thread)
 
         while self.threads_are_running():
             self.eat_queue()
@@ -210,10 +282,10 @@ class Tester():
         test[shell_result_key] = result['result']
 
         if test[shell_result_key] != test[shell_expected_key]:
-            self.failed = True
-            print("Test #%02d (%-4s - %s) failed" % (test['number'], shell, test['description']))
+            self.num_failed += 1
+            print_err("Test #%02d (%-4s - %s) failed" % (test['number'], shell, test['description']))
         else:
-            print("Test #%02d (%-4s - %s) OK" % (test['number'], shell, test['description']))
+            print_err("Test #%02d (%-4s - %s) OK" % (test['number'], shell, test['description']))
 
 # =============================================================================
 # Main
@@ -225,8 +297,18 @@ with open(TESTS_INFILE, 'r') as fh:
 tests.enumerate_tests()
 tests.add_empty_expected()
 tests.strip_expected()
+tests.generate_completion_files()
 tester = Tester(tests)
 tester.run()
 tests.write_tests_file(TESTS_OUTFILE)
-if tester.failed:
+if tester.num_failed:
+    print_err(f'{tester.num_failed} tests failed.')
+    print_err(f'Use diff or vimdiff on `{TESTS_INFILE}` and `{TESTS_OUTFILE}` for further details')
+    if opts.threads > 2:
+        print_err('NOTE:')
+        print_err(' A high value for -t|--threads may cause that tests fail.')
+        print_err(' Consider running this script again with `-t 1`.')
     sys.exit(1)
+else:
+    print_err("All tests passed")
+    sys.exit(0)

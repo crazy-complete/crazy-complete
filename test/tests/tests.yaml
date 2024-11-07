@@ -1,6 +1,9 @@
-generate-scripts: {"args": ["--input-type=python"], "definition_file": "crazy-complete-test"}
+main: {"args": ["--input-type=python"], "definition_file": "crazy-complete-test"}
+when: {"args": ["--input-type=yaml"], "definition_file": "when-test.yaml"}
+groups: {"args": ["--input-type=yaml"], "definition_file": "groups-test.yaml"}
 ---
 number: 1
+definition_file: "main"
 description: "No arguments, check if all commands are listed"
 send: "crazy-complete-test "
 bash_expected: |
@@ -23,6 +26,7 @@ zsh_expected: |
   when                            -- Test the "when"-feature
 ---
 number: 2
+definition_file: "main"
 description: "Check if subcommand is completed"
 send: "crazy-complete-test t"
 bash_expected: |
@@ -33,6 +37,7 @@ zsh_expected: |
   > crazy-complete-test test
 ---
 number: 3
+definition_file: "main"
 description: "Check if all options are listed"
 send: "crazy-complete-test test -"
 bash_expected: |
@@ -70,6 +75,7 @@ zsh_expected: |
   --special-chars-in-description      -- Here are some special chars: $"'\[]*`)
 ---
 number: 4
+definition_file: "main"
 description: "Check long option with argument (with space)"
 send: "crazy-complete-test test --arg "
 bash_expected: |
@@ -84,6 +90,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 5
+definition_file: "main"
 description: "Check long option with argument (with equal sign)"
 send: "crazy-complete-test test --arg="
 bash_expected: |
@@ -99,6 +106,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 6
+definition_file: "main"
 description: "Check short option with argument (without space)"
 send: "crazy-complete-test test -A"
 bash_expected: |
@@ -113,6 +121,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 7
+definition_file: "main"
 description: "Check short option with argument (with space)"
 send: "crazy-complete-test test -A "
 bash_expected: |
@@ -127,6 +136,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 8
+definition_file: "main"
 description: "Check old-style option with argument (with space)"
 send: "crazy-complete-test test -arg "
 bash_expected: |
@@ -141,6 +151,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 9
+definition_file: "main"
 description: "Check old-style option with argument (with equal sign)"
 send: "crazy-complete-test test -arg="
 bash_expected: |
@@ -155,6 +166,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 10
+definition_file: "main"
 description: "Check long option with optional argument"
 send: "crazy-complete-test test --optional="
 bash_expected: |
@@ -170,6 +182,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 11
+definition_file: "main"
 description: "Check short option with optional argument"
 comment: "FISH has a slightly wrong output"
 send: "crazy-complete-test test -O"
@@ -187,6 +200,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 12
+definition_file: "main"
 description: "Check old-style option with optional argument"
 send: "crazy-complete-test test -optional="
 bash_expected: |
@@ -202,6 +216,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 13
+definition_file: "main"
 description: "Check if mutually exclusive options work"
 send: "crazy-complete-test test --exclusive-1 --exclusive"
 bash_expected: |
@@ -212,6 +227,7 @@ zsh_expected: |
   > crazy-complete-test test --exclusive-1 --exclusive
 ---
 number: 14
+definition_file: "main"
 description: "Check if repeatable options work"
 send: "crazy-complete-test test --repeatable-flag --repeatable-"
 bash_expected: |
@@ -226,6 +242,7 @@ zsh_expected: |
   --repeatable-arg   --repeatable-flag
 ---
 number: 15
+definition_file: "main"
 description: "Check if final options work"
 send: "crazy-complete-test test --help -"
 bash_expected: |
@@ -236,6 +253,7 @@ zsh_expected: |
   > crazy-complete-test test --help -
 ---
 number: 16
+definition_file: "main"
 description: "Check if hidden options work (short option) #1"
 send: "crazy-complete-test test -H"
 bash_expected: |
@@ -250,6 +268,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 17
+definition_file: "main"
 description: "Check if hidden options work (short option) #2"
 send: "crazy-complete-test test -H "
 bash_expected: |
@@ -264,6 +283,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 18
+definition_file: "main"
 description: "Check if hidden options work (short option, stacked) #1"
 send: "crazy-complete-test test -FH"
 bash_expected: |
@@ -278,6 +298,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 19
+definition_file: "main"
 description: "Check if hidden options work (short option, stacked) #2"
 send: "crazy-complete-test test -FH "
 bash_expected: |
@@ -292,6 +313,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 20
+definition_file: "main"
 description: "Check if hidden options work (long option) #1"
 send: "crazy-complete-test test --hidden "
 bash_expected: |
@@ -306,6 +328,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 21
+definition_file: "main"
 description: "Check if hidden options work (long option) #2"
 send: "crazy-complete-test test --hidden="
 bash_expected: |
@@ -320,6 +343,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 22
+definition_file: "main"
 description: "Check if hidden options work (old option) #1"
 send: "crazy-complete-test test -hidden "
 bash_expected: |
@@ -334,6 +358,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 23
+definition_file: "main"
 description: "Check if hidden options work (old option) #2"
 send: "crazy-complete-test test -hidden="
 bash_expected: |
@@ -348,6 +373,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 24
+definition_file: "main"
 description: "Check option stacking"
 comment: "Does not work for BASH yet"
 send: "crazy-complete-test test -F"
@@ -364,6 +390,7 @@ zsh_expected: |
   -h  -- show this help message and exit
 ---
 number: 25
+definition_file: "main"
 description: "Check option stacking (with required argument and no space)"
 send: "crazy-complete-test test -FA"
 bash_expected: |
@@ -378,6 +405,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 26
+definition_file: "main"
 description: "Check option stacking (with required argument and space)"
 send: "crazy-complete-test test -FA "
 bash_expected: |
@@ -392,6 +420,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 27
+definition_file: "main"
 description: "Check option stacking (with optional argument)"
 comment: "FISH produces a bit of a wrong output"
 send: "crazy-complete-test test -FO"
@@ -409,6 +438,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 28
+definition_file: "main"
 description: "when: Check if none of --if-* options are listed"
 send: "crazy-complete-test when -"
 bash_expected: |
@@ -427,6 +457,7 @@ zsh_expected: |
   -optional                        -- Conditional variable
 ---
 number: 29
+definition_file: "main"
 description: "when: Check if --if-var appears (with --var)"
 send: "crazy-complete-test when --var value --if-"
 bash_expected: |
@@ -437,6 +468,7 @@ zsh_expected: |
   > crazy-complete-test when --var value --if-var=
 ---
 number: 30
+definition_file: "main"
 description: "when: Check if --if-var appears (with -V)"
 send: "crazy-complete-test when -V value --if-"
 bash_expected: |
@@ -447,6 +479,7 @@ zsh_expected: |
   > crazy-complete-test when -V value --if-var=
 ---
 number: 31
+definition_file: "main"
 description: "when: Check if --if-var appears (with -var)"
 send: "crazy-complete-test when -var value --if-"
 bash_expected: |
@@ -457,6 +490,7 @@ zsh_expected: |
   > crazy-complete-test when -var value --if-var=
 ---
 number: 32
+definition_file: "main"
 description: "when: Check if --if-var and --if-var-is-foo appears (with -V foo)"
 send: "crazy-complete-test when -V foo --if-"
 bash_expected: |
@@ -474,6 +508,7 @@ zsh_expected: |
   --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 33
+definition_file: "main"
 description: "when: Check if --if-var and --if-var-is-foo appears (with -Vfoo)"
 send: "crazy-complete-test when -Vfoo --if-"
 bash_expected: |
@@ -491,6 +526,7 @@ zsh_expected: |
   --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 34
+definition_file: "main"
 description: "when: Check if --if-var and --if-var-is-foo appears (with --var foo)"
 send: "crazy-complete-test when --var foo --if-"
 bash_expected: |
@@ -508,6 +544,7 @@ zsh_expected: |
   --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 35
+definition_file: "main"
 description: "when: Check if --if-var and --if-var-is-foo appears (with --var=foo)"
 send: "crazy-complete-test when --var=foo --if-"
 bash_expected: |
@@ -525,6 +562,7 @@ zsh_expected: |
   --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 36
+definition_file: "main"
 description: "when: Check if --if-var and --if-var-is-foo appears (with -var foo)"
 send: "crazy-complete-test when -var foo --if-"
 bash_expected: |
@@ -542,6 +580,7 @@ zsh_expected: |
   --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 37
+definition_file: "main"
 description: "when: Check if --if-var and --if-var-is-foo appears (with -var=foo)"
 send: "crazy-complete-test when -var=foo --if-"
 bash_expected: |
@@ -559,6 +598,7 @@ zsh_expected: |
   --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 38
+definition_file: "main"
 description: "when: Check if --if-var and --if-var-is-foo appears (with --var bar)"
 send: "crazy-complete-test when --var bar --if-"
 bash_expected: |
@@ -576,6 +616,7 @@ zsh_expected: |
   --if-var-is-foo  -- Only show option if --var is foo or bar
 ---
 number: 39
+definition_file: "main"
 description: "when: Check if --if-optional appears (with -O)"
 send: "crazy-complete-test when -O --if-"
 bash_expected: |
@@ -586,6 +627,7 @@ zsh_expected: |
   > crazy-complete-test when -O --if-optional=
 ---
 number: 40
+definition_file: "main"
 description: "when: Check if --if-optional appears (with --optional)"
 send: "crazy-complete-test when --optional --if-"
 bash_expected: |
@@ -596,6 +638,7 @@ zsh_expected: |
   > crazy-complete-test when --optional --if-optional=
 ---
 number: 41
+definition_file: "main"
 description: "when: Check if --if-optional appears (with -optional)"
 send: "crazy-complete-test when -optional --if-"
 bash_expected: |
@@ -606,6 +649,7 @@ zsh_expected: |
   > crazy-complete-test when -optional --if-optional=
 ---
 number: 42
+definition_file: "main"
 description: "when: Check if --if-optional and --if-optional-is-foo appears (with -Ofoo)"
 send: "crazy-complete-test when -Ofoo --if-"
 bash_expected: |
@@ -623,6 +667,7 @@ zsh_expected: |
   --if-optional-is-foo  -- Only show option if --optional is foo
 ---
 number: 43
+definition_file: "main"
 description: "when: Check if --if-optional and --if-optional-is-foo appears (with --optional=foo)"
 send: "crazy-complete-test when --optional=foo --if-"
 bash_expected: |
@@ -640,6 +685,7 @@ zsh_expected: |
   --if-optional-is-foo  -- Only show option if --optional is foo
 ---
 number: 44
+definition_file: "main"
 description: "when: Check if --if-optional and --if-optional-is-foo appears (with -optional=foo)"
 send: "crazy-complete-test when -optional=foo --if-"
 bash_expected: |
@@ -657,6 +703,7 @@ zsh_expected: |
   --if-optional-is-foo  -- Only show option if --optional is foo
 ---
 number: 45
+definition_file: "main"
 description: "complete: Check --exec"
 send: "crazy-complete-test complete --exec "
 bash_expected: |
@@ -670,6 +717,7 @@ zsh_expected: |
   > crazy-complete-test complete --exec Item\
 ---
 number: 46
+definition_file: "main"
 description: "complete: Check --choices"
 send: "crazy-complete-test complete --choices "
 bash_expected: |
@@ -686,6 +734,7 @@ zsh_expected: |
   foo:bar  -- Description for foo:bar
 ---
 number: 47
+definition_file: "main"
 description: "complete: Check --value-list #1"
 send: "crazy-complete-test complete --value-list "
 bash_expected: |
@@ -700,6 +749,7 @@ zsh_expected: |
   bar  baz  foo
 ---
 number: 48
+definition_file: "main"
 description: "complete: Check --value-list #2"
 send: "crazy-complete-test complete --value-list f"
 bash_expected: |
@@ -710,6 +760,7 @@ zsh_expected: |
   > crazy-complete-test complete --value-list foo,
 ---
 number: 49
+definition_file: "main"
 description: "complete: Check --value-list #3"
 send: "crazy-complete-test complete --value-list foo"
 bash_expected: |
@@ -720,6 +771,7 @@ zsh_expected: |
   > crazy-complete-test complete --value-list foo,
 ---
 number: 50
+definition_file: "main"
 description: "complete: Check --value-list #4"
 send: "crazy-complete-test complete --value-list foo,baz,"
 bash_expected: |
@@ -732,6 +784,7 @@ zsh_expected: |
   > crazy-complete-test complete --value-list foo,baz,bar,
 ---
 number: 51
+definition_file: "main"
 description: "complete: Check --value-list-2"
 send: "crazy-complete-test complete --value-list-2 "
 bash_expected: |
@@ -747,6 +800,7 @@ zsh_expected: |
   foo  -- Some foo
 ---
 number: 52
+definition_file: "main"
 description: "complete: Check --range-1"
 send: "crazy-complete-test complete --range-1 "
 bash_expected: |
@@ -763,6 +817,7 @@ zsh_expected: |
   1  2  3  4  5  6  7  8  9
 ---
 number: 53
+definition_file: "main"
 description: "complete: Check --range-2"
 send: "crazy-complete-test complete --range-2 "
 bash_expected: |
@@ -778,6 +833,7 @@ zsh_expected: |
   1  3  5  7  9
 ---
 number: 54
+definition_file: "main"
 description: "Check if positionals are working (1st positional)"
 send: "crazy-complete-test test "
 bash_expected: |
@@ -792,6 +848,7 @@ zsh_expected: |
   > crazy-complete-test test first
 ---
 number: 55
+definition_file: "main"
 description: "Check if positionals are working (2nd positional)"
 send: "crazy-complete-test test first1 "
 bash_expected: |
@@ -805,6 +862,7 @@ zsh_expected: |
   > crazy-complete-test test first1 second
 ---
 number: 56
+definition_file: "main"
 description: "Check if positionals are working (3rd positional)"
 send: "crazy-complete-test test first1 second1 "
 bash_expected: |
@@ -818,6 +876,7 @@ zsh_expected: |
   > crazy-complete-test test first1 second1 repeated
 ---
 number: 57
+definition_file: "main"
 description: "Check if positionals are working (repeated positional)"
 send: "crazy-complete-test test first1 second1 repeated1 "
 bash_expected: |
@@ -831,6 +890,7 @@ zsh_expected: |
   > crazy-complete-test test first1 second1 repeated1 repeated
 ---
 number: 58
+definition_file: "main"
 description: "Check if aliases are working (alias1)"
 send: "crazy-complete-test alias1 --arg "
 bash_expected: |
@@ -845,6 +905,7 @@ zsh_expected: |
   1  2  3
 ---
 number: 59
+definition_file: "main"
 description: "Check if aliases are working (alias2)"
 send: "crazy-complete-test alias2 --arg "
 bash_expected: |
@@ -858,9 +919,8 @@ zsh_expected: |
   > crazy-complete-test alias2 --arg
   1  2  3
 ---
-generate-scripts: {"args": ["--input-type=yaml"], "definition_file": "when-test.yaml"}
----
 number: 60
+definition_file: "when"
 description: "Check --complete with --files"
 send: "crazy-complete-test --files --complete "
 bash_expected: |
@@ -874,6 +934,7 @@ zsh_expected: |
   > crazy-complete-test --files --complete file
 ---
 number: 61
+definition_file: "when"
 description: "Check --complete with --directories"
 send: "crazy-complete-test --directories --complete "
 bash_expected: |
@@ -887,6 +948,7 @@ zsh_expected: |
   > crazy-complete-test --directories --complete dir
 ---
 number: 62
+definition_file: "when"
 description: "Check positional with --files"
 send: "crazy-complete-test --files "
 bash_expected: |
@@ -900,6 +962,7 @@ zsh_expected: |
   > crazy-complete-test --files file
 ---
 number: 63
+definition_file: "when"
 description: "Check positional with --directories"
 send: "crazy-complete-test --directories "
 bash_expected: |
@@ -912,9 +975,8 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --directories dir
 ---
-generate-scripts: {"args": ["--input-type=yaml"], "definition_file": "groups-test.yaml"}
----
 number: 64
+definition_file: "groups"
 description: "Check -A"
 send: "crazy-complete-test -A -"
 bash_expected: |
@@ -925,6 +987,7 @@ zsh_expected: |
   > crazy-complete-test -A -C
 ---
 number: 65
+definition_file: "groups"
 description: "Check -B"
 send: "crazy-complete-test -B -"
 bash_expected: |
@@ -935,6 +998,7 @@ zsh_expected: |
   > crazy-complete-test -B -
 ---
 number: 66
+definition_file: "groups"
 description: "Check -C"
 send: "crazy-complete-test -C -"
 bash_expected: |

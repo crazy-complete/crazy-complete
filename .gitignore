@@ -11,9 +11,7 @@ python-cracy-complete/
 python-cracy-complete-*.pkg.*
 
 # directory 'test'
-out.bash
-out.fish
-out.zsh
+test/tests/output/
 out.json
 out.yaml
 help.txt
