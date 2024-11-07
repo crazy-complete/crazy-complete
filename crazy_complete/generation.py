@@ -80,7 +80,7 @@ def enhance_commandline(commandline, program_name, config):
 
     commandline.visit_commandlines(lambda c: apply_config(c, config))
     commandline.visit_commandlines(lambda c: add_parsed_when(c))
-    completion_validator.CompletionValidator().validate_commandlines(commandline)
+    completion_validator.CompletionValidator.validate_commandlines(commandline)
     return commandline
 
 def visit_commandlines(completion_class, ctxt, commandline):
