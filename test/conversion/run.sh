@@ -1,11 +1,13 @@
 #!/bin/sh
 
-set -x -e
+set -e
 
 cd "$(dirname "$0")"
 
 CRAZY_COMPLETE=../../crazy-complete
 TEST_FILE=../tests/crazy-complete-test
+
+set -x
 
 $CRAZY_COMPLETE --debug --input-type=python json "$TEST_FILE" -o out.json
 $CRAZY_COMPLETE --debug --input-type=python yaml "$TEST_FILE" -o out.yaml
