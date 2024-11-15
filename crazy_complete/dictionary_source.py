@@ -9,26 +9,12 @@ from .errors import CrazyError, CrazyTypeError
 from .cli import CommandLine, ExtendedBool
 from . import compat
 
-def _validate_keys(dictionary, allowed_keys):
-    for key in dictionary.keys():
-        if key not in allowed_keys:
-            raise CrazyError(f'Unknown key: {key}')
-
 def _is_empty_or_whitespace(string):
     return not string.strip()
 
 def dictionary_to_commandline(dictionary, prog=None):
-    _validate_keys(dictionary,
-        ['prog', 'help', 'aliases', 'abbreviate_commands', 'abbreviate_options',
-         'inherit_options', 'options', 'positionals'])
-
     options = dictionary.get('options', [])
-    if not isinstance(options, list):
-        raise CrazyTypeError('options', 'list', options)
-
     positionals = dictionary.get('positionals', [])
-    if not isinstance(positionals, list):
-        raise CrazyTypeError('positionals', 'list', positionals)
 
     commandline = CommandLine(
         prog or dictionary['prog'],
@@ -40,10 +26,6 @@ def dictionary_to_commandline(dictionary, prog=None):
         inherit_options     = dictionary.get('inherit_options', ExtendedBool.INHERIT))
 
     for option in options:
-        _validate_keys(option,
-            ['option_strings', 'metavar', 'help', 'optional_arg', 'groups',
-             'repeatable', 'final', 'hidden', 'complete', 'when'])
-
         commandline.add_option(
             option.get('option_strings',  None),
             metavar         = option.get('metavar',         None),
@@ -57,9 +39,6 @@ def dictionary_to_commandline(dictionary, prog=None):
             when            = option.get('when',            None))
 
     for positional in positionals:
-        _validate_keys(positional,
-            ['number', 'metavar', 'help', 'repeatable', 'complete', 'when'])
-
         commandline.add_positional(
             positional.get('number', None),
             metavar    = positional.get('metavar',    None),
@@ -124,15 +103,6 @@ def dictionaries_to_commandline(dictionaries):
     commandline_tree = CommandlineTree()
 
     for dictionary in dictionaries:
-        if 'prog' not in dictionary:
-            raise CrazyError('Missing `prog` field')
-
-        if not isinstance(dictionary['prog'], str):
-            raise CrazyTypeError('prog', 'str', dictionary["prog"])
-
-        if _is_empty_or_whitespace(dictionary['prog']):
-            raise CrazyError('The `prog` field must not be empty')
-
         commandline_tree.add_commandline(dictionary)
 
     root = commandline_tree.get_root_commandline()

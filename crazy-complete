@@ -204,7 +204,9 @@ if __name__ == '__main__':
             FileNotFoundError,
             yaml.scanner.ScannerError,
             yaml.parser.ParserError,
-            json.decoder.JSONDecodeError) as e:
+            json.decoder.JSONDecodeError,
+            yaml_source.YAMLSchemeError,
+            json_source.JSONSchemeError) as e:
         print_err('Error:', e)
         if options.debug:
             traceback.print_exc()
