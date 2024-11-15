@@ -1,6 +1,5 @@
 ''' This module contains the CommandLine, Option and Positional classes '''
 
-import re
 from collections import OrderedDict
 from types import NoneType
 
@@ -11,20 +10,6 @@ class ExtendedBool:
     TRUE    = True
     FALSE   = False
     INHERIT = 'INHERIT'
-
-def _is_extended_bool(obj):
-    return obj in (True, False, ExtendedBool.INHERIT)
-
-_VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
-
-def _validate_option_string(option_string):
-    if not _VALID_OPTION_STRING_RE.fullmatch(option_string):
-        return False
-
-    if option_string == '--':
-        return False
-
-    return True
 
 class CommandLine:
     '''
@@ -52,31 +37,10 @@ class CommandLine:
             abbreviate_options (ExtendedBool): Specifies if options can be abbreviated.
             inherit_options (ExtendedBool): Specifies if options are visible to subcommands.
         '''
-
-        if not isinstance(prog, str):
-            raise CrazyTypeError('prog', 'str', prog)
-
+        # This function assumes that its arguments are of correct type. Type
+        # checking is done using json_schema.py and related files.
         if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
-
-        if not isinstance(aliases, list):
-            raise CrazyTypeError('aliases', 'list', aliases)
-
-        for index, alias in enumerate(aliases):
-            if not isinstance(alias, str):
-                raise CrazyTypeError(f'aliases[{index}]', 'str', alias)
-
-        if not _is_extended_bool(abbreviate_commands):
-            raise CrazyTypeError('abbreviate_commands', 'ExtendedBool', abbreviate_commands)
-
-        if not _is_extended_bool(abbreviate_options):
-            raise CrazyTypeError('abbreviate_options', 'ExtendedBool', abbreviate_options)
-
-        if not _is_extended_bool(inherit_options):
-            raise CrazyTypeError('inherit_options', 'ExtendedBool', inherit_options)
 
         self.prog = prog
         self.parent = parent
@@ -142,9 +106,6 @@ class CommandLine:
         '''
         if not isinstance(name, str):
             raise CrazyTypeError('name', 'str', name)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
 
         if self.subcommands:
             raise CrazyError('CommandLine object already has subcommands')
@@ -418,27 +379,6 @@ class Positional:
         if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
-        if not isinstance(number, int):
-            raise CrazyTypeError('number', 'int', number)
-
-        if not isinstance(metavar, (str, NoneType)):
-            raise CrazyTypeError('metavar', 'str|None', metavar)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
-
-        if not isinstance(complete, (list, tuple, NoneType)):
-            raise CrazyTypeError('complete', 'list|None', complete)
-
-        if not isinstance(repeatable, bool):
-            raise CrazyTypeError('repeatable', 'bool', repeatable)
-
-        if not isinstance(when, (str, NoneType)):
-            raise CrazyTypeError('when', 'str|None', when)
-
-        if number <= 0:
-            raise CrazyError(f'number: value ({number}) is invalid, number has to be >= 1')
-
         self.parent = parent
         self.number = number
         self.metavar = metavar
@@ -522,51 +462,10 @@ class Option:
         Returns:
             Option: The newly added Option object.
         '''
-
+        # This function assumes that its arguments are of correct type. Type
+        # checking is done using json_schema.py and related files.
         if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
-
-        if not isinstance(option_strings, list):
-            raise CrazyTypeError('option_strings', 'list', option_strings)
-
-        if not isinstance(metavar, (str, NoneType)):
-            raise CrazyTypeError('metavar', 'str|None', metavar)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
-
-        if not isinstance(complete, (list, tuple, NoneType)):
-            raise CrazyTypeError('complete', 'list|None', complete)
-
-        if not isinstance(groups, (list, NoneType)):
-            raise CrazyTypeError('groups', 'list|None', groups)
-
-        if groups is not None:
-            for index, group in enumerate(groups):
-                if not isinstance(group, str):
-                    raise CrazyTypeError(f'groups[{index}]', 'str', group)
-
-        if not isinstance(optional_arg, bool):
-            raise CrazyTypeError('optional_arg', 'bool', optional_arg)
-
-        if not _is_extended_bool(repeatable):
-            raise CrazyTypeError('repeatable', 'ExtendedBool', repeatable)
-
-        if not isinstance(final, bool):
-            raise CrazyTypeError('final', 'bool', final)
-
-        if not isinstance(hidden, bool):
-            raise CrazyTypeError('hidden', 'bool', hidden)
-
-        if not isinstance(when, (str, NoneType)):
-            raise CrazyTypeError('when', 'str|None', when)
-
-        if not option_strings:
-            raise CrazyError('Empty option strings')
-
-        for option_string in option_strings:
-            if not _validate_option_string(option_string):
-                raise CrazyError(f"Invalid option string: {option_string}")
 
         if metavar and not complete:
             raise CrazyError(f'Option {option_strings} has metavar set, but has no complete')
