@@ -14,7 +14,7 @@ def run(args, env=None):
 
 try:
     run(['sh', '-c', 'which tmux'])
-except:
+except Exception:
     print('Program `tmux` not found.')
     sys.exit(2)
 
