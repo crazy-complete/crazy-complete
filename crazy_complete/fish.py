@@ -296,7 +296,7 @@ def _define_option_types(ctxt, commandline):
 
 def generate_completion(commandline, program_name=None, config=None):
     if config is None:
-        config = _config.Config()
+        config = config_.Config()
 
     commandline = generation.enhance_commandline(commandline, program_name, config)
     helpers = fish_helpers.FishHelpers(commandline.prog)
