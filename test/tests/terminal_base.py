@@ -20,7 +20,7 @@ class TerminalBase:
         self.clear_screen()
         self.send(commandline)
 
-        for i in range(num_tabs):
+        for _ in range(num_tabs):
             self.send_tab()
 
         if fast:

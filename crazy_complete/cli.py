@@ -166,7 +166,7 @@ class CommandLine:
 
         def get(self):
             r = []
-            for commandline, options in self.options.values():
+            for _, options in self.options.values():
                 for option in options:
                     r.append(option)
             return r
