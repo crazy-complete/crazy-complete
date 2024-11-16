@@ -5,7 +5,6 @@ import collections
 
 from . import cli
 from . import utils
-from . import config as _config
 
 def make_identifier(string):
     '''Make `string` a valid shell identifier.

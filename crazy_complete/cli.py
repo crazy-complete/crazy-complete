@@ -4,7 +4,6 @@ import re
 from collections import OrderedDict
 from types import NoneType
 
-from . import algo
 from .errors import CrazyError, CrazyTypeError
 
 class ExtendedBool:
