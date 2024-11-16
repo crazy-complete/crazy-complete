@@ -16,7 +16,6 @@ from .cli import CommandLine, MutuallyExclusiveGroup
 
 def range_to_complete(r):
     '''Convert a Python range object to a range complete format.'''
-
     start = r.start
     step = r.step
     end = r.stop - 1 if step > 0 else r.stop + 1
@@ -90,7 +89,6 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
     Returns:
         CommandLine: A CommandLine object representing the converted parser.
     '''
-
     if not description:
         description = parser.description
 

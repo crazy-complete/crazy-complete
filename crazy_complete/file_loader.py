@@ -8,7 +8,6 @@ import __main__
 
 def execute_file(file):
     '''Import file using compile + exec.'''
-
     with open(os.devnull, 'w', encoding='utf-8') as null_fh:
         sys.stdout = null_fh
         sys.stderr = null_fh
@@ -30,7 +29,6 @@ def execute_file(file):
 
 def import_file(file):
     '''Import file using importlib.'''
-
     directory, filename = os.path.split(file)
     if filename.lower().endswith('.py'):
         module_name = filename[:-3]

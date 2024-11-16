@@ -302,7 +302,6 @@ def parse_options_with_description(stream):
 
 def parse(stream):
     """Parses the stream and returns a list of options with descriptions or unparsed lines."""
-
     r = []
 
     while not stream.is_end():

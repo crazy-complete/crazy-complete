@@ -33,7 +33,6 @@ def make_argument_option_spec(
     Return something like this:
         (--option -o){--option=,-o+}[Option description]:Metavar:Action
     '''
-
     result = []
 
     # Not options =============================================================

@@ -146,7 +146,6 @@ def get_all_command_variations(commandline):
     If `commandline.abbreviate_commands` is True, also return abbreviated
     forms.
     '''
-
     if commandline.parent is None:
         return [commandline.prog] + commandline.aliases
 

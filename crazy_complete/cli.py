@@ -50,7 +50,6 @@ class CommandLine:
             abbreviate_options (ExtendedBool): Specifies if options can be abbreviated.
             inherit_options (ExtendedBool): Specifies if options are visible to subcommands.
         '''
-
         if not isinstance(prog, str):
             raise CrazyTypeError('prog', 'str', prog)
 
@@ -96,7 +95,6 @@ class CommandLine:
         Returns:
             Option: The newly added Option object.
         '''
-
         o = Option(self, option_strings, **parameters)
         self.options.append(o)
         return o
@@ -110,7 +108,6 @@ class CommandLine:
         Returns:
             Positional: The newly added Positional object.
         '''
-
         p = Positional(self, number, **parameters)
         self.positionals.append(p)
         return p
@@ -408,7 +405,6 @@ class Positional:
             complete (list): The completion specification for the positional.
             when (str): Specifies a condition for showing this positional.
         '''
-
         if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
@@ -516,7 +512,6 @@ class Option:
         Returns:
             Option: The newly added Option object.
         '''
-
         if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
@@ -727,7 +722,6 @@ class MutuallyExclusiveGroup:
 
         For a list of valid parameters, see `class Option`.
         '''
-
         if 'groups' in parameters:
             raise CrazyError('Paramter `groups` not allowed')
 
