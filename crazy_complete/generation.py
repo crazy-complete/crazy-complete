@@ -61,7 +61,7 @@ def add_parsed_when(commandline):
     for option in commandline.options:
         if option.when:
             try:
-                setattr(option, 'when_parsed', when.parse_when(option.when))
+                option.when_parsed = when.parse_when(option.when)
             except CrazyError as e:
                 raise CrazyError('%s: %s: %s: %s' % (
                     commandline.get_command_path(),
@@ -69,7 +69,7 @@ def add_parsed_when(commandline):
                     option.when,
                     e)) from e
         else:
-            setattr(option, 'when_parsed', None)
+            option.when_parsed = None
 
 def enhance_commandline(commandline, program_name, config):
     commandline = commandline.copy()
