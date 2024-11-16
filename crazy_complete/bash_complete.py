@@ -3,9 +3,7 @@
 from . import shell
 
 class BashCompletionBase:
-    '''
-    Base class for BASH completions.
-    '''
+    '''Base class for BASH completions.'''
 
     def get_code(self, append=False):
         '''
@@ -21,9 +19,7 @@ class BashCompletionBase:
         raise NotImplementedError
 
 class BashCompletionCommand(BashCompletionBase):
-    '''
-    Used for completion functions that internally modify COMPREPLY.
-    '''
+    '''Used for completion functions that internally modify COMPREPLY.'''
     def __init__(self, ctxt, cmd):
         self.ctxt = ctxt
         self.cmd = cmd
@@ -57,9 +53,7 @@ class CompgenW(BashCompletionBase):
             ' '.join(shell.escape(str(s)) for s in self.values)))
 
 class BashCompletionCompgen(BashCompletionBase):
-    '''
-    Used for completion using `compgen`.
-    '''
+    '''Used for completion using `compgen`.'''
     def __init__(self, ctxt, compgen_args, word='"$cur"'):
         self.compgen_args = compgen_args
         self.word = word

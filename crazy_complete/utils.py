@@ -96,9 +96,7 @@ class GeneralAbbreviationGenerator:
         return r
 
 class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
-    '''
-    AbbreviationGenerator for abbreviating long and old-style options.
-    '''
+    '''AbbreviationGenerator for abbreviating long and old-style options.'''
     def __init__(self, words):
         assert is_iterable(words), \
             "OptionAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
@@ -116,9 +114,7 @@ class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
         super().__init__(3, words)
 
 class CommandAbbreviationGenerator(GeneralAbbreviationGenerator):
-    '''
-    AbbreviationGenerator for abbreviating commands.
-    '''
+    '''AbbreviationGenerator for abbreviating commands.'''
     def __init__(self, words):
         super().__init__(1, words)
 

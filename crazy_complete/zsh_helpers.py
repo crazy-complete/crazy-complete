@@ -1,6 +1,4 @@
-'''
-This module contains helper functions for Zsh.
-'''
+'''This module contains helper functions for Zsh.'''
 
 from . import helpers
 

@@ -15,9 +15,7 @@ from .cli import CommandLine, MutuallyExclusiveGroup
 # pylint: disable=protected-access
 
 def range_to_complete(r):
-    '''
-    Convert a Python range object to a range complete format.
-    '''
+    '''Convert a Python range object to a range complete format.'''
 
     start = r.start
     step = r.step
@@ -178,9 +176,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
     return commandline
 
 def find_objects_by_type(module, types):
-    '''
-    Search for objects in the specified module that match the given types.
-    '''
+    '''Search for objects in the specified module that match the given types.'''
     r = []
 
     for obj_name in dir(module):
@@ -191,9 +187,7 @@ def find_objects_by_type(module, types):
     return r
 
 def find_root_argument_parsers(module):
-    '''
-    Return a list of all ArgumentParser objects that have no parent.
-    '''
+    '''Return a list of all ArgumentParser objects that have no parent.'''
     parsers = find_objects_by_type(module, argparse.ArgumentParser)
     actions = find_objects_by_type(module, argparse._SubParsersAction)
 

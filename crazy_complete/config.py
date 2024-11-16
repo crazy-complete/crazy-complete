@@ -5,9 +5,7 @@ def _assert_is_bool(obj, func, param):
         raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")
 
 class Config:
-    '''
-    A class representing configuration settings for command line completion.
-    '''
+    '''A class representing configuration settings for command line completion.'''
 
     def __init__(self):
         self.abbreviate_commands = False
@@ -192,18 +190,14 @@ class Config:
         self.fish_inline_conditions = enable
 
     def include_file(self, file):
-        '''
-        Add a file which should be included to the generated code.
-        '''
+        '''Add a file which should be included to the generated code.'''
         assert isinstance(file, str), \
             f"Config.include_file: file: expected str, got `{file}`"
 
         self.include_files.append(file)
 
     def include_many_files(self, files):
-        '''
-        Add files which should be included to the generated code.
-        '''
+        '''Add files which should be included to the generated code.'''
         self.include_files.extend(files)
 
     def get_included_files_content(self):

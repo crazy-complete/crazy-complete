@@ -1,6 +1,4 @@
-'''
-Code for generating a bash auto completion file.
-'''
+'''Code for generating a bash auto completion file.'''
 
 from collections import OrderedDict
 

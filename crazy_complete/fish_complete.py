@@ -22,9 +22,7 @@ class FishCompletionFromArgs(FishCompletionBase):
         return self.args
 
 class FishCompletionCommand(FishCompletionBase):
-    '''
-    Class for executing a command and parsing its output.
-    '''
+    '''Class for executing a command and parsing its output.'''
     def  __init__(self, command):
         self.command = command
 

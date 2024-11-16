@@ -73,9 +73,7 @@ def make_fish_string(s, raw):
         return None
 
 class FishCompleteCommand:
-    '''
-    Class for creating FISH's `complete` command.
-    '''
+    '''Class for creating FISH's `complete` command.'''
     def __init__(self):
         self.command       = None
         self.description   = None

@@ -27,9 +27,7 @@ def _validate_option_string(option_string):
     return True
 
 class CommandLine:
-    '''
-    Represents a command line interface with options, positionals, and subcommands.
-    '''
+    '''Represents a command line interface with options, positionals, and subcommands.'''
 
     def __init__(self,
                  prog,
@@ -153,9 +151,7 @@ class CommandLine:
         return self.subcommands
 
     class OptionsGetter:
-        '''
-        A class for getting options from a CommandLine object.
-        '''
+        '''A class for getting options from a CommandLine object.'''
 
         def __init__(self, commandline, with_parent_options=False, only_with_arguments=False):
             self.options = OrderedDict()
@@ -332,9 +328,7 @@ class CommandLine:
                 sub.visit_commandlines(callback)
 
     def copy(self):
-        '''
-        Make a copy of the current CommandLine object, including sub-objects.
-        '''
+        '''Make a copy of the current CommandLine object, including sub-objects.'''
         copy = CommandLine(
             self.prog,
             parent              = None,

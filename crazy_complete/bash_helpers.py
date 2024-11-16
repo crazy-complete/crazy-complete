@@ -1,6 +1,4 @@
-'''
-This module contains helper functions for Bash.
-'''
+'''This module contains helper functions for Bash.'''
 
 from . import helpers
 

@@ -1,6 +1,4 @@
-'''
-This module contains helper functions for Fish.
-'''
+'''This module contains helper functions for Fish.'''
 
 from . import helpers
 

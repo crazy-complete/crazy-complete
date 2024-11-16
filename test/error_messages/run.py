@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-'''
-This script is for checking error messages of cracy-complete.
-'''
+'''This script is for checking error messages of cracy-complete.'''
 
 import os
 import sys

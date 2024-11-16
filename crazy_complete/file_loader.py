@@ -1,6 +1,4 @@
-"""
-Functions for loading a python file.
-"""
+"""Functions for loading a python file."""
 
 import os
 import sys
