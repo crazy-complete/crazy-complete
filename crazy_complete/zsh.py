@@ -20,7 +20,7 @@ def escape_square_brackets(s):
 
 def make_argument_option_spec(
         option_strings,
-        conflicting_options = [],
+        conflicting_options = None,
         description = None,
         complete = None,
         optional_arg = False,
@@ -34,6 +34,9 @@ def make_argument_option_spec(
         (--option -o){--option=,-o+}[Option description]:Metavar:Action
     '''
     result = []
+
+    if conflicting_options is None:
+        conflicting_options = []
 
     # Not options =============================================================
     not_options = []

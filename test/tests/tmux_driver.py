@@ -27,7 +27,7 @@ class TmuxTerminal(TerminalBase):
         env.pop('TMUX', None)
         return run(['tmux'] + args, env)
 
-    def start(self, command_args=[], env=None):
+    def start(self, command_args=(), env=None):
         tmux_env_args = []
 
         if env:

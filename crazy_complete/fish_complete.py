@@ -49,15 +49,15 @@ class FishCompleter(shell.ShellCompleter):
     def command(self, ctxt):
         return FishCompletionCommand("__fish_complete_command")
 
-    def directory(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def directory(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory is not None:
             funcname = ctxt.helpers.use_function('fish_complete_filedir')
             return FishCompletionCommand('%s -D -C %s' % (funcname, shell.escape(directory)))
         return FishCompletionCommand("__fish_complete_directories")
 
-    def file(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def file(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory is not None:
             funcname = ctxt.helpers.use_function('fish_complete_filedir')
             return FishCompletionCommand('%s -C %s' % (funcname, shell.escape(directory)))

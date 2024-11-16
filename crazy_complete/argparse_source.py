@@ -197,7 +197,7 @@ def find_root_argument_parsers(module):
 
     return parsers
 
-def load_from_file(file, parser_variable=None, parser_blacklist=[]):
+def load_from_file(file, parser_variable=None, parser_blacklist=()):
     '''
     Load a Python file, search for the ArgumentParser object and convert
     it to a CommandLine object.

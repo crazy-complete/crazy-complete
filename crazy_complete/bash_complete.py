@@ -74,8 +74,8 @@ class BashCompleter(shell.ShellCompleter):
     def command(self, ctxt):
         return BashCompletionCompgen(ctxt, '-A command')
 
-    def directory(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def directory(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  _filedir -d\n'
@@ -85,8 +85,8 @@ class BashCompleter(shell.ShellCompleter):
         else:
             return BashCompletionCommand(ctxt, '_filedir -d')
 
-    def file(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def file(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  _filedir\n'

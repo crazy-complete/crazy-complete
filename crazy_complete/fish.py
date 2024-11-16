@@ -111,13 +111,19 @@ class FishCompletionDefinition:
     def __init__(
           self,
           ctxt,
-          short_options=[],        # List of short options
-          long_options=[],         # List of long options
-          old_options=[],          # List of old-style options
+          short_options=None,      # List of short options
+          long_options=None,       # List of long options
+          old_options=None,        # List of old-style options
           description=None,        # Description
           requires_argument=False, # Option requires an argument
           completion_args=None
         ):
+        if short_options is None:
+            short_options = []
+        if long_options is None:
+            long_options = []
+        if old_options is None:
+            old_options = []
         self.ctxt = ctxt
         self.short_options = short_options
         self.long_options = long_options

@@ -32,7 +32,7 @@ class CommandLine:
                  prog,
                  parent=None,
                  help=None,
-                 aliases=[],
+                 aliases=None,
                  abbreviate_commands=ExtendedBool.INHERIT,
                  abbreviate_options=ExtendedBool.INHERIT,
                  inherit_options=ExtendedBool.INHERIT):
@@ -42,11 +42,14 @@ class CommandLine:
             prog (str): The name of the program (or subcommand).
             help (str): The help message for the program (or subcommand).
             parent (CommandLine or None): The parent command line object, if any.
-            aliases (list of str): Aliases for this command.
+            aliases (list of str or None): Aliases for this command.
             abbreviate_commands (ExtendedBool): Specifies if commands can be abbreviated.
             abbreviate_options (ExtendedBool): Specifies if options can be abbreviated.
             inherit_options (ExtendedBool): Specifies if options are visible to subcommands.
         '''
+        if aliases is None:
+            aliases = []
+
         if not isinstance(prog, str):
             raise CrazyTypeError('prog', 'str', prog)
 
