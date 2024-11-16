@@ -1,4 +1,4 @@
-'''This module contains code for validating the `complete` attribute'''
+'''This module contains code for validating the `complete` attribute.'''
 
 from .errors import CrazyError
 

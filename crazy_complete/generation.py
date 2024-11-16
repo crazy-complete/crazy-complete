@@ -1,4 +1,4 @@
-'''Functions that are used in the generation process'''
+'''Functions that are used in the generation process.'''
 
 from .errors import CrazyError
 from . import completion_validator

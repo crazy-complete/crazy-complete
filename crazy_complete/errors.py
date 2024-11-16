@@ -1,4 +1,4 @@
-'''This module contains Exception classes for crazy-complete'''
+'''This module contains Exception classes for crazy-complete.'''
 
 class CrazyError(Exception):
     '''

@@ -1,4 +1,4 @@
-'''This module contains code for completing arguments in Bash'''
+'''This module contains code for completing arguments in Bash.'''
 
 from . import shell
 
@@ -58,7 +58,7 @@ class CompgenW(BashCompletionBase):
 
 class BashCompletionCompgen(BashCompletionBase):
     '''
-    Used for completion using `compgen`
+    Used for completion using `compgen`.
     '''
     def __init__(self, ctxt, compgen_args, word='"$cur"'):
         self.compgen_args = compgen_args

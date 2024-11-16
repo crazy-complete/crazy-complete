@@ -1,4 +1,4 @@
-'''Algorithm functions'''
+'''Algorithm functions.'''
 
 def flatten(iterable):
     r = []

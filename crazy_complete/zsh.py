@@ -1,5 +1,5 @@
 '''
-Code for generating a zsh auto completion file
+Code for generating a zsh auto completion file.
 '''
 
 from collections import namedtuple

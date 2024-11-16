@@ -1,5 +1,5 @@
 '''
-Code for generating a fish auto completion file
+Code for generating a fish auto completion file.
 '''
 
 from collections import namedtuple, OrderedDict

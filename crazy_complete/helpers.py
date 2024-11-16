@@ -1,4 +1,4 @@
-'''Classes for including functions in the generation process'''
+'''Classes for including functions in the generation process.'''
 
 from . import utils
 from . import preprocessor

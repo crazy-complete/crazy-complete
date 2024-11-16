@@ -1,4 +1,4 @@
-'''Fish utility functions'''
+'''Fish utility functions.'''
 
 from .errors import InternalError
 from . import shell

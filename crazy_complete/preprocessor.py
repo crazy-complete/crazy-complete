@@ -1,4 +1,4 @@
-'''Contains code for preprocessing text'''
+'''Contains code for preprocessing text.'''
 
 def preprocess(string, defines):
     defines = set(defines)
