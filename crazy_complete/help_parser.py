@@ -176,7 +176,7 @@ def parse_metavar(stream):
     '''
     metavar = ''
 
-    while not stream.is_end() and not stream.peek() in (' ', '\t', '\n'):
+    while not stream.is_end() and stream.peek() not in (' ', '\t', '\n'):
         if stream.peek() in ('<', '[', '(', '{'):
             metavar += parse_bracket(stream)
         elif stream.peek() in ('"', "'"):
