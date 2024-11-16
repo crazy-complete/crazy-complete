@@ -26,8 +26,7 @@ class OptionGenerationContext(GenerationContext):
         self.option = option
 
 def apply_config(commandline, config):
-    '''
-    Applies configuration settings to a command line object.
+    '''Applies configuration settings to a command line object.
 
     If a setting in the CommandLine or Option object is set to ExtendedBool.INHERIT,
     it will be overridden by the corresponding setting from the config object.

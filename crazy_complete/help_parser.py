@@ -84,8 +84,7 @@ def eat_space(stream):
     return content
 
 def parse_option_string(stream):
-    '''
-    Read an option string and return it.
+    '''Read an option string and return it.
 
     All chars except OPTION_BREAK_CHARS are considered valid option chars.
 
@@ -111,8 +110,7 @@ def parse_option_string(stream):
     return option
 
 def parse_bracket(stream):
-    '''
-    Read and return a bracketed expression.
+    '''Read and return a bracketed expression.
 
     Bracketed expressions are:
         <foo bar>
@@ -136,8 +134,7 @@ def parse_bracket(stream):
     return content
 
 def parse_quoted_string(stream):
-    '''
-    Read and return a string.
+    '''Read and return a string.
 
     Strings are:
         'foo bar'
@@ -161,8 +158,7 @@ def parse_quoted_string(stream):
     return content
 
 def parse_metavar(stream):
-    '''
-    Read and return a metavar.
+    '''Read and return a metavar.
 
     Everything until a tab, space or newline is considered a metavar.
 
@@ -193,8 +189,7 @@ def parse_metavar(stream):
     return metavar
 
 def parse_trailing_description_line(stream):
-    '''
-    Reads and returns a trailing description line.
+    '''Reads and returns a trailing description line.
 
     A line is considered a trailing description line if it meets the following criteria:
       - It starts with whitespace (indicating continuation from a previous line).
@@ -228,8 +223,7 @@ def parse_description(stream):
     return content
 
 def parse_option_with_metavar(stream):
-    '''
-    Read and return an option with its metavar (if any).
+    '''Read and return an option with its metavar (if any).
 
     Valid inputs are:
       --option=METAVAR

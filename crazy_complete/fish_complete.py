@@ -5,8 +5,7 @@ from . import helpers
 
 class FishCompletionBase:
     def get_args(self):
-        '''
-        Return a list of arguments to be appended to the `complete`
+        '''Return a list of arguments to be appended to the `complete`
         command in FISH.
 
         The returned arguments should be in raw form, without any escaping.

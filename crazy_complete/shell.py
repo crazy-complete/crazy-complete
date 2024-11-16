@@ -8,8 +8,7 @@ from . import utils
 from . import config as _config
 
 def make_identifier(string):
-    '''
-    Make `string` a valid shell identifier.
+    '''Make `string` a valid shell identifier.
 
     This function replaces any dashes '-' with underscores '_',
     removes any characters that are not letters, digits, or underscores,
@@ -31,8 +30,7 @@ def make_identifier(string):
     return string
 
 def escape(string, escape_empty_string=True):
-    '''
-    Escapes special characters in a string for safe usage in shell commands or scripts.
+    '''Escapes special characters in a string for safe usage in shell commands or scripts.
 
     Args:
         string (str): The input string to be escaped.
@@ -59,8 +57,7 @@ def escape(string, escape_empty_string=True):
     return "'%s'" % string.replace("'", '\'"\'"\'')
 
 def make_completion_funcname(cmdline, prefix='_', suffix=''):
-    '''
-    Generates a function name for auto-completing a program or subcommand.
+    '''Generates a function name for auto-completing a program or subcommand.
 
     Args:
         cmdline (CommandLine): The CommandLine instance representing the program or subcommand.

@@ -75,8 +75,7 @@ def get_final(action):
     return action.get_final()
 
 def argumentparser_to_commandline(parser, prog=None, description=None):
-    '''
-    Converts an ArgumentParser object to a CommandLine object.
+    '''Converts an ArgumentParser object to a CommandLine object.
 
     Args:
         parser (argparse.ArgumentParser):

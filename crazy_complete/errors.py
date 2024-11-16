@@ -1,8 +1,7 @@
 '''This module contains Exception classes for crazy-complete.'''
 
 class CrazyError(Exception):
-    '''
-    Exception class for handling predictable or expected errors.
+    '''Exception class for handling predictable or expected errors.
 
     This exception is raised in situations where the error condition is
     anticipated and should be handled gracefully by the program. It is
@@ -11,8 +10,7 @@ class CrazyError(Exception):
     '''
 
 class CrazyTypeError(CrazyError):
-    '''
-    Exception raised for invalid parameter types.
+    '''Exception raised for invalid parameter types.
 
     Args:
         name (str): The name of the parameter with the invalid type.
@@ -31,8 +29,7 @@ class CrazyTypeError(CrazyError):
             self.name, self.expected, self.value, type(self.value).__name__)
 
 class InternalError(Exception):
-    '''
-    Exception raised for internal errors within the program.
+    '''Exception raised for internal errors within the program.
 
     This exception indicates that an unexpected condition has occurred that
     typically results from a bug or flaw in the code logic. It represents

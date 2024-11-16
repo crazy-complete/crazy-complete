@@ -7,8 +7,7 @@ import sys
 # =============================================================================
 
 def is_iterable(obj):
-    '''
-    Check if an object is iterable.
+    '''Check if an object is iterable.
 
     Args:
         obj: The object to check.
@@ -19,8 +18,7 @@ def is_iterable(obj):
     return hasattr(obj, '__iter__') and not isinstance(obj, str)
 
 class GeneralAbbreviationGenerator:
-    '''
-    A class for generating abbreviations from a list of words.
+    '''A class for generating abbreviations from a list of words.
 
     Attributes:
         min_abbreviated_length (int): The minimum length of an abbreviation.
@@ -28,8 +26,7 @@ class GeneralAbbreviationGenerator:
         min_lengths (dict): A dictionary mapping each word to its minimum abbreviation length.
     '''
     def __init__(self, min_abbreviated_length, words):
-        '''
-        Initialize the GeneralAbbreviationGenerator instance.
+        '''Initialize the GeneralAbbreviationGenerator instance.
 
         Args:
             min_abbreviated_length (int): The minimum length of an abbreviation.
@@ -63,8 +60,7 @@ class GeneralAbbreviationGenerator:
                     self.min_lengths[word] = length
 
     def get_abbreviations(self, word):
-        '''
-        Get the list of abbreviations for a given word.
+        '''Get the list of abbreviations for a given word.
 
         Args:
             word (str): The word for which to retrieve abbreviations.
@@ -78,8 +74,7 @@ class GeneralAbbreviationGenerator:
         return self.abbreviations[word]
 
     def get_many_abbreviations(self, words):
-        '''
-        Get the list of abbreviations for multiple words.
+        '''Get the list of abbreviations for multiple words.
 
         Args:
             words (iterable of str): The words for which to retrieve abbreviations.
@@ -119,8 +114,7 @@ class CommandAbbreviationGenerator(GeneralAbbreviationGenerator):
         super().__init__(1, words)
 
 class DummyAbbreviationGenerator:
-    '''
-    A dummy abbreviation generator that returns the original word as the abbreviation.
+    '''A dummy abbreviation generator that returns the original word as the abbreviation.
 
     This class is used as a placeholder when abbreviation generation is not required.
     '''
@@ -140,8 +134,7 @@ class DummyAbbreviationGenerator:
         return words
 
 def get_all_command_variations(commandline):
-    '''
-    Return all possible names for this command.
+    '''Return all possible names for this command.
 
     If `commandline.abbreviate_commands` is True, also return abbreviated
     forms.
@@ -160,8 +153,7 @@ def get_all_command_variations(commandline):
     return abbrevs.get_abbreviations(commandline.prog) + commandline.aliases
 
 def indent(string, num_spaces):
-    '''
-    Indents each line in a string by a specified number of spaces,
+    '''Indents each line in a string by a specified number of spaces,
     preserving empty lines.
 
     Args:

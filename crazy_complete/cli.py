@@ -38,8 +38,7 @@ class CommandLine:
                  abbreviate_options=ExtendedBool.INHERIT,
                  inherit_options=ExtendedBool.INHERIT):
 
-        '''
-        Initializes a CommandLine object with the specified parameters.
+        '''Initializes a CommandLine object with the specified parameters.
 
         Args:
             prog (str): The name of the program (or subcommand).
@@ -87,8 +86,7 @@ class CommandLine:
         self.subcommands = None
 
     def add_option(self, option_strings, **parameters):
-        '''
-        Adds a new option to the command line.
+        '''Adds a new option to the command line.
 
         For a list of valid parameters, see `class Option`.
 
@@ -100,8 +98,7 @@ class CommandLine:
         return o
 
     def add_positional(self, number, **parameters):
-        '''
-        Adds a new positional argument to the command line.
+        '''Adds a new positional argument to the command line.
 
         For a list of valid parameters, see `class Positional`.
 
@@ -113,8 +110,7 @@ class CommandLine:
         return p
 
     def add_mutually_exclusive_group(self, group):
-        '''
-        Adds a new mutually exclusive group.
+        '''Adds a new mutually exclusive group.
 
         Returns:
             MutuallyExclusiveGroup: The newly created mutually exclusive group.
@@ -122,8 +118,7 @@ class CommandLine:
         return MutuallyExclusiveGroup(self, group)
 
     def add_subcommands(self, name='command', help=None):
-        '''
-        Adds a subcommands option to the command line if none exists already.
+        '''Adds a subcommands option to the command line if none exists already.
 
         Args:
             name (str): The name of the subcommands option.
@@ -176,8 +171,7 @@ class CommandLine:
             return r
 
     def get_options(self, with_parent_options=False, only_with_arguments=False):
-        '''
-        Gets a list of options associated with the command line.
+        '''Gets a list of options associated with the command line.
 
         Args:
             with_parent_options (bool): If True, include options from parent command lines.
@@ -198,8 +192,7 @@ class CommandLine:
         return getter.get()
 
     def get_option_strings(self, with_parent_options=False, only_with_arguments=False):
-        '''
-        Gets a list of option strings associated with the command line.
+        '''Gets a list of option strings associated with the command line.
 
         Args:
             with_parent_options (bool): If True, include options from parent command lines.
@@ -235,8 +228,7 @@ class CommandLine:
         return r
 
     def get_positionals(self):
-        '''
-        Gets a list of positional arguments associated with the command line.
+        '''Gets a list of positional arguments associated with the command line.
 
         Note:
             SubCommandsOption objects are not considered positional arguments and are not included in the list.
@@ -247,8 +239,7 @@ class CommandLine:
         return list(self.positionals)
 
     def get_subcommands_option(self):
-        '''
-        Gets the subcommands option of the command line.
+        '''Gets the subcommands option of the command line.
 
         Returns:
             SubCommandsOption or None: The subcommands option if it exists, otherwise None.
@@ -256,8 +247,7 @@ class CommandLine:
         return self.subcommands
 
     def get_parents(self, include_self=False):
-        '''
-        Gets a list of parent CommandLine objects.
+        '''Gets a list of parent CommandLine objects.
 
         Args:
             include_self (bool): If True, includes the current CommandLine object in the list.
@@ -394,8 +384,7 @@ class Positional:
             complete=None,
             repeatable=False,
             when=None):
-        '''
-        Initializes a Positional object with the specified parameters.
+        '''Initializes a Positional object with the specified parameters.
 
         Args:
             number (int): The number of the positional argument (starting from 1)
@@ -438,8 +427,7 @@ class Positional:
         self.when = when
 
     def get_positional_index(self):
-        '''
-        Returns the index of the current positional argument within the current
+        '''Returns the index of the current positional argument within the current
         commandline, including parent commandlines.
 
         Returns:
@@ -459,8 +447,7 @@ class Positional:
         return positional_no
 
     def get_positional_num(self):
-        '''
-        Returns the number of the current positional argument within the current
+        '''Returns the number of the current positional argument within the current
         commandline, including parent commandlines.
 
         Note:
@@ -496,8 +483,7 @@ class Option:
             final=False,
             hidden=False,
             when=None):
-        '''
-        Initializes an Option object with the specified parameters.
+        '''Initializes an Option object with the specified parameters.
 
         Args:
             option_strings (list of str): The list of option strings.
@@ -576,8 +562,7 @@ class Option:
         self.when = when
 
     def get_option_strings(self):
-        '''
-        Returns the option strings associated with the Option object.
+        '''Returns the option strings associated with the Option object.
 
         Returns:
             list: A list of strings representing the option strings.
@@ -588,8 +573,7 @@ class Option:
         return delimiter.join(sorted(self.option_strings))
 
     def get_short_option_strings(self):
-        '''
-        Returns the short option strings associated with the Option object.
+        '''Returns the short option strings associated with the Option object.
 
         Returns:
             list: A list of short option strings ("-o").
@@ -597,8 +581,7 @@ class Option:
         return [o for o in self.option_strings if o.startswith('-') and len(o) == 2]
 
     def get_long_option_strings(self):
-        '''
-        Returns the long option strings associated with the Option object.
+        '''Returns the long option strings associated with the Option object.
 
         Returns:
             list: A list of long option strings ("--option").
@@ -606,8 +589,7 @@ class Option:
         return [o for o in self.option_strings if o.startswith('--')]
 
     def get_old_option_strings(self):
-        '''
-        Returns the old-style option strings associated with the Option object.
+        '''Returns the old-style option strings associated with the Option object.
 
         Returns:
             list: A list of old-style option strings ("-option").
@@ -615,8 +597,7 @@ class Option:
         return [o for o in self.option_strings if o.startswith('-') and not o.startswith('--') and len(o) > 2]
 
     def get_conflicting_options(self):
-        '''
-        Returns a list of conflicting options within the same mutually exclusive groups.
+        '''Returns a list of conflicting options within the same mutually exclusive groups.
 
         Returns:
             list: A list of Option objects representing conflicting options.
@@ -633,8 +614,7 @@ class Option:
         return r
 
     def get_conflicting_option_strings(self):
-        '''
-        Returns a list of option strings conflicting with the current option
+        '''Returns a list of option strings conflicting with the current option
         within the same mutually exclusive groups.
 
         Returns:
@@ -717,8 +697,7 @@ class MutuallyExclusiveGroup:
         self.group = group
 
     def add(self, option_strings, **parameters):
-        '''
-        Creates and adds a new option.
+        '''Creates and adds a new option.
 
         For a list of valid parameters, see `class Option`.
         '''
