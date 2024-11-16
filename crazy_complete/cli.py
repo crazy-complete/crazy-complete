@@ -37,7 +37,6 @@ class CommandLine:
                  abbreviate_commands=ExtendedBool.INHERIT,
                  abbreviate_options=ExtendedBool.INHERIT,
                  inherit_options=ExtendedBool.INHERIT):
-
         '''Initializes a CommandLine object with the specified parameters.
 
         Args:
