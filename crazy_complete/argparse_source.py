@@ -103,8 +103,8 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
             for name, subparser in action.choices.items():
                 subparsers[name] = {'parser': subparser, 'help': None}
 
-            for action in action._get_subactions():
-                subparsers[action.dest]['help'] = action.help
+            for subaction in action._get_subactions():
+                subparsers[subaction.dest]['help'] = subaction.help
 
             subcommands = commandline.add_subcommands()
             for name, data in subparsers.items():
