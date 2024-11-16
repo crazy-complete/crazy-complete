@@ -67,7 +67,7 @@ def add_parsed_when(commandline):
                     commandline.get_command_path(),
                     option.get_option_strings_key('|'),
                     option.when,
-                    e))
+                    e)) from e
         else:
             setattr(option, 'when_parsed', None)
 

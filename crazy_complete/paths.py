@@ -20,8 +20,8 @@ def _pkg_config(args):
             stdout=subprocess.PIPE,
             text=True,
             check=False)
-    except FileNotFoundError:
-        raise Exception('Program `pkg-config` not found')
+    except FileNotFoundError as exc:
+        raise Exception('Program `pkg-config` not found') from exc
 
     if result.returncode == 0:
         return result.stdout.strip()

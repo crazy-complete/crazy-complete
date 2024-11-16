@@ -171,7 +171,7 @@ class Tests:
             os.mkdir(COMPLETIONS_OUTDIR)
         except FileExistsError:
             if not os.path.isdir(COMPLETIONS_OUTDIR):
-                raise NotADirectoryError(COMPLETIONS_OUTDIR)
+                raise NotADirectoryError(COMPLETIONS_OUTDIR) from None
 
         print_err('Generating completion files ...')
         for file, args in self.definition_files.items():

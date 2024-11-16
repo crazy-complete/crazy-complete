@@ -6,7 +6,7 @@ def get_required_arg(args, name):
     try:
         return args.pop(0)
     except IndexError:
-        raise CrazyError(f'Missing argument: {name}')
+        raise CrazyError(f'Missing argument: {name}') from None
 
 def get_optional_arg(args, default=None):
     try:
@@ -42,7 +42,7 @@ class CompletionValidator:
                 raise CrazyError("%s: %s: %s" % (
                     cmdline.get_command_path(),
                     '|'.join(option.option_strings),
-                    e))
+                    e)) from e
 
         for positional in cmdline.get_positionals():
             try:
@@ -52,7 +52,7 @@ class CompletionValidator:
                     cmdline.get_command_path(),
                     positional.number,
                     positional.metavar,
-                    e))
+                    e)) from e
 
     @staticmethod
     def validate_commandlines(cmdline):

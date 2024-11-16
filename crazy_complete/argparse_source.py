@@ -213,7 +213,7 @@ def load_from_file(file, parser_variable=None, parser_blacklist=[]):
         try:
             parser = getattr(module, parser_variable)
         except AttributeError:
-            raise CrazyError(f"No variable named `{parser_variable}` found in `{file}`")
+            raise CrazyError(f"No variable named `{parser_variable}` found in `{file}`") from None
     else:
         parsers = find_root_argument_parsers(module)
         for blacklisted in parser_blacklist:

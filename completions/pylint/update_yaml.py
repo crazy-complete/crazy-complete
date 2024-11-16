@@ -19,7 +19,7 @@ FILE_OPTIONS = '--import-graph --ext-import-graph --int-import-graph --rcfile --
 try:
     in_file = sys.argv[1]
 except IndexError:
-    raise Exception('Missing input file argument')
+    raise Exception('Missing input file argument') from None
 
 cmdline = crazy_complete.yaml_source.load_from_file(in_file)
 

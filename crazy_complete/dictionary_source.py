@@ -96,7 +96,7 @@ class CommandlineTree:
             except KeyError:
                 msg  = "Previous commands %r are missing. " % previous_commands
                 msg += "Cannot define command %r" % command
-                raise CrazyError(msg)
+                raise CrazyError(msg) from None
 
         if command in node.subcommands:
             raise CrazyError(f"Multiple definition of program `{command}`")
