@@ -1,4 +1,4 @@
-''' Code for parsing a command line in Bash '''
+'''Code for parsing a command line in Bash'''
 
 from collections import namedtuple
 

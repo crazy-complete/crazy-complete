@@ -1,4 +1,4 @@
-''' Functions for parsing the `when` attribute '''
+'''Functions for parsing the `when` attribute'''
 
 import shlex
 

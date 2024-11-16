@@ -6,7 +6,7 @@ import subprocess
 import crazy_complete
 
 def get_msg_ids():
-    ''' Return an array of possible msg ids '''
+    '''Return an array of possible msg ids'''
     cmd = "pylint --list-msgs | grep -Eo '^:[^ ]+' | tr -d :"
     r = subprocess.run(['sh', '-c', cmd], stdout=subprocess.PIPE, text=True, check=True)
     return r.stdout.split()

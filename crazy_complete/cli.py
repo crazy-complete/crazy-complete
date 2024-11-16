@@ -1,4 +1,4 @@
-''' This module contains the CommandLine, Option and Positional classes '''
+'''This module contains the CommandLine, Option and Positional classes'''
 
 import re
 from collections import OrderedDict
@@ -746,6 +746,6 @@ class MutuallyExclusiveGroup:
             **parameters)
 
     def add_option(self, option):
-        ''' Adds an option object '''
+        '''Adds an option object'''
         option.parent = self.parent
         option.groups = [self.group]

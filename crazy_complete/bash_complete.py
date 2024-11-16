@@ -1,4 +1,4 @@
-''' This module contains code for completing arguments in Bash '''
+'''This module contains code for completing arguments in Bash'''
 
 from . import shell
 

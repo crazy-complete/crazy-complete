@@ -1,4 +1,4 @@
-''' This module contains code for completing arguments in Zsh '''
+'''This module contains code for completing arguments in Zsh'''
 
 from . import shell
 from . import helpers

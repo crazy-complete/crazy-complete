@@ -1,4 +1,4 @@
-''' Exporting modules '''
+'''Exporting modules'''
 
 from . import errors
 from . import cli, config, utils

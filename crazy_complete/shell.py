@@ -1,4 +1,4 @@
-''' Shell utility functions '''
+'''Shell utility functions'''
 
 import re
 import collections
