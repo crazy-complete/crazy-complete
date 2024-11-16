@@ -173,7 +173,7 @@ class CompletionValidator:
             if stop > start:
                 raise CrazyError(f"stop > start: {stop} > {start} (step={step})")
         else:
-            raise CrazyError(f"step: cannot be 0")
+            raise CrazyError("step: cannot be 0")
 
         return args
 
@@ -235,7 +235,7 @@ class CompletionValidator:
             raise CrazyError(f'values: not a list|dictionary: {values}')
 
         if len(values) == 0:
-            raise CrazyError(f'values: cannot be empty')
+            raise CrazyError('values: cannot be empty')
 
         if hasattr(values, 'items'):
             for item, desc in values.items():
