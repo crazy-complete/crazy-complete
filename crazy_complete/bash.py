@@ -13,7 +13,7 @@ from . import helpers
 from . import bash_helpers
 from . import bash_complete
 from . import bash_parser
-from .bash_utils import *
+from .bash_utils import make_option_variable_name, get_OptionAbbreviationGenerator
 from . import generation
 
 class VariableUsageTracer:

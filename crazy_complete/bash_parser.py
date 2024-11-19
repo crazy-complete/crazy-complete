@@ -4,7 +4,7 @@ from collections import namedtuple
 
 from . import utils
 from . import shell
-from .bash_utils import *
+from .bash_utils import make_option_variable_name, CasePatterns, get_OptionAbbreviationGenerator
 
 _PARSER_CODE = '''\
 POSITIONALS=()

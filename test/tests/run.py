@@ -11,7 +11,7 @@ import threading
 import subprocess
 from collections import OrderedDict
 
-from shells import *
+from shells import BashShell, FishShell, ZshShell
 
 # =============================================================================
 # Script configuration
@@ -93,14 +93,14 @@ def test_to_yaml(test):
 
 if opts.driver == 'pyte':
     try:
-        from pyte_driver import *
+        from pyte_driver import PyteTerminal
     except ImportError as e:
         print_err(e)
         print_err('Please install the missing modules.')
         print_err('Alternatively, you can use --driver=tmux if you have tmux installed')
         sys.exit(2)
 elif opts.driver == 'tmux':
-    from tmux_driver import *
+    from tmux_driver import TmuxTerminal
 
 # =============================================================================
 # Ensure all dependencies are available

@@ -5,11 +5,12 @@ from collections import namedtuple, OrderedDict
 from . import config as config_
 from . import generation_notice
 from . import modeline
+from . import shell
 from . import utils
 from . import algo
 from . import fish_complete
 from . import fish_helpers
-from .fish_utils import *
+from .fish_utils import FishCompleteCommand, VariableManager
 from . import when
 from . import generation
 
