@@ -1,16 +1,16 @@
-''' Algorithm functions '''
+'''Algorithm functions.'''
 
 def flatten(iterable):
-    r = []
-    for l in iterable:
-        r.extend(l)
-    return r
+    result = []
+    for item in iterable:
+        result.extend(item)
+    return result
 
 def uniq(iterable):
-    r = []
+    result = []
     seen = set()
     for item in iterable:
         if item not in seen:
             seen.add(item)
-            r.append(item)
-    return r
+            result.append(item)
+    return result

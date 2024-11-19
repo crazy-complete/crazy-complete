@@ -38,7 +38,7 @@ def find_programs(path):
 def parse_bash_complete_command(line):
     try:
         split = shlex.split(line)
-    except:
+    except Exception:
         return []
 
     i = 1
@@ -62,7 +62,7 @@ def parse_bash_complete_command(line):
 def parse_fish_complete_command(line):
     try:
         split = shlex.split(line)
-    except:
+    except Exception:
         return []
 
     i = 1

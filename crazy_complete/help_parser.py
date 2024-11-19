@@ -1,6 +1,4 @@
-"""
-This module contains functions to parse the --help output of a program.
-"""
+"""This module contains functions to parse the --help output of a program."""
 
 import re
 from collections import namedtuple
@@ -16,9 +14,7 @@ OptionWithMetavar = namedtuple('OptionWithMetavar', ['option', 'metavar', 'optio
 OptionsWithDescription = namedtuple('OptionsWithDescription', ['options', 'description'])
 
 class CharStream:
-    """
-    A utility class for sequentially reading characters from a string.
-    """
+    """A utility class for sequentially reading characters from a string."""
 
     def __init__(self, string, pos = 0):
         self.string = string
@@ -43,29 +39,21 @@ class CharStream:
         return self.string[self.pos:self.pos + length]
 
     def get(self):
-        """
-        Returns the current character and advances the position by one.
-        """
+        """Returns the current character and advances the position by one."""
         c = self.string[self.pos]
         self.pos += 1
         return c
 
     def is_space(self):
-        """
-        Checks if the current character is a space or a tab.
-        """
+        """Checks if the current character is a space or a tab."""
         return self.peek() in (' ', '\t')
 
     def is_end(self):
-        """
-        Checks if the current position has reached the end of the string.
-        """
+        """Checks if the current position has reached the end of the string."""
         return self.pos >= self.len
 
     def copy(self):
-        """
-        Creates and returns a new CharStream object at the current position.
-        """
+        """Creates and returns a new CharStream object at the current position."""
         return CharStream(self.string, self.pos)
 
     def __repr__(self):
@@ -79,9 +67,7 @@ class CharStream:
         return f"CharStream({line!r})"
 
 def eat_line(stream):
-    '''
-    Read the remainling line and return it (including the newline character).
-    '''
+    '''Read the remainling line and return it (including the newline character).'''
     content = ''
     while not stream.is_end():
         char = stream.get()
@@ -91,17 +77,14 @@ def eat_line(stream):
     return content
 
 def eat_space(stream):
-    '''
-    Read spaces and tabs and return it.
-    '''
+    '''Read spaces and tabs and return it.'''
     content = ''
     while stream.is_space():
         content += stream.get()
     return content
 
 def parse_option_string(stream):
-    '''
-    Read an option string and return it.
+    '''Read an option string and return it.
 
     All chars except OPTION_BREAK_CHARS are considered valid option chars.
 
@@ -127,8 +110,7 @@ def parse_option_string(stream):
     return option
 
 def parse_bracket(stream):
-    '''
-    Read and return a bracketed expression.
+    '''Read and return a bracketed expression.
 
     Bracketed expressions are:
         <foo bar>
@@ -152,8 +134,7 @@ def parse_bracket(stream):
     return content
 
 def parse_quoted_string(stream):
-    '''
-    Read and return a string.
+    '''Read and return a string.
 
     Strings are:
         'foo bar'
@@ -177,8 +158,7 @@ def parse_quoted_string(stream):
     return content
 
 def parse_metavar(stream):
-    '''
-    Read and return a metavar.
+    '''Read and return a metavar.
 
     Everything until a tab, space or newline is considered a metavar.
 
@@ -196,7 +176,7 @@ def parse_metavar(stream):
     '''
     metavar = ''
 
-    while not stream.is_end() and not stream.peek() in (' ', '\t', '\n'):
+    while not stream.is_end() and stream.peek() not in (' ', '\t', '\n'):
         if stream.peek() in ('<', '[', '(', '{'):
             metavar += parse_bracket(stream)
         elif stream.peek() in ('"', "'"):
@@ -209,8 +189,7 @@ def parse_metavar(stream):
     return metavar
 
 def parse_trailing_description_line(stream):
-    '''
-    Reads and returns a trailing description line.
+    '''Reads and returns a trailing description line.
 
     A line is considered a trailing description line if it meets the following criteria:
       - It starts with whitespace (indicating continuation from a previous line).
@@ -231,9 +210,7 @@ def parse_trailing_description_line(stream):
     return content
 
 def parse_description(stream):
-    '''
-    Reads and returns the description of an option.
-    '''
+    '''Reads and returns the description of an option.'''
     eat_space(stream)
     content = eat_line(stream)
     while True:
@@ -246,8 +223,7 @@ def parse_description(stream):
     return content
 
 def parse_option_with_metavar(stream):
-    '''
-    Read and return an option with its metavar (if any).
+    '''Read and return an option with its metavar (if any).
 
     Valid inputs are:
       --option=METAVAR
@@ -287,9 +263,7 @@ def parse_option_with_metavar(stream):
         return None
 
 def parse_option_delimiter(stream):
-    '''
-    Parse an option delimiter and return True if it was found, False otherwise.
-    '''
+    '''Parse an option delimiter and return True if it was found, False otherwise.'''
     p = stream.copy()
     eat_space(p)
     if p.get() in (',', '|'):
@@ -321,10 +295,7 @@ def parse_options_with_description(stream):
     return OptionsWithDescription(options, description)
 
 def parse(stream):
-    """
-    Parses the stream and returns a list of options with descriptions or unparsed lines.
-    """
-
+    """Parses the stream and returns a list of options with descriptions or unparsed lines."""
     r = []
 
     while not stream.is_end():
@@ -338,9 +309,7 @@ def parse(stream):
     return r
 
 def get_program_name_from_help(string):
-    """
-    Extracts the program name from the help string.
-    """
+    """Extracts the program name from the help string."""
     m = re.match('usage:[\n\t ]+([^\n\t ]+)', string, re.I)
     if m:
         return m[1]

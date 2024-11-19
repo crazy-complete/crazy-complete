@@ -1,11 +1,10 @@
-''' Fish utility functions '''
+'''Fish utility functions.'''
 
 from .errors import InternalError
 from . import shell
 
 class FishString:
-    '''
-    A utility class for handling command-line strings that may or may not require escaping.
+    '''A utility class for handling command-line strings that may or may not require escaping.
 
     When building command-line commands, it's important to ensure that strings are properly
     escaped to prevent shell injection vulnerabilities or syntax errors. However, in some
@@ -34,8 +33,7 @@ class FishString:
     '''
 
     def __init__(self, s, raw=False):
-        '''
-        Initializes a FishString instance.
+        '''Initializes a FishString instance.
 
         Args:
             s (str): The string to be used for command-line purposes.
@@ -47,8 +45,7 @@ class FishString:
         self.raw = raw
 
     def escape(self):
-        '''
-        Escapes the string unless it's marked as already escaped.
+        '''Escapes the string unless it's marked as already escaped.
 
         If the `raw` attribute is set to `True`, the method returns the string without any changes.
         Otherwise, it applies shell escaping to ensure the string is safe to use in a command-line context.
@@ -73,9 +70,7 @@ def make_fish_string(s, raw):
         return None
 
 class FishCompleteCommand:
-    '''
-    Class for creating FISH's `complete` command.
-    '''
+    '''Class for creating FISH's `complete` command.'''
     def __init__(self):
         self.command       = None
         self.description   = None

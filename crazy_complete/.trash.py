@@ -4,7 +4,7 @@
 
 def make_switch_case_pattern(option_strings):
     '''
-    Generates a switch case pattern for `option_strings'
+    Generates a switch case pattern for `option_strings'.
     '''
     r = []
     for option_string in sorted(option_strings):

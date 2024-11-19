@@ -15,10 +15,7 @@ from .cli import CommandLine, MutuallyExclusiveGroup
 # pylint: disable=protected-access
 
 def range_to_complete(r):
-    '''
-    Convert a Python range object to a range complete format.
-    '''
-
+    '''Convert a Python range object to a range complete format.'''
     start = r.start
     step = r.step
     end = r.stop - 1 if step > 0 else r.stop + 1
@@ -78,8 +75,7 @@ def get_final(action):
     return action.get_final()
 
 def argumentparser_to_commandline(parser, prog=None, description=None):
-    '''
-    Converts an ArgumentParser object to a CommandLine object.
+    '''Converts an ArgumentParser object to a CommandLine object.
 
     Args:
         parser (argparse.ArgumentParser):
@@ -92,7 +88,6 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
     Returns:
         CommandLine: A CommandLine object representing the converted parser.
     '''
-
     if not description:
         description = parser.description
 
@@ -108,8 +103,8 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
             for name, subparser in action.choices.items():
                 subparsers[name] = {'parser': subparser, 'help': None}
 
-            for action in action._get_subactions():
-                subparsers[action.dest]['help'] = action.help
+            for subaction in action._get_subactions():
+                subparsers[subaction.dest]['help'] = subaction.help
 
             subcommands = commandline.add_subcommands()
             for name, data in subparsers.items():
@@ -178,9 +173,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
     return commandline
 
 def find_objects_by_type(module, types):
-    '''
-    Search for objects in the specified module that match the given types.
-    '''
+    '''Search for objects in the specified module that match the given types.'''
     r = []
 
     for obj_name in dir(module):
@@ -191,9 +184,7 @@ def find_objects_by_type(module, types):
     return r
 
 def find_root_argument_parsers(module):
-    '''
-    Return a list of all ArgumentParser objects that have no parent.
-    '''
+    '''Return a list of all ArgumentParser objects that have no parent.'''
     parsers = find_objects_by_type(module, argparse.ArgumentParser)
     actions = find_objects_by_type(module, argparse._SubParsersAction)
 
@@ -206,7 +197,7 @@ def find_root_argument_parsers(module):
 
     return parsers
 
-def load_from_file(file, parser_variable=None, parser_blacklist=[]):
+def load_from_file(file, parser_variable=None, parser_blacklist=()):
     '''
     Load a Python file, search for the ArgumentParser object and convert
     it to a CommandLine object.
@@ -222,7 +213,7 @@ def load_from_file(file, parser_variable=None, parser_blacklist=[]):
         try:
             parser = getattr(module, parser_variable)
         except AttributeError:
-            raise CrazyError(f"No variable named `{parser_variable}` found in `{file}`")
+            raise CrazyError(f"No variable named `{parser_variable}` found in `{file}`") from None
     else:
         parsers = find_root_argument_parsers(module)
         for blacklisted in parser_blacklist:

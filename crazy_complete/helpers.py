@@ -1,4 +1,4 @@
-''' Classes for including functions in the generation process '''
+'''Classes for including functions in the generation process.'''
 
 from . import utils
 from . import preprocessor
@@ -12,7 +12,7 @@ class FunctionBase:
         raise NotImplementedError
 
 class ShellFunction(FunctionBase):
-    def get_code(self, funcname=None, defines=set()):
+    def get_code(self, funcname=None, defines=frozenset()):
         if funcname is None:
             funcname = self.funcname
 
@@ -26,7 +26,7 @@ class ShellFunction(FunctionBase):
         return r
 
 class FishFunction(FunctionBase):
-    def get_code(self, funcname=None, defines=set()):
+    def get_code(self, funcname=None, defines=frozenset()):
         if funcname is None:
             funcname = self.funcname
 

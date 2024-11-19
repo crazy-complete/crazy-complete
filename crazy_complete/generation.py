@@ -1,4 +1,4 @@
-''' Functions that are used in the generation process '''
+'''Functions that are used in the generation process.'''
 
 from .errors import CrazyError
 from . import completion_validator
@@ -26,8 +26,7 @@ class OptionGenerationContext(GenerationContext):
         self.option = option
 
 def apply_config(commandline, config):
-    '''
-    Applies configuration settings to a command line object.
+    '''Applies configuration settings to a command line object.
 
     If a setting in the CommandLine or Option object is set to ExtendedBool.INHERIT,
     it will be overridden by the corresponding setting from the config object.
@@ -62,15 +61,15 @@ def add_parsed_when(commandline):
     for option in commandline.options:
         if option.when:
             try:
-                setattr(option, 'when_parsed', when.parse_when(option.when))
+                option.when_parsed = when.parse_when(option.when)
             except CrazyError as e:
                 raise CrazyError('%s: %s: %s: %s' % (
                     commandline.get_command_path(),
                     option.get_option_strings_key('|'),
                     option.when,
-                    e))
+                    e)) from e
         else:
-            setattr(option, 'when_parsed', None)
+            option.when_parsed = None
 
 def enhance_commandline(commandline, program_name, config):
     commandline = commandline.copy()

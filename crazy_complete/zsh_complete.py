@@ -1,4 +1,4 @@
-''' This module contains code for completing arguments in Zsh '''
+'''This module contains code for completing arguments in Zsh.'''
 
 from . import shell
 from . import helpers
@@ -34,14 +34,14 @@ class ZshCompleter(shell.ShellCompleter):
     def command(self, ctxt):
         return '_command_names'
 
-    def directory(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def directory(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory:
             return '"_directories -W %s"' % shell.escape(directory)
         return '_directories'
 
-    def file(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def file(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory:
             return '"_files -W %s"' % shell.escape(directory)
         return '_files'

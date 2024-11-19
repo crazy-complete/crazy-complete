@@ -1,4 +1,4 @@
-''' Bash utility functions '''
+'''Bash utility functions.'''
 
 from . import shell
 from . import utils

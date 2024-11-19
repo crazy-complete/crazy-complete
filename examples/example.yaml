@@ -18,7 +18,7 @@ options:
   - option_strings: ["--change-dir"]
     metavar: "change_dir"
     help: "Change to directory"
-    complete: ["directory"]
+    complete: ["directory", {"directory": "/tmp"}]
 
   - option_strings: ["--mode", "-m"]
     metavar: "mode"

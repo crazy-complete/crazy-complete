@@ -14,7 +14,7 @@ def run(args, env=None):
 
 try:
     run(['sh', '-c', 'which tmux'])
-except:
+except Exception:
     print('Program `tmux` not found.')
     sys.exit(2)
 
@@ -27,7 +27,7 @@ class TmuxTerminal(TerminalBase):
         env.pop('TMUX', None)
         return run(['tmux'] + args, env)
 
-    def start(self, command_args=[], env=None):
+    def start(self, command_args=(), env=None):
         tmux_env_args = []
 
         if env:

@@ -1,6 +1,4 @@
-'''
-Code for maintaining backward compatibility with previous versions of crazy-complete
-'''
+'''Code for maintaining backward compatibility with previous versions of crazy-complete.'''
 
 from . import utils
 

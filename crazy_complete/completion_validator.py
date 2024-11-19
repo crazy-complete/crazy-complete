@@ -1,4 +1,4 @@
-''' This module contains code for validating the `complete` attribute '''
+'''This module contains code for validating the `complete` attribute.'''
 
 from .errors import CrazyError
 
@@ -6,7 +6,7 @@ def get_required_arg(args, name):
     try:
         return args.pop(0)
     except IndexError:
-        raise CrazyError(f'Missing argument: {name}')
+        raise CrazyError(f'Missing argument: {name}') from None
 
 def get_optional_arg(args, default=None):
     try:
@@ -42,7 +42,7 @@ class CompletionValidator:
                 raise CrazyError("%s: %s: %s" % (
                     cmdline.get_command_path(),
                     '|'.join(option.option_strings),
-                    e))
+                    e)) from e
 
         for positional in cmdline.get_positionals():
             try:
@@ -52,7 +52,7 @@ class CompletionValidator:
                     cmdline.get_command_path(),
                     positional.number,
                     positional.metavar,
-                    e))
+                    e)) from e
 
     @staticmethod
     def validate_commandlines(cmdline):
@@ -173,7 +173,7 @@ class CompletionValidator:
             if stop > start:
                 raise CrazyError(f"stop > start: {stop} > {start} (step={step})")
         else:
-            raise CrazyError(f"step: cannot be 0")
+            raise CrazyError("step: cannot be 0")
 
         return args
 
@@ -235,7 +235,7 @@ class CompletionValidator:
             raise CrazyError(f'values: not a list|dictionary: {values}')
 
         if len(values) == 0:
-            raise CrazyError(f'values: cannot be empty')
+            raise CrazyError('values: cannot be empty')
 
         if hasattr(values, 'items'):
             for item, desc in values.items():

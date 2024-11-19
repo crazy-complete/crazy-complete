@@ -1,12 +1,11 @@
-''' This module contains code for completing arguments in Fish '''
+'''This module contains code for completing arguments in Fish.'''
 
 from . import shell
 from . import helpers
 
 class FishCompletionBase:
     def get_args(self):
-        '''
-        Return a list of arguments to be appended to the `complete`
+        '''Return a list of arguments to be appended to the `complete`
         command in FISH.
 
         The returned arguments should be in raw form, without any escaping.
@@ -22,9 +21,7 @@ class FishCompletionFromArgs(FishCompletionBase):
         return self.args
 
 class FishCompletionCommand(FishCompletionBase):
-    '''
-    Class for executing a command and parsing its output.
-    '''
+    '''Class for executing a command and parsing its output.'''
     def  __init__(self, command):
         self.command = command
 
@@ -52,15 +49,15 @@ class FishCompleter(shell.ShellCompleter):
     def command(self, ctxt):
         return FishCompletionCommand("__fish_complete_command")
 
-    def directory(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def directory(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory is not None:
             funcname = ctxt.helpers.use_function('fish_complete_filedir')
             return FishCompletionCommand('%s -D -C %s' % (funcname, shell.escape(directory)))
         return FishCompletionCommand("__fish_complete_directories")
 
-    def file(self, ctxt, opts={}):
-        directory = opts.get('directory', None)
+    def file(self, ctxt, opts=None):
+        directory = None if opts is None else opts.get('directory', None)
         if directory is not None:
             funcname = ctxt.helpers.use_function('fish_complete_filedir')
             return FishCompletionCommand('%s -C %s' % (funcname, shell.escape(directory)))

@@ -109,7 +109,7 @@ elif opts.driver == 'tmux':
 for program in SHELLS:
     try:
         run(['sh', '-c', f'type {program}'])
-    except:
+    except Exception:
         print_err(f'Program `{program}` not found')
         sys.exit(2)
 
@@ -171,7 +171,7 @@ class Tests:
             os.mkdir(COMPLETIONS_OUTDIR)
         except FileExistsError:
             if not os.path.isdir(COMPLETIONS_OUTDIR):
-                raise NotADirectoryError(COMPLETIONS_OUTDIR)
+                raise NotADirectoryError(COMPLETIONS_OUTDIR) from None
 
         print_err('Generating completion files ...')
         for file, args in self.definition_files.items():
@@ -206,8 +206,10 @@ def tests_worker_thread(thread_id, shell, input_queue, result_queue):
         if old_definition_file != test['definition_file']:
             old_definition_file = test['definition_file']
 
-            try:    term_shell.stop()
-            except: pass
+            try:
+                term_shell.stop()
+            except Exception:
+                pass
             completion_file = '%s/%s.%s' % (COMPLETIONS_OUTDIR, test['definition_file'], shell)
             term_shell.start()
             term.resize_window(80, 100)
@@ -232,7 +234,7 @@ def tests_worker_thread(thread_id, shell, input_queue, result_queue):
 
     try:
         term_shell.stop()
-    except:
+    except Exception:
         pass
 
 class Tester():

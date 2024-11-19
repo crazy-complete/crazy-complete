@@ -1,13 +1,11 @@
-''' This module contains the configuration class '''
+'''This module contains the configuration class.'''
 
 def _assert_is_bool(obj, func, param):
     if not isinstance(obj, bool):
         raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")
 
 class Config:
-    '''
-    A class representing configuration settings for command line completion.
-    '''
+    '''A class representing configuration settings for command line completion.'''
 
     def __init__(self):
         self.abbreviate_commands = False
@@ -21,8 +19,7 @@ class Config:
         self.fish_inline_conditions = False
 
     def set_abbreviate_commands(self, enable):
-        '''
-        Sets whether commands can be abbreviated.
+        '''Sets whether commands can be abbreviated.
 
         Args:
             enable (bool):
@@ -50,8 +47,7 @@ class Config:
         self.abbreviate_commands = enable
 
     def set_abbreviate_options(self, enable):
-        '''
-        Sets whether options can be abbreviated.
+        '''Sets whether options can be abbreviated.
 
         Args:
             enable (bool):
@@ -79,8 +75,7 @@ class Config:
         self.abbreviate_options = enable
 
     def set_repeatable_options(self, enable):
-        '''
-        Sets whether options are suggested multiple times during completion.
+        '''Sets whether options are suggested multiple times during completion.
 
         Args:
             enable (bool):
@@ -109,8 +104,7 @@ class Config:
         self.repeatable_options = enable
 
     def set_inherit_options(self, enable):
-        '''
-        Sets whether parent options are visible to subcommands.
+        '''Sets whether parent options are visible to subcommands.
 
         Args:
             enable (bool):
@@ -139,8 +133,7 @@ class Config:
         self.inherit_options = enable
 
     def set_vim_modeline(self, enable):
-        '''
-        Sets whether a vim modeline comment shall be appended to the generated code.
+        '''Sets whether a vim modeline comment shall be appended to the generated code.
 
         The modeline comment looks like this:
 
@@ -159,8 +152,7 @@ class Config:
         self.vim_modeline = enable
 
     def set_zsh_compdef(self, enable):
-        '''
-        Sets whether a `#compdef` comment is written at the top of the generated
+        '''Sets whether a `#compdef` comment is written at the top of the generated
         zsh script.
 
         The `#compdef` directive is used by Zsh to automatically associate the
@@ -192,18 +184,14 @@ class Config:
         self.fish_inline_conditions = enable
 
     def include_file(self, file):
-        '''
-        Add a file which should be included to the generated code.
-        '''
+        '''Add a file which should be included to the generated code.'''
         assert isinstance(file, str), \
             f"Config.include_file: file: expected str, got `{file}`"
 
         self.include_files.append(file)
 
     def include_many_files(self, files):
-        '''
-        Add files which should be included to the generated code.
-        '''
+        '''Add files which should be included to the generated code.'''
         self.include_files.extend(files)
 
     def get_included_files_content(self):

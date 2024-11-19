@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
-import yaml
 import subprocess
 import crazy_complete
 
 def get_msg_ids():
-    ''' Return an array of possible msg ids '''
+    '''Return an array of possible msg ids.'''
     cmd = "pylint --list-msgs | grep -Eo '^:[^ ]+' | tr -d :"
     r = subprocess.run(['sh', '-c', cmd], stdout=subprocess.PIPE, text=True, check=True)
     return r.stdout.split()
@@ -20,7 +19,7 @@ FILE_OPTIONS = '--import-graph --ext-import-graph --int-import-graph --rcfile --
 try:
     in_file = sys.argv[1]
 except IndexError:
-    raise Exception('Missing input file argument')
+    raise Exception('Missing input file argument') from None
 
 cmdline = crazy_complete.yaml_source.load_from_file(in_file)
 
