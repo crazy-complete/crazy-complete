@@ -1,0 +1,33 @@
+[tool.ruff.lint]
+# First four warning types are enabled by default.
+select = ["E4", "E7", "E9", "F", "C90", "I", "N", "D", "B"]
+ignore = [
+  # crazy-complete uses single quotes for everything
+  "D300", # triple-single-quotes
+  # These turn off warnings about undocumented public interface. There are too
+  # many of these for them to be useful
+  "D100", # undocumented-public-module
+  "D101", # undocumented-public-class
+  "D102", # undocumented-public-method
+  "D103", # undocumented-public-function
+  "D105", # undocumented-magic-method
+  "D107", # undocumented-public-init
+  # Unsorted imports are also annoying to deal with.
+  "I001", # unsorted-imports
+  # This gets triggered because the summary line of docstrings is too long.
+  # It would require rewriting a lot of documentation to fix this in the entire
+  # codebase
+  "D205", # blank-line-after-summary
+  "D212", # multi-line-summary-first-line
+]
+# These don't seem to be especially important.
+exclude = ["completions/fpm/old/**", "crazy_complete/.trash.py"]
+pydocstyle.convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# I wasn't sure about this warning, so I didn't want to touch it.
+"crazy_complete/argparse_mod.py" = ["B010"] # set-attr-with-constant
+"crazy_complete/bash.py" = ["N806"] # non-lowercase-variable-in-function
+
+[tool.ruff.format]
+quote-style = "single"
