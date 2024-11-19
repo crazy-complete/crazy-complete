@@ -14,7 +14,7 @@ SCRIPT_DIR  = os.path.dirname(__file__)
 CRAZY_COMPLETE_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
 sys.path.insert(0, CRAZY_COMPLETE_DIR)
 
-import crazy_complete
+import crazy_complete # noqa: E402
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
