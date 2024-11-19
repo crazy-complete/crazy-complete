@@ -60,6 +60,8 @@ def make_completion_funcname(cmdline, prefix='_', suffix=''):
 
     Args:
         cmdline (CommandLine): The CommandLine instance representing the program or subcommand.
+        prefix (str): The prefix that shall be prepended to the result.
+        suffix (str): The suffix that shall be appended to the result.
 
     Returns:
         str: The generated function name for auto-completion.

@@ -388,6 +388,7 @@ class Positional:
         '''Initializes a Positional object with the specified parameters.
 
         Args:
+            parent (CommandLine): The parent command line object, if any.
             number (int): The number of the positional argument (starting from 1)
             metavar (str): The metavar for the positional.
             help (str): The help message for the positional.
@@ -487,6 +488,7 @@ class Option:
         '''Initializes an Option object with the specified parameters.
 
         Args:
+            parent (CommandLine): The parent command line object, if any.
             option_strings (list of str): The list of option strings.
             metavar (str): The metavar for the option.
             help (str): The help message for the option.
@@ -494,6 +496,8 @@ class Option:
             optional_arg (bool): Specifies if option's argument is optional.
             groups (list of str): Specify to which mutually exclusive groups this option belongs to.
             repeatable (ExtendedBool): Specifies if the option can be repeated.
+            final (bool): If True, no more options are suggested after this one.
+            hidden (bool): Specifies if this option is hidden.
             when (str): Specifies a condition for showing this option.
 
         Returns:
