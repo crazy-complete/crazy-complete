@@ -159,10 +159,10 @@ def option_to_dictionary(self):
     if self.repeatable != ExtendedBool.INHERIT:
         r['repeatable'] = self.repeatable
 
-    if self.final != False:
+    if self.final is True:
         r['final'] = self.final
 
-    if self.hidden != False:
+    if self.hidden is True:
         r['hidden'] = self.hidden
 
     if self.complete:

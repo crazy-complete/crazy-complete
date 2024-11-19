@@ -18,7 +18,7 @@ def preprocess(string, defines):
                 stack.append(False)
                 ignore = True
         elif stripped_line.startswith("#endif"):
-            if stack.pop() == False:
+            if stack.pop() is False:
                 ignore = False if len(stack) == 0 else not any(stack)
         else:
             if not ignore:
