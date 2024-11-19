@@ -39,7 +39,7 @@ class Config:
                     - set_abbreviate_commands(True): works
                     - set_abbreviate_commands(False): works
 
-        See also:
+        See Also:
             cli.CommandLine(..., abbreviate_commands=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_abbreviate_commands", "enable")
@@ -67,7 +67,7 @@ class Config:
                     - set_abbreviate_options(True): not implemented
                     - set_abbreviate_options(False): works
 
-        See also:
+        See Also:
             cli.CommandLine(..., abbreviate_options=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_abbreviate_options", "enable")
@@ -96,7 +96,7 @@ class Config:
                     - set_repeatable_options(True): works
                     - set_repeatable_options(False): works
 
-        See also:
+        See Also:
             cli.CommandLine.add_option(..., repeatable=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_repeatable_options", "enable")
@@ -125,7 +125,7 @@ class Config:
                     - set_inherit_options(True): works
                     - set_inherit_options(False): works
 
-        See also:
+        See Also:
             cli.CommandLine(..., inherit_options=BOOL, ...)
         '''
         _assert_is_bool(enable, "set_inherit_options", "enable")
