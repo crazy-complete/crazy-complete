@@ -147,7 +147,7 @@ You can even have a look at the [tests](https://github.com/crazy-complete/crazy-
 Documentation
 =============
 
-See [documentation.md](https://github.com/crazy-complete/crazy-complete/blob/main/documentation.md) and [commands.md](https://github.com/crazy-complete/crazy-complete/blob/main/commands.md).
+See [documentation.md](docs/documentation.md) and [commands.md](docs/commands.md).
 
 Comparision with other auto-complete generators
 ===============================================
