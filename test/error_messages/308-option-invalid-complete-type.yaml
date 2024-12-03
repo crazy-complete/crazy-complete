@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    complete: false
----
-expected_error: "Parameter `complete` has an invalid type. Expected types: list|None. Received: False (bool)"

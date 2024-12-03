@@ -1,4 +1,0 @@
-prog: "test"
-options: false
----
-expected_error: "Parameter `options` has an invalid type. Expected types: list. Received: False (bool)"

@@ -1,0 +1,2 @@
+prog: "foo"
+inherit_options: "wrong"

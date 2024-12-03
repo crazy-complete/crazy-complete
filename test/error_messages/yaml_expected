@@ -1,0 +1,104 @@
+======= Directory "01-commandline" =======
+000-no-prog                              | line 1, column 1: Missing required key: prog
+001-empty-prog                           | line 1, column 7: prog is empty
+002-prog-is-space                        | line 1, column 7: prog is empty
+003-no-programs-defined                  | line 1, column 1: No programs defined
+004-too-many-programs-defined            | No error
+005-duplicate-programs                   | No error
+006-duplicate-subcommands                | No error
+010-aliases-wrong-type                   | line 2, column 10: aliases: Invalid type. Expected types: list|none
+011-aliases-not-str                      | line 2, column 11: alias: Invalid type. Expected types: string
+012-aliases-with-space                   | line 2, column 11: alias contains space
+020-abbreviate-commands-wrong-type       | line 2, column 22: abbreviate_commands: Invalid type. Expected types: boolean|string|none
+021-abbreviate-commands-wrong-value      | line 2, column 22: Invalid value. Expected true, false or "INHERIT"
+030-abbreviate-options-wrong-type        | line 2, column 21: abbreviate_options: Invalid type. Expected types: boolean|string|none
+031-abbreviate-options-wrong-value       | line 2, column 21: Invalid value. Expected true, false or "INHERIT"
+040-inherit-options-wrong-type           | line 2, column 18: inherit_options: Invalid type. Expected types: boolean|string|none
+041-inherit-options-wrong-value          | line 2, column 18: Invalid value. Expected true, false or "INHERIT"
+050-options-wrong-type                   | line 2, column 10: options: Invalid type. Expected types: list|none
+060-positionals-wrong-type               | line 2, column 14: positionals: Invalid type. Expected types: list|none
+======= Directory "02-option" =======
+100-no-option-strings                    | line 3, column 5: Missing required key: option_strings
+101-option-strings-wrong-type            | line 3, column 21: option_strings: Invalid type. Expected types: list
+102-option-strings-is-empty              | line 3, column 21: option_strings: cannot be empty
+103-option-string-wrong-type             | line 3, column 22: option_string: Invalid type. Expected types: string
+104-option-string-is-double-dash         | line 3, column 22: Invalid option string
+105-option-string-with-space             | line 3, column 22: Invalid option string
+106-option-string-with-comma             | line 3, column 22: Invalid option string
+110-metavar-wrong-type                   | line 4, column 14: metavar: Invalid type. Expected types: string|none
+120-help-wrong-type                      | line 4, column 11: help: Invalid type. Expected types: string|none
+130-optional-arg-wrong-type              | line 4, column 19: optional_arg: Invalid type. Expected types: boolean|none
+140-group-wrong-type                     | line 4, column 12: group: Invalid type. Expected types: string|none
+150-groups-wrong-type                    | line 4, column 13: groups: Invalid type. Expected types: list|none
+151-groups-wrong-value                   | line 4, column 14: group: Invalid type. Expected types: string
+160-repeatable-wrong-type                | line 4, column 17: repeatable: Invalid type. Expected types: boolean|string|none
+161-repeatable-wrong-value               | line 4, column 17: Invalid value. Expected true, false or "INHERIT"
+170-multiple-option-wrong-type           | line 4, column 22: multiple_option: Invalid type. Expected types: boolean|string|none
+171-multiple-option-wrong-value          | line 4, column 22: Invalid value. Expected true, false or "INHERIT"
+180-final-wrong-type                     | line 4, column 12: final: Invalid type. Expected types: boolean|none
+190-hidden-wrong-type                    | line 4, column 13: hidden: Invalid type. Expected types: boolean|none
+200-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected types: list|none
+210-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected types: string|none
+220-metavar-but-no-complete              | line 3, column 5: metavar is set but complete is missing
+230-optional-arg-but-no-complete         | line 3, column 5: optional_arg is set but complete is missing
+240-repeatable-and-multiple-option       | line 3, column 5: Both `repeatable` and `multiple_option` are set
+======= Directory "03-positional" =======
+200-no-number                            | line 3, column 5: Missing required key: number
+201-number-wrong-type                    | line 3, column 13: number: Invalid type. Expected types: integer
+202-number-is-zero                       | line 3, column 13: number cannot be zero or negative
+203-number-is-negative                   | line 3, column 13: number cannot be zero or negative
+210-metavar-wrong-type                   | line 4, column 14: metavar: Invalid type. Expected types: string|none
+220-help-wrong-type                      | line 4, column 14: metavar: Invalid type. Expected types: string|none
+230-repeatable-wrong-type                | line 4, column 17: repeatable: Invalid type. Expected types: boolean|none
+240-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected types: list|none
+250-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected types: string|none
+======= Directory "04-complete" =======
+300-invalid-command                      | line 4, column 16: Invalid command
+301-command-too-many-args                | line 4, column 15: Too many arguments provided
+302-environment-too-many-args            | line 4, column 15: Too many arguments provided
+303-group-too-many-args                  | line 4, column 15: Too many arguments provided
+304-hostname-too-many-args               | line 4, column 15: Too many arguments provided
+305-none-too-many-args                   | line 4, column 15: Too many arguments provided
+306-pid-too-many-args                    | line 4, column 15: Too many arguments provided
+307-process-too-many-args                | line 4, column 15: Too many arguments provided
+309-service-too-many-args                | line 4, column 15: Too many arguments provided
+310-signal-too-many-args                 | line 4, column 15: Too many arguments provided
+311-user-too-many-args                   | line 4, column 15: Too many arguments provided
+312-variable-too-many-args               | line 4, column 15: Too many arguments provided
+320-choices-missing-arg                  | line 4, column 15: Missing required arg `choices`
+321-choices-arg-wrong-type               | line 4, column 27: Invalid type. Expected types: list|dictionary
+322-choices-dict-key-wrong-type          | No error
+323-choices-dict-desc-wrong-type         | line 4, column 36: Invalid type. Expected types: string|integer|float
+324-choices-list-value-wrong-type        | line 4, column 28: Invalid type. Expected types: string|integer|float
+325-choices-too-many-args                | line 4, column 15: Too many arguments provided
+330-file-options-wrong-type              | line 4, column 24: Invalid type. Expected types: dictionary
+331-file-unknown-key                     | line 4, column 25: Unknown key: wrong
+332-file-directory-wrong-type            | line 4, column 38: directory: Invalid type. Expected types: string
+333-file-directory-empty                 | line 4, column 38: directory may not be empty
+334-file-too-many-args                   | line 4, column 15: Too many arguments provided
+340-directory-options-wrong-type         | line 4, column 29: Invalid type. Expected types: dictionary
+341-directory-unknown-key                | line 4, column 30: Unknown key: wrong
+342-directory-directory-wrong-type       | line 4, column 43: directory: Invalid type. Expected types: string
+343-directory-directory-empty            | line 4, column 43: directory may not be empty
+344-directory-too-many-args              | line 4, column 15: Too many arguments provided
+350-range-missing-arg-1                  | line 4, column 15: Missing required arg `start`
+351-range-missing-arg-2                  | line 4, column 15: Missing required arg `stop`
+352-range-too-many-args                  | line 4, column 15: Too many arguments provided
+353-range-step-zero                      | line 4, column 31: step: cannot be 0
+354-range-invalid-range-0                | line 4, column 31: stop > start: 2 > 1 (step=-1)
+355-range-invalid-range-1                | line 4, column 31: start > stop: 2 > 1 (step=1)
+360-exec-missing-arg                     | line 4, column 15: Missing required arg `command`
+361-exec-too-many-arguments              | line 4, column 15: Too many arguments provided
+362-exec-command-wrong-type              | line 4, column 24: command: Invalid type. Expected types: string
+370-value-list-missing-arg               | line 4, column 15: Missing required arg `options`
+371-value-list-missing-values            | line 4, column 30: Missing required key: values
+372-value-list-values-wrong-type         | line 4, column 39: values: Invalid type. Expected types: list|dictionary
+373-value-list-separator-wrong-type      | line 4, column 64: separator: Invalid type. Expected types: string
+374-value-list-separator-wrong-value     | line 4, column 64: Invalid length for separator
+375-value-list-values-empty              | line 4, column 41: values: cannot be empty
+376-value-list-list-wrong-type           | line 4, column 42: Invalid type. Expected types: string
+377-value-list-dict-key-wrong-type       | line 4, column 42: Invalid type. Expected types: string
+378-value-list-dict-desc-wrong-type      | line 4, column 48: Invalid type. Expected types: string
+379-value-list-too-many-args             | line 4, column 15: Too many arguments provided
+======= Directory "05-misc" =======
+000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary

@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    repeatable: ["wrong type"]
----
-expected_error: "Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: ['wrong type'] (list)"

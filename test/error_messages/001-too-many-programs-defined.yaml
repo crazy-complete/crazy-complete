@@ -1,5 +1,0 @@
-prog: "test"
----
-prog: "test1"
----
-expected_error: "Too many main programs defined: ['test', 'test1']"

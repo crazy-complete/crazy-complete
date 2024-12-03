@@ -1,3 +1,0 @@
-prog: false
----
-expected_error: "Parameter `prog` has an invalid type. Expected types: str. Received: False (bool)"

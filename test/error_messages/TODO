@@ -1,3 +1,20 @@
-positional: check for double repeat
-test for invalid `when`
-test for `repeatable` and `final`
+options: when - check value
+positionals: when - check value
+
+positionals: check for double repeat:
+positionals:
+  - number: 1
+    repeatable: true
+  - number: 2
+    repeatable: true
+
+expected_error: "Too many main programs defined: ['test', 'test1']"
+expected_error: "Multiple definition of program `test`"
+expected_error: "Multiple definition of program `subcommand`"
+
+check this:
+
+prog: "foo"
+options:
+  - option_strings: ["-o"]
+    complete: ["value_list", {"values", []}]

@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    when: false
----
-expected_error: "Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)"

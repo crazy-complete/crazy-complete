@@ -11,12 +11,12 @@ class ExtendedBool:
     FALSE   = False
     INHERIT = 'INHERIT'
 
-def _is_extended_bool(obj):
+def is_extended_bool(obj):
     return obj in (True, False, ExtendedBool.INHERIT)
 
 _VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
 
-def _validate_option_string(option_string):
+def validate_option_string(option_string):
     if not _VALID_OPTION_STRING_RE.fullmatch(option_string):
         return False
 
@@ -24,6 +24,9 @@ def _validate_option_string(option_string):
         return False
 
     return True
+
+def _contains_space(string):
+    return (' ' in string or '\t' in string or '\n' in string)
 
 class CommandLine:
     '''Represents a command line interface with options, positionals, and subcommands.'''
@@ -66,13 +69,16 @@ class CommandLine:
             if not isinstance(alias, str):
                 raise CrazyTypeError(f'aliases[{index}]', 'str', alias)
 
-        if not _is_extended_bool(abbreviate_commands):
+            if _contains_space(alias):
+                raise CrazyError(f'aliases[{index}]: cannot contain space')
+
+        if not is_extended_bool(abbreviate_commands):
             raise CrazyTypeError('abbreviate_commands', 'ExtendedBool', abbreviate_commands)
 
-        if not _is_extended_bool(abbreviate_options):
+        if not is_extended_bool(abbreviate_options):
             raise CrazyTypeError('abbreviate_options', 'ExtendedBool', abbreviate_options)
 
-        if not _is_extended_bool(inherit_options):
+        if not is_extended_bool(inherit_options):
             raise CrazyTypeError('inherit_options', 'ExtendedBool', inherit_options)
 
         self.prog = prog
@@ -529,7 +535,7 @@ class Option:
         if not isinstance(optional_arg, bool):
             raise CrazyTypeError('optional_arg', 'bool', optional_arg)
 
-        if not _is_extended_bool(repeatable):
+        if not is_extended_bool(repeatable):
             raise CrazyTypeError('repeatable', 'ExtendedBool', repeatable)
 
         if not isinstance(final, bool):
@@ -544,9 +550,12 @@ class Option:
         if not option_strings:
             raise CrazyError('Empty option strings')
 
-        for option_string in option_strings:
-            if not _validate_option_string(option_string):
-                raise CrazyError(f"Invalid option string: {option_string}")
+        for index, option_string in enumerate(option_strings):
+            if not isinstance(option_string, str):
+                raise CrazyTypeError(f'option_strings[{index}]', 'str', option_string)
+
+            if not validate_option_string(option_string):
+                raise CrazyError(f"Invalid option string: {option_string!r}")
 
         if metavar and not complete:
             raise CrazyError(f'Option {option_strings} has metavar set, but has no complete')

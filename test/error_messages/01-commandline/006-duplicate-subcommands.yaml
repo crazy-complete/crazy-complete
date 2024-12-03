@@ -1,0 +1,5 @@
+prog: "test"
+---
+prog: "test subcommand"
+---
+prog: "test subcommand"

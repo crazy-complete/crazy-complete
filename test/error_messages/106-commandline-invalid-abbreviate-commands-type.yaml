@@ -1,4 +1,0 @@
-prog: "test"
-abbreviate_commands: 'wrong-type'
----
-expected_error: "Parameter `abbreviate_commands` has an invalid type. Expected types: ExtendedBool. Received: 'wrong-type' (str)"

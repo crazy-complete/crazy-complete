@@ -1,4 +1,0 @@
-prog: "test"
-aliases: false
----
-expected_error: "Parameter `aliases` has an invalid type. Expected types: list. Received: False (bool)"

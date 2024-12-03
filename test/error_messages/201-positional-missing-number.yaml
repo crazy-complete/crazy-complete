@@ -1,5 +1,0 @@
-prog: "test"
-positionals:
-  - metavar: "FOO"
----
-expected_error: "Parameter `number` has an invalid type. Expected types: int. Received: None (NoneType)"

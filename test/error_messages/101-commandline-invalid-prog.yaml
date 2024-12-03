@@ -1,3 +1,0 @@
-prog: "test subcommand"
----
-expected_error: "Previous commands ['test'] are missing. Cannot define command 'subcommand'"

@@ -1,0 +1,104 @@
+======= Directory "01-commandline" =======
+000-no-prog                              | Missing `prog` field
+001-empty-prog                           | The `prog` field must not be empty
+002-prog-is-space                        | The `prog` field must not be empty
+003-no-programs-defined                  | No programs defined
+004-too-many-programs-defined            | Too many main programs defined: ['test', 'test1']
+005-duplicate-programs                   | Multiple definition of program `test`
+006-duplicate-subcommands                | Multiple definition of program `subcommand`
+010-aliases-wrong-type                   | Parameter `aliases` has an invalid type. Expected types: list. Received: True (bool)
+011-aliases-not-str                      | Parameter `aliases[0]` has an invalid type. Expected types: str. Received: True (bool)
+012-aliases-with-space                   | aliases[0]: cannot contain space
+020-abbreviate-commands-wrong-type       | Parameter `abbreviate_commands` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+021-abbreviate-commands-wrong-value      | Parameter `abbreviate_commands` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+030-abbreviate-options-wrong-type        | Parameter `abbreviate_options` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+031-abbreviate-options-wrong-value       | Parameter `abbreviate_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+040-inherit-options-wrong-type           | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+041-inherit-options-wrong-value          | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+050-options-wrong-type                   | Parameter `options` has an invalid type. Expected types: list. Received: False (bool)
+060-positionals-wrong-type               | Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)
+======= Directory "02-option" =======
+100-no-option-strings                    | Parameter `option_strings` has an invalid type. Expected types: list. Received: None (NoneType)
+101-option-strings-wrong-type            | Parameter `option_strings` has an invalid type. Expected types: list. Received: False (bool)
+102-option-strings-is-empty              | Empty option strings
+103-option-string-wrong-type             | Parameter `option_strings[0]` has an invalid type. Expected types: str. Received: False (bool)
+104-option-string-is-double-dash         | Invalid option string: '--'
+105-option-string-with-space             | Invalid option string: '-o '
+106-option-string-with-comma             | Invalid option string: '-o,'
+110-metavar-wrong-type                   | Parameter `metavar` has an invalid type. Expected types: str|None. Received: False (bool)
+120-help-wrong-type                      | Parameter `help` has an invalid type. Expected types: str|None. Received: False (bool)
+130-optional-arg-wrong-type              | Parameter `optional_arg` has an invalid type. Expected types: bool. Received: 'wrong' (str)
+140-group-wrong-type                     | Parameter `groups[0]` has an invalid type. Expected types: str. Received: False (bool)
+150-groups-wrong-type                    | Parameter `groups` has an invalid type. Expected types: list|None. Received: False (bool)
+151-groups-wrong-value                   | Parameter `groups[0]` has an invalid type. Expected types: str. Received: False (bool)
+160-repeatable-wrong-type                | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+161-repeatable-wrong-value               | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+170-multiple-option-wrong-type           | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+171-multiple-option-wrong-value          | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+180-final-wrong-type                     | Parameter `final` has an invalid type. Expected types: bool. Received: 'wrong' (str)
+190-hidden-wrong-type                    | Parameter `hidden` has an invalid type. Expected types: bool. Received: 'wrong' (str)
+200-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: False (bool)
+210-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
+220-metavar-but-no-complete              | Option ['-o'] has metavar set, but has no complete
+230-optional-arg-but-no-complete         | Option ['-o'] has optional_arg=True, but has no complete
+240-repeatable-and-multiple-option       | No error
+======= Directory "03-positional" =======
+200-no-number                            | Parameter `number` has an invalid type. Expected types: int. Received: None (NoneType)
+201-number-wrong-type                    | Parameter `number` has an invalid type. Expected types: int. Received: 'wrong' (str)
+202-number-is-zero                       | number: value (0) is invalid, number has to be >= 1
+203-number-is-negative                   | number: value (-1) is invalid, number has to be >= 1
+210-metavar-wrong-type                   | Parameter `metavar` has an invalid type. Expected types: str|None. Received: False (bool)
+220-help-wrong-type                      | Parameter `metavar` has an invalid type. Expected types: str|None. Received: False (bool)
+230-repeatable-wrong-type                | Parameter `repeatable` has an invalid type. Expected types: bool. Received: 'wrong' (str)
+240-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: 'wrong' (str)
+250-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
+======= Directory "04-complete" =======
+300-invalid-command                      | foo: -o: Unknown command for `complete`: wrong
+301-command-too-many-args                | foo: -o: Too many arguments: ['wrong']
+302-environment-too-many-args            | foo: -o: Too many arguments: ['wrong']
+303-group-too-many-args                  | foo: -o: Too many arguments: ['wrong']
+304-hostname-too-many-args               | foo: -o: Too many arguments: ['wrong']
+305-none-too-many-args                   | No error
+306-pid-too-many-args                    | foo: -o: Too many arguments: ['wrong']
+307-process-too-many-args                | foo: -o: Too many arguments: ['wrong']
+309-service-too-many-args                | foo: -o: Too many arguments: ['wrong']
+310-signal-too-many-args                 | foo: -o: Too many arguments: ['wrong']
+311-user-too-many-args                   | foo: -o: Too many arguments: ['wrong']
+312-variable-too-many-args               | foo: -o: Too many arguments: ['wrong']
+320-choices-missing-arg                  | foo: -o: Missing argument: values
+321-choices-arg-wrong-type               | foo: -o: values: Not a list or dictionary
+322-choices-dict-key-wrong-type          | No error
+323-choices-dict-desc-wrong-type         | foo: -o: Description not a string/int/float: []
+324-choices-list-value-wrong-type        | foo: -o: Item not a string/int/float: []
+325-choices-too-many-args                | foo: -o: Too many arguments: ['wrong']
+330-file-options-wrong-type              | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
+331-file-unknown-key                     | foo: -o: Unknown option: wrong
+332-file-directory-wrong-type            | foo: -o: directory: Not a string: False
+333-file-directory-empty                 | foo: -o: directory: Cannot be empty
+334-file-too-many-args                   | foo: -o: Too many arguments: ['wrong']
+340-directory-options-wrong-type         | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
+341-directory-unknown-key                | foo: -o: Unknown option: wrong
+342-directory-directory-wrong-type       | foo: -o: directory: Not a string: False
+343-directory-directory-empty            | foo: -o: directory: Cannot be empty
+344-directory-too-many-args              | foo: -o: Too many arguments: ['wrong']
+350-range-missing-arg-1                  | foo: -o: Missing argument: start
+351-range-missing-arg-2                  | foo: -o: Missing argument: stop
+352-range-too-many-args                  | foo: -o: Too many arguments: [4]
+353-range-step-zero                      | foo: -o: step: cannot be 0
+354-range-invalid-range-0                | foo: -o: stop > start: 2 > 1 (step=-1)
+355-range-invalid-range-1                | foo: -o: start > stop: 2 > 1 (step=1)
+360-exec-missing-arg                     | foo: -o: Missing argument: command
+361-exec-too-many-arguments              | foo: -o: Too many arguments: ['wrong']
+362-exec-command-wrong-type              | foo: -o: Command is not a string: False
+370-value-list-missing-arg               | foo: -o: Missing argument: options
+371-value-list-missing-values            | foo: -o: Missing `values` option: {}
+372-value-list-values-wrong-type         | foo: -o: Unknown option: wrong
+373-value-list-separator-wrong-type      | foo: -o: separator: Not a string: False
+374-value-list-separator-wrong-value     | foo: -o: Invalid length for separator: invalid
+375-value-list-values-empty              | foo: -o: values: cannot be empty
+376-value-list-list-wrong-type           | foo: -o: values[0]: Not a string: False
+377-value-list-dict-key-wrong-type       | foo: -o: values: Not a string: False
+378-value-list-dict-desc-wrong-type      | foo: -o: values: Not a string: None
+379-value-list-too-many-args             | foo: -o: Too many arguments: ['wrong']
+======= Directory "05-misc" =======
+000-list                                 | Missing `prog` field

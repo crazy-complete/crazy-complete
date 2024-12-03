@@ -1,6 +1,0 @@
-prog: "test"
-positionals:
-  - number: 1
-    repeatable: ["wrong type"]
----
-expected_error: "Parameter `repeatable` has an invalid type. Expected types: bool. Received: ['wrong type'] (list)"

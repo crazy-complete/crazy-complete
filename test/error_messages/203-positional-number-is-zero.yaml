@@ -1,5 +1,0 @@
-prog: "test"
-positionals:
-  - number: 0
----
-expected_error: "number: value (0) is invalid, number has to be >= 1"

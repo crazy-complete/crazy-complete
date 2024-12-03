@@ -28,6 +28,27 @@ class CrazyTypeError(CrazyError):
         return 'Parameter `%s` has an invalid type. Expected types: %s. Received: %r (%s)' % (
             self.name, self.expected, self.value, type(self.value).__name__)
 
+class CrazySchemaValidationError(CrazyError):
+    '''Exception raised for errors in the configuration structure.
+
+    This exception is specifically designed to handle errors encountered when
+    validating YAML or JSON configuration files against a defined schema.
+    It provides detailed error messages, including the line and column numbers
+    where the error occurred, to help locate the issue in the configuration file.
+
+    Args:
+        message (str): The error message.
+        value_with_trace (ValueWithTrace): The value that caused the error.
+    '''
+
+    def  __init__(self, message, value_with_trace):
+        self.message = message
+        self.value_with_trace = value_with_trace
+        super().__init__(self.__str__())
+
+    def __str__(self):
+        return f'{self.value_with_trace.get_position_string()}: {self.message}'
+
 class InternalError(Exception):
     '''Exception raised for internal errors within the program.
 

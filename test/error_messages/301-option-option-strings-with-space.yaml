@@ -1,5 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["--with space"]
----
-expected_error: "Invalid option string: --with space"

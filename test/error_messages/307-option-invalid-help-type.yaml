@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    help: false
----
-expected_error: "Parameter `help` has an invalid type. Expected types: str|None. Received: False (bool)"

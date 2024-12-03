@@ -1,4 +1,0 @@
-prog: "test"
-invalid_key: false
----
-expected_error: "Unknown key: invalid_key"

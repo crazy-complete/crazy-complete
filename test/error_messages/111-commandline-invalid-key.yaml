@@ -1,4 +1,0 @@
-prog: "test"
-positionals: false
----
-expected_error: "Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)"

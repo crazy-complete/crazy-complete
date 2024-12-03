@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    final: ["wrong type"]
----
-expected_error: "Parameter `final` has an invalid type. Expected types: bool. Received: ['wrong type'] (list)"

@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - metavar: "test"
----
-# TODO
-expected_error: "Parameter `option_strings` has an invalid type. Expected types: list. Received: None (NoneType)"

@@ -8,6 +8,8 @@ import yaml
 
 from . import utils
 from . import dictionary_source
+from . import scheme_validator
+from .extended_yaml_parser import ExtendedYAMLParser
 from .cli import ExtendedBool
 
 def option_to_yaml(dictionary):
@@ -131,6 +133,19 @@ def commandline_to_yaml(commandline):
     return '\n---\n'.join(r)
 
 def load_from_file(file):
+    # First, load using normal yaml loader. It gives better error messages
+    # in case of syntax errors.
     with open(file, 'r', encoding='utf-8') as fh:
         dictionaries = list(yaml.safe_load_all(fh))
-        return dictionary_source.dictionaries_to_commandline(dictionaries)
+
+    # Then load using extended yaml loader...
+    with open(file, 'r', encoding='utf-8') as fh:
+        content = fh.read()
+
+    # Validate YAML...
+    parser = ExtendedYAMLParser()
+    parsed = parser.parse(content)
+    scheme_validator.validate(parsed)
+
+    # Finally convert the config structure to CommandLine objects
+    return dictionary_source.dictionaries_to_commandline(dictionaries)

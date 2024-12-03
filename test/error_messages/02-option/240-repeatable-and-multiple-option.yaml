@@ -1,0 +1,5 @@
+prog: "foo"
+options:
+  - option_strings: ["-o"]
+    repeatable: true
+    multiple_option: true

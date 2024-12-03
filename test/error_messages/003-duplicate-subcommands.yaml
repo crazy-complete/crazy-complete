@@ -1,7 +1,0 @@
-prog: "test"
----
-prog: "test subcommand"
----
-prog: "test subcommand"
----
-expected_error: "Multiple definition of program `subcommand`"

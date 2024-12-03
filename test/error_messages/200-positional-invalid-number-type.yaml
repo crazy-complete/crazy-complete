@@ -1,5 +1,0 @@
-prog: "test"
-positionals:
-  - number: "wrong-type"
----
-expected_error: "Parameter `number` has an invalid type. Expected types: int. Received: 'wrong-type' (str)"

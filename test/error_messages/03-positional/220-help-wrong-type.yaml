@@ -1,0 +1,4 @@
+prog: "foo"
+positionals:
+  - number: 1
+    metavar: false

@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    invalid_key: false
----
-expected_error: "Unknown key: invalid_key"

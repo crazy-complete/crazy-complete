@@ -1,4 +1,0 @@
-prog: "test"
-help: false
----
-expected_error: "Parameter `help` has an invalid type. Expected types: str|None. Received: False (bool)"

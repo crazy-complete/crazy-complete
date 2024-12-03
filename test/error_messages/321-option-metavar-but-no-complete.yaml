@@ -1,6 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["-o"]
-    metavar: "FOO"
----
-expected_error: "Option ['-o'] has metavar set, but has no complete"

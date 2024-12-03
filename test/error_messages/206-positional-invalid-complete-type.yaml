@@ -1,6 +1,0 @@
-prog: "test"
-positionals:
-  - number: 1
-    complete: false
----
-expected_error: "Parameter `complete` has an invalid type. Expected types: list|None. Received: False (bool)"

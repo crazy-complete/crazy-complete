@@ -1,6 +1,6 @@
 '''This module contains code for validating the `complete` attribute.'''
 
-from .errors import CrazyError
+from .errors import CrazyError, CrazyTypeError
 
 def get_required_arg(args, name):
     try:
@@ -101,11 +101,17 @@ class CompletionValidator:
         opts = get_optional_arg(args, {})
         require_no_more(args)
 
+        if not isinstance(opts, dict):
+            raise CrazyTypeError('options', 'dict', opts)
+
         directory = None
         for key, value in opts.items():
             if key == 'directory':
                 if not isinstance(value, str):
                     raise CrazyError(f"directory: Not a string: {value}")
+
+                if value == '':
+                    raise CrazyError('directory: Cannot be empty')
 
                 directory = value
             else:
@@ -118,11 +124,17 @@ class CompletionValidator:
         opts = get_optional_arg(args, {})
         require_no_more(args)
 
+        if not isinstance(opts, dict):
+            raise CrazyTypeError('options', 'dict', opts)
+
         directory = None
         for key, value in opts.items():
             if key == 'directory':
                 if not isinstance(value, str):
                     raise CrazyError(f"directory: Not a string: {value}")
+
+                if value == '':
+                    raise CrazyError('directory: Cannot be empty')
 
                 directory = value
             else:

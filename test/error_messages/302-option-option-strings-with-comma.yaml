@@ -1,5 +1,0 @@
-prog: "test"
-options:
-  - option_strings: ["--with,comma"]
----
-expected_error: "Invalid option string: --with,comma"

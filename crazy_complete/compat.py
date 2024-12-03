@@ -2,7 +2,13 @@
 
 from . import utils
 
+# Wrong types in configuration structures are silently ignored, because
+# they are handled elsewhere
+
 def fix_option_dictionary(dictionary):
+    if not isinstance(dictionary, dict):
+        return
+
     if 'group' in dictionary:
         if 'groups' in dictionary:
             utils.warn('Both `group` and `groups` found. `group` is deprecated. Removing `group` in favour of `groups`')
@@ -19,11 +25,19 @@ def fix_option_dictionary(dictionary):
             utils.warn('`multiple_option` is deprecated. Please use `repeatable` instead')
             dictionary['repeatable'] = dictionary.pop('multiple_option')
 
-def fix_commandline_dictionaries(dictionaries):
-    for commandline_dictionary in dictionaries:
-        options = commandline_dictionary.get('options', [])
+def fix_commandline_dictionary(dictionary):
+    if not isinstance(dictionary, dict):
+        return
 
-        # If `options` has a wrong type, ignore it. It will be handled elsewhere
-        if isinstance(options, list):
-            for option in commandline_dictionary.get('options', []):
-                fix_option_dictionary(option)
+    options = dictionary.get('options', [])
+
+    if isinstance(options, list):
+        for option in options:
+            fix_option_dictionary(option)
+
+def fix_commandline_dictionaries(dictionaries):
+    if not isinstance(dictionaries, list):
+        return
+
+    for commandline_dictionary in dictionaries:
+        fix_commandline_dictionary(commandline_dictionary)
