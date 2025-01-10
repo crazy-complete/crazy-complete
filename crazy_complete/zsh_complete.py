@@ -77,6 +77,10 @@ class ZshCompleter(shell.ShellCompleter):
         funcname = ctxt.helpers.use_function('exec')
         return shell.escape('{%s %s}' % (funcname, shell.escape(command)))
 
+    def exec_fast(self, ctxt, command):
+        funcname = ctxt.helpers.use_function('exec')
+        return shell.escape('{%s %s}' % (funcname, shell.escape(command)))
+
     def value_list(self, ctxt, opts):
         desc = ctxt.option.metavar or ''
         values = opts['values']

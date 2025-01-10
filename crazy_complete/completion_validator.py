@@ -99,7 +99,7 @@ def validate_complete(complete):
         else:
             raise CrazyError("step: cannot be 0")
 
-    elif command == 'exec':
+    elif command in ('exec', 'exec_fast'):
         cmd = _get_required_arg(args, 'command')
         _require_no_more(args)
 

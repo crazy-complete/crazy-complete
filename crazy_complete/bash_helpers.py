@@ -30,6 +30,16 @@ while IFS=$'\t' read -r item desc; do
 done < <(eval "$1")
 ''')
 
+_EXEC_FAST = helpers.ShellFunction('exec_fast', r'''
+local item desc
+
+while IFS=$'\t' read -r item desc; do
+  if [[ "$item" == "$cur"* ]]; then
+    COMPREPLY+=("$item")
+  fi
+done < <(eval "$1")
+''')
+
 _VALUE_LIST = helpers.ShellFunction('value_list', r'''
 local separator="$1"; shift
 local -a values=("$@")
@@ -89,5 +99,6 @@ class BashHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix)
         self.add_function(_COMPGEN_W_REPLACEMENT)
         self.add_function(_EXEC)
+        self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
         self.add_function(_PREFIX_COMPREPLY)

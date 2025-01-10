@@ -134,7 +134,7 @@ def _check_complete(args):
         else:
             raise _error("step: cannot be 0", step)
 
-    elif cmd.value == 'exec':
+    elif cmd.value in ('exec', 'exec_fast'):
         command = _get_required_arg(args, "command")
         _check_type(command, (str,), "command")
         _require_no_more(args)

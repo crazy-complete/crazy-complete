@@ -121,6 +121,12 @@ options:
 Item 1  (Description 1)  Item 2  (Description 2)
 ```
 
+**exec_fast**
+
+> Faster version of exec for handling large amounts of data.
+> This implementation requires that the items of the parsed output do not include
+> special shell characters or whitespace.
+
 **range**
 
 > Complete a range of integers.

@@ -718,6 +718,20 @@ zsh_expected: |
 ---
 number: 46
 definition_file: "main"
+description: "complete: Check --exec-fast"
+send: "crazy-complete-test complete --exec-fast "
+bash_expected: |
+  > crazy-complete-test complete --exec-fast
+  Item_1  Item_2
+  > crazy-complete-test complete --exec-fast Item_
+fish_expected: |
+  > crazy-complete-test complete --exec-fast Item_
+  Item_1  (Description 1)  Item_2  (Description 2)
+zsh_expected: |
+  > crazy-complete-test complete --exec-fast Item_
+---
+number: 47
+definition_file: "main"
 description: "complete: Check --choices"
 send: "crazy-complete-test complete --choices "
 bash_expected: |
@@ -733,7 +747,7 @@ zsh_expected: |
   2        -- two
   foo:bar  -- Description for foo:bar
 ---
-number: 47
+number: 48
 definition_file: "main"
 description: "complete: Check --value-list #1"
 send: "crazy-complete-test complete --value-list "
@@ -748,7 +762,7 @@ zsh_expected: |
   > crazy-complete-test complete --value-list
   bar  baz  foo
 ---
-number: 48
+number: 49
 definition_file: "main"
 description: "complete: Check --value-list #2"
 send: "crazy-complete-test complete --value-list f"
@@ -759,7 +773,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test complete --value-list foo,
 ---
-number: 49
+number: 50
 definition_file: "main"
 description: "complete: Check --value-list #3"
 send: "crazy-complete-test complete --value-list foo"
@@ -770,7 +784,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test complete --value-list foo,
 ---
-number: 50
+number: 51
 definition_file: "main"
 description: "complete: Check --value-list #4"
 send: "crazy-complete-test complete --value-list foo,baz,"
@@ -783,7 +797,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test complete --value-list foo,baz,bar,
 ---
-number: 51
+number: 52
 definition_file: "main"
 description: "complete: Check --value-list-2"
 send: "crazy-complete-test complete --value-list-2 "
@@ -799,7 +813,7 @@ zsh_expected: |
   bar  -- Some bar
   foo  -- Some foo
 ---
-number: 52
+number: 53
 definition_file: "main"
 description: "complete: Check --range-1"
 send: "crazy-complete-test complete --range-1 "
@@ -816,7 +830,7 @@ zsh_expected: |
   > crazy-complete-test complete --range-1
   1  2  3  4  5  6  7  8  9
 ---
-number: 53
+number: 54
 definition_file: "main"
 description: "complete: Check --range-2"
 send: "crazy-complete-test complete --range-2 "
@@ -832,7 +846,7 @@ zsh_expected: |
   > crazy-complete-test complete --range-2
   1  3  5  7  9
 ---
-number: 54
+number: 55
 definition_file: "main"
 description: "Check if positionals are working (1st positional)"
 send: "crazy-complete-test test "
@@ -847,7 +861,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first
 ---
-number: 55
+number: 56
 definition_file: "main"
 description: "Check if positionals are working (2nd positional)"
 send: "crazy-complete-test test first1 "
@@ -861,7 +875,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first1 second
 ---
-number: 56
+number: 57
 definition_file: "main"
 description: "Check if positionals are working (3rd positional)"
 send: "crazy-complete-test test first1 second1 "
@@ -875,7 +889,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first1 second1 repeated
 ---
-number: 57
+number: 58
 definition_file: "main"
 description: "Check if positionals are working (repeated positional)"
 send: "crazy-complete-test test first1 second1 repeated1 "
@@ -889,7 +903,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test test first1 second1 repeated1 repeated
 ---
-number: 58
+number: 59
 definition_file: "main"
 description: "Check if aliases are working (alias1)"
 send: "crazy-complete-test alias1 --arg "
@@ -904,7 +918,7 @@ zsh_expected: |
   > crazy-complete-test alias1 --arg
   1  2  3
 ---
-number: 59
+number: 60
 definition_file: "main"
 description: "Check if aliases are working (alias2)"
 send: "crazy-complete-test alias2 --arg "
@@ -919,7 +933,7 @@ zsh_expected: |
   > crazy-complete-test alias2 --arg
   1  2  3
 ---
-number: 60
+number: 61
 definition_file: "when"
 description: "Check --complete with --files"
 send: "crazy-complete-test --files --complete "
@@ -933,7 +947,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --files --complete file
 ---
-number: 61
+number: 62
 definition_file: "when"
 description: "Check --complete with --directories"
 send: "crazy-complete-test --directories --complete "
@@ -947,7 +961,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --directories --complete dir
 ---
-number: 62
+number: 63
 definition_file: "when"
 description: "Check positional with --files"
 send: "crazy-complete-test --files "
@@ -961,7 +975,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --files file
 ---
-number: 63
+number: 64
 definition_file: "when"
 description: "Check positional with --directories"
 send: "crazy-complete-test --directories "
@@ -975,7 +989,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --directories dir
 ---
-number: 64
+number: 65
 definition_file: "groups"
 description: "Check -A"
 send: "crazy-complete-test -A -"
@@ -986,7 +1000,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test -A -C
 ---
-number: 65
+number: 66
 definition_file: "groups"
 description: "Check -B"
 send: "crazy-complete-test -B -"
@@ -997,7 +1011,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test -B -
 ---
-number: 66
+number: 67
 definition_file: "groups"
 description: "Check -C"
 send: "crazy-complete-test -C -"

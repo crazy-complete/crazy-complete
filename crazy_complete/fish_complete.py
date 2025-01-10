@@ -96,6 +96,9 @@ class FishCompleter(shell.ShellCompleter):
     def exec(self, ctxt, command):
         return FishCompletionCommand(command)
 
+    def exec_fast(self, ctxt, command):
+        return FishCompletionCommand(command)
+
     def value_list(self, ctxt, opts):
         separator = opts.get('separator', ',')
         values = opts['values']
