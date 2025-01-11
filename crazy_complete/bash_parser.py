@@ -62,7 +62,7 @@ def generate(commandline):
 
     for commandline in commandlines:
         option_cases = generate_option_cases(commandline)
-        command = shell.escape(commandline.get_command_path())
+        command = commandline.get_command_paths_pattern()
         if commandline.inherit_options:
             command += '*'
 

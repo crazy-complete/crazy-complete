@@ -278,6 +278,7 @@ def generate_completion(commandline, program_name=None, config=None):
     helpers = zsh_helpers.ZshHelpers(commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
     result = generation.visit_commandlines(ZshCompletionGenerator, ctxt, commandline)
+    all_progs = ' '.join([commandline.prog] + commandline.aliases)
 
     if helpers.is_used('zsh_query'):
         commandline.visit_commandlines(
@@ -286,7 +287,7 @@ def generate_completion(commandline, program_name=None, config=None):
     output = []
 
     if config.zsh_compdef:
-        output += ['#compdef %s' % commandline.prog]
+        output += ['#compdef %s' % all_progs]
 
     output.append(generation_notice.GENERATION_NOTICE)
 
@@ -300,7 +301,7 @@ def generate_completion(commandline, program_name=None, config=None):
     if config.zsh_compdef:
         output += ['%s "$@"' % result[0].funcname]
     else:
-        output += ['compdef %s %s' % (result[0].funcname, commandline.prog)]
+        output += ['compdef %s %s' % (result[0].funcname, all_progs)]
 
     if config.vim_modeline:
         output += [modeline.get_vim_modeline('zsh')]

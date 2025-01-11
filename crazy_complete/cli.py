@@ -2,9 +2,11 @@
 
 import re
 from collections import OrderedDict
+from itertools import product
 from types import NoneType
 
 from .errors import CrazyError, CrazyTypeError
+from . import shell
 
 class ExtendedBool:
     TRUE    = True
@@ -308,6 +310,13 @@ class CommandLine:
     def get_command_path(self):
         cmd = ' '.join(c.prog for c in self.get_parents(include_self=True))
         return cmd
+
+    def get_command_paths_pattern(self):
+        paths = []
+        for cmdline in self.get_parents(include_self=True):
+            paths.append(cmdline.get_all_commands(with_aliases=True))
+
+        return '|'.join(shell.escape(" ".join(combo)) for combo in product(*paths))
 
     def get_all_commands(self, with_aliases=True):
         r = [self.prog]

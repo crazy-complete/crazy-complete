@@ -342,6 +342,9 @@ def generate_completion(commandline, program_name=None, config=None):
         output.extend(generator.conditions.get_lines())
         output.extend(generator.lines)
 
+    for alias in commandline.aliases:
+        output.append('complete -c %s -w %s' % (alias, commandline.prog))
+
     if config.vim_modeline:
         output.append('')
         output.append(modeline.get_vim_modeline('fish'))

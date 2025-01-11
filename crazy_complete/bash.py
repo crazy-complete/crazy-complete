@@ -463,7 +463,11 @@ def generate_completion(commandline, program_name=None, config=None):
     output += config.get_included_files_content()
     output += helpers.get_used_functions_code()
     output += [generator.result for generator in result]
-    output += ['complete -F %s %s' % (shell.make_completion_funcname(commandline), commandline.prog)]
+    output += ['complete -F %s %s' % (
+        shell.make_completion_funcname(commandline),
+        ' '.join(commandline.get_all_commands(with_aliases=True))
+    )]
+
     if config.vim_modeline:
         output += [modeline.get_vim_modeline('sh')]
 
