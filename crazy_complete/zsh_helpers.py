@@ -309,7 +309,7 @@ local -a describe=()
 local item='' desc=''
 
 while IFS=$'\t' read -r item desc; do
-  item="${item/:/\\:/}"
+  item="${item//:/\\:}"
   describe+=("$item:$desc")
 done < <(eval "$1")
 
