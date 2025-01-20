@@ -119,7 +119,7 @@ class BashCompletionGenerator:
         self.subcommands = commandline.get_subcommands_option()
         self.completer   = bash_complete.BashCompleter()
         self.captured_variables = VariableUsageTracer()
-        self._complete_commandline()
+        self._generate()
 
     def _complete_option(self, option, append=True):
         context = self.ctxt.getOptionGenerationContext(self.commandline, option)
@@ -396,7 +396,7 @@ __is_oldstyle_option() {
         r += 'fi'
         return r
 
-    def _complete_commandline(self):
+    def _generate(self):
         # The completion function returns 0 (success) if there was a completion match.
         # This return code is used for dealing with subcommands.
 
@@ -449,11 +449,11 @@ __is_oldstyle_option() {
 
         self.result = r
 
-def generate_completion(commandline, program_name=None, config=None):
+def generate_completion(commandline, config=None):
     if config is None:
         config = config_.Config()
 
-    commandline = generation.enhance_commandline(commandline, program_name, config)
+    commandline = generation.enhance_commandline(commandline, config)
     helpers = bash_helpers.BashHelpers(commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
     result = generation.visit_commandlines(BashCompletionGenerator, ctxt, commandline)

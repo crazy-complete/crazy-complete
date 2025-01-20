@@ -91,7 +91,7 @@ class DictionaryValidatorTester(TesterBase):
 
         try:
             cmdline = crazy_complete.dictionary_source.dictionaries_to_commandline(definition)
-            crazy_complete.bash.generate_completion(cmdline, None, None)
+            crazy_complete.bash.generate_completion(cmdline, None)
         except crazy_complete.errors.CrazyError as e:
             have_error = str(e)
 

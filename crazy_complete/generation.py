@@ -71,12 +71,8 @@ def add_parsed_when(commandline):
         else:
             option.when_parsed = None
 
-def enhance_commandline(commandline, program_name, config):
+def enhance_commandline(commandline, config):
     commandline = commandline.copy()
-
-    if program_name is not None:
-        commandline.prog = program_name
-
     commandline.visit_commandlines(lambda c: apply_config(c, config))
     commandline.visit_commandlines(lambda c: add_parsed_when(c))
     completion_validator.validate_commandlines(commandline)
