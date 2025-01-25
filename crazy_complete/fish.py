@@ -332,6 +332,9 @@ def generate_completion(commandline, config=None):
         output.append('set -l query "%s"' % helpers.use_function('fish_query'))
 
     output.append('')
+    output.append('# Delete existing completions')
+    output.append('complete -c $prog -e')
+    output.append('')
     output.append('# Generally disable file completion')
     output.append('complete -c $prog -x')
 
@@ -342,8 +345,11 @@ def generate_completion(commandline, config=None):
         output.extend(generator.conditions.get_lines())
         output.extend(generator.lines)
 
-    for alias in commandline.aliases:
-        output.append('complete -c %s -w %s' % (alias, commandline.prog))
+    if commandline.aliases:
+        output.append('')
+        for alias in commandline.aliases:
+            output.append('complete -c %s -e' % alias)
+            output.append('complete -c %s -w %s' % (alias, commandline.prog))
 
     if config.vim_modeline:
         output.append('')
