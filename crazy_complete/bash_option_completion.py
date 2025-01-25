@@ -165,6 +165,10 @@ return 1
         elif option.complete is None:
             short_no_args += ''.join(o.lstrip('-') for o in option.get_short_option_strings())
 
+    short_no_args_pattern = ''
+    if short_no_args:
+        short_no_args_pattern = '*([%s])' % short_no_args
+
     code = [
       # CONDITION, TEXT
       (G0        , 'case "$prev" in\n'),
@@ -173,7 +177,7 @@ return 1
       (G0        , ';;\n'),
       (G0        , '  -*)'),
       (OR        , '\n    __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0'),
-      (SR        , '\n    case "$prev" in -*([%s])[%s])' % (short_no_args, short_required_args)),
+      (SR        , '\n    case "$prev" in -%s[%s])' % (short_no_args_pattern, short_required_args)),
       (SR        , '\n      __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0'),
       (SR        , '\n    esac'),
       (G0        , ';;\n'),
