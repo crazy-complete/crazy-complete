@@ -7,8 +7,9 @@ class BashCompletionBase:
 
     def get_code(self, append=False):
         '''
-        Returns the command for BASH completion. If `append` is `True`, then
-        the results will be appended to COMPREPLY, otherwise COMPREPLY will be truncated.
+        Returns the code used for completing an argument.
+        If `append` is `True`, then the results will be appended to COMPREPLY,
+        otherwise COMPREPLY will be truncated.
 
         Args:
             append (bool): If True, the results will be appended to COMPREPLY.
@@ -20,6 +21,7 @@ class BashCompletionBase:
 
 class BashCompletionCommand(BashCompletionBase):
     '''Used for completion functions that internally modify COMPREPLY.'''
+
     def __init__(self, ctxt, cmd):
         self.ctxt = ctxt
         self.cmd = cmd
@@ -40,6 +42,21 @@ class BashCompletionCommand(BashCompletionBase):
 
         return '\n'.join(r)
 
+class BashCompleteCombine(BashCompletionBase):
+    def __init__(self, ctxt, completer, commands):
+        self.completion_objects = []
+
+        for command_args in commands:
+            command, *args = command_args
+            obj = getattr(completer, command)(ctxt, *args)
+            self.completion_objects.append(obj)
+
+    def get_code(self, append=False):
+        code = [self.completion_objects[0].get_code(append=append)]
+        for obj in self.completion_objects[1:]:
+            code.append(obj.get_code(append=True))
+        return '\n'.join(code)
+
 class CompgenW(BashCompletionBase):
     def __init__(self, ctxt, values):
         self.ctxt = ctxt
@@ -54,6 +71,7 @@ class CompgenW(BashCompletionBase):
 
 class BashCompletionCompgen(BashCompletionBase):
     '''Used for completion using `compgen`.'''
+
     def __init__(self, ctxt, compgen_args, word='"$cur"'):
         self.compgen_args = compgen_args
         self.word = word
@@ -145,3 +163,6 @@ class BashCompleter(shell.ShellCompleter):
             funcname,
             shell.escape(separator),
             ' '.join(shell.escape(v) for v in values)))
+
+    def combine(self, ctxt, commands):
+        return BashCompleteCombine(ctxt, self, commands)

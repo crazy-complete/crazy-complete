@@ -28,7 +28,7 @@ p.add_argument('definition_file',
     help='The file containing the command line definitions'
 ).complete('file')
 
-p.add_argument('--version', action='version', version='%(prog)s 0.3.2',
+p.add_argument('--version', action='version', version='%(prog)s 0.3.3',
     help='Show program version')
 
 p.add_argument('--parser-variable', default=None,

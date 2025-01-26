@@ -13,6 +13,17 @@ options:
     complete: ["none"]
 ```
 
+**combine**
+
+> Combine two ore more completion commands
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--combine"]
+    complete: ["combine", [["user"], ["pid"]]]
+```
+
 **file**
 
 > Complete a file.

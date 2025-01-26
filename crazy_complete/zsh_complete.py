@@ -15,7 +15,7 @@ class ZshCompleter(shell.ShellCompleter):
 
     def choices(self, ctxt, choices):
         if hasattr(choices, 'items'):
-            funcname = shell.make_completion_funcname_for_context(ctxt)
+            funcname = ctxt.helpers.get_unique_function_name(ctxt)
             metavar = shell.escape(ctxt.option.metavar or '')
             code  = 'local -a items=(\n'
             for item, description in choices.items():
@@ -100,3 +100,21 @@ class ZshCompleter(shell.ShellCompleter):
             values_arg
         )
         return shell.escape(cmd)
+
+    def combine(self, ctxt, commands):
+        completions = []
+        for command_args in commands:
+            command, *args = command_args
+            c = getattr(self, command)(ctxt, *args)
+            completions.append(c)
+
+        funcname = ctxt.helpers.get_unique_function_name(ctxt)
+        #metavar = shell.escape(ctxt.option.metavar or '')
+        code  = '_alternative \\\n'
+        for c in completions:
+            code += '  %s \\\n' % c
+        code = code.rstrip(' \\\n')
+
+        ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
+        funcname = ctxt.helpers.use_function(funcname)
+        return funcname

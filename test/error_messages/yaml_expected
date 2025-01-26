@@ -53,7 +53,7 @@
 240-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected types: list|none
 250-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected types: string|none
 ======= Directory "04-complete" =======
-300-invalid-command                      | line 4, column 16: Invalid command
+300-invalid-command                      | line 4, column 16: Invalid command: wrong
 301-command-too-many-args                | line 4, column 15: Too many arguments provided
 302-environment-too-many-args            | line 4, column 15: Too many arguments provided
 303-group-too-many-args                  | line 4, column 15: Too many arguments provided
@@ -100,5 +100,15 @@
 377-value-list-dict-key-wrong-type       | line 4, column 42: Invalid type. Expected types: string
 378-value-list-dict-desc-wrong-type      | line 4, column 48: Invalid type. Expected types: string
 379-value-list-too-many-args             | line 4, column 15: Too many arguments provided
+380-combine-missing-arg                  | line 4, column 15: Missing required arg `commands`
+381-combine-wrong-type                   | line 4, column 27: Invalid type. Expected types: list
+382-combine-empty-subcommands            | line 4, column 27: commands: Cannot be empty
+383-combine-single-subcommand            | line 4, column 27: commands: Must contain more than one command
+384-combine-subcommand-no-command        | line 4, column 38: Missing command
+385-combine-subcommand-invalid-type      | line 4, column 38: Invalid type. Expected types: list
+386-combine-subcommand-invalid-command   | line 4, column 39: Invalid command: invalid
+387-combine-subcommand-is-none           | line 4, column 38: Command `none` not allowed inside combine
+388-combine-subcommand-is-combine        | line 4, column 38: Nested `combine` not allowed
+389-combine-too-many-args                | line 4, column 15: Too many arguments provided
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary

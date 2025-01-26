@@ -148,6 +148,34 @@ def validate_complete(complete):
         if len(separator) != 1:
             raise CrazyError(f'Invalid length for separator: {separator}')
 
+    elif command == 'combine':
+        commands = _get_required_arg(args, 'commands')
+        _require_no_more(args)
+
+        if not isinstance(commands, list):
+            raise CrazyError(f'commands: Not a list: {commands}')
+
+        for subcommand_args in commands:
+            if not isinstance(subcommand_args, list):
+                raise CrazyError(f'combine: Not a list: {subcommand_args}')
+
+            if len(subcommand_args) == 0:
+                raise CrazyError('combine: Missing command')
+
+            if subcommand_args[0] == 'combine':
+                raise CrazyError('Nested `combine` not allowed')
+
+            if subcommand_args[0] == 'none':
+                raise CrazyError('Command `none` not allowed inside combine')
+
+            validate_complete(subcommand_args)
+
+        if len(commands) == 0:
+            raise CrazyError('commands: Cannot be empty')
+
+        if len(commands) == 1:
+            raise CrazyError('commands: Must contain more than one command')
+
     else:
         raise CrazyError(f"Unknown command for `complete`: {command}")
 

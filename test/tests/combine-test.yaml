@@ -1,0 +1,9 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ["-o"]
+    complete: ["combine", [
+      ["range", 0, 1],
+      ["exec", "printf '%s\\n' 2 3"],
+      ["choices", ["4", "5"]],
+      ["choices", {"6": "six", "7": "seven"}]
+    ]]

@@ -166,8 +166,35 @@ def _check_complete(args):
 
             if len(separator.value) != 1:
                 raise _error('Invalid length for separator', separator)
+
+    elif cmd.value == 'combine':
+        commands = _get_required_arg(args, 'commands')
+        _require_no_more(args)
+
+        _check_type(commands, (list,))
+
+        for subcommand_args in commands.value:
+            _check_type(subcommand_args, (list,))
+
+            if len(subcommand_args.value) == 0:
+                raise _error('Missing command', subcommand_args)
+
+            if subcommand_args.value[0] == 'combine':
+                raise _error('Nested `combine` not allowed', subcommand_args)
+
+            if subcommand_args.value[0] == 'none':
+                raise _error('Command `none` not allowed inside combine', subcommand_args)
+
+            _check_complete(subcommand_args)
+
+        if len(commands.value) == 0:
+            raise _error('commands: Cannot be empty', commands)
+
+        if len(commands.value) == 1:
+            raise _error('commands: Must contain more than one command', commands)
+
     else:
-        raise _error('Invalid command', cmd)
+        raise _error(f'Invalid command: {cmd.value}', cmd)
 
 def _check_option(option):
     _check_dictionary(option, {

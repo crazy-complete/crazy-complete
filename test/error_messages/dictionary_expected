@@ -100,5 +100,15 @@
 377-value-list-dict-key-wrong-type       | foo: -o: values: Not a string: False
 378-value-list-dict-desc-wrong-type      | foo: -o: values: Not a string: None
 379-value-list-too-many-args             | foo: -o: Too many arguments: ['wrong']
+380-combine-missing-arg                  | foo: -o: Missing argument: commands
+381-combine-wrong-type                   | foo: -o: commands: Not a list: True
+382-combine-empty-subcommands            | foo: -o: commands: Cannot be empty
+383-combine-single-subcommand            | foo: -o: commands: Must contain more than one command
+384-combine-subcommand-no-command        | foo: -o: combine: Missing command
+385-combine-subcommand-invalid-type      | foo: -o: combine: Not a list: True
+386-combine-subcommand-invalid-command   | foo: -o: Unknown command for `complete`: invalid
+387-combine-subcommand-is-none           | foo: -o: Command `none` not allowed inside combine
+388-combine-subcommand-is-combine        | foo: -o: Nested `combine` not allowed
+389-combine-too-many-args                | foo: -o: Too many arguments: ['wrong']
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field

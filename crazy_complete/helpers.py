@@ -2,6 +2,7 @@
 
 from . import utils
 from . import preprocessor
+from . import shell
 
 class FunctionBase:
     def __init__(self, funcname, code):
@@ -44,6 +45,15 @@ class GeneralHelpers:
         self.function_prefix = function_prefix
         self.functions = {}
         self.used_functions = {} # funcname:set(defines)
+
+    def get_unique_function_name(self, ctxt):
+        funcname = shell.make_completion_funcname_for_context(ctxt)
+        num = 0
+        funcname_plus_num = funcname
+        while funcname_plus_num in self.used_functions:
+            funcname_plus_num = '%s%d' % (funcname, num)
+            num += 1
+        return funcname_plus_num
 
     def get_real_function_name(self, function_name):
         return '_%s_%s' % (self.function_prefix, function_name)
