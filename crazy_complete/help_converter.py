@@ -16,6 +16,62 @@ def fix_description(s):
     s = s.replace('\n', ' ')
     return s
 
+def strip_metavar(s):
+    if s and s[0] == '[' and s[-1] == ']':
+        s = s[1:-1]
+
+    if s and s[0] == '=':
+        s = s[1:]
+
+    return s
+
+def complete_for_metavar(s):
+    s = s.lower()
+
+    if s == 'f' or s.endswith('file'):
+        return ['file']
+
+    if s.endswith('dir') or s.endswith('directory'):
+        return ['directory']
+
+    if (s == 'n' or
+        s == 'duration' or
+        s == 'bits' or
+        s == 'cols' or
+        s == 'column' or 
+        s == 'digits' or
+        s == 'size' or
+        s == 'bytes' or
+        s.endswith('length') or
+        s.endswith('width') or
+        s.endswith('num') or
+        s.endswith('number')
+       ):
+        return ['integer']
+
+    if s == 'pid':
+        return ['pid']
+
+    if s == 'user':
+        return ['user']
+
+    if s == 'group':
+        return ['group']
+
+    if s == 'program' or s == 'command' or s == 'cmd':
+        return ['command']
+
+    if s == 'signal' or s == 'sig':
+        return ['signal']
+
+    if s.startswith('{') and s.endswith('}'):
+        s = s.strip('{}')
+        for sep in ['|', ',']:
+            if sep in s:
+                return ['choices', [item.strip() for item in s.split(sep)]]
+
+    return ['none']
+
 def from_file_to_yaml(file):
     with open(file, 'r', encoding='utf-8') as fh:
         content = fh.read()
@@ -46,8 +102,8 @@ def from_file_to_yaml(file):
                     option_dict['optional_arg'] = True
 
                 if option.metavar:
-                    option_dict['metavar'] = option.metavar
-                    option_dict['complete'] = ['none']
+                    option_dict['metavar'] = strip_metavar(option.metavar)
+                    option_dict['complete'] = complete_for_metavar(option_dict['metavar'])
 
             output.append(
                 utils.indent(yaml_source.option_to_yaml(option_dict), 2)
