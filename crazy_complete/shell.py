@@ -19,7 +19,6 @@ def make_identifier(string):
     Returns:
         str: The modified string that is a valid shell identifier.
     '''
-    assert isinstance(string, str), "make_identifier: string: expected str, got %r" % string
 
     string = string.replace('-', '_')
     string = re.sub('[^a-zA-Z0-9_]', '', string)
@@ -39,7 +38,6 @@ def escape(string, escape_empty_string=True):
     Returns:
         str: The escaped string.
     '''
-    assert isinstance(string, str), "escape: s: expected str, got %r" % string
 
     if not string and not escape_empty_string:
         return ''

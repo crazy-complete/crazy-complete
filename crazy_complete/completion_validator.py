@@ -22,8 +22,7 @@ def validate_complete(complete):
     if not complete:
         return
 
-    args = list(complete)
-    command = args.pop(0)
+    command, *args = complete
 
     if not isinstance(command, str):
         raise CrazyError(f"Command is not a string: {command}")

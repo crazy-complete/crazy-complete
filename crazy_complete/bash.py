@@ -20,9 +20,11 @@ from . import generation
 class VariableUsageTracer:
     def __init__(self):
         self.values = []
+        self.value_ids = []
 
     def make_value_variable(self, option):
-        if option not in self.values:
+        if id(option) not in self.value_ids:
+            self.value_ids.append(id(option))
             self.values.append(option)
         return make_option_variable_name(option, prefix='OPT_')
 

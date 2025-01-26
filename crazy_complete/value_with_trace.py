@@ -14,6 +14,7 @@ class ValueWithTrace:
         line (int): The line number of the value in the source.
         column (int): The column number of the value in the source.
     '''
+
     def __init__(self, value, source, line, column):
         self.value = value
         self.source = source
