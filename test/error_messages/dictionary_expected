@@ -53,62 +53,70 @@
 240-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: 'wrong' (str)
 250-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
 ======= Directory "04-complete" =======
-300-invalid-command                      | foo: -o: Unknown command for `complete`: wrong
-301-command-too-many-args                | foo: -o: Too many arguments: ['wrong']
-302-environment-too-many-args            | foo: -o: Too many arguments: ['wrong']
-303-group-too-many-args                  | foo: -o: Too many arguments: ['wrong']
-304-hostname-too-many-args               | foo: -o: Too many arguments: ['wrong']
-305-none-too-many-args                   | No error
-306-pid-too-many-args                    | foo: -o: Too many arguments: ['wrong']
-307-process-too-many-args                | foo: -o: Too many arguments: ['wrong']
-309-service-too-many-args                | foo: -o: Too many arguments: ['wrong']
-310-signal-too-many-args                 | foo: -o: Too many arguments: ['wrong']
-311-user-too-many-args                   | foo: -o: Too many arguments: ['wrong']
-312-variable-too-many-args               | foo: -o: Too many arguments: ['wrong']
-320-choices-missing-arg                  | foo: -o: Missing argument: values
-321-choices-arg-wrong-type               | foo: -o: values: Not a list or dictionary
-322-choices-dict-key-wrong-type          | No error
-323-choices-dict-desc-wrong-type         | foo: -o: Description not a string/int/float: []
-324-choices-list-value-wrong-type        | foo: -o: Item not a string/int/float: []
-325-choices-too-many-args                | foo: -o: Too many arguments: ['wrong']
-330-file-options-wrong-type              | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
-331-file-unknown-key                     | foo: -o: Unknown option: wrong
-332-file-directory-wrong-type            | foo: -o: directory: Not a string: False
-333-file-directory-empty                 | foo: -o: directory: Cannot be empty
-334-file-too-many-args                   | foo: -o: Too many arguments: ['wrong']
-340-directory-options-wrong-type         | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
-341-directory-unknown-key                | foo: -o: Unknown option: wrong
-342-directory-directory-wrong-type       | foo: -o: directory: Not a string: False
-343-directory-directory-empty            | foo: -o: directory: Cannot be empty
-344-directory-too-many-args              | foo: -o: Too many arguments: ['wrong']
-350-range-missing-arg-1                  | foo: -o: Missing argument: start
-351-range-missing-arg-2                  | foo: -o: Missing argument: stop
-352-range-too-many-args                  | foo: -o: Too many arguments: [4]
-353-range-step-zero                      | foo: -o: step: cannot be 0
-354-range-invalid-range-0                | foo: -o: stop > start: 2 > 1 (step=-1)
-355-range-invalid-range-1                | foo: -o: start > stop: 2 > 1 (step=1)
-360-exec-missing-arg                     | foo: -o: Missing argument: command
-361-exec-too-many-arguments              | foo: -o: Too many arguments: ['wrong']
-362-exec-command-wrong-type              | foo: -o: Command is not a string: False
-370-value-list-missing-arg               | foo: -o: Missing argument: options
-371-value-list-missing-values            | foo: -o: Missing `values` option: {}
-372-value-list-values-wrong-type         | foo: -o: Unknown option: wrong
-373-value-list-separator-wrong-type      | foo: -o: separator: Not a string: False
-374-value-list-separator-wrong-value     | foo: -o: Invalid length for separator: invalid
-375-value-list-values-empty              | foo: -o: values: cannot be empty
-376-value-list-list-wrong-type           | foo: -o: values[0]: Not a string: False
-377-value-list-dict-key-wrong-type       | foo: -o: values: Not a string: False
-378-value-list-dict-desc-wrong-type      | foo: -o: values: Not a string: None
-379-value-list-too-many-args             | foo: -o: Too many arguments: ['wrong']
-380-combine-missing-arg                  | foo: -o: Missing argument: commands
-381-combine-wrong-type                   | foo: -o: commands: Not a list: True
-382-combine-empty-subcommands            | foo: -o: commands: Cannot be empty
-383-combine-single-subcommand            | foo: -o: commands: Must contain more than one command
-384-combine-subcommand-no-command        | foo: -o: combine: Missing command
-385-combine-subcommand-invalid-type      | foo: -o: combine: Not a list: True
-386-combine-subcommand-invalid-command   | foo: -o: Unknown command for `complete`: invalid
-387-combine-subcommand-is-none           | foo: -o: Command `none` not allowed inside combine
-388-combine-subcommand-is-combine        | foo: -o: Nested `combine` not allowed
-389-combine-too-many-args                | foo: -o: Too many arguments: ['wrong']
+3_00_00-invalid-command                  | foo: -o: Unknown command for `complete`: wrong
+3_01_00-command-too-many-args            | foo: -o: Too many arguments: ['wrong']
+3_02_00-environment-too-many-args        | foo: -o: Too many arguments: ['wrong']
+3_03_00-float-too-many-args              | foo: -o: Too many arguments: ['wrong']
+3_04_00-group-too-many-args              | foo: -o: Too many arguments: ['wrong']
+3_05_00-hostname-too-many-args           | foo: -o: Too many arguments: ['wrong']
+3_06_00-integer-too-many-args            | foo: -o: Too many arguments: ['wrong']
+3_07_00-none-too-many-args               | No error
+3_08_00-pid-too-many-args                | foo: -o: Too many arguments: ['wrong']
+3_09_00-process-too-many-args            | foo: -o: Too many arguments: ['wrong']
+3_10_00-service-too-many-args            | foo: -o: Too many arguments: ['wrong']
+3_11_00-signal-too-many-args             | foo: -o: Too many arguments: ['wrong']
+3_12_00-user-too-many-args               | foo: -o: Too many arguments: ['wrong']
+3_13_00-variable-too-many-args           | foo: -o: Too many arguments: ['wrong']
+3_14_00-choices-missing-arg              | foo: -o: Missing argument: values
+3_14_01-choices-arg-wrong-type           | foo: -o: values: Not a list or dictionary
+3_14_02-choices-dict-key-wrong-type      | No error
+3_14_03-choices-dict-desc-wrong-type     | foo: -o: Description not a string/int/float: []
+3_14_04-choices-list-value-wrong-type    | foo: -o: Item not a string/int/float: []
+3_14_05-choices-too-many-args            | foo: -o: Too many arguments: ['wrong']
+3_15_00-file-options-wrong-type          | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
+3_15_01-file-unknown-key                 | foo: -o: Unknown option: wrong
+3_15_02-file-directory-wrong-type        | foo: -o: directory: Not a string: False
+3_15_03-file-directory-empty             | foo: -o: directory: Cannot be empty
+3_15_04-file-too-many-args               | foo: -o: Too many arguments: ['wrong']
+3_16_00-directory-options-wrong-type     | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
+3_16_01-directory-unknown-key            | foo: -o: Unknown option: wrong
+3_16_02-directory-directory-wrong-type   | foo: -o: directory: Not a string: False
+3_16_03-directory-directory-empty        | foo: -o: directory: Cannot be empty
+3_16_04-directory-too-many-args          | foo: -o: Too many arguments: ['wrong']
+3_17_00-range-missing-arg-1              | foo: -o: Missing argument: start
+3_17_01-range-missing-arg-2              | foo: -o: Missing argument: stop
+3_17_02-range-too-many-args              | foo: -o: Too many arguments: [4]
+3_17_03-range-step-zero                  | foo: -o: step: cannot be 0
+3_17_04-range-invalid-range-0            | foo: -o: stop > start: 2 > 1 (step=-1)
+3_17_05-range-invalid-range-1            | foo: -o: start > stop: 2 > 1 (step=1)
+3_18_00-exec-missing-arg                 | foo: -o: Missing argument: command
+3_18_01-exec-too-many-arguments          | foo: -o: Too many arguments: ['wrong']
+3_18_02-exec-command-wrong-type          | foo: -o: Command is not a string: False
+3_19_00-exec-fast-missing-arg            | foo: -o: Missing argument: command
+3_19_01-exec-fast-too-many-arguments     | foo: -o: Too many arguments: ['wrong']
+3_19_02-exec-fast-command-wrong-type     | foo: -o: Command is not a string: False
+3_20_00-exec-internal-missing-arg        | foo: -o: Missing argument: command
+3_20_01-exec-internal-too-many-arguments | foo: -o: Too many arguments: ['wrong']
+3_20_02-exec-internal-command-wrong-type | foo: -o: Command is not a string: False
+3_21_00-value-list-missing-arg           | foo: -o: Missing argument: options
+3_21_01-value-list-missing-values        | foo: -o: Missing `values` option: {}
+3_21_02-value-list-values-wrong-type     | foo: -o: Unknown option: wrong
+3_21_03-value-list-separator-wrong-type  | foo: -o: separator: Not a string: False
+3_21_04-value-list-separator-wrong-value | foo: -o: Invalid length for separator: invalid
+3_21_05-value-list-values-empty          | foo: -o: values: cannot be empty
+3_21_06-value-list-list-wrong-type       | foo: -o: values[0]: Not a string: False
+3_21_07-value-list-dict-key-wrong-type   | foo: -o: values: Not a string: False
+3_21_08-value-list-dict-desc-wrong-type  | foo: -o: values: Not a string: None
+3_21_09-value-list-too-many-args         | foo: -o: Too many arguments: ['wrong']
+3_22_00-combine-missing-arg              | foo: -o: Missing argument: commands
+3_22_01-combine-wrong-type               | foo: -o: commands: Not a list: True
+3_22_02-combine-empty-subcommands        | foo: -o: commands: Cannot be empty
+3_22_03-combine-single-subcommand        | foo: -o: commands: Must contain more than one command
+3_22_04-combine-subcommand-no-command    | foo: -o: combine: Missing command
+3_22_05-combine-subcommand-invalid-type  | foo: -o: combine: Not a list: True
+3_22_06-combine-subcommand-invalid-command | foo: -o: Unknown command for `complete`: invalid
+3_22_07-combine-subcommand-is-none       | foo: -o: Command `none` not allowed inside combine
+3_22_08-combine-subcommand-is-combine    | foo: -o: Nested `combine` not allowed
+3_22_09-combine-too-many-args            | foo: -o: Too many arguments: ['wrong']
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field

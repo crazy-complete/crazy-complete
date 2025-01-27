@@ -86,6 +86,12 @@ class BashCompleter(shell.ShellCompleter):
     def none(self, ctxt, *a):
         return BashCompletionCommand(ctxt, '')
 
+    def integer(self, ctxt, *a):
+        return BashCompletionCommand(ctxt, '')
+
+    def float(self, ctxt, *a):
+        return BashCompletionCommand(ctxt, '')
+
     def choices(self, ctxt, choices):
         return CompgenW(ctxt, choices)
 
@@ -151,6 +157,9 @@ class BashCompleter(shell.ShellCompleter):
     def exec_fast(self, ctxt, command):
         funcname = ctxt.helpers.use_function('exec_fast')
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(command)))
+
+    def exec_internal(self, ctxt, command):
+        return BashCompletionCommand(ctxt, command)
 
     def value_list(self, ctxt, opts):
         funcname = ctxt.helpers.use_function('value_list')

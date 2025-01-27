@@ -177,7 +177,8 @@ class Tests:
         for file, args in self.definition_files.items():
             for shell in SHELLS:
                 cmd =  [CRAZY_COMPLETE, '--debug', '--zsh-compdef=False']
-                cmd += args['args']
+                for arg in args['args']:
+                    cmd += [arg.replace('$shell', shell)]
                 cmd += ['-o', f'{COMPLETIONS_OUTDIR}/{file}.{shell}']
                 cmd += [shell, args['definition_file']]
                 print_err('Running', ' '.join(cmd))

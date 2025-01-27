@@ -159,6 +159,12 @@ class FishCompleter(shell.ShellCompleter):
     def none(self, ctxt, *a):
         return FishCompleteNone()
 
+    def integer(self, ctxt, *a):
+        return FishCompleteNone()
+
+    def float(self, ctxt, *a):
+        return FishCompleteNone()
+
     def choices(self, ctxt, choices):
         return FishCompleteChoices(ctxt, choices)
 
@@ -205,6 +211,9 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompletionCommand(command)
 
     def exec_fast(self, ctxt, command):
+        return FishCompletionCommand(command)
+
+    def exec_internal(self, ctxt, command):
         return FishCompletionCommand(command)
 
     def value_list(self, ctxt, opts):

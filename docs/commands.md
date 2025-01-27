@@ -13,6 +13,31 @@ options:
     complete: ["none"]
 ```
 
+**integer**
+
+> Complete an integer.
+> NOTE: This completion currently serves as documentation and does not provide actual functionality.
+> If you want to complete a range of integers, see **range**.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--integer"]
+    complete: ["integer"]
+```
+
+**float**
+
+> Complete a floating point number.
+> NOTE: This completion currently serves as documentation and does not provide actual functionality.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--float"]
+    complete: ["float"]
+```
+
 **combine**
 
 > Combine two ore more completion commands
@@ -137,6 +162,45 @@ Item 1  (Description 1)  Item 2  (Description 2)
 > Faster version of exec for handling large amounts of data.
 > This implementation requires that the items of the parsed output do not include
 > special shell characters or whitespace.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--exec-fast"]
+    complete: ["exec_fast", "printf '%s\\t%s\\n' 1 one 2 two"]
+```
+
+**exec_internal**
+
+> Execute a function that internally modifies the completion state.
+> This is useful if a more advanced completion is needed.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--exec-internal"]
+    complete: ["exec_internal", "my_completion_func"]
+```
+
+> For BASH, it might look like:
+```
+my_completion_func() {
+    COMPREPLY=( $(compgen -W "foo bar baz") )
+}
+```
+> For ZSH, it might look like:
+```
+my_completion_func() {
+    local items=( foo bar baz )
+    _describe '' items
+}
+```
+> For FISH, it might look like:
+```
+function my_completion_func
+    printf '%s\n' foo bar baz
+end
+```
 
 **range**
 

@@ -13,6 +13,12 @@ class ZshCompleter(shell.ShellCompleter):
     def none(self, ctxt, *a):
         return "' '"
 
+    def integer(self, ctxt):
+        return '_numbers'
+
+    def float(self, ctxt):
+        return '"_numbers -f"'
+
     def choices(self, ctxt, choices):
         if hasattr(choices, 'items'):
             funcname = ctxt.helpers.get_unique_function_name(ctxt)
@@ -80,6 +86,9 @@ class ZshCompleter(shell.ShellCompleter):
     def exec_fast(self, ctxt, command):
         funcname = ctxt.helpers.use_function('exec')
         return shell.escape('{%s %s}' % (funcname, shell.escape(command)))
+
+    def exec_internal(self, ctxt, command):
+        return shell.escape(command)
 
     def value_list(self, ctxt, opts):
         desc = ctxt.option.metavar or ''

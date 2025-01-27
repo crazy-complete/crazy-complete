@@ -80,7 +80,7 @@ def _check_complete(args):
     cmd = _get_required_arg(args, 'command')
 
     no_args_commands = (
-        'none',
+        'none', 'integer', 'float',
         'command', 'environment', 'group', 'hostname', 'pid', 'process',
         'service', 'signal', 'user', 'variable',
     )
@@ -134,7 +134,7 @@ def _check_complete(args):
         else:
             raise _error("step: cannot be 0", step)
 
-    elif cmd.value in ('exec', 'exec_fast'):
+    elif cmd.value in ('exec', 'exec_fast', 'exec_internal'):
         command = _get_required_arg(args, "command")
         _check_type(command, (str,), "command")
         _require_no_more(args)

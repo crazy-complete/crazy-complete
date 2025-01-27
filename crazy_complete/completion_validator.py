@@ -28,6 +28,7 @@ def validate_complete(complete):
         raise CrazyError(f"Command is not a string: {command}")
 
     NO_ARG_COMMANDS = [
+        "integer", "float",
         "command", "group", "hostname", "pid", "process",
         "user", "service", "signal", "variable", "environment"]
 
@@ -98,7 +99,7 @@ def validate_complete(complete):
         else:
             raise CrazyError("step: cannot be 0")
 
-    elif command in ('exec', 'exec_fast'):
+    elif command in ('exec', 'exec_fast', 'exec_internal'):
         cmd = _get_required_arg(args, 'command')
         _require_no_more(args)
 
