@@ -2,12 +2,7 @@
 
 from . import shell
 from . import helpers
-
-def escape_colon(s):
-    return s.replace(':', '\\:')
-
-def escape_square_brackets(s):
-    return s.replace('[', '\\[').replace(']', '\\]')
+from .zsh_utils import escape_colon, escape_square_brackets
 
 class ZshCompleter(shell.ShellCompleter):
     def none(self, ctxt, *a):
