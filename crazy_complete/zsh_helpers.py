@@ -8,7 +8,7 @@ _ZSH_QUERY_FUNC = helpers.ShellFunction('zsh_query', r'''
 # This function is for querying the command line.
 #
 # COMMANDS
-#   setup <OPTIONS> <ARGS...>
+#   init <OPTIONS> <ARGS...>
 #     This is the first call you have to make, otherwise the other commands
 #     won't (successfully) work.
 #
@@ -36,7 +36,7 @@ _ZSH_QUERY_FUNC = helpers.ShellFunction('zsh_query', r'''
 #
 # EXAMPLE
 #   local POSITIONALS HAVING_OPTIONS OPTION_VALUES
-#   zsh_query setup '-f,-a=,-optional=?' program_name -f -optional -a foo bar
+#   zsh_query init '-f,-a=,-optional=?' program_name -f -optional -a foo bar
 #   zsh_query has_option -f
 #   zsh_query option_is -a -- foo
 #
@@ -138,7 +138,7 @@ case "$cmd" in
 
     return 1
     ;;
-  setup)
+  init)
     local IFS=','
     local -a options=(${=1})
     unset IFS
@@ -150,7 +150,7 @@ case "$cmd" in
     ;;
 esac
 
-# continuing setup....
+# continuing init...
 
 # ===========================================================================
 # Parsing of available options

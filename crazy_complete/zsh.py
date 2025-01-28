@@ -96,7 +96,7 @@ class ZshCompletionGenerator:
             zsh_query = self.ctxt.helpers.use_function('zsh_query')
             r  = 'local opts=%s\n' % shell.escape(self._get_option_strings())
             r += "local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''\n"
-            r += '%s setup "$opts" "${words[@]}"' % zsh_query
+            r += '%s init "$opts" "${words[@]}"' % zsh_query
             code.append(r)
 
         if subcommand_code:
