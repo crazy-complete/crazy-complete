@@ -2,38 +2,80 @@
 
 import os
 import re
+import sys
 import shlex
+import argparse
 
-PATHS = ['/bin', '/sbin', '/usr/bin', '/usr/sbin']
-BASH_COMPLETION_PATHS = ['/etc/bash_completion.d', '/usr/share/bash-completion/completions']
-FISH_COMPLETION_PATHS = ['/usr/share/fish/completions', '/usr/share/fish/vendor_completions.d']
-ZSH_COMPLETION_PATHS = '''\
-/usr/share/zsh/site-functions
-/usr/share/zsh/functions/Zle
-/usr/share/zsh/functions/VCS_Info
-/usr/share/zsh/functions/VCS_Info/Backends
-/usr/share/zsh/functions/Chpwd
-/usr/share/zsh/functions/MIME
-/usr/share/zsh/functions/Newuser
-/usr/share/zsh/functions/TCP
-/usr/share/zsh/functions/Math
-/usr/share/zsh/functions/Calendar
-/usr/share/zsh/functions/Exceptions
-/usr/share/zsh/functions/Prompts
-/usr/share/zsh/functions/Zftp
-/usr/share/zsh/functions/Misc
-/usr/share/zsh/functions/Completion
-/usr/share/zsh/functions/Completion/Linux
-/usr/share/zsh/functions/Completion/Unix
-/usr/share/zsh/functions/Completion/Base
-/usr/share/zsh/functions/Completion/Zsh
-/usr/share/zsh/functions/Completion/X'''.split('\n')
+# =============================================================================
+# Constants
+# =============================================================================
+
+PROGRAM_PATHS = ['/bin', '/sbin', '/usr/bin', '/usr/sbin']
+
+BASH_COMPLETION_PATHS = [
+    '/etc/bash_completion.d',
+    '/usr/share/bash-completion/completions',
+]
+
+FISH_COMPLETION_PATHS = [
+    '/usr/share/fish/completions',
+    '/usr/share/fish/vendor_completions.d',
+]
+
+ZSH_COMPLETION_PATHS = [
+    '/usr/share/zsh/site-functions',
+    '/usr/share/zsh/vendor-completions',
+    '/usr/share/zsh/functions/Completion/Linux',
+    '/usr/share/zsh/functions/Completion/Unix',
+    '/usr/share/zsh/functions/Completion/Base',
+    '/usr/share/zsh/functions/Completion/Zsh',
+    '/usr/share/zsh/functions/Completion/X',
+]
+
+# =============================================================================
+# Functions
+# =============================================================================
 
 def find_programs(path):
     try:
         return os.listdir(path)
     except FileNotFoundError:
         pass
+
+def get_all_files_in_directories(directories):
+    r = []
+
+    for directory in directories:
+        try:
+            for file in os.scandir(directory):
+                r.append(file.path)
+        except FileNotFoundError:
+            continue
+
+    return r
+
+def process_file(filename, callback):
+    try:
+        with open(filename, 'r', encoding='UTF-8') as fh:
+            content = fh.read()
+        return callback(filename, content)
+    except FileNotFoundError:
+        return None
+    except UnicodeDecodeError:
+        return None
+
+def process_files(files, callback):
+    r = []
+
+    for file in files:
+        with open(file, 'r', encoding='UTF-8') as fh:
+            content = fh.read()
+            result = callback(file, content)
+
+            if result:
+                r.append(result)
+
+    return r
 
 def parse_bash_complete_command(line):
     try:
@@ -50,6 +92,12 @@ def parse_bash_complete_command(line):
         if arg == '-F':
             have_F = True
             i += 1
+        elif arg == '-o':
+            i += 1
+        elif arg == '-X':
+            i += 1
+        elif arg.startswith('-'):
+            pass
         else:
             programs.append(arg)
         i += 1
@@ -81,90 +129,157 @@ def parse_zsh_compdef(line):
     return split[1:]
 
 def get_bash_completions():
-    r = []
+    def callback(filename, content):
+        r = []
+        content = content.replace('\\\n', '')
 
-    for path in BASH_COMPLETION_PATHS:
-        try:
-            files = sorted(os.listdir(path))
-        except FileNotFoundError:
-            continue
+        matches = re.findall('complete [^;&|\n]+', content)
+        for m in matches:
+            programs = parse_bash_complete_command(m)
+            r.extend(programs)
 
-        for file in files:
-            with open(os.path.join(path, file), 'r') as fh:
-                content = fh.read()
+        if not r:
+            r = [os.path.basename(filename).lstrip('_')]
 
-            content = content.replace('\\\n', '')
+        return r
 
-            for line in content.split('\n'):
-                m = re.search('complete [^;&|]+', line)
-                if m:
-                    programs = parse_bash_complete_command(m[0])
-                    r.extend(programs)
+    files = get_all_files_in_directories(BASH_COMPLETION_PATHS)
+    results = process_files(files, callback)
 
-    return sorted(set(r))
+    r = set()
+    for result in results:
+        r.update(result)
+    return sorted(r)
 
 def get_fish_completions():
-    r = []
+    def callback(filename, content):
+        r = set()
+        content = content.replace('\\\n', '')
 
-    for path in FISH_COMPLETION_PATHS:
-        try:
-            files = sorted(os.listdir(path))
-        except FileNotFoundError:
-            continue
+        matches = re.findall('complete [^\n]+', content)
+        for m in matches:
+            programs = parse_fish_complete_command(m)
+            r.update(programs)
 
-        for file in files:
-            with open(os.path.join(path, file), 'r') as fh:
-                content = fh.read()
+        return r
 
-            content = content.replace('\\\n', '')
+    files = get_all_files_in_directories(FISH_COMPLETION_PATHS)
+    results = process_files(files, callback)
 
-            for line in content.split('\n'):
-                m = re.search('complete .*', line)
-                if m:
-                    programs = parse_fish_complete_command(m[0])
-                    r.extend(programs)
-
-    return sorted(set(r))
+    r = set()
+    for result in results:
+        r.update(result)
+    return sorted(r)
 
 def get_zsh_completions():
-    r = []
+    def callback(filename, content):
+        content = content.replace('\\\n', '')
 
-    for path in ZSH_COMPLETION_PATHS:
-        try:
-            files = sorted(os.listdir(path))
-        except FileNotFoundError:
-            continue
+        match = re.search('#compdef [^\n]+', content)
+        if match:
+            programs = parse_zsh_compdef(match[0])
+            return programs
 
-        for file in files:
+        return []
+
+    files = get_all_files_in_directories(ZSH_COMPLETION_PATHS)
+    results = process_files(files, callback)
+
+    r = set()
+    for result in results:
+        r.update(result)
+    return sorted(r)
+
+# =============================================================================
+# Classes
+# =============================================================================
+
+class Program:
+    def __init__(self, program, has_bash, has_fish, has_zsh):
+        self.program = program
+        self.has_bash = has_bash
+        self.has_fish = has_fish
+        self.has_zsh = has_zsh
+
+    def print(self):
+        print('%-40s %-5s %-5s %-5s' % (
+            self.program,
+            self.has_bash,
+            self.has_fish,
+            self.has_zsh))
+
+class Filter:
+    def __init__(self, s):
+        self.filters = {}
+
+        for shell_filter in s.split(','):
             try:
-                with open(os.path.join(path, file), 'r') as fh:
-                    content = fh.read()
-            except IsADirectoryError:
-                continue
+                shell, filter_ = shell_filter.split('=')
+            except ValueError:
+                raise Exception('Invalid format. Format has to be SHELL=BOOL') from None
 
-            content = content.replace('\\\n', '')
+            if shell not in ['bash', 'fish', 'zsh']:
+                raise Exception(f'Invalid shell: {shell}')
 
-            for line in content.split('\n'):
-                m = re.search('#compdef .*', line)
-                if m:
-                    programs = parse_zsh_compdef(m[0])
-                    r.extend(programs)
+            if filter_ not in ['True', 'False']:
+                raise Exception(f'Invalid filter: {filter_}')
 
-    return sorted(set(r))
+            if shell in self.filters:
+                raise Exception(f'Double shell key: {shell}')
 
-fish_completions = get_fish_completions()
+            self.filters[shell] = {'True': True, 'False': False}[filter_]
+
+    def accept(self, program):
+        for shell, filter_ in self.filters.items():
+            if shell == 'bash':
+                if program.has_bash != filter_:
+                    return False
+            elif shell == 'fish':
+                if program.has_fish != filter_:
+                    return False
+            elif shell == 'zsh':
+                if program.has_zsh != filter_:
+                    return False
+
+        return True
+
+# =============================================================================
+# Command line arguments
+# =============================================================================
+
+p = argparse.ArgumentParser()
+p.add_argument('-f', '--filter', metavar='SHELL=True|False',
+    type=Filter, action='append',
+    help='Filter results. Example: -f bash=True,zsh=False')
+opts = p.parse_args()
+
+# =============================================================================
+# Collect data
+# =============================================================================
+
 bash_completions = get_bash_completions()
+fish_completions = get_fish_completions()
 zsh_completions = get_zsh_completions()
 
 programs = set()
-for path in PATHS:
+for path in PROGRAM_PATHS:
     programs.update(find_programs(path))
 programs = sorted(programs)
 
+# =============================================================================
+# Filter and print results
+# =============================================================================
+
 for program in programs:
-    have_bash_completion = (program in bash_completions)
-    have_fish_completion = (program in fish_completions)
-    have_zsh_completion  = (program in zsh_completions)
+    program = Program(program,
+        (program in bash_completions),
+        (program in fish_completions),
+        (program in zsh_completions))
 
-    print('%-40s %-5s %-5s %-5s' % (program, have_bash_completion, have_fish_completion, have_zsh_completion))
-
+    if opts.filter:
+        for filter_ in opts.filter:
+            if filter_.accept(program):
+                program.print()
+                break
+    else:
+        program.print()
