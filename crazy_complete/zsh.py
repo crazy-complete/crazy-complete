@@ -1,6 +1,6 @@
 '''Code for generating a zsh auto completion file.'''
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 from . import config as config_
 from . import generation
@@ -14,7 +14,7 @@ from . import zsh_utils
 
 Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
 
-class ZshCompletionGenerator:
+class ZshCompletionFunction:
     def __init__(self, ctxt, commandline):
         self.commandline = commandline
         self.ctxt = ctxt
@@ -23,7 +23,8 @@ class ZshCompletionGenerator:
         self.command_counter = 0
         self.completer = zsh_complete.ZshCompleter()
         self.query_used = False
-        self._generate_completion_function()
+        self.code = None
+        self._generate_completion_code()
 
     def _get_option_strings(self):
         r = []
@@ -76,6 +77,7 @@ class ZshCompletionGenerator:
         positional_num = option.get_positional_num()
         if option.repeatable:
             positional_num = "'*'"
+
         option_spec = "%s:%s:%s" % (
             positional_num,
             shell.escape(zsh_utils.escape_colon(option.help or option.metavar or ' ')),
@@ -84,30 +86,28 @@ class ZshCompletionGenerator:
 
         return Arg(option, option.when, False, option_spec)
 
-    def _generate_completion_function(self):
-        code = []
+    def _generate_completion_code(self):
+        self.code = OrderedDict()
+        self.code['0-init'] = ''
+        self.code['1-subcommands'] = ''
+        self.code['2-options'] = ''
 
         # We have to call these functions first, because they tell us if
         # the zsh_query function is used.
-        subcommand_code = self._generate_subcommand()
-        options_code = self._generate_option_parsing()
+        self.code['1-subcommands'] = self._generate_subcommand()
+        self.code['2-options']     = self._generate_option_parsing()
 
         if self.query_used:
             zsh_query = self.ctxt.helpers.use_function('zsh_query')
             r  = 'local opts=%s\n' % shell.escape(self._get_option_strings())
             r += "local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''\n"
             r += '%s init "$opts" "${words[@]}"' % zsh_query
-            code.append(r)
+            self.code['0-init'] = r
 
-        if subcommand_code:
-            code.append(subcommand_code)
-
-        if options_code:
-            code.append(options_code)
-
-        self.result = '%s() {\n%s\n}' % (
+    def get_code(self):
+        return '%s() {\n%s\n}' % (
             self.funcname,
-            utils.indent('\n\n'.join(code), 2))
+            utils.indent('\n\n'.join(c for c in self.code.values() if c), 2))
 
     def _generate_subcommand(self):
         if not self.subcommands:
@@ -206,7 +206,7 @@ def generate_completion(commandline, config=None):
     commandline = generation.enhance_commandline(commandline, config)
     helpers = zsh_helpers.ZshHelpers(commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
-    result = generation.visit_commandlines(ZshCompletionGenerator, ctxt, commandline)
+    functions = generation.visit_commandlines(ZshCompletionFunction, ctxt, commandline)
     all_progs = ' '.join([commandline.prog] + commandline.aliases)
 
     if helpers.is_used('zsh_query'):
@@ -225,12 +225,12 @@ def generate_completion(commandline, config=None):
     for code in helpers.get_used_functions_code():
         output.append(code)
 
-    output += [generator.result for generator in result]
+    output += [function.get_code() for function in functions]
 
     if config.zsh_compdef:
-        output += ['%s "$@"' % result[0].funcname]
+        output += ['%s "$@"' % functions[0].funcname]
     else:
-        output += ['compdef %s %s' % (result[0].funcname, all_progs)]
+        output += ['compdef %s %s' % (functions[0].funcname, all_progs)]
 
     if config.vim_modeline:
         output += [modeline.get_vim_modeline('zsh')]
