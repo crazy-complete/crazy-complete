@@ -27,6 +27,9 @@ def make_identifier(string):
         return '_' + string
     return string
 
+def needs_escape(string):
+    return not re.fullmatch('[a-zA-Z0-9_@%+=:,./-]+', string)
+
 def escape(string, escape_empty_string=True):
     '''Escapes special characters in a string for safe usage in shell commands or scripts.
 
@@ -42,7 +45,7 @@ def escape(string, escape_empty_string=True):
     if not string and not escape_empty_string:
         return ''
 
-    if re.fullmatch('[a-zA-Z0-9_@%+=:,./-]+', string):
+    if not needs_escape(string):
         return string
 
     if "'" not in string:

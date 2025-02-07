@@ -150,7 +150,8 @@ class BashCompletionGenerator:
                 when_guard = '%s && ' % when_guard
 
             r += '  %s%sopts+=(%s)\n' % (conditions, when_guard, make_option_strings(option))
-        r += '  %s -a -- "$cur" "${opts[@]}"\n' % self.ctxt.helpers.use_function('compgen_w_replacement')
+
+        r += '  COMPREPLY=($(compgen -W "${opts[*]}" -- "$cur"))\n'
         r += '  [[ ${COMPREPLY-} == *= ]] && compopt -o nospace\n'
         r += '  return 1\n'
         r += 'fi'

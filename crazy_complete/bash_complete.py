@@ -63,11 +63,18 @@ class CompgenW(BashCompletionBase):
         self.values = values
 
     def get_code(self, append=False):
-        compgen_funcname = self.ctxt.helpers.use_function('compgen_w_replacement')
-        return ('%s %s-- "$cur" %s' % (
-            compgen_funcname,
-            ('-a ' if append else ''),
-            ' '.join(shell.escape(str(s)) for s in self.values)))
+        needs_escape = any(shell.needs_escape(value) for value in self.values)
+
+        if needs_escape:
+            compgen_funcname = self.ctxt.helpers.use_function('compgen_w_replacement')
+            return ('%s %s-- "$cur" %s' % (
+                compgen_funcname,
+                ('-a ' if append else ''),
+                ' '.join(shell.escape(str(s)) for s in self.values)))
+        else:
+            return 'COMPREPLY%s=($(compgen -W %s -- "$cur"))' % (
+                ('+' if append else ''),
+                shell.escape(' '.join(self.values)))
 
 class BashCompletionCompgen(BashCompletionBase):
     '''Used for completion using `compgen`.'''
