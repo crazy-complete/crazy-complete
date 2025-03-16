@@ -45,6 +45,10 @@ class GeneralHelpers:
         self.function_prefix = function_prefix
         self.functions = {}
         self.used_functions = {} # funcname:set(defines)
+        self.global_defines = set()
+
+    def define(self, name):
+        self.global_defines.add(name)
 
     def get_unique_function_name(self, ctxt):
         funcname = shell.make_completion_funcname_for_context(ctxt)
@@ -88,5 +92,5 @@ class GeneralHelpers:
         r = []
         for funcname, defines in self.used_functions.items():
             r.append(self.functions[funcname].get_code(
-                self.get_real_function_name(funcname), defines))
+                self.get_real_function_name(funcname), self.global_defines | defines))
         return r

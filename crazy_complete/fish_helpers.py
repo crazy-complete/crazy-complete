@@ -97,6 +97,7 @@ else
 
   if test -n "$options"
     for option in (string split -- ',' $options)
+#ifdef FISH3
       # Using one big switch case is the fastest way
       switch $option
 #ifdef long_options
@@ -120,6 +121,36 @@ else
           return 1
 #endif
       end
+#endif
+#ifdef FISH4
+      if false
+        true
+#ifdef long_options
+      else if string match -qr -- '^--.+=$' $option
+        set -a long_opts_with_arg (string replace -- '='  '' $option)
+      else if string match -qr -- '^--.+=\?$' $option
+        set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
+      else if string match -qr -- '^--.+$' $option
+        set -a long_opts_without_arg $option
+#endif
+#ifdef short_options
+      else if string match -qr -- '^-.=$' $option
+        set -a short_opts_with_arg (string replace -- '='  '' $option)
+      else if string match -qr -- '^-.=\?$' $option
+        set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
+      else if string match -qr -- '^-.$' $option
+        set -a short_opts_without_arg $option
+#endif
+#ifdef old_options
+      else if string match -qr -- '^-..+=$' $option
+        set -a old_opts_with_arg (string replace -- '='  '' $option)
+      else if string match -qr -- '^-..+=\?$' $option
+        set -a old_opts_with_optional_arg  (string replace -- '=?' '' $option)
+      else if string match -qr -- '^-..+$' $option
+        set -a old_opts_without_arg $option
+#endif
+      end
+#endif
     end
   end
 
@@ -264,15 +295,14 @@ switch $cmd
       set -l tokens (commandline -po)
       set -e tokens[1]
       for option in $argv
-        switch $option
-          case '-?'
-            set option (string sub -l 1 -s 2 -- $option)
-            string match -q -r -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
-            string match -q -r -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
-          case '*'
-            string match -q -r -- "^$option\$"       $tokens[-2] && return 0
-            string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
-            contains -- $tokens[-1] $argv && return 0
+        if test 2 -eq (string length -- $option)
+          set option (string sub -l 1 -s 2 -- $option)
+          string match -q -r -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
+          string match -q -r -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
+        else
+          string match -q -r -- "^$option\$"       $tokens[-2] && return 0
+          string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
+          contains -- $tokens[-1] $argv && return 0
         end
       end
     end

@@ -8,6 +8,7 @@ from . import argparse_mod # .complete() etc.
 from . import help_converter
 from . import config
 from . import paths
+from . import versions
 
 
 def boolean(string):
@@ -21,7 +22,7 @@ p = argparse.ArgumentParser('crazy-complete',
     description='Generate shell auto completion files for all major shells',
     exit_on_error=False)
 
-p.add_argument('shell', choices=('bash', 'fish', 'zsh', 'json', 'yaml'),
+p.add_argument('shell', choices=('bash', 'fish', 'fish3', 'fish4', 'zsh', 'json', 'yaml'),
     help='Specify the shell type for the completion script')
 
 p.add_argument('definition_file',
@@ -160,17 +161,24 @@ def generate(opts):
     conf.set_fish_inline_conditions(opts.fish_inline_conditions)
     conf.include_many_files(opts.include_file or [])
 
-    output = {
-        'bash': bash.generate_completion,
-        'fish': fish.generate_completion,
-        'zsh':  zsh.generate_completion
-    }[opts.shell](cmdline, conf)
+    if opts.shell == 'bash':
+        output = bash.generate_completion(cmdline, conf)
+    elif opts.shell == 'fish':
+        output = fish.generate_completion(cmdline, conf, versions.get_fish_major_version())
+    elif opts.shell == 'fish3':
+        output = fish.generate_completion(cmdline, conf, 3)
+    elif opts.shell == 'fish4':
+        output = fish.generate_completion(cmdline, conf, 4)
+    elif opts.shell == 'zsh':
+        output = zsh.generate_completion(cmdline, conf)
 
     if opts.install_system_wide or opts.uninstall_system_wide:
         file = {
-            'bash': paths.get_bash_completion_file,
-            'fish': paths.get_fish_completion_file,
-            'zsh':  paths.get_zsh_completion_file,
+            'bash':  paths.get_bash_completion_file,
+            'fish':  paths.get_fish_completion_file,
+            'fish3': paths.get_fish_completion_file,
+            'fish4': paths.get_fish_completion_file,
+            'zsh':   paths.get_zsh_completion_file,
         }[opts.shell](cmdline.prog)
 
         if opts.install_system_wide:
