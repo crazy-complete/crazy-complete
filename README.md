@@ -152,7 +152,7 @@ See [documentation.md](docs/documentation.md) and [commands.md](docs/commands.md
 Comparision with other auto-complete generators
 ===============================================
 
-See [comparision](https://github.com/crazy-complete/crazy-complete/blob/main/comparision.md) for a comparision with other tools.
+See [comparision](docs/comparision.md) for a comparision with other tools.
 
 Questions or problems
 =====================
