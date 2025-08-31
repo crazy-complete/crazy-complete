@@ -8,7 +8,6 @@ from . import argparse_mod # .complete() etc.
 from . import help_converter
 from . import config
 from . import paths
-from . import versions
 
 
 def boolean(string):
