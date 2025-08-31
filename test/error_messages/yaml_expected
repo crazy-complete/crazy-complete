@@ -33,15 +33,12 @@
 151-groups-wrong-value                   | line 4, column 14: group: Invalid type. Expected types: string
 160-repeatable-wrong-type                | line 4, column 17: repeatable: Invalid type. Expected types: boolean|string|none
 161-repeatable-wrong-value               | line 4, column 17: Invalid value. Expected true, false or "INHERIT"
-170-multiple-option-wrong-type           | line 4, column 22: multiple_option: Invalid type. Expected types: boolean|string|none
-171-multiple-option-wrong-value          | line 4, column 22: Invalid value. Expected true, false or "INHERIT"
 180-final-wrong-type                     | line 4, column 12: final: Invalid type. Expected types: boolean|none
 190-hidden-wrong-type                    | line 4, column 13: hidden: Invalid type. Expected types: boolean|none
 200-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected types: list|none
 210-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected types: string|none
 220-metavar-but-no-complete              | line 3, column 5: metavar is set but complete is missing
 230-optional-arg-but-no-complete         | line 3, column 5: optional_arg is set but complete is missing
-240-repeatable-and-multiple-option       | line 3, column 5: Both `repeatable` and `multiple_option` are set
 ======= Directory "03-positional" =======
 200-no-number                            | line 3, column 5: Missing required key: number
 201-number-wrong-type                    | line 3, column 13: number: Invalid type. Expected types: integer

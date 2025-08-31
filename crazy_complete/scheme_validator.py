@@ -205,7 +205,6 @@ def _check_option(option):
         'group':                (False, (str,  NoneType)),
         'groups':               (False, (list, NoneType)),
         'repeatable':           (False, (bool, str, NoneType)),
-        'multiple_option':      (False, (bool, str, NoneType)),
         'final':                (False, (bool, NoneType)),
         'hidden':               (False, (bool, NoneType)),
         'complete':             (False, (list, NoneType)),
@@ -238,12 +237,6 @@ def _check_option(option):
 
     if _has_set(option, 'repeatable'):
         _check_extended_bool(option.value['repeatable'])
-
-    if _has_set(option, 'multiple_option'):
-        _check_extended_bool(option.value['multiple_option'])
-
-    if _has_set(option, 'repeatable') and _has_set(option, 'multiple_option'):
-        raise _error('Both `repeatable` and `multiple_option` are set', option)
 
     if _has_set(option, 'complete'):
         _check_complete(option.value['complete'])

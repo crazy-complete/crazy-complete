@@ -33,15 +33,12 @@
 151-groups-wrong-value                   | Parameter `groups[0]` has an invalid type. Expected types: str. Received: False (bool)
 160-repeatable-wrong-type                | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
 161-repeatable-wrong-value               | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
-170-multiple-option-wrong-type           | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
-171-multiple-option-wrong-value          | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
 180-final-wrong-type                     | Parameter `final` has an invalid type. Expected types: bool. Received: 'wrong' (str)
 190-hidden-wrong-type                    | Parameter `hidden` has an invalid type. Expected types: bool. Received: 'wrong' (str)
 200-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: False (bool)
 210-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
 220-metavar-but-no-complete              | Option ['-o'] has metavar set, but has no complete
 230-optional-arg-but-no-complete         | Option ['-o'] has optional_arg=True, but has no complete
-240-repeatable-and-multiple-option       | No error
 ======= Directory "03-positional" =======
 200-no-number                            | Parameter `number` has an invalid type. Expected types: int. Received: None (NoneType)
 201-number-wrong-type                    | Parameter `number` has an invalid type. Expected types: int. Received: 'wrong' (str)

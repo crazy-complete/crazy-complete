@@ -45,11 +45,6 @@ p.add_argument('--abbreviate-options', metavar='BOOL', default=False, type=boole
     help='Sets whether options can be abbreviated'
 ).complete('choices', ('True', 'False'))
 
-# Be backwards compatible
-p.add_argument('--multiple-options', metavar='BOOL', default=False, type=boolean,
-    help=argparse.SUPPRESS, dest='repeatable_options',
-).complete('choices', ('True', 'False'))
-
 p.add_argument('--repeatable-options', metavar='BOOL', default=False, type=boolean,
     help='Sets whether options are suggested multiple times during completion'
 ).complete('choices', ('True', 'False'))

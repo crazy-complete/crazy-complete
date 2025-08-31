@@ -1,4 +1,0 @@
-prog: "foo"
-options:
-  - option_strings: ['-o']
-    multiple_option: "wrong"
