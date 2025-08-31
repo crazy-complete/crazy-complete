@@ -97,32 +97,6 @@ else
 
   if test -n "$options"
     for option in (string split -- ',' $options)
-#ifdef FISH3
-      # Using one big switch case is the fastest way
-      switch $option
-#ifdef long_options
-        case '--?*=';   set -a long_opts_with_arg           (string replace -- '='  '' $option)
-        case '--?*=\?'; set -a long_opts_with_optional_arg  (string replace -- '=?' '' $option)
-        case '--?*';    set -a long_opts_without_arg        $option
-#endif
-#ifdef short_options
-        case '-?=';     set -a short_opts_with_arg          (string replace -- '='  '' $option)
-        case '-?=\?';   set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
-        case '-?';      set -a short_opts_without_arg       $option
-#endif
-#ifdef old_options
-        case '-??*=';   set -a old_opts_with_arg            (string replace -- '='  '' $option)
-        case '-??*=\?'; set -a old_opts_with_optional_arg   (string replace -- '=?' '' $option)
-        case '-??*';    set -a old_opts_without_arg         $option
-#endif
-#ifdef DEBUG
-        case '*'
-          echo "%FUNCNAME%: argv[1]: '$option' is not a short, long or old-style option" >&2
-          return 1
-#endif
-      end
-#endif
-#ifdef FISH4
       if false
         true
 #ifdef long_options
@@ -150,7 +124,6 @@ else
         set -a old_opts_without_arg $option
 #endif
       end
-#endif
     end
   end
 

@@ -22,7 +22,7 @@ p = argparse.ArgumentParser('crazy-complete',
     description='Generate shell auto completion files for all major shells',
     exit_on_error=False)
 
-p.add_argument('shell', choices=('bash', 'fish', 'fish3', 'fish4', 'zsh', 'json', 'yaml'),
+p.add_argument('shell', choices=('bash', 'fish', 'zsh', 'json', 'yaml'),
     help='Specify the shell type for the completion script')
 
 p.add_argument('definition_file',
@@ -164,11 +164,7 @@ def generate(opts):
     if opts.shell == 'bash':
         output = bash.generate_completion(cmdline, conf)
     elif opts.shell == 'fish':
-        output = fish.generate_completion(cmdline, conf, versions.get_fish_major_version())
-    elif opts.shell == 'fish3':
-        output = fish.generate_completion(cmdline, conf, 3)
-    elif opts.shell == 'fish4':
-        output = fish.generate_completion(cmdline, conf, 4)
+        output = fish.generate_completion(cmdline, conf)
     elif opts.shell == 'zsh':
         output = zsh.generate_completion(cmdline, conf)
 
@@ -176,8 +172,6 @@ def generate(opts):
         file = {
             'bash':  paths.get_bash_completion_file,
             'fish':  paths.get_fish_completion_file,
-            'fish3': paths.get_fish_completion_file,
-            'fish4': paths.get_fish_completion_file,
             'zsh':   paths.get_zsh_completion_file,
         }[opts.shell](cmdline.prog)
 

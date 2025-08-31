@@ -45,7 +45,7 @@ Installation
 Synopsis
 ========
 
-> `crazy-complete [OPTIONS] {bash,fish,fish3,fish4,zsh,yaml,json} <DEFINITION_FILE>`
+> `crazy-complete [OPTIONS] {bash,fish,zsh,yaml,json} <DEFINITION_FILE>`
 
 Options
 =======

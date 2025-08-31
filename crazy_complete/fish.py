@@ -301,16 +301,12 @@ def _define_option_types(ctxt, commandline):
             else:
                 ctxt.helpers.use_function('fish_query', 'old_options')
 
-def generate_completion(commandline, config=None, version=4):
+def generate_completion(commandline, config=None):
     if config is None:
         config = config_.Config()
 
-    if version not in (3, 4):
-        raise CrazyError('Fish version must be 3 or 4')
-
     commandline = generation.enhance_commandline(commandline, config)
     helpers = fish_helpers.FishHelpers(commandline.prog)
-    helpers.define(f'FISH{version}')
     ctxt = generation.GenerationContext(config, helpers)
     result = generation.visit_commandlines(FishCompletionGenerator, ctxt, commandline)
 
