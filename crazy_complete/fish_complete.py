@@ -52,12 +52,12 @@ class FishCompleteChoices(FishCompletionBase):
 
     def get_code(self):
         if hasattr(self.choices, 'items'):
-            code = 'printf "%s\\t%s\\n" \\\n'
+            code = "printf '%s\\t%s\\n' \\\n"
             for item, description in self.choices.items():
                 code += '  %s %s \\\n' % (shell.escape(str(item)), shell.escape(str(description)))
             return code.rstrip(' \\\n')
         else:
-            code = 'printf "%s\\n" \\\n'
+            code = "printf '%s\\n' \\\n"
             for item in self.choices:
                 code += '  %s \\\n' % (shell.escape(str(item)))
             return code.rstrip(' \\\n')
@@ -107,12 +107,12 @@ class FishCompleteValueList:
         funcname = ctxt.helpers.get_unique_function_name(ctxt)
 
         if hasattr(values, 'items'):
-            code = 'printf "%s\\t%s\\n" \\\n'
+            code = "printf '%s\\t%s\\n' \\\n"
             for item, desc in values.items():
                 code += '  %s %s \\\n' % (shell.escape(item), shell.escape(desc))
             code = code.rstrip(' \\\n')
         else:
-            code = 'printf "%s\\n" \\\n'
+            code = "printf '%s\\n' \\\n"
             for value in values:
                 code += '  %s \\\n' % shell.escape(value)
             code = code.rstrip(' \\\n')

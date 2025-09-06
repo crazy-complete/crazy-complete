@@ -327,9 +327,9 @@ def generate_completion(commandline, config=None):
         output.append(code)
         output.append('')
 
-    output.append('set -l prog "%s"' % commandline.prog)
+    output.append("set -l prog '%s'" % commandline.prog)
     if helpers.is_used('fish_query'):
-        output.append('set -l query "%s"' % helpers.use_function('fish_query'))
+        output.append("set -l query '%s'" % helpers.use_function('fish_query'))
 
     output.append('')
     output.append('# Delete existing completions')

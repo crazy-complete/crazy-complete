@@ -52,10 +52,10 @@ set -l option_values
 #ifdef DEBUG
 switch (count $argv)
   case 0
-    echo "%FUNCNAME%: missing OPTIONS argument" >&2
+    echo '%FUNCNAME%: missing OPTIONS argument' >&2
     return 1
   case 1
-    echo "%FUNCNAME%: missing COMMAND" >&2
+    echo '%FUNCNAME%: missing COMMAND' >&2
     return 1
 end
 #endif
@@ -161,14 +161,14 @@ else
           end
         else
           set -a having_options $arg
-          set -a option_values ""
+          set -a option_values ''
         end
 #endif
       case '-*'
         set -l end_of_parsing false
 
 #ifdef old_options
-        if string match -q -- "*=*" $arg
+        if string match -q -- '*=*' $arg
           set -l split (string split -m 1 -- '=' $arg)
           if contains -- $split[1] $old_opts_with_arg $old_opts_with_optional_arg
             set -a having_options $split[1]
@@ -184,7 +184,7 @@ else
           end
         else if contains -- $arg $old_opts_without_arg $old_opts_with_optional_arg
           set -a having_options $arg
-          set -a option_values ""
+          set -a option_values ''
           set end_of_parsing true
         end
 #endif
@@ -198,7 +198,7 @@ else
 
           if contains -- $option $short_opts_without_arg
             set -a having_options $option
-            set -a option_values ""
+            set -a option_values ''
           else if contains -- $option $short_opts_with_arg
             set end_of_parsing true
 
@@ -240,7 +240,7 @@ switch $cmd
 #ifdef positional_contains
   case 'positional_contains'
     if test (count $argv) -eq 0
-      echo "%FUNCNAME%: positional_contains: argv[3]: missing number" >&2
+      echo '%FUNCNAME%: positional_contains: argv[3]: missing number' >&2
       return 1
     end
 
@@ -253,7 +253,7 @@ switch $cmd
 #ifdef with_incomplete
     set -l with_incomplete false
 
-    if test $argv[1] = "WITH_INCOMPLETE"
+    if test $argv[1] = 'WITH_INCOMPLETE'
       set with_incomplete true
       set -e argv[1]
     end
@@ -289,17 +289,17 @@ switch $cmd
       case 0
         count $positionals
       case 1
-        echo "%FUNCNAME%: num_of_positionals: $argv[1]: missing operand" >&2
+        echo '%FUNCNAME%: num_of_positionals: $argv[1]: missing operand' >&2
         return 1
       case 2
         if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
           test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
         else
-          echo "%FUNCNAME%: num_of_positionals: $argv[1]: unknown operator" >&2
+          echo '%FUNCNAME%: num_of_positionals: $argv[1]: unknown operator' >&2
           return 1
         end
       case '*'
-        echo "%FUNCNAME%: num_of_positionals: too many arguments" >&2
+        echo '%FUNCNAME%: num_of_positionals: too many arguments' >&2
         return 1
     end
 #endif
@@ -320,7 +320,7 @@ switch $cmd
     end
 
     if test (count $values) -eq 0
-      echo "%FUNCNAME%: missing values" >&2
+      echo '%FUNCNAME%: missing values' >&2
       return 1
     end
 
@@ -339,7 +339,7 @@ switch $cmd
 #endif
 #ifdef DEBUG
   case '*'
-    echo "%FUNCNAME%: argv[2]: invalid command" >&2
+    echo '%FUNCNAME%: argv[2]: invalid command' >&2
     return 1
 #endif
 end
@@ -385,10 +385,10 @@ end
 
 if set -q files[1]
   if set -q _flag_directories[1]
-    set files (printf "%s\n" $files | string match -r '.*/$')
+    set files (printf '%s\n' $files | string match -r '.*/$')
   end
 
-  printf "%s\n" $files\t"$desc"
+  printf '%s\n' $files\t"$desc"
 end
 ''')
 
