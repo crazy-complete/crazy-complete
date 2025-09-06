@@ -42,30 +42,28 @@ done < <(eval "$1")
 
 _VALUE_LIST = helpers.ShellFunction('value_list', r'''
 local separator="$1"; shift
-local -a values=("$@")
-local -a having_values
 
 if [[ -z "$cur" ]]; then
-  COMPREPLY=("${values[@]}")
+  COMPREPLY=("$@")
   return
 fi
 
+local value having_value found_value
+local -a having_values remaining_values
+
 IFS="$separator" read -r -a having_values <<< "$cur"
 
-local -a remaining_values=()
-local value having_value found_value
-
-for value in "${values[@]}"; do
-  found_value=false
+for value; do
+  found_value=0
 
   for having_value in "${having_values[@]}"; do
     if [[ "$value" == "$having_value" ]]; then
-      found_value=true
+      found_value=1
       break
     fi
   done
 
-  if ! $found_value; then
+  if (( ! found_value )); then
     remaining_values+=("$value")
   fi
 done

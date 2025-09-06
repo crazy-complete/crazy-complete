@@ -123,7 +123,7 @@ class BashCompletionGenerator:
             return ' '.join(shell.escape(option_string) for option_string in r)
 
         r  = 'if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then\n'
-        r += '  local -a opts=()\n'
+        r += '  local -a opts\n'
         for option in self.options:
             if option.hidden:
                 continue
