@@ -166,10 +166,10 @@ class BashCompletionGenerator:
 
         r = ''
         for positional in self.positionals:
-            operator = '-eq'
+            operator = '=='
             if positional.repeatable:
-                operator = '-ge'
-            r += 'test "$POSITIONAL_NUM" %s %d && ' % (operator, positional.get_positional_num())
+                operator = '>='
+            r += '(( POSITIONAL_NUM %s %d )) && ' % (operator, positional.get_positional_num())
             if positional.when:
                 r += '%s && ' % self._generate_when_conditions(positional.when)
             r += '%s\n\n' % make_block(self._complete_option(positional, False))
@@ -177,7 +177,7 @@ class BashCompletionGenerator:
         if self.subcommands:
             cmds = self.subcommands.get_choices().keys()
             complete = self.completer.choices(self.ctxt, cmds).get_code()
-            r += 'test "$POSITIONAL_NUM" -eq %d && ' % self.subcommands.get_positional_num()
+            r += '(( POSITIONAL_NUM == %d )) && ' % self.subcommands.get_positional_num()
             r += '%s\n\n' % make_block(complete)
         return r.strip()
 
