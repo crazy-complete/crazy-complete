@@ -13,6 +13,7 @@ from . import helpers
 from . import bash_helpers
 from . import bash_complete
 from . import bash_parser
+from . import bash_parser_v2
 from . import bash_option_completion
 from .bash_utils import make_option_variable_name, get_OptionAbbreviationGenerator
 from . import generation
@@ -216,7 +217,10 @@ class BashCompletionGenerator:
             r += '_init_completion -n = || return'
             code['init_completion'] = r
 
-            c = bash_parser.generate(self.commandline)
+            v1 = bash_parser.generate(self.commandline)
+            v2 = bash_parser_v2.generate(self.commandline)
+            c  = v1 if len(v1) < len(v2) else v2
+
             func = helpers.ShellFunction('parse_commandline', c)
             self.ctxt.helpers.add_function(func)
 

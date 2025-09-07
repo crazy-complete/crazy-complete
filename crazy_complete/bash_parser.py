@@ -5,13 +5,14 @@ from collections import namedtuple
 from . import utils
 from . import shell
 from .bash_utils import make_option_variable_name, CasePatterns, get_OptionAbbreviationGenerator
+from .bash_parser_subcommand_code import *
 
 _PARSER_CODE = '''\
 POSITIONALS=()
 END_OF_OPTIONS=0
 POSITIONAL_NUM=0
 
-local cmd="${words[0]}" argi arg i char trailing_chars
+local cmd="root" argi arg i char trailing_chars
 
 for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
   arg="${words[argi]}"
@@ -54,17 +55,17 @@ _OPT_ISSET = '_OPT_ISSET_'
 def generate(commandline):
     commandlines = []
     commandline.visit_commandlines(lambda o: commandlines.append(o))
-    commandlines = reversed(commandlines)
+    commandlines = list(reversed(commandlines))
 
     long_option_cases = []
     short_option_cases = []
-    subcommand_call_code = []
+
+    subcommand_call_code = make_subcommand_call_code(commandlines)
 
     for commandline in commandlines:
         option_cases = generate_option_cases(commandline)
-        command = commandline.get_command_paths_pattern()
-        if commandline.inherit_options:
-            command += '*'
+        command = get_subcommand_path(commandline)
+        #if commandline.inherit_options  ## TODO
 
         if option_cases.long_options:
             r =  'case "$cmd" in %s)\n' % command
@@ -84,18 +85,6 @@ def generate(commandline):
             r += 'esac'
             short_option_cases.append(r)
 
-        if commandline.get_subcommands_option():
-            positional_num = commandline.get_subcommands_option().get_positional_num()
-            r =  'if (( POSITIONAL_NUM == %d )); then\n' % positional_num
-            r += '  case "$arg" in\n'
-            for subcommand in commandline.get_subcommands_option().subcommands:
-                r += '    %s)\n' % '|'.join(utils.get_all_command_variations(subcommand))
-                r += '      cmd+=" %s";;\n' % subcommand.prog
-            r += '    *) cmd+=" $arg";;\n'
-            r += '  esac\n'
-            r += 'fi'
-            subcommand_call_code.append(r)
-
     s = _PARSER_CODE
 
     if long_option_cases:
@@ -111,8 +100,7 @@ def generate(commandline):
         s = s.replace('%SHORT_OPTION_CASES%\n', '')
 
     if subcommand_call_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%',
-            utils.indent('\n\n'.join(subcommand_call_code), 6))
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', utils.indent(subcommand_call_code, 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 
@@ -154,14 +142,14 @@ def make_short_option_case(
     r = ''
 
     if complete and optional_arg is True:
-        r += '%s)\n'    % CasePatterns.for_short(short_options)
+        r += '%s)\n' % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
         r += '  then %s+=("$trailing_chars")\n' % value_variable
-        r += '  else %s+=(%s)\n'                % (value_variable,_OPT_ISSET)
+        r += '  else %s+=(%s)\n'                % (value_variable, _OPT_ISSET)
         r += '  fi\n'
         r += '  continue 2;;'
     elif complete:
-        r += '%s)\n'    % CasePatterns.for_short(short_options)
+        r += '%s)\n' % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
         r += '  then %s+=("$trailing_chars")\n'   % value_variable
         r += '  else %s+=("${words[++argi]}")\n'  % value_variable
