@@ -53,19 +53,13 @@ __zsh_query_contains() {
   return 1
 }
 
-if [[ $# == 0 ]]; then
-  echo "%FUNCNAME%: missing command" >&2
-  return 1;
-fi
-
-local cmd="$1"
-shift
+local cmd="$1"; shift
 
 case "$cmd" in
   get_positional)
-    if test $# -ne 1; then
+    if (( $# != 1 )); then
       echo "%FUNCNAME%: get_positional: takes exactly one argument" >&2
-      return 1;
+      return 1
     fi
 
     if test "$1" -eq 0; then
@@ -74,20 +68,18 @@ case "$cmd" in
     fi
 
     printf "%s" "${POSITIONALS[$1]}"
-    return 0
-    ;;
+    return 0;;
   has_option)
 #ifdef with_incomplete
-    local with_incomplete=0
-    [[ "$1" == "WITH_INCOMPLETE" ]] && { with_incomplete=1; shift; }
+    local option='' with_incomplete=0
+    [[ "$1" == 'WITH_INCOMPLETE' ]] && { with_incomplete=1; shift; }
 
 #endif
-    if test $# -eq 0; then
+    if (( $# == 0 )); then
       echo "%FUNCNAME%: has_option: arguments required" >&2
-      return 1;
+      return 1
     fi
 
-    local option=''
     for option in "${HAVING_OPTIONS[@]}"; do
       __zsh_query_contains "$option" "$@" && return 0
     done
@@ -97,57 +89,41 @@ case "$cmd" in
       __zsh_query_contains "$INCOMPLETE_OPTION" "$@" && return 0
 
 #endif
-    return 1
-    ;;
+    return 1;;
   option_is)
-    local -a cmd_option_is_options cmd_option_is_values
-    local end_of_options_num=0
+    local i=0 dash_dash_pos=0 cmd_option_is_options=() cmd_option_is_values=()
 
-    while test $# -ge 1; do
-      if [[ "$1" == "--" ]]; then
-        (( ++end_of_options_num ))
-      elif test $end_of_options_num -eq 0; then
-        cmd_option_is_options+=("$1")
-      elif test $end_of_options_num -eq 1; then
-        cmd_option_is_values+=("$1")
-      fi
+    dash_dash_pos=${@[(i)--]}
+    cmd_option_is_options=("${@:1:$((dash_dash_pos - 1))}")
+    cmd_option_is_values=("${@:$((dash_dash_pos + 1))}")
 
-      shift
-    done
-
-    if test ${#cmd_option_is_options[@]} -eq 0; then
+    if (( ${#cmd_option_is_options[@]} == 0 )); then
       echo "%FUNCNAME%: option_is: missing options" >&2
       return 1
     fi
 
-    if test ${#cmd_option_is_values[@]} -eq 0; then
+    if (( ${#cmd_option_is_values[@]} == 0 )); then
       echo "%FUNCNAME%: option_is: missing values" >&2
       return 1
     fi
 
-    local I=${#HAVING_OPTIONS[@]}
-    while test $I -ge 1; do
-      local option="${HAVING_OPTIONS[$I]}"
+    for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
+      local option="${HAVING_OPTIONS[$i]}"
       if __zsh_query_contains "$option" "${cmd_option_is_options[@]}"; then
-        local VALUE="${OPTION_VALUES[$I]}"
-        __zsh_query_contains "$VALUE" "${cmd_option_is_values[@]}" && return 0
+        local value="${OPTION_VALUES[$i]}"
+        __zsh_query_contains "$value" "${cmd_option_is_values[@]}" && return 0
       fi
-
-      (( --I ))
     done
 
-    return 1
-    ;;
+    return 1;;
   init)
     local IFS=','
     local -a options=(${=1})
     unset IFS
-    shift
-    ;;
+    shift;;
   *)
     echo "%FUNCNAME%: argv[1]: invalid command" >&2
-    return 1
-    ;;
+    return 1;;
 esac
 
 # continuing init...
@@ -157,13 +133,13 @@ esac
 # ===========================================================================
 
 #ifdef old_options
-local -a   old_opts_with_arg=()   old_opts_with_optional_arg=()   old_opts_without_arg=()
+local   old_opts_with_arg=()   old_opts_with_optional_arg=()   old_opts_without_arg=()
 #endif
 #ifdef long_options
-local -a  long_opts_with_arg=()  long_opts_with_optional_arg=()  long_opts_without_arg=()
+local  long_opts_with_arg=()  long_opts_with_optional_arg=()  long_opts_without_arg=()
 #endif
 #ifdef short_options
-local -a short_opts_with_arg=() short_opts_with_optional_arg=() short_opts_without_arg=()
+local short_opts_with_arg=() short_opts_with_optional_arg=() short_opts_without_arg=()
 #endif
 
 local option=''
@@ -198,7 +174,7 @@ OPTION_VALUES=()
 INCOMPLETE_OPTION=''
 
 local argi=2 # argi[1] is program name
-while [[ $argi -le $# ]]; do
+for ((; argi <= $#; ++argi)); do
   local arg="${@[$argi]}"
   local have_trailing_arg=$(test $argi -lt $# && echo true || echo false)
 
@@ -206,7 +182,7 @@ while [[ $argi -le $# ]]; do
     -)
       POSITIONALS+=(-);;
     --)
-      for argi in $(seq $((argi + 1)) $#); do
+      for argi in $(command seq $((argi + 1)) $#); do
         POSITIONALS+=("${@[$argi]}")
       done
       break;;
@@ -218,8 +194,7 @@ while [[ $argi -le $# ]]; do
       if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
         if $have_trailing_arg; then
           HAVING_OPTIONS+=("$arg")
-          OPTION_VALUES+=("${@[$((argi + 1))]}")
-          (( argi++ ))
+          OPTION_VALUES+=("${@[$((++argi))]}")
 #ifdef with_incomplete
         else
           INCOMPLETE_OPTION="$arg"
@@ -232,23 +207,21 @@ while [[ $argi -le $# ]]; do
 #endif
       ;;
     -*)
-      local end_of_parsing=false
+      local end_of_parsing=0
 
 #ifdef old_options
       if [[ "$arg" == *=* ]]; then
-        local option="${arg%%=*}"
-        local value="${arg#*=}"
+        local option="${arg%%=*}" value="${arg#*=}"
         if __zsh_query_contains "$option" "${old_opts_with_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("$value")
-          end_of_parsing=true
+          end_of_parsing=1
         fi
       elif __zsh_query_contains "$arg" "${old_opts_with_arg[@]}"; then
-        end_of_parsing=true
+        end_of_parsing=1
         if $have_trailing_arg; then
           HAVING_OPTIONS+=("$arg")
-          OPTION_VALUES+=("${@[$((argi + 1))]}")
-          (( argi++ ))
+          OPTION_VALUES+=("${@[$((++argi))]}")
 #ifdef with_incomplete
         else
           INCOMPLETE_OPTION="$arg"
@@ -257,14 +230,13 @@ while [[ $argi -le $# ]]; do
       elif __zsh_query_contains "$arg" "${old_opts_without_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
         HAVING_OPTIONS+=("$arg")
         OPTION_VALUES+=("")
-        end_of_parsing=true
+        end_of_parsing=1
       fi
 #endif
 
 #ifdef short_options
-      local arg_length=${#arg}
-      local i=1
-      while ! $end_of_parsing && test $i -lt $arg_length; do
+      local i=1 arg_length=${#arg}
+      for ((; ! end_of_parsing && i < arg_length; ++i)); do
         local option="-${arg:$i:1}"
         local trailing_chars="${arg:$((i+1))}"
 
@@ -272,41 +244,35 @@ while [[ $argi -le $# ]]; do
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("")
         elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
-          end_of_parsing=true
+          end_of_parsing=1
 
           if [[ -n "$trailing_chars" ]]; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("$trailing_chars")
           elif $have_trailing_arg; then
             HAVING_OPTIONS+=("$option")
-            OPTION_VALUES+=("${@[$((argi + 1))]}")
-            (( argi++ ))
+            OPTION_VALUES+=("${@[$((++argi))]}")
 #ifdef with_incomplete
           else
             INCOMPLETE_OPTION="$option"
 #endif
           fi
         elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
-          end_of_parsing=true
+          end_of_parsing=1
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("$trailing_chars") # may be empty
         fi
-
-        (( i++ ))
       done
 #endif
       ;;
     *)
       POSITIONALS+=("$arg");;
   esac
-
-  (( argi++ ))
 done
 ''')
 
 _EXEC = helpers.ShellFunction('exec', r'''
-local -a describe=()
-local item='' desc=''
+local item='' desc='' describe=()
 
 while IFS=$'\t' read -r item desc; do
   item="${item//:/\\:}"

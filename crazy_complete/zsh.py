@@ -122,7 +122,7 @@ class ZshCompletionFunction:
             sub_funcname = shell.make_completion_funcname(subcommand)
             cmds = utils.get_all_command_variations(subcommand)
             pattern = '|'.join(shell.escape(s) for s in cmds)
-            r += f'  ({pattern}) {sub_funcname}; return $?;;\n'
+            r += f'  {pattern}) {sub_funcname}; return $?;;\n'
         r += 'esac'
 
         return r
