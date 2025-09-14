@@ -283,6 +283,8 @@ _describe '' describe
 ''')
 
 class ZshHelpers(helpers.GeneralHelpers):
+    '''Class holding helper functions for Zsh.'''
+
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
         self.add_function(_ZSH_QUERY_FUNC)

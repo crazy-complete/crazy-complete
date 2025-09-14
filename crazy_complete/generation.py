@@ -25,7 +25,7 @@ class OptionGenerationContext(GenerationContext):
         self.commandline = commandline
         self.option = option
 
-def apply_config(commandline, config):
+def _apply_config(commandline, config):
     '''Applies configuration settings to a command line object.
 
     If a setting in the CommandLine or Option object is set to ExtendedBool.INHERIT,
@@ -57,7 +57,7 @@ def apply_config(commandline, config):
         if option.repeatable == cli.ExtendedBool.INHERIT:
             option.repeatable = config.repeatable_options
 
-def add_parsed_when(commandline):
+def _add_parsed_when(commandline):
     for option in commandline.options:
         if option.when:
             try:
@@ -72,13 +72,22 @@ def add_parsed_when(commandline):
             option.when_parsed = None
 
 def enhance_commandline(commandline, config):
+    '''Enhance commandline.
+
+    - Make a copy of commandline
+    - Apply configuration to it
+    - Add `when_parsed` attribute
+    '''
+
     commandline = commandline.copy()
-    commandline.visit_commandlines(lambda c: apply_config(c, config))
-    commandline.visit_commandlines(lambda c: add_parsed_when(c))
+    commandline.visit_commandlines(lambda c: _apply_config(c, config))
+    commandline.visit_commandlines(lambda c: _add_parsed_when(c))
     completion_validator.validate_commandlines(commandline)
     return commandline
 
 def visit_commandlines(completion_class, ctxt, commandline):
+    '''Visit commandlines with a completer class.'''
+
     result = []
 
     def _call_generator(commandline):

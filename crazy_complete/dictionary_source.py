@@ -140,6 +140,8 @@ def dictionaries_to_commandline(dictionaries):
     return root.commandline
 
 def option_to_dictionary(self):
+    '''Convert a cli.Option object to a dictionary.'''
+
     r = OrderedDict()
 
     r['option_strings'] = self.option_strings
@@ -174,6 +176,8 @@ def option_to_dictionary(self):
     return r
 
 def positional_to_dictionary(self):
+    '''Convert a cli.Positional object to a dictionary.'''
+
     r = OrderedDict()
 
     r['number'] = self.number
@@ -196,6 +200,8 @@ def positional_to_dictionary(self):
     return r
 
 def commandline_to_dictionary(commandline):
+    '''Convert a cli.CommandLine object to a dictionary.'''
+
     r = OrderedDict()
 
     r['prog'] = commandline.get_command_path()
@@ -228,6 +234,8 @@ def commandline_to_dictionary(commandline):
     return r
 
 def commandline_to_dictionaries(commandline):
+    '''Convert a cli.CommandLine object to dictionaries.'''
+
     dictionaries = []
     commandline.visit_commandlines(lambda c: dictionaries.append(commandline_to_dictionary(c)))
     return dictionaries

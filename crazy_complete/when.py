@@ -4,7 +4,11 @@ import shlex
 
 from .errors import CrazyError
 
+# pylint: disable=too-few-public-methods
+
 class OptionIs:
+    '''Class for holding `option_is`.'''
+
     def __init__(self, args):
         self.options = []
         self.values = []
@@ -25,6 +29,8 @@ class OptionIs:
             raise CrazyError('OptionIs: Empty values')
 
 class HasOption:
+    '''Class for holding `has_option`.'''
+
     def __init__(self, args):
         self.options = args
 
@@ -32,6 +38,8 @@ class HasOption:
             raise CrazyError('HasOption: Empty options')
 
 def parse_when(s):
+    '''Parse `when` string and return an object.'''
+
     split = shlex.split(s)
 
     if not split:

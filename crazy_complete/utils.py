@@ -2,9 +2,15 @@
 
 import sys
 
-# =============================================================================
-# Utility functions
-# =============================================================================
+def warn(*a):
+    '''Print a warning.'''
+
+    print('WARNING:', *a, file=sys.stderr)
+
+def print_err(*a):
+    '''Print to STDERR.'''
+
+    print(*a, file=sys.stderr)
 
 def is_iterable(obj):
     '''Check if an object is iterable.
@@ -15,6 +21,7 @@ def is_iterable(obj):
     Returns:
         bool: True if the object is iterable, False otherwise.
     '''
+
     return hasattr(obj, '__iter__') and not isinstance(obj, str)
 
 class GeneralAbbreviationGenerator:
@@ -25,6 +32,7 @@ class GeneralAbbreviationGenerator:
         abbreviations (dict): A dictionary mapping each word to its list of abbreviations.
         min_lengths (dict): A dictionary mapping each word to its minimum abbreviation length.
     '''
+
     def __init__(self, min_abbreviated_length, words):
         '''Initialize the GeneralAbbreviationGenerator instance.
 
@@ -68,6 +76,7 @@ class GeneralAbbreviationGenerator:
         Returns:
             list: A list of abbreviations for the given word.
         '''
+
         assert isinstance(word, str), \
             "GeneralAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
 
@@ -82,6 +91,7 @@ class GeneralAbbreviationGenerator:
         Returns:
             list: A list of abbreviations for the given words.
         '''
+
         assert is_iterable(words), \
             "GeneralAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
@@ -92,6 +102,7 @@ class GeneralAbbreviationGenerator:
 
 class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
     '''AbbreviationGenerator for abbreviating long and old-style options.'''
+
     def __init__(self, words):
         assert is_iterable(words), \
             "OptionAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
@@ -104,12 +115,13 @@ class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
             elif word.startswith('-') and len(word) > 2:
                 pass
             else:
-                raise Exception('Not a long or old-style option: %r' % word)
+                raise ValueError('Not a long or old-style option: %r' % word)
 
         super().__init__(3, words)
 
 class CommandAbbreviationGenerator(GeneralAbbreviationGenerator):
     '''AbbreviationGenerator for abbreviating commands.'''
+
     def __init__(self, words):
         super().__init__(1, words)
 
@@ -118,16 +130,21 @@ class DummyAbbreviationGenerator:
 
     This class is used as a placeholder when abbreviation generation is not required.
     '''
+
     def __init__(self):
         pass
 
     def get_abbreviations(self, word):
+        '''Don't abbreviate, just return the input.'''
+
         assert isinstance(word, str), \
             "DummyAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
 
         return [word]
 
     def get_many_abbreviations(self, words):
+        '''Don't abbreviate, just return the input.'''
+
         assert is_iterable(words), \
             "DummyAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
@@ -136,9 +153,9 @@ class DummyAbbreviationGenerator:
 def get_all_command_variations(commandline):
     '''Return all possible names for this command.
 
-    If `commandline.abbreviate_commands` is True, also return abbreviated
-    forms.
+    If `commandline.abbreviate_commands` is True, also return abbreviated forms.
     '''
+
     if commandline.parent is None:
         return [commandline.prog] + commandline.aliases
 
@@ -163,6 +180,7 @@ def indent(string, num_spaces):
     Returns:
         str: The indented string.
     '''
+
     assert isinstance(string, str), "indent: string: expected str, got %r" % string
     assert isinstance(num_spaces, int), "indent: num_spaces: expected int, got %r" % num_spaces
 
@@ -170,10 +188,15 @@ def indent(string, num_spaces):
     indented_lines = [((' ' * num_spaces) + line) if line.strip() else line for line in lines]
     return '\n'.join(indented_lines)
 
-def warn(*a):
-    print('WARNING:', *a, file=sys.stderr)
-
 def is_worth_a_function(commandline):
+    '''Check if a commandline "is worth a function".
+
+    This means that a commandline has on of:
+        - Subcommands
+        - Positionals
+        - Options that aren't --help or --version
+    '''
+
     if len(commandline.get_positionals()) > 0:
         return True
 

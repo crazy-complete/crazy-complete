@@ -1,29 +1,41 @@
-'''Utility functions for zsh.'''
+'''Utility functions for Zsh.'''
 
 from . import algo
 from . import shell
 
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments
+
 def escape_colon(s):
+    '''Escape colons in a string with backslash.'''
+
     return s.replace(':', '\\:')
 
 def escape_square_brackets(s):
+    '''Escape square brackets with backslash.'''
+
     return s.replace('[', '\\[').replace(']', '\\]')
 
 def make_option_spec(
         option_strings,
         conflicting_options = None,
-        description = None,
-        complete = None,
-        optional_arg = False,
-        repeatable = False,
-        final = False,
-        metavar = None,
-        action = None
+        description         = None,
+        complete            = None,
+        optional_arg        = False,
+        repeatable          = False,
+        final               = False,
+        metavar             = None,
+        action              = None
     ):
+
     '''
-    Return something like this:
+    Make a Zsh option spec.
+
+    Returns something like this:
         (--option -o){--option=,-o+}[Option description]:Metavar:Action
     '''
+
     result = []
 
     if conflicting_options is None:
@@ -66,6 +78,7 @@ def make_option_spec(
     if description is not None:
         result.append(shell.escape('[%s]' % escape_colon(escape_square_brackets(description))))
 
+    # Complete ================================================================
     if complete:
         if metavar is None:
             metavar = ' '
@@ -73,4 +86,3 @@ def make_option_spec(
         result.append(':%s:%s' % (shell.escape(escape_colon(metavar)), action))
 
     return ''.join(result)
-

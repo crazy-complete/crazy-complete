@@ -259,8 +259,8 @@ def parse_option_with_metavar(stream):
             return OptionWithMetavar(opt, parse_metavar(stream), optional)
 
         return OptionWithMetavar(opt, metavar, optional)
-    else:
-        return None
+
+    return None
 
 def parse_option_delimiter(stream):
     '''Parse an option delimiter and return True if it was found, False otherwise.'''
@@ -272,6 +272,7 @@ def parse_option_delimiter(stream):
     return False
 
 def parse_options_with_description(stream):
+    '''Parse options with description.'''
     options = []
     description = None
 
@@ -313,5 +314,4 @@ def get_program_name_from_help(string):
     m = re.match('usage:[\n\t ]+([^\n\t ]+)', string, re.I)
     if m:
         return m[1]
-    else:
-        return string.split()[0]
+    return string.split()[0]

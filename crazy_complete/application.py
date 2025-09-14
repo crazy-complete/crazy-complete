@@ -1,20 +1,29 @@
+'''Class for main command line application.'''
+
 import os
 import argparse
 
 from .errors import CrazyError
 from . import bash, fish, zsh
 from . import argparse_source, json_source, yaml_source
-from . import argparse_mod # .complete() etc.
+from . import argparse_mod # .complete()
 from . import help_converter
+from . import utils
 from . import config
 from . import paths
 
+# The import of `argparse_mod` only modifies the classes provided by the argparse
+# module. We use the dummy function to silence warnings about the unused import.
+argparse_mod.dummy()
+
 
 def boolean(string):
+    '''Convert string to bool, else raise ValueError.'''
+
     try:
         return {'true': True, 'false': False}[string.lower()]
-    except KeyError:
-        raise ValueError(f"Not a bool: {string}")
+    except KeyError as e:
+        raise ValueError(f"Not a bool: {string}") from e
 
 
 p = argparse.ArgumentParser('crazy-complete',
@@ -93,7 +102,18 @@ grp.add_argument('-u', '--uninstall-system-wide', default=False, action='store_t
 _crazy_complete_argument_parser = p
 del p
 
+def write_string_to_file(string, file):
+    '''Writes string to file if file is given.'''
+
+    if file is not None:
+        with open(file, 'w', encoding='utf-8') as fh:
+            fh.write(string)
+    else:
+        print(string)
+
 def load_definition_file(opts):
+    '''Load a definition file as specified in `opts`.'''
+
     if opts.input_type == 'auto':
         basename = os.path.basename(opts.definition_file)
         extension = os.path.splitext(basename)[1].lower().strip('.')
@@ -117,14 +137,9 @@ def load_definition_file(opts):
 
     raise AssertionError("Should not be reached")
 
-def write_string_to_file(string, file):
-    if file is not None:
-        with open(file, 'w', encoding='utf-8') as fh:
-            fh.write(string)
-    else:
-        print(string)
-
 def generate(opts):
+    '''Generate output file as specified in `opts`.'''
+
     if opts.input_type == 'help':
         if opts.shell != 'yaml':
             raise CrazyError('The `help` input-type currently only supports YAML generation')
@@ -170,15 +185,17 @@ def generate(opts):
         }[opts.shell](cmdline.prog)
 
         if opts.install_system_wide:
-            print_err(f'Installing to {file}')
+            utils.print_err(f'Installing to {file}')
             write_string_to_file(output, file)
         else:
-            print_err(f'Removing {file}')
+            utils.print_err(f'Removing {file}')
             os.remove(file)
     else:
         write_string_to_file(output, opts.output_file)
 
 class Application:
+    '''Class for main command line application.'''
+
     def __init__(self):
         self.options = None
 

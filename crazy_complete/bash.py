@@ -255,6 +255,8 @@ class BashCompletionGenerator:
         self.result = r
 
 def generate_completion(commandline, config=None):
+    '''Code for generating a Bash auto completion file.'''
+
     if config is None:
         config = config_.Config()
 

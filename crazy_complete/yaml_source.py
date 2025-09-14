@@ -12,7 +12,11 @@ from . import scheme_validator
 from .extended_yaml_parser import ExtendedYAMLParser
 from .cli import ExtendedBool
 
+# pylint: disable=redefined-builtin
+
 def option_to_yaml(dictionary):
+    '''Convert an option dictionary to YAML.'''
+
     option_strings  = dictionary['option_strings']
     metavar         = dictionary.get('metavar',         None)
     help            = dictionary.get('help',            None)
@@ -56,6 +60,8 @@ def option_to_yaml(dictionary):
     return r.rstrip()
 
 def positional_to_yaml(dictionary):
+    '''Convert a positional dictionary to YAML.'''
+
     number     = dictionary['number']
     metavar    = dictionary.get('metavar',    None)
     help       = dictionary.get('help',       None)
@@ -83,6 +89,8 @@ def positional_to_yaml(dictionary):
     return r.rstrip()
 
 def to_yaml(dictionary):
+    '''Convert a single dictionary to YAML.'''
+
     prog                = dictionary['prog']
     aliases             = dictionary.get('aliases',             None)
     help                = dictionary.get('help',                None)
@@ -124,6 +132,8 @@ def to_yaml(dictionary):
     return r.rstrip()
 
 def commandline_to_yaml(commandline):
+    '''Convert a cli.CommandLine object to YAML.'''
+
     dictionaries = dictionary_source.commandline_to_dictionaries(commandline)
     r = []
 
@@ -133,6 +143,8 @@ def commandline_to_yaml(commandline):
     return '\n---\n'.join(r)
 
 def load_from_file(file):
+    '''Load a YAML file and turn it into a cli.CommandLine object.'''
+
     # First, load using normal yaml loader. It gives better error messages
     # in case of syntax errors.
     with open(file, 'r', encoding='utf-8') as fh:

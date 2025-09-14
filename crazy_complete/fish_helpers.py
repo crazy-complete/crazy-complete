@@ -393,6 +393,8 @@ end
 ''')
 
 class FishHelpers(helpers.GeneralHelpers):
+    '''Class holding helper functions for Fish.'''
+
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
         self.add_function(_FISH_QUERY)

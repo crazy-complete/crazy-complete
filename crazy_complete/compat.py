@@ -6,6 +6,8 @@ from . import utils
 # they are handled elsewhere
 
 def fix_option_dictionary(dictionary):
+    '''Fix an option dictionary.'''
+
     if not isinstance(dictionary, dict):
         return
 
@@ -18,6 +20,8 @@ def fix_option_dictionary(dictionary):
             dictionary['groups'] = [dictionary.pop('group')]
 
 def fix_commandline_dictionary(dictionary):
+    '''Fix a commandline dictionary.'''
+
     if not isinstance(dictionary, dict):
         return
 
@@ -28,6 +32,8 @@ def fix_commandline_dictionary(dictionary):
             fix_option_dictionary(option)
 
 def fix_commandline_dictionaries(dictionaries):
+    '''Fix a list of commandline dictionaries.'''
+
     if not isinstance(dictionaries, list):
         return
 

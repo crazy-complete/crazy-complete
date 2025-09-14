@@ -1,6 +1,8 @@
 '''Contains code for preprocessing text.'''
 
 def preprocess(string, defines):
+    '''Simple preprocessor function.'''
+
     defines = set(defines)
     output = []
     stack = []
@@ -27,10 +29,12 @@ def preprocess(string, defines):
     return ''.join(output)
 
 def strip_double_empty_lines(string):
+    '''Collapse triple newlines into double newlines.'''
+
     return string.replace('\n\n\n', '\n\n')
 
-if __name__ == '__main__':
-    input_str = """\
+def _test():
+    string = """\
 Lorem Ipsum
 #ifdef DEBUG
     This is debug code.
@@ -41,6 +45,8 @@ Lorem Ipsum
 Dolor Sit Amet\
 """
     defines = ["DEBUG"]
-
-    result = preprocess(input_str, defines)
+    result = preprocess(string, defines)
     print(result)
+
+if __name__ == '__main__':
+    _test()

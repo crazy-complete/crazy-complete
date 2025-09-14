@@ -7,9 +7,7 @@ local cur word append=0
 
 [[ "$1" == "-a" ]] && { shift; append=1; }
 [[ "$1" == "--" ]] && { shift; }
-
-cur="$1"
-shift
+cur="$1"; shift
 
 (( append )) || COMPREPLY=()
 
@@ -86,13 +84,15 @@ fi
 ''')
 
 _PREFIX_COMPREPLY = helpers.ShellFunction('prefix_compreply', r'''
-local i=0 prefix="$1"
+local i prefix="$1"
 for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
   COMPREPLY[i]="$prefix${COMPREPLY[i]}"
 done
 ''')
 
 class BashHelpers(helpers.GeneralHelpers):
+    '''Class holding helper functions for Bash.'''
+
     def __init__(self, function_prefix):
         super().__init__(function_prefix)
         self.add_function(_COMPGEN_W_REPLACEMENT)

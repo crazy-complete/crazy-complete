@@ -4,9 +4,11 @@ from . import shell
 from . import helpers
 
 class FishCompletionBase:
+    '''Base class for Fish completions.'''
+
     def get_args(self):
         '''Return a list of arguments to be appended to the `complete`
-        command in FISH.
+        command in Fish.
 
         The returned arguments should be in raw form, without any escaping.
         Escaping will be handled at a later stage.
@@ -18,6 +20,8 @@ class FishCompletionBase:
         raise NotImplementedError
 
 class FishCompleteNone(FishCompletionBase):
+    '''Class for completing an argument without a completer.'''
+
     def get_args(self):
         return ['-f']
 
@@ -26,6 +30,7 @@ class FishCompleteNone(FishCompletionBase):
 
 class FishCompletionCommand(FishCompletionBase):
     '''Class for executing a command and parsing its output.'''
+
     def  __init__(self, command):
         self.command = command
 
@@ -36,6 +41,8 @@ class FishCompletionCommand(FishCompletionBase):
         return ['-f', '-a', '(%s)' % self.command]
 
 class FishCompleteChoices(FishCompletionBase):
+    '''Class for completing choices.'''
+
     def __init__(self, ctxt, choices):
         self.ctxt = ctxt
         self.choices = choices
@@ -63,13 +70,12 @@ class FishCompleteChoices(FishCompletionBase):
             return code.rstrip(' \\\n')
 
 class FishCompleteFileDir(FishCompletionBase):
+    '''Class for completing file/dir completion.'''
+
     def __init__(self, ctxt, mode, opts):
         self.ctxt = ctxt
         self.mode = mode
-        self.directory = None
-
-        if opts is not None:
-            self.directory = opts.get('directory', None)
+        self.directory = None if opts is None else opts.get('directory', None)
 
     def get_args(self):
         if self.mode == 'file':
@@ -78,7 +84,7 @@ class FishCompleteFileDir(FishCompletionBase):
                 return ['-f', '-a', '(%s -C %s)' % (funcname, shell.escape(self.directory))]
 
             return ['-F']
-        elif self.mode == 'directory':
+        else: # self.mode == 'directory'
             if self.directory is not None:
                 funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
                 return ['-f', '-a', '(%s -D -C %s)' % (funcname, shell.escape(self.directory))]
@@ -93,14 +99,16 @@ class FishCompleteFileDir(FishCompletionBase):
                 return '%s -C %s' % (funcname, shell.escape(self.directory))
             else:
                 return '%s' % funcname
-        elif self.mode == 'directory':
+        else: # self.mode == 'directory'
             if self.directory is not None:
                 funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
                 return '%s -D -C %s' % (funcname, shell.escape(self.directory))
 
             return '__fish_complete_directories'
 
-class FishCompleteValueList:
+class FishCompleteValueList(FishCompletionBase):
+    '''Class for completing a list of values.'''
+
     def __init__(self, ctxt, opts):
         separator = opts.get('separator', ',')
         values = opts['values']
@@ -128,7 +136,9 @@ class FishCompleteValueList:
     def get_code(self):
         return self.cmd
 
-class FishCompleteCombine:
+class FishCompleteCombine(FishCompletionBase):
+    '''Used for combining multiple complete commands.'''
+
     def __init__(self, ctxt, completer, commands):
         self.ctxt = ctxt
         self.code = []
@@ -142,33 +152,35 @@ class FishCompleteCombine:
         return '\n'.join(self.code)
 
     def get_args(self):
-        code_is_singleline = True
-        for code in self.code:
-            if '\n' in code:
-                code_is_singleline = False
+        code_is_singleline = not any('\n' in code for code in self.code)
 
         if code_is_singleline:
             return ['-f', '-a', '(%s)' % '; '.join(self.code)]
-        else:
-            code = '\n'.join(self.code)
-            funcname = self.ctxt.helpers.get_unique_function_name(self.ctxt)
-            self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
-            return ['-f', '-a', '(%s)' % self.ctxt.helpers.use_function(funcname)]
+
+        code = '\n'.join(self.code)
+        funcname = self.ctxt.helpers.get_unique_function_name(self.ctxt)
+        self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
+        return ['-f', '-a', '(%s)' % self.ctxt.helpers.use_function(funcname)]
 
 class FishCompleter(shell.ShellCompleter):
-    def none(self, ctxt, *a):
+    '''Code generator for completing arguments in Fish.'''
+
+    # pylint: disable=missing-function-docstring
+    # pylint: disable=too-many-public-methods
+
+    def none(self, _ctxt, *_):
         return FishCompleteNone()
 
-    def integer(self, ctxt, *a):
+    def integer(self, _ctxt, *_):
         return FishCompleteNone()
 
-    def float(self, ctxt, *a):
+    def float(self, _ctxt, *_):
         return FishCompleteNone()
 
     def choices(self, ctxt, choices):
         return FishCompleteChoices(ctxt, choices)
 
-    def command(self, ctxt):
+    def command(self, __ctxt):
         return FishCompletionCommand("__fish_complete_command")
 
     def directory(self, ctxt, opts=None):
@@ -177,43 +189,43 @@ class FishCompleter(shell.ShellCompleter):
     def file(self, ctxt, opts=None):
         return FishCompleteFileDir(ctxt, 'file', opts)
 
-    def group(self, ctxt):
+    def group(self, _ctxt):
         return FishCompletionCommand("__fish_complete_groups")
 
-    def hostname(self, ctxt):
+    def hostname(self, _ctxt):
         return FishCompletionCommand("__fish_print_hostnames")
 
-    def pid(self, ctxt):
+    def pid(self, _ctxt):
         return FishCompletionCommand("__fish_complete_pids")
 
-    def process(self, ctxt):
+    def process(self, _ctxt):
         return FishCompletionCommand("__fish_complete_proc")
 
-    def range(self, ctxt, start, stop, step=1):
+    def range(self, _ctxt, start, stop, step=1):
         if step == 1:
             return FishCompletionCommand(f"command seq {start} {stop}")
-        else:
-            return FishCompletionCommand(f"command seq {start} {step} {stop}")
 
-    def service(self, ctxt):
+        return FishCompletionCommand(f"command seq {start} {step} {stop}")
+
+    def service(self, _ctxt):
         return FishCompletionCommand("__fish_systemctl_services")
 
-    def user(self, ctxt):
+    def user(self, _ctxt):
         return FishCompletionCommand("__fish_complete_users")
 
-    def variable(self, ctxt):
+    def variable(self, _ctxt):
         return FishCompletionCommand("set -n")
 
-    def environment(self, ctxt):
+    def environment(self, _ctxt):
         return FishCompletionCommand("set -n -x")
 
-    def exec(self, ctxt, command):
+    def exec(self, _ctxt, command):
         return FishCompletionCommand(command)
 
-    def exec_fast(self, ctxt, command):
+    def exec_fast(self, _ctxt, command):
         return FishCompletionCommand(command)
 
-    def exec_internal(self, ctxt, command):
+    def exec_internal(self, _ctxt, command):
         return FishCompletionCommand(command)
 
     def value_list(self, ctxt, opts):

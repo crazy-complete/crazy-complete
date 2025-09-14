@@ -1,4 +1,4 @@
-'''Fish utility functions.'''
+'''Fish utility functions and classes.'''
 
 from .errors import InternalError
 from . import shell
@@ -36,11 +36,14 @@ class FishString:
         '''Initializes a FishString instance.
 
         Args:
-            s (str): The string to be used for command-line purposes.
-            raw (bool, optional): If True, indicates that the string `s` is already escaped
-                                  and should not be escaped again. Defaults to False.
+            s (str):
+                The string to be used for command-line purposes.
+            raw (bool, optional):
+                If True, indicates that the string `s` is already escaped
+                and should not be escaped again. Defaults to False.
         '''
         assert isinstance(s, str)
+        assert isinstance(raw, bool)
         self.s = s
         self.raw = raw
 
@@ -64,13 +67,18 @@ class FishString:
         return repr(self.s)
 
 def make_fish_string(s, raw):
+    '''Make a fish string.'''
+
     if s is not None:
         return FishString(s, raw)
-    else:
-        return None
+
+    return None
 
 class FishCompleteCommand:
-    '''Class for creating FISH's `complete` command.'''
+    '''Class for creating Fish's `complete` command.'''
+
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self):
         self.command       = None
         self.description   = None
@@ -82,31 +90,42 @@ class FishCompleteCommand:
         self.flags         = set()
 
     def set_command(self, command, raw=False):
+        '''Set the command (-c|--command).'''
         self.command = make_fish_string(command, raw)
 
     def set_description(self, description, raw=False):
+        '''Set the description (-d|--description).'''
         self.description = make_fish_string(description, raw)
 
     def add_short_options(self, opts, raw=False):
+        '''Add short options (-s|--short-option).'''
         self.short_options.extend(make_fish_string(o.lstrip('-'), raw) for o in opts)
 
     def add_long_options(self, opts, raw=False):
+        '''Add long options (-l|--long-option).'''
         self.long_options.extend(make_fish_string(o.lstrip('-'), raw) for o in opts)
 
     def add_old_options(self, opts, raw=False):
+        '''Add old options (-o|--old-option).'''
         self.old_options.extend(make_fish_string(o.lstrip('-'), raw) for o in opts)
 
     def set_condition(self, condition, raw=False):
+        '''Set the condition (-n|--condition).'''
         self.condition = make_fish_string(condition, raw)
 
     def set_arguments(self, arguments, raw=False):
+        '''Set the arguments (-a|--arguments).'''
         self.arguments = make_fish_string(arguments, raw)
 
     def add_flag(self, flag):
+        '''Set a flag.'''
         self.flags.add(flag)
 
     def parse_args(self, args):
-        while len(args):
+        '''Parse args (an iterable) and apply it to the instance.'''
+        args = list(args)
+
+        while len(args) > 0:
             arg = args.pop(0)
 
             if arg == '-f':
@@ -122,6 +141,8 @@ class FishCompleteCommand:
                 raise InternalError(f'Unknown option for `complete`: {arg}')
 
     def get(self):
+        '''Return the `complete` command.'''
+
         r = ['complete']
 
         if self.command is not None:
@@ -160,12 +181,18 @@ class FishCompleteCommand:
         return ' '.join(v if isinstance(v, str) else v.escape() for v in r)
 
 class VariableManager:
+    '''
+    Manages the creation of unique shell variables for a given name prefix.
+    '''
+
     def __init__(self, variable_name):
         self.variable_name = variable_name
         self.value_to_variable  = {}
         self.counter = 0
 
     def add(self, value):
+        '''Add a value and get its associated shell variable.'''
+
         if value in self.value_to_variable:
             return '$%s' % self.value_to_variable[value]
 
@@ -175,6 +202,8 @@ class VariableManager:
         return '$%s' % var
 
     def get_lines(self):
+        '''Generate shell code to define all stored variables.'''
+
         r = []
         for value, variable in self.value_to_variable.items():
             r.append('set -l %s %s' % (variable, value))

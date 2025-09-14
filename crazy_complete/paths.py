@@ -7,12 +7,17 @@ import subprocess
 
 from . import utils
 
+# pylint: disable=broad-exception-caught
+# pylint: disable=broad-exception-raised
+
 def _pkg_config(args):
     '''
     Call the `pkg-config` program with `args` and check the return code.
     If everything is fine, return the output as string.
     '''
+
     command = ['pkg-config'] + args
+
     try:
         result = subprocess.run(
             command,
@@ -29,7 +34,10 @@ def _pkg_config(args):
     raise Exception('Command `%s` failed: %s' % (' '.join(command), result.stderr.strip()))
 
 def get_bash_completion_file(program_name):
+    '''Get the path for a Bash completion file.'''
+
     directory = '/usr/share/bash-completion/completions'
+
     try:
         directory = _pkg_config(['--variable=completionsdir', 'bash-completion'])
     except Exception as e:
@@ -38,7 +46,10 @@ def get_bash_completion_file(program_name):
     return f'{directory}/{program_name}'
 
 def get_fish_completion_file(program_name):
+    '''Get the path for a Fish completion file.'''
+
     directory = '/usr/share/fish/vendor_completions.d'
+
     try:
         directory = _pkg_config(['--variable=completionsdir', 'fish'])
     except Exception as e:
@@ -47,6 +58,8 @@ def get_fish_completion_file(program_name):
     return f'{directory}/{program_name}.fish'
 
 def get_zsh_completion_file(program_name):
+    '''Get the path for a Zsh completion file.'''
+
     # There is '/usr/share/zsh/vendor-completions', but that directory is not
     # in the default $fpath of zsh.
     directory = '/usr/share/zsh/site-functions'

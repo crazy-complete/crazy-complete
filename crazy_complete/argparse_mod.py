@@ -10,6 +10,11 @@ from .cli import ExtendedBool
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access
 
+def dummy():
+    '''Since this module only modifies the classes by argparse we provide this
+    function so it can be called to silence warnings.'''
+
+
 def _action_complete(self, command, *args):
     setattr(self, '_complete', (command, *args))
     return self
@@ -66,15 +71,15 @@ def _parser_remove_help(self):
     self._option_string_actions.pop('--help')
 
 
-argparse.Action.complete = _action_complete
-argparse.Action.get_complete = _action_get_complete
-argparse.Action.when = _action_when
-argparse.Action.get_when = _action_get_when
-argparse.Action.set_repeatable = _action_set_repeatable
-argparse.Action.get_repeatable = _action_get_repeatable
-argparse.Action.set_final = _action_set_final
-argparse.Action.get_final = _action_get_final
-argparse.ArgumentParser.alias = _parser_alias
-argparse.ArgumentParser.aliases = _parser_aliases
+argparse.Action.complete            = _action_complete
+argparse.Action.get_complete        = _action_get_complete
+argparse.Action.when                = _action_when
+argparse.Action.get_when            = _action_get_when
+argparse.Action.set_repeatable      = _action_set_repeatable
+argparse.Action.get_repeatable      = _action_get_repeatable
+argparse.Action.set_final           = _action_set_final
+argparse.Action.get_final           = _action_get_final
+argparse.ArgumentParser.alias       = _parser_alias
+argparse.ArgumentParser.aliases     = _parser_aliases
 argparse.ArgumentParser.get_aliases = _parser_get_aliases
 argparse.ArgumentParser.remove_help = _parser_remove_help

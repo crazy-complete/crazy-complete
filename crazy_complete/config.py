@@ -1,11 +1,13 @@
 '''This module contains the configuration class.'''
 
+# pylint: disable=too-many-instance-attributes
+
 def _assert_is_bool(obj, func, param):
     if not isinstance(obj, bool):
         raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")
 
 class Config:
-    '''A class representing configuration settings for command line completion.'''
+    '''Class representing configuration settings for command line completion.'''
 
     def __init__(self):
         self.abbreviate_commands = False
@@ -42,6 +44,7 @@ class Config:
         See Also:
             cli.CommandLine(..., abbreviate_commands=BOOL, ...)
         '''
+
         _assert_is_bool(enable, "set_abbreviate_commands", "enable")
 
         self.abbreviate_commands = enable
@@ -70,6 +73,7 @@ class Config:
         See Also:
             cli.CommandLine(..., abbreviate_options=BOOL, ...)
         '''
+
         _assert_is_bool(enable, "set_abbreviate_options", "enable")
 
         self.abbreviate_options = enable
@@ -99,6 +103,7 @@ class Config:
         See Also:
             cli.CommandLine.add_option(..., repeatable=BOOL, ...)
         '''
+
         _assert_is_bool(enable, "set_repeatable_options", "enable")
 
         self.repeatable_options = enable
@@ -128,6 +133,7 @@ class Config:
         See Also:
             cli.CommandLine(..., inherit_options=BOOL, ...)
         '''
+
         _assert_is_bool(enable, "set_inherit_options", "enable")
 
         self.inherit_options = enable
@@ -137,7 +143,7 @@ class Config:
 
         The modeline comment looks like this:
 
-            # vim: ft=zsh
+            # vim: ft=zsh ts=2 sts=2 sw=2 et
 
         Args:
             enable (bool):
@@ -147,6 +153,7 @@ class Config:
         Notes:
             This feature defaults to `True`.
         '''
+
         _assert_is_bool(enable, "set_vim_modeline", "enable")
 
         self.vim_modeline = enable
@@ -169,22 +176,28 @@ class Config:
         Notes:
             This feature defaults to `True`
         '''
+
         _assert_is_bool(enable, "set_zsh_compdef", "enable")
 
         self.zsh_compdef = enable
 
     def set_fish_fast(self, enable):
+        '''Use faster conditions at the cost of correctness.'''
+
         _assert_is_bool(enable, "set_fish_fast", "enable")
 
         self.fish_fast = enable
 
     def set_fish_inline_conditions(self, enable):
+        '''Don't store conditions in an extra variable.'''
+
         _assert_is_bool(enable, "set_fish_inline_conditions", "enable")
 
         self.fish_inline_conditions = enable
 
     def include_file(self, file):
         '''Add a file which should be included to the generated code.'''
+
         assert isinstance(file, str), \
             f"Config.include_file: file: expected str, got `{file}`"
 
@@ -192,11 +205,19 @@ class Config:
 
     def include_many_files(self, files):
         '''Add files which should be included to the generated code.'''
+
+        assert hasattr(files, '__iter__') and not isinstance(files, str), \
+            f"Config.include_many_files: files: expected iterable, got `{files}`"
+
         self.include_files.extend(files)
 
     def get_included_files_content(self):
+        '''Return a list of contents of all included files.'''
+
         content = []
+
         for file in self.include_files:
             with open(file, 'r', encoding='utf-8') as fh:
                 content.append(fh.read().strip())
+
         return content

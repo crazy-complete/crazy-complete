@@ -7,13 +7,11 @@ import argparse
 import traceback
 
 from crazy_complete import application
+from crazy_complete.utils import print_err
 
 # "Import" argparse definitions for:
 #   crazy-complete --input-type=python bash "$(which crazy-complete)"
 p = application._crazy_complete_argument_parser
-
-def print_err(*a):
-    print(*a, file=sys.stderr)
 
 if __name__ == '__main__':
     app = application.Application()

@@ -302,6 +302,8 @@ def _define_option_types(ctxt, commandline):
                 ctxt.helpers.use_function('fish_query', 'old_options')
 
 def generate_completion(commandline, config=None):
+    '''Code for generating a Fish auto completion file.'''
+
     if config is None:
         config = config_.Config()
 
@@ -311,7 +313,7 @@ def generate_completion(commandline, config=None):
     result = generation.visit_commandlines(FishCompletionGenerator, ctxt, commandline)
 
     if helpers.is_used('fish_query'):
-       commandline.visit_commandlines(
+        commandline.visit_commandlines(
             lambda cmdline: _define_option_types(ctxt, cmdline))
 
     output = []

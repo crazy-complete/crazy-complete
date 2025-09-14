@@ -6,19 +6,30 @@ from itertools import product
 from types import NoneType
 
 from .errors import CrazyError, CrazyTypeError
-from . import shell
+
+# pylint: disable=redefined-builtin
+# pylint: disable=too-few-public-methods
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments
 
 class ExtendedBool:
+    '''Class that holds an extended bool.'''
+
     TRUE    = True
     FALSE   = False
     INHERIT = 'INHERIT'
 
 def is_extended_bool(obj):
+    '''Check if `obj` an instance of `ExtendedBool.INHERIT`.'''
+
     return obj in (True, False, ExtendedBool.INHERIT)
 
 _VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
 
 def validate_option_string(option_string):
+    '''Check if `option_string` is a valid option string.'''
+
     if not _VALID_OPTION_STRING_RE.fullmatch(option_string):
         return False
 
@@ -102,6 +113,7 @@ class CommandLine:
         Returns:
             Option: The newly added Option object.
         '''
+
         o = Option(self, option_strings, **parameters)
         self.options.append(o)
         return o
@@ -114,6 +126,7 @@ class CommandLine:
         Returns:
             Positional: The newly added Positional object.
         '''
+
         p = Positional(self, number, **parameters)
         self.positionals.append(p)
         return p
@@ -124,6 +137,7 @@ class CommandLine:
         Returns:
             MutuallyExclusiveGroup: The newly created mutually exclusive group.
         '''
+
         return MutuallyExclusiveGroup(self, group)
 
     def add_subcommands(self, name='command', help=None):
@@ -139,6 +153,7 @@ class CommandLine:
         Raises:
             CrazyError: If the command line object already has subcommands.
         '''
+
         if not isinstance(name, str):
             raise CrazyTypeError('name', 'str', name)
 
@@ -183,12 +198,16 @@ class CommandLine:
         '''Gets a list of options associated with the command line.
 
         Args:
-            with_parent_options (bool): If True, include options from parent command lines.
-            only_with_arguments (bool): If True, include only options that take arguments.
+            with_parent_options (bool):
+                If True, include options from parent command lines.
+
+            only_with_arguments (bool):
+                If True, include only options that take arguments.
 
         Returns:
             list: A list of Option objects
         '''
+
         assert isinstance(with_parent_options, bool), \
             "CommandLine.get_options: with_parent_options: expected bool, got %r" % with_parent_options
 
@@ -204,12 +223,16 @@ class CommandLine:
         '''Gets a list of option strings associated with the command line.
 
         Args:
-            with_parent_options (bool): If True, include options from parent command lines.
-            only_with_arguments (bool): If True, include only options that take arguments.
+            with_parent_options (bool):
+                If True, include options from parent command lines.
+
+            only_with_arguments (bool):
+                If True, include only options that take arguments.
 
         Returns:
             list: A list of option strings
         '''
+
         assert isinstance(with_parent_options, bool), \
             "CommandLine.get_option_strings: with_parent_options: expected bool, got %r" % with_parent_options
 
@@ -224,6 +247,8 @@ class CommandLine:
         return option_strings
 
     def get_final_options(self):
+        '''Gets a list of all final options.'''
+
         r = []
         for option in self.options:
             if option.final:
@@ -231,6 +256,8 @@ class CommandLine:
         return r
 
     def get_final_option_strings(self):
+        '''Gets a list of all final option strings.'''
+
         r = []
         for option in self.get_final_options():
             r.extend(option.option_strings)
@@ -245,6 +272,7 @@ class CommandLine:
         Returns:
             list: A list of positional arguments
         '''
+
         return list(self.positionals)
 
     def get_subcommands_option(self):
@@ -253,6 +281,7 @@ class CommandLine:
         Returns:
             SubCommandsOption or None: The subcommands option if it exists, otherwise None.
         '''
+
         return self.subcommands
 
     def get_parents(self, include_self=False):
@@ -264,6 +293,7 @@ class CommandLine:
         Returns:
             list: A list of parent CommandLine objects.
         '''
+
         assert isinstance(include_self, bool), \
             "CommandLine.get_parents: include_self: expected bool, got %r" % include_self
 
@@ -280,6 +310,8 @@ class CommandLine:
         return parents
 
     def get_options_by_option_strings(self, option_strings):
+        '''Return all options containing one option_strings.'''
+
         result = []
 
         for option_string in option_strings:
@@ -296,6 +328,8 @@ class CommandLine:
         return result
 
     def get_highest_positional_num(self):
+        '''Get the highest positional number.'''
+
         highest = 0
         for positional in self.positionals:
             highest = max(highest, positional.number)
@@ -304,19 +338,23 @@ class CommandLine:
         return highest
 
     def get_program_name(self):
+        '''Return the program name.'''
+
         commandlines = self.get_parents(include_self=True)
         return commandlines[0].prog
 
     def get_command_path(self):
+        '''Return the full command path.'''
+
         cmd = ' '.join(c.prog for c in self.get_parents(include_self=True))
         return cmd
 
-    def get_command_paths_pattern(self):
-        paths = []
-        for cmdline in self.get_parents(include_self=True):
-            paths.append(cmdline.get_all_commands(with_aliases=True))
-
-        return '|'.join(shell.escape(" ".join(combo)) for combo in product(*paths))
+    #def get_command_paths_pattern(self):
+    #    paths = []
+    #    for cmdline in self.get_parents(include_self=True):
+    #        paths.append(cmdline.get_all_commands(with_aliases=True))
+    #
+    #    return '|'.join(shell.escape(" ".join(combo)) for combo in product(*paths))
 
     def get_all_commands(self, with_aliases=True):
         r = [self.prog]
@@ -325,6 +363,8 @@ class CommandLine:
         return r
 
     def visit_commandlines(self, callback):
+        '''Apply a callback to all CommandLine objects.'''
+
         callback(self)
         if self.get_subcommands_option():
             for sub in self.get_subcommands_option().subcommands:
@@ -332,6 +372,7 @@ class CommandLine:
 
     def copy(self):
         '''Make a copy of the current CommandLine object, including sub-objects.'''
+
         copy = CommandLine(
             self.prog,
             parent              = None,
@@ -374,15 +415,15 @@ class CommandLine:
 
     def __eq__(self, other):
         return (
-            isinstance(other, CommandLine) and
-            self.prog                == other.prog and
-            self.aliases             == other.aliases and
-            self.help                == other.help and
+            isinstance(other, CommandLine)                        and
+            self.prog                == other.prog                and
+            self.aliases             == other.aliases             and
+            self.help                == other.help                and
             self.abbreviate_commands == other.abbreviate_commands and
-            self.abbreviate_options  == other.abbreviate_options and
-            self.inherit_options     == other.inherit_options and
-            self.options             == other.options and
-            self.positionals         == other.positionals and
+            self.abbreviate_options  == other.abbreviate_options  and
+            self.inherit_options     == other.inherit_options     and
+            self.options             == other.options             and
+            self.positionals         == other.positionals         and
             self.subcommands         == other.subcommands
         )
 
@@ -411,6 +452,7 @@ class Positional:
             complete (list): The completion specification for the positional.
             when (str): Specifies a condition for showing this positional.
         '''
+
         if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
@@ -450,6 +492,7 @@ class Positional:
         Returns:
             int: The index of the positional argument.
         '''
+
         positional_no = self.number - 1
 
         for commandline in self.parent.get_parents():
@@ -473,17 +516,18 @@ class Positional:
         Returns:
             int: The number of the positional argument.
         '''
+
         return self.get_positional_index() + 1
 
     def __eq__(self, other):
         return (
-            isinstance(other, Positional) and
-            self.number          == other.number and
-            self.metavar         == other.metavar and
-            self.help            == other.help and
-            self.repeatable      == other.repeatable and
-            self.complete        == other.complete and
-            self.when            == other.when
+            isinstance(other, Positional)       and
+            self.number     == other.number     and
+            self.metavar    == other.metavar    and
+            self.help       == other.help       and
+            self.repeatable == other.repeatable and
+            self.complete   == other.complete   and
+            self.when       == other.when
         )
 
 class Option:
@@ -518,6 +562,7 @@ class Option:
         Returns:
             Option: The newly added Option object.
         '''
+
         if not isinstance(parent, (CommandLine, NoneType)):
             raise CrazyTypeError('parent', 'CommandLine|None', parent)
 
@@ -590,9 +635,12 @@ class Option:
         Returns:
             list: A list of strings representing the option strings.
         '''
+
         return self.option_strings
 
     def get_option_strings_key(self, delimiter=' '):
+        '''Returns a key with consisting of all option strings.'''
+
         return delimiter.join(sorted(self.option_strings))
 
     def get_short_option_strings(self):
@@ -601,6 +649,7 @@ class Option:
         Returns:
             list: A list of short option strings ("-o").
         '''
+
         return [o for o in self.option_strings if o.startswith('-') and len(o) == 2]
 
     def get_long_option_strings(self):
@@ -609,6 +658,7 @@ class Option:
         Returns:
             list: A list of long option strings ("--option").
         '''
+
         return [o for o in self.option_strings if o.startswith('--')]
 
     def get_old_option_strings(self):
@@ -617,6 +667,7 @@ class Option:
         Returns:
             list: A list of old-style option strings ("-option").
         '''
+
         return [o for o in self.option_strings if o.startswith('-') and not o.startswith('--') and len(o) > 2]
 
     def get_conflicting_options(self):
@@ -625,6 +676,7 @@ class Option:
         Returns:
             list: A list of Option objects representing conflicting options.
         '''
+
         if not self.groups:
             return []
         r = []
@@ -643,24 +695,25 @@ class Option:
         Returns:
             list: A list of option strings representing conflicting options.
         '''
-        option_strings = []
+
+        r = []
         for option in self.get_conflicting_options():
-            option_strings.extend(option.get_option_strings())
-        return option_strings
+            r.extend(option.get_option_strings())
+        return r
 
     def __eq__(self, other):
         return (
-            isinstance(other, Option) and
-            self.option_strings  == other.option_strings and
-            self.metavar         == other.metavar and
-            self.help            == other.help and
-            self.optional_arg    == other.optional_arg and
-            self.repeatable      == other.repeatable and
-            self.final           == other.final and
-            self.hidden          == other.hidden and
-            self.complete        == other.complete and
-            self.groups          == other.groups and
-            self.when            == other.when
+            isinstance(other, Option)                   and
+            self.option_strings == other.option_strings and
+            self.metavar        == other.metavar        and
+            self.help           == other.help           and
+            self.optional_arg   == other.optional_arg   and
+            self.repeatable     == other.repeatable     and
+            self.final          == other.final          and
+            self.hidden         == other.hidden         and
+            self.complete       == other.complete       and
+            self.groups         == other.groups         and
+            self.when           == other.when
         )
 
     def __repr__(self):
@@ -687,6 +740,8 @@ class SubCommandsOption(Positional):
         return commandline
 
     def get_choices(self, with_aliases=True):
+        '''Return a mapping of command and its description.'''
+
         r = OrderedDict()
         for subcommand in self.subcommands:
             r[subcommand.prog] = subcommand.help
@@ -697,18 +752,19 @@ class SubCommandsOption(Positional):
 
     def __eq__(self, other):
         return (
-            isinstance(other, SubCommandsOption) and
-            self.subcommands    == other.subcommands and
-            self.help           == other.help and
-            self.metavar        == other.metavar and
-            self.complete       == other.complete
+            isinstance(other, SubCommandsOption)  and
+            self.subcommands == other.subcommands and
+            self.help        == other.help        and
+            self.metavar     == other.metavar     and
+            self.complete    == other.complete
         )
 
     def __repr__(self):
-        return '{help: %r, subcommands %r}' % (
-            self.help, self.subcommands)
+        return '{help: %r, subcommands %r}' % (self.help, self.subcommands)
 
 class MutuallyExclusiveGroup:
+    '''Helper class for adding mutually exclusive options.'''
+
     def __init__(self, parent, group):
         assert isinstance(parent, CommandLine), \
             "MutuallyExclusiveGroup: parent: expected CommandLine, got %r" % parent
@@ -724,6 +780,7 @@ class MutuallyExclusiveGroup:
 
         For a list of valid parameters, see `class Option`.
         '''
+
         if 'groups' in parameters:
             raise CrazyError('Paramter `groups` not allowed')
 
@@ -737,5 +794,6 @@ class MutuallyExclusiveGroup:
 
     def add_option(self, option):
         '''Adds an option object.'''
+
         option.parent = self.parent
         option.groups = [self.group]

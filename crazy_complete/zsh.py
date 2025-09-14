@@ -1,4 +1,4 @@
-'''Code for generating a zsh auto completion file.'''
+'''Code for generating a Zsh auto completion file.'''
 
 from collections import namedtuple, OrderedDict
 
@@ -15,6 +15,12 @@ from . import zsh_utils
 Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
 
 class ZshCompletionFunction:
+    '''Class for generating a zsh completion function.'''
+
+    # pylint: disable=too-many-branches
+    # pylint: disable=too-few-public-methods
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, ctxt, commandline):
         self.commandline = commandline
         self.ctxt = ctxt
@@ -37,13 +43,13 @@ class ZshCompletionFunction:
                 r.extend('%s' % s for s in o.option_strings)
         return ','.join(r)
 
-    def complete(self, option, command, *args):
+    def _complete(self, option, command, *args):
         context = self.ctxt.getOptionGenerationContext(self.commandline, option)
         return self.completer.complete(context, command, *args)
 
-    def complete_option(self, option):
+    def _complete_option(self, option):
         if option.complete:
-            action = self.complete(option, *option.complete)
+            action = self._complete(option, *option.complete)
         else:
             action = None
 
@@ -61,19 +67,19 @@ class ZshCompletionFunction:
 
         return Arg(option, option.when, option.hidden, option_spec)
 
-    def complete_subcommands(self, option):
+    def _complete_subcommands(self, option):
         choices = option.get_choices()
         self.command_counter += 1
 
         option_spec = "%d:command%d:%s" % (
             option.get_positional_num(),
             self.command_counter,
-            self.complete(option, 'choices', choices)
+            self._complete(option, 'choices', choices)
         )
 
         return Arg(option, None, False, option_spec)
 
-    def complete_positional(self, option):
+    def _complete_positional(self, option):
         positional_num = option.get_positional_num()
         if option.repeatable:
             positional_num = "'*'"
@@ -81,7 +87,7 @@ class ZshCompletionFunction:
         option_spec = "%s:%s:%s" % (
             positional_num,
             shell.escape(zsh_utils.escape_colon(option.help or option.metavar or ' ')),
-            self.complete(option, *option.complete)
+            self._complete(option, *option.complete)
         )
 
         return Arg(option, option.when, False, option_spec)
@@ -94,7 +100,7 @@ class ZshCompletionFunction:
 
         # We have to call these functions first, because they tell us if
         # the zsh_query function is used.
-        self.code['1-subcommands'] = self._generate_subcommand()
+        self.code['1-subcommands'] = self._generate_subcommand_call()
         self.code['2-options']     = self._generate_option_parsing()
 
         if self.query_used:
@@ -104,12 +110,7 @@ class ZshCompletionFunction:
             r += '%s init "$opts" "${words[@]}"' % zsh_query
             self.code['0-init'] = r
 
-    def get_code(self):
-        return '%s() {\n%s\n}' % (
-            self.funcname,
-            utils.indent('\n\n'.join(c for c in self.code.values() if c), 2))
-
-    def _generate_subcommand(self):
+    def _generate_subcommand_call(self):
         if not self.subcommands:
             return ''
 
@@ -136,20 +137,20 @@ class ZshCompletionFunction:
             options = self.commandline.get_options()
 
         for option in options:
-            args.append(self.complete_option(option))
+            args.append(self._complete_option(option))
 
         for cmdline in self.commandline.get_parents():
             for option in cmdline.get_positionals():
-                args.append(self.complete_positional(option))
+                args.append(self._complete_positional(option))
 
             if cmdline.get_subcommands_option():
-                args.append(self.complete_subcommands(cmdline.get_subcommands_option()))
+                args.append(self._complete_subcommands(cmdline.get_subcommands_option()))
 
         for option in self.commandline.get_positionals():
-            args.append(self.complete_positional(option))
+            args.append(self._complete_positional(option))
 
         if self.subcommands:
-            args.append(self.complete_subcommands(self.subcommands))
+            args.append(self._complete_subcommands(self.subcommands))
 
         if not args:
             return ''
@@ -189,6 +190,13 @@ class ZshCompletionFunction:
         r += '_arguments -S -s -w "${args[@]}"'
         return r
 
+    def get_code(self):
+        '''Return the code of the completion function.'''
+
+        return '%s() {\n%s\n}' % (
+            self.funcname,
+            utils.indent('\n\n'.join(c for c in self.code.values() if c), 2))
+
 def _define_option_types(ctxt, commandline):
     for option in commandline.options:
         for option_string in option.option_strings:
@@ -200,6 +208,8 @@ def _define_option_types(ctxt, commandline):
                 ctxt.helpers.use_function('zsh_query', 'old_options')
 
 def generate_completion(commandline, config=None):
+    '''Code for generating a Zsh auto completion file.'''
+
     if config is None:
         config = config_.Config()
 

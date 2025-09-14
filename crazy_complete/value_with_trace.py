@@ -3,9 +3,9 @@
 class ValueWithTrace:
     '''Represents a value from a configuration file along with its metadata.
 
-    This class is used to associate a value from a YAML or JSON file with its 
-    source, line number, and column number. It is particularly useful for 
-    debugging and error reporting, as it provides precise location information 
+    This class is used to associate a value from a YAML or JSON file with its
+    source, line number, and column number. It is particularly useful for
+    debugging and error reporting, as it provides precise location information
     for the value in the original configuration file.
 
     Attributes:
@@ -23,10 +23,14 @@ class ValueWithTrace:
 
     @staticmethod
     def from_yaml_event(value, source, event):
+        '''Constructs a `ValueWithTrace` from a YAML event object.'''
+
         return ValueWithTrace(value, source,
             event.start_mark.line + 1, event.start_mark.column + 1)
 
     def get_position_string(self):
+        '''Return a string describing the position of the value.'''
+
         return f'line {self.line}, column {self.column}'
 
     def __hash__(self):
@@ -34,7 +38,6 @@ class ValueWithTrace:
 
     def __eq__(self, other):
         return self.value == other
-    
+
     def __repr__(self):
         return f'{self.value!r}'
-

@@ -16,20 +16,22 @@ from .cli import CommandLine, MutuallyExclusiveGroup
 
 def range_to_complete(r):
     '''Convert a Python range object to a range complete format.'''
+
     start = r.start
     step = r.step
     end = r.stop - 1 if step > 0 else r.stop + 1
 
     if step == 1:
         return ('range', start, end)
-    else:
-        return ('range', start, end, step)
+
+    return ('range', start, end, step)
 
 def get_complete(action):
     '''
     Get the `complete` attribute of `action` if it is set.
     Otherwise determine `complete` from action type.
     '''
+
     complete = action.get_complete()
 
     if isinstance(action, (
@@ -69,6 +71,8 @@ def get_complete(action):
     raise CrazyError(f'Unknown action type: {action}')
 
 def get_final(action):
+    '''Return if an argparse action object is final.'''
+
     if isinstance(action, (argparse._HelpAction, argparse._VersionAction)):
         return True
 
@@ -88,6 +92,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
     Returns:
         CommandLine: A CommandLine object representing the converted parser.
     '''
+
     if not description:
         description = parser.description
 
@@ -174,6 +179,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
 
 def find_objects_by_type(module, types):
     '''Search for objects in the specified module that match the given types.'''
+
     r = []
 
     for obj_name in dir(module):
@@ -185,6 +191,7 @@ def find_objects_by_type(module, types):
 
 def find_root_argument_parsers(module):
     '''Return a list of all ArgumentParser objects that have no parent.'''
+
     parsers = find_objects_by_type(module, argparse.ArgumentParser)
     actions = find_objects_by_type(module, argparse._SubParsersAction)
 
@@ -202,6 +209,7 @@ def load_from_file(file, parser_variable=None, parser_blacklist=()):
     Load a Python file, search for the ArgumentParser object and convert
     it to a CommandLine object.
     '''
+
     try:
         module = file_loader.import_file(file)
     except Exception as e:

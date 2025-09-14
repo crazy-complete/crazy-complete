@@ -28,6 +28,8 @@ def make_identifier(string):
     return string
 
 def needs_escape(string):
+    '''Return if string needs escaping.'''
+
     return not re.fullmatch('[a-zA-Z0-9_@%+=:,./-]+', string)
 
 def escape(string, escape_empty_string=True):
@@ -84,20 +86,11 @@ def make_completion_funcname(cmdline, prefix='_', suffix=''):
 
     return f'{prefix}{identifier}{suffix}'
 
-def make_completion_funcname_for_context(ctxt):
-    commandlines = ctxt.commandline.get_parents(include_self=True)
-    del commandlines[0]
-
-    funcname = make_identifier('_'.join(p.prog for p in commandlines))
-
-    if isinstance(ctxt.option, cli.Option):
-        return '%s_%s' % (funcname, ctxt.option.option_strings[0])
-    if isinstance(ctxt.option, cli.Positional):
-        return '%s_%s' % (funcname, ctxt.option.metavar)
-
-    raise AssertionError('make_completion_funcname_for_context: Should not be reached')
-
 class ShellCompleter:
+    '''Base class for argument completion.'''
+
+    # pylint: disable=missing-function-docstring
+
     def complete(self, ctxt, completion, *a):
         if not hasattr(self, completion):
             utils.warn(f"ShellCompleter: Falling back from `{completion}` to `none`")
@@ -108,9 +101,6 @@ class ShellCompleter:
     def fallback(self, ctxt, from_, to, *a):
         utils.warn(f"ShellCompleter: Falling back from `{from_}` to `{to}`")
         return self.complete(ctxt, to, *a)
-
-    def none(self, ctxt, *a):
-        return ''
 
     def signal(self, ctxt, prefix=''):
         sig = prefix
@@ -147,31 +137,10 @@ class ShellCompleter:
         return self.complete(ctxt, 'choices', signals)
 
     def range(self, ctxt, start, stop, step=1):
-        return self.complete('choices', list(range(start, stop, step)))
+        return self.fallback(ctxt, 'range', 'choices', list(range(start, stop, step)))
 
     def directory(self, ctxt, opts):
         return self.fallback(ctxt, 'directory', 'file', opts)
 
-    def process(self, ctxt):
-        return self.fallback(ctxt, 'process', 'none')
-
-    def pid(self, ctxt):
-        return self.fallback(ctxt, 'pid', 'none')
-
     def command(self, ctxt):
         return self.fallback(ctxt, 'command', 'file')
-
-    def variable(self, ctxt):
-        return self.fallback(ctxt, 'variable', 'none')
-
-    def environment(self, ctxt):
-        return self.fallback(ctxt, 'environment', 'none')
-
-    def service(self, ctxt):
-        return self.fallback(ctxt, 'service', 'none')
-
-    def user(self, ctxt):
-        return self.fallback(ctxt, 'user', 'none')
-
-    def group(self, ctxt):
-        return self.fallback(ctxt, 'group', 'none')

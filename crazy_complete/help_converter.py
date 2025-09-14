@@ -5,6 +5,8 @@ from . import yaml_source
 from . import utils
 
 def fix_description(s):
+    '''Fix description.'''
+
     s = s.strip()
 
     # Replace hyphens followed by a newline ('-\n') with a simple hyphen.
@@ -17,62 +19,75 @@ def fix_description(s):
     return s
 
 def strip_metavar(s):
+    '''Strip metavar.'''
+
     if s and s[0] == '[' and s[-1] == ']':
         s = s[1:-1]
 
     if s and s[0] == '=':
         s = s[1:]
 
+    if s and s[0] == '<' and s[-1] == '>':
+        s = s[1:-1]
+
     return s
 
-def complete_for_metavar(s):
-    s = s.lower()
+def complete_for_metavar(string):
+    '''Return completion for metavar.'''
 
-    if s == 'f' or s.endswith('file'):
-        return ['file']
+    string = string.strip('<>')
+    lower  = string.lower()
 
-    if s.endswith('dir') or s.endswith('directory'):
-        return ['directory']
+    equals = {
+        'f':            ['file'],
+        'n':            ['integer'],
+        'duration':     ['integer'],
+        'bits':         ['integer'],
+        'cols':         ['integer'],
+        'column':       ['integer'],
+        'digits':       ['integer'],
+        'size':         ['integer'],
+        'bytes':        ['integer'],
+        'pid':          ['pid'],
+        'user':         ['user'],
+        'group':        ['group'],
+        'program':      ['command'],
+        'command':      ['command'],
+        'cmd':          ['cmd'],
+        'signal':       ['signal'],
+        'sig':          ['signal'],
+    }
 
-    if (s == 'n' or
-        s == 'duration' or
-        s == 'bits' or
-        s == 'cols' or
-        s == 'column' or 
-        s == 'digits' or
-        s == 'size' or
-        s == 'bytes' or
-        s.endswith('length') or
-        s.endswith('width') or
-        s.endswith('num') or
-        s.endswith('number')
-       ):
-        return ['integer']
+    endswith = {
+        'file':         ['file'],
+        'filename':     ['file'],
+        'dir':          ['directory'],
+        'directory':    ['directory'],
+        'seconds':      ['integer'],
+        'length':       ['integer'],
+        'width':        ['integer'],
+        'num':          ['integer'],
+        'number':       ['integer'],
+    }
 
-    if s == 'pid':
-        return ['pid']
+    if lower in equals:
+        return equals[lower]
 
-    if s == 'user':
-        return ['user']
+    for suffix, complete in endswith.items():
+        if lower.endswith(suffix):
+            return complete
 
-    if s == 'group':
-        return ['group']
-
-    if s == 'program' or s == 'command' or s == 'cmd':
-        return ['command']
-
-    if s == 'signal' or s == 'sig':
-        return ['signal']
-
-    if s.startswith('{') and s.endswith('}'):
-        s = s.strip('{}')
+    if string.startswith('{') and string.endswith('}'):
+        string = string.strip('{}')
         for sep in ['|', ',']:
-            if sep in s:
-                return ['choices', [item.strip() for item in s.split(sep)]]
+            if sep in string:
+                return ['choices', [item.strip() for item in string.split(sep)]]
 
     return ['none']
 
 def from_file_to_yaml(file):
+    '''Parse help text in a file and return YAML.'''
+
     with open(file, 'r', encoding='utf-8') as fh:
         content = fh.read()
 
