@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from . import algo
 from . import utils
+from . import bash_when
 
 class MasterCompletionFunction:
     def __init__(self, name, options, abbreviations, complete, generator):
@@ -68,8 +69,13 @@ class MasterCompletionFunction:
             opts = self._get_all_option_strings(option)
             completion_code = self.complete(option, False)
 
+            cond = bash_when.generate_when_conditions(
+                self.generator.commandline,
+                self.generator.variable_manager,
+                option.when)
+
             r  = 'case "$opt" in %s)\n' % '|'.join(opts)
-            r += '  if %s; then\n' % self.generator._generate_when_conditions(option.when)
+            r += '  if %s; then\n' % cond
             if completion_code:
                 r += '%s\n' % utils.indent(completion_code, 4)
             r += '    return 0\n'
