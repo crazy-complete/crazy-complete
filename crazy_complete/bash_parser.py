@@ -60,7 +60,7 @@ def generate(commandline):
     long_option_cases = []
     short_option_cases = []
 
-    subcommand_call_code = make_subcommand_call_code(commandlines)
+    subcommand_call_code = make_subcommand_call_code(commandline)
 
     for commandline in commandlines:
         option_cases = generate_option_cases(commandline)

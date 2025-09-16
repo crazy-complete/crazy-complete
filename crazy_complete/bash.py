@@ -15,7 +15,7 @@ from . import bash_parser
 from . import bash_parser_v2
 from . import bash_option_completion
 from . import bash_when
-from .bash_utils import get_OptionAbbreviationGenerator, VariableManager
+from .bash_utils import VariableManager
 from . import generation
 
 class BashCompletionGenerator:

@@ -19,13 +19,23 @@ def make_option_variable_name(option, prefix=''):
     raise AssertionError("make_option_variable_name: Should not be reached")
 
 class VariableManager:
+    '''Variable manager.'''
+
     def __init__(self, prefix):
         self.prefix = prefix
+        self.variables = set()
 
     def make_variable(self, option):
-        return make_option_variable_name(option, self.prefix)
+        var = make_option_variable_name(option, self.prefix)
+        self.variables.add(var)
+        return var
+
+    def get_variables(self):
+        return list(sorted(self.variables))
 
 class CasePatterns:
+    '''Functions for creating case patterns.'''
+
     @staticmethod
     def for_long_without_arg(option_strings):
         return '|'.join(option_strings)

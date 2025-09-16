@@ -135,7 +135,7 @@ def generate(commandline):
     commandlines = list(reversed(commandlines))
 
     find_option_code = make_find_option_code(commandlines)
-    subcommand_call_code = make_subcommand_call_code(commandlines)
+    subcommand_call_code = make_subcommand_call_code(commandline)
 
     s = _PARSER_CODE
 

@@ -5,7 +5,10 @@ def get_subcommand_path(commandline):
     prognames = ['root'] + [c.prog for c in commandlines]
     return ':'.join(prognames)
 
-def make_subcommand_call_code(commandlines):
+def make_subcommand_call_code(commandline):
+    commandlines = []
+    commandline.visit_commandlines(lambda o: commandlines.append(o))
+
     code = []
 
     for commandline in commandlines:

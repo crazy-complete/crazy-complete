@@ -1,31 +1,27 @@
-from collections import OrderedDict
+'''Module for option completion in Bash.'''
 
 from . import algo
 from . import utils
 from . import bash_when
+from . import bash_utils
 
 class MasterCompletionFunction:
-    def __init__(self, name, options, abbreviations, complete, generator):
-        self.name = name
-        self.options = options
+    '''Class for generating a master completion function.'''
+
+    def __init__(self, options, abbreviations, complete, generator):
         self.abbreviations = abbreviations
         self.complete = complete
         self.generator = generator
         self.code = []
 
-        options_with_optional_arg = []
-        options_with_required_arg = []
+        optional_arg = list(filter(lambda o: o.complete and o.optional_arg is True, options))
+        required_arg = list(filter(lambda o: o.complete and o.optional_arg is False, options))
 
-        for option in options:
-            if option.complete and option.optional_arg is True:
-                options_with_optional_arg.append(option)
-            elif option.complete:
-                options_with_required_arg.append(option)
+        self._add_options(required_arg)
 
-        self.add_options(options_with_required_arg)
-        if options_with_optional_arg:
-            self.code.append('[[ "$mode" == WITH_OPTIONALS ]] || return 1')
-            self.add_options(options_with_optional_arg)
+        if optional_arg:
+            self.code.append('[[ "$mode" == WITH_OPTIONAL ]] || return 1')
+            self._add_options(optional_arg)
 
     def _get_all_option_strings(self, option):
         opts = []
@@ -34,30 +30,18 @@ class MasterCompletionFunction:
         opts.extend(option.get_short_option_strings())
         return opts
 
-    def add_options(self, options):
-        options_with_when = []
-        options_wout_when = []
-        options_group_by_complete = OrderedDict()
+    def _add_options(self, options):
+        with_when, without_when = algo.partition(options, lambda o: o.when)
+        self._add_options_with_when(with_when)
+        self._add_options_without_when(without_when)
 
-        for option in options:
-            if option.when:
-                options_with_when.append(option)
-            else:
-                options_wout_when.append(option)
-
-        for option in options_wout_when:
-            complete = self.complete(option, False)
-            if complete not in options_group_by_complete:
-                options_group_by_complete[complete] = []
-            options_group_by_complete[complete].append(option)
+    def _add_options_without_when(self, options):
+        options_group_by_complete = algo.group_by(options, lambda o: self.complete(o, False))
 
         if options_group_by_complete:
             r = 'case "$opt" in\n'
             for complete, options in options_group_by_complete.items():
-                opts = []
-                for option in options:
-                    opts.extend(self._get_all_option_strings(option))
-
+                opts = algo.flatten([self._get_all_option_strings(o) for o in options])
                 r += '  %s)\n' % '|'.join(opts)
                 if complete:
                     r += '%s\n' % utils.indent(complete, 4)
@@ -65,10 +49,10 @@ class MasterCompletionFunction:
             r += 'esac'
             self.code.append(r)
 
-        for option in options_with_when:
+    def _add_options_with_when(self, options):
+        for option in options:
             opts = self._get_all_option_strings(option)
             completion_code = self.complete(option, False)
-
             cond = bash_when.generate_when_conditions(
                 self.generator.commandline,
                 self.generator.variable_manager,
@@ -83,16 +67,18 @@ class MasterCompletionFunction:
             r += 'esac'
             self.code.append(r)
 
-    def get(self):
+    def get(self, funcname):
+        '''Get the function code.'''
+
         if self.code:
-            r  = '%s() {\n' % self.name
+            r  = '%s() {\n' % funcname
             r += '  local opt="$1" cur="$2" mode="$3"\n\n'
             r += '%s\n\n' % utils.indent('\n\n'.join(self.code), 2)
             r += '  return 1\n'
             r += '}'
             return r
-        else:
-            return None
+
+        return None
 
 def generate_option_completion(self):
     r = ''
@@ -101,18 +87,20 @@ def generate_option_completion(self):
     if self.commandline.abbreviate_options:
         # If we inherit options from parent commands, add those
         # to the abbreviation generator
-        abbreviations = get_OptionAbbreviationGenerator(
+        abbreviations = bash_utils.get_OptionAbbreviationGenerator(
             self.commandline.get_options(
                 with_parent_options=self.commandline.inherit_options))
     else:
         abbreviations = utils.DummyAbbreviationGenerator()
 
     complete_option = MasterCompletionFunction(
-        '__complete_option', options, abbreviations, self._complete_option, self)
-    code = complete_option.get()
+        options, abbreviations, self._complete_option, self)
+    code = complete_option.get('__complete_option')
 
-    if code:
-        r += '%s\n\n' % code
+    if not code:
+        return None
+
+    r += '%s\n\n' % code
 
     # pylint: disable=invalid-name
     LR = False # Long with required argument
@@ -179,12 +167,12 @@ return 1
       # CONDITION, TEXT
       (G0        , 'case "$prev" in\n'),
       (G0        , '  --*)'),
-      (LR        , '\n    __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0'),
+      (LR        , '\n    __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0'),
       (G0        , ';;\n'),
       (G0        , '  -*)'),
-      (OR        , '\n    __complete_option "$prev" "$cur" WITHOUT_OPTIONALS && return 0'),
+      (OR        , '\n    __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0'),
       (SR        , '\n    case "$prev" in -%s[%s])' % (short_no_args_pattern, short_required_args)),
-      (SR        , '\n      __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONALS && return 0'),
+      (SR        , '\n      __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONAL && return 0'),
       (SR        , '\n    esac'),
       (G0        , ';;\n'),
       (G0        , 'esac\n'),
@@ -192,10 +180,10 @@ return 1
 
       (G1        , 'case "$cur" in\n'),
       (G1        , '  --*=*)'),
-      (LR|LO     , '\n    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0'),
+      (LR|LO     , '\n    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0'),
       (G1        , ';;\n'),
       (G1        , '  -*=*)'),
-      (OR|OO     , '\n    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONALS && return 0'),
+      (OR|OO     , '\n    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0'),
       (G1        , ';;\n'),
       (G1        , '  --*);;\n'),
       (G1        , '  -*)'),
@@ -203,7 +191,7 @@ return 1
       (G2        , '\n      local i'),
       (G2        , '\n      for ((i=2; i <= ${#cur}; ++i)); do'),
       (G2        , '\n        local pre="${cur:0:$i}" value="${cur:$i}"'),
-      (SR|SO     , '\n        __complete_option "-${pre: -1}" "$value" WITH_OPTIONALS && {'),
+      (SR|SO     , '\n        __complete_option "-${pre: -1}" "$value" WITH_OPTIONAL && {'),
       (SR|SO     , '\n          %s "$pre"' % prefix_compreply_func),
       (SR|SO     , '\n          return 0'),
       (SR|SO     , '\n        }'),
