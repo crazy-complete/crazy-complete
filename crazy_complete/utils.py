@@ -64,7 +64,7 @@ class GeneralAbbreviationGenerator:
                         can_abbreviate = False
                         break
 
-                if can_abbreviate:
+                if can_abbreviate or abbrev == word:
                     self.abbreviations[word].append(abbrev)
                     self.min_lengths[word] = length
 
