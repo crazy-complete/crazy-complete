@@ -4,7 +4,7 @@ from collections import namedtuple
 
 from . import utils
 from .str_utils import indent
-from .bash_utils import make_option_variable_name, get_OptionAbbreviationGenerator
+from .bash_utils import make_option_variable_name
 from .bash_parser_subcommand_code import *
 
 _PARSER_CODE = '''\
@@ -154,12 +154,7 @@ def generate(commandline):
 def generate_option_cases(commandline):
     OptionCase = namedtuple('OptionCase', ['option_strings', 'variable', 'mode'])
     options = commandline.get_options()
-
-    if commandline.abbreviate_options:
-        abbreviations = get_OptionAbbreviationGenerator(options)
-    else:
-        abbreviations = utils.DummyAbbreviationGenerator()
-
+    abbreviations = utils.get_option_abbreviator(commandline)
     option_cases = []
 
     for option in options:

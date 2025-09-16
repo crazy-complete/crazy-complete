@@ -3,15 +3,14 @@
 from . import algo
 from . import utils
 from . import bash_when
-from . import bash_utils
 from .str_utils import indent
 
 class MasterCompletionFunction:
     '''Class for generating a master completion function.'''
 
-    def __init__(self, options, abbreviations, complete, generator):
+    def __init__(self, options, abbreviations, generator):
         self.abbreviations = abbreviations
-        self.complete = complete
+        self.complete = generator._complete_option
         self.generator = generator
         self.code = []
 
@@ -84,18 +83,9 @@ class MasterCompletionFunction:
 def generate_option_completion(self):
     r = ''
     options = self.commandline.get_options(only_with_arguments=True)
+    abbreviations = utils.get_option_abbreviator(self.commandline)
 
-    if self.commandline.abbreviate_options:
-        # If we inherit options from parent commands, add those
-        # to the abbreviation generator
-        abbreviations = bash_utils.get_OptionAbbreviationGenerator(
-            self.commandline.get_options(
-                with_parent_options=self.commandline.inherit_options))
-    else:
-        abbreviations = utils.DummyAbbreviationGenerator()
-
-    complete_option = MasterCompletionFunction(
-        options, abbreviations, self._complete_option, self)
+    complete_option = MasterCompletionFunction(options, abbreviations, self)
     code = complete_option.get('__complete_option')
 
     if not code:

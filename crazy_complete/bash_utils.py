@@ -1,7 +1,6 @@
 '''Bash utility functions.'''
 
 from . import shell
-from . import utils
 
 def make_option_variable_name(option, prefix=''):
     long_options = option.get_long_option_strings()
@@ -47,11 +46,3 @@ class CasePatterns:
     @staticmethod
     def for_short(option_strings):
         return '|'.join(o[1] for o in option_strings)
-
-def get_OptionAbbreviationGenerator(options):
-    all_option_strings = []
-    for option in options:
-        all_option_strings.extend(option.get_long_option_strings())
-        all_option_strings.extend(option.get_old_option_strings())
-
-    return utils.OptionAbbreviationGenerator(all_option_strings)

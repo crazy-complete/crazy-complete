@@ -4,7 +4,7 @@ from collections import namedtuple
 
 from . import utils
 from .str_utils import indent
-from .bash_utils import make_option_variable_name, CasePatterns, get_OptionAbbreviationGenerator
+from .bash_utils import make_option_variable_name, CasePatterns
 from .bash_parser_subcommand_code import *
 
 _PARSER_CODE = '''\
@@ -164,12 +164,7 @@ def make_short_option_case(
 def generate_option_cases(commandline):
     OptionCases = namedtuple('OptionCases', ['long_options', 'short_options'])
     options = commandline.get_options()
-
-    if commandline.abbreviate_options:
-        abbreviations = get_OptionAbbreviationGenerator(options)
-    else:
-        abbreviations = utils.DummyAbbreviationGenerator()
-
+    abbreviations = utils.get_option_abbreviator(commandline)
     option_cases = OptionCases([], [])
 
     for option in options:

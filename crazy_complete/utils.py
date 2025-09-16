@@ -151,6 +151,21 @@ class DummyAbbreviationGenerator:
 
         return words
 
+def get_option_abbreviator(commandline):
+    '''Return an OptionAbbreviationGenerator for options in `commandline`.'''
+
+    if not commandline.abbreviate_options:
+        return DummyAbbreviationGenerator()
+
+    options = commandline.get_options(with_parent_options=commandline.inherit_options)
+    option_strings = []
+
+    for option in options:
+        option_strings.extend(option.get_long_option_strings())
+        option_strings.extend(option.get_old_option_strings())
+
+    return OptionAbbreviationGenerator(option_strings)
+
 def get_all_command_variations(commandline):
     '''Return all possible names for this command.
 
