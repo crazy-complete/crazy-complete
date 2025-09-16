@@ -1,4 +1,21 @@
 # =============================================================================
+# cli.py
+# =============================================================================
+
+def get_command_paths_pattern(self):
+    paths = []
+    for cmdline in self.get_parents(include_self=True):
+        paths.append(cmdline.get_all_commands(with_aliases=True))
+
+    return '|'.join(shell.escape(" ".join(combo)) for combo in product(*paths))
+
+def get_all_commands(self, with_aliases=True):
+    r = [self.prog]
+    if with_aliases:
+        r.extend(self.aliases)
+    return r
+
+# =============================================================================
 # bash.py
 # =============================================================================
 

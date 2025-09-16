@@ -332,19 +332,6 @@ class CommandLine:
         cmd = ' '.join(c.prog for c in self.get_parents(include_self=True))
         return cmd
 
-    #def get_command_paths_pattern(self):
-    #    paths = []
-    #    for cmdline in self.get_parents(include_self=True):
-    #        paths.append(cmdline.get_all_commands(with_aliases=True))
-    #
-    #    return '|'.join(shell.escape(" ".join(combo)) for combo in product(*paths))
-
-    def get_all_commands(self, with_aliases=True):
-        r = [self.prog]
-        if with_aliases:
-            r.extend(self.aliases)
-        return r
-
     def visit_commandlines(self, callback):
         '''Apply a callback to all CommandLine objects.'''
 

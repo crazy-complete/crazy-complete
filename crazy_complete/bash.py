@@ -205,7 +205,7 @@ def generate_completion(commandline, config=None):
     output += [generator.result for generator in result]
     output += ['complete -F %s %s' % (
         shell.make_completion_funcname(commandline),
-        ' '.join(commandline.get_all_commands(with_aliases=True))
+        ' '.join([commandline.prog] + commandline.aliases)
     )]
 
     if config.vim_modeline:
