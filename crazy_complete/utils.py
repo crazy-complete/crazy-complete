@@ -1,6 +1,7 @@
 '''This module contains utility functions.'''
 
 import sys
+from collections import namedtuple
 
 def warn(*a):
     '''Print a warning.'''
@@ -169,24 +170,43 @@ def get_all_command_variations(commandline):
 
     return abbrevs.get_abbreviations(commandline.prog) + commandline.aliases
 
-def indent(string, num_spaces):
-    '''Indents each line in a string by a specified number of spaces,
-    preserving empty lines.
+def get_defined_option_types(commandline):
+    '''Return a tuple of defined option types.'''
 
-    Args:
-        string (str): The input string to be indented.
-        num_spaces (int): The number of spaces to indent each line.
+    old   = False
+    long  = False
+    short = False
 
-    Returns:
-        str: The indented string.
+    for cmdline in commandline.get_all_commandlines():
+        for option in cmdline.options:
+            for option_string in option.option_strings:
+                if option_string.startswith('--'):
+                    long = True
+                elif len(option_string) == 2:
+                    short = True
+                else:
+                    old = True
+
+    return namedtuple('Types', ('short', 'long', 'old'))(short, long, old)
+
+def get_query_option_strings(commandline):
+    '''Return a string that can be used by {fish,zsh}_query functions.
+
+    Returns something like:
+        "-f,--flag,-a=,--argument=,-o=?,--optional=?"
     '''
 
-    assert isinstance(string, str), "indent: string: expected str, got %r" % string
-    assert isinstance(num_spaces, int), "indent: num_spaces: expected int, got %r" % num_spaces
+    r = []
 
-    lines = string.split('\n')
-    indented_lines = [((' ' * num_spaces) + line) if line.strip() else line for line in lines]
-    return '\n'.join(indented_lines)
+    for option in commandline.get_options(with_parent_options=True):
+        if option.complete and option.optional_arg is True:
+            r.extend('%s=?' % s for s in option.option_strings)
+        elif option.complete:
+            r.extend('%s=' % s for s in option.option_strings)
+        else:
+            r.extend(option.option_strings)
+
+    return ','.join(r)
 
 def is_worth_a_function(commandline):
     '''Check if a commandline "is worth a function".

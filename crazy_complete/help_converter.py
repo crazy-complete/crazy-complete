@@ -2,7 +2,7 @@
 
 from . import help_parser
 from . import yaml_source
-from . import utils
+from .str_utils import indent
 
 def fix_description(s):
     '''Fix description.'''
@@ -121,7 +121,7 @@ def from_file_to_yaml(file):
                     option_dict['complete'] = complete_for_metavar(option_dict['metavar'])
 
             output.append(
-                utils.indent(yaml_source.option_to_yaml(option_dict), 2)
+                indent(yaml_source.option_to_yaml(option_dict), 2)
             )
 
             output.append('')

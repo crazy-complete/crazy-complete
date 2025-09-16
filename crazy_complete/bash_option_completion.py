@@ -4,6 +4,7 @@ from . import algo
 from . import utils
 from . import bash_when
 from . import bash_utils
+from .str_utils import indent
 
 class MasterCompletionFunction:
     '''Class for generating a master completion function.'''
@@ -44,7 +45,7 @@ class MasterCompletionFunction:
                 opts = algo.flatten([self._get_all_option_strings(o) for o in options])
                 r += '  %s)\n' % '|'.join(opts)
                 if complete:
-                    r += '%s\n' % utils.indent(complete, 4)
+                    r += '%s\n' % indent(complete, 4)
                 r += '    return 0;;\n'
             r += 'esac'
             self.code.append(r)
@@ -61,7 +62,7 @@ class MasterCompletionFunction:
             r  = 'case "$opt" in %s)\n' % '|'.join(opts)
             r += '  if %s; then\n' % cond
             if completion_code:
-                r += '%s\n' % utils.indent(completion_code, 4)
+                r += '%s\n' % indent(completion_code, 4)
             r += '    return 0\n'
             r += '  fi;;\n'
             r += 'esac'
@@ -73,7 +74,7 @@ class MasterCompletionFunction:
         if self.code:
             r  = '%s() {\n' % funcname
             r += '  local opt="$1" cur="$2" mode="$3"\n\n'
-            r += '%s\n\n' % utils.indent('\n\n'.join(self.code), 2)
+            r += '%s\n\n' % indent('\n\n'.join(self.code), 2)
             r += '  return 1\n'
             r += '}'
             return r

@@ -15,6 +15,7 @@ from . import bash_parser
 from . import bash_parser_v2
 from . import bash_option_completion
 from . import bash_when
+from .str_utils import indent
 from .bash_utils import VariableManager
 from . import generation
 
@@ -30,7 +31,7 @@ class BashCompletionGenerator:
         self._generate()
 
     def _complete_option(self, option, append=True):
-        context = self.ctxt.getOptionGenerationContext(self.commandline, option)
+        context = self.ctxt.get_option_context(self.commandline, option)
         return self.completer.complete(context, *option.complete).get_code(append)
 
     def _generate_commandline_parsing(self):
@@ -93,7 +94,7 @@ class BashCompletionGenerator:
     def _generate_positionals_completion(self):
         def make_block(code):
             if code:
-                return '{\n%s\n  return 0;\n}' % utils.indent(code, 2)
+                return '{\n%s\n  return 0;\n}' % indent(code, 2)
             else:
                 return '{\n  return 0;\n}'
 
@@ -180,7 +181,7 @@ class BashCompletionGenerator:
         code['command_line_parsing'] = self._generate_commandline_parsing()
 
         r  = '%s() {\n' % shell.make_completion_funcname(self.commandline)
-        r += '%s\n\n'   % utils.indent('\n\n'.join(c for c in code.values() if c), 2)
+        r += '%s\n\n'   % indent('\n\n'.join(c for c in code.values() if c), 2)
         r += '  return 1\n'
         r += '}'
 

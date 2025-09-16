@@ -7,11 +7,17 @@ from . import config as _config
 from . import when
 
 class GenerationContext:
+    '''Holds global configuration and helpers used during code generation.'''
+
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, config, helpers):
         self.config = config
         self.helpers = helpers
 
-    def getOptionGenerationContext(self, commandline, option):
+    def get_option_context(self, commandline, option):
+        '''Return OptionGenerationContext based on current context.'''
+
         return OptionGenerationContext(
             self.config,
             self.helpers,
@@ -20,6 +26,10 @@ class GenerationContext:
         )
 
 class OptionGenerationContext(GenerationContext):
+    '''Extends GenerationContext; holds commandline and option objects.'''
+
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, config, helpers, commandline, option):
         super().__init__(config, helpers)
         self.commandline = commandline
@@ -63,13 +73,25 @@ def _add_parsed_when(commandline):
             try:
                 option.when_parsed = when.parse_when(option.when)
             except CrazyError as e:
-                raise CrazyError('%s: %s: %s: %s' % (
+                raise CrazyError('%s: %s: when: %s: %s' % (
                     commandline.get_command_path(),
                     option.get_option_strings_key('|'),
                     option.when,
                     e)) from e
         else:
             option.when_parsed = None
+
+    for positional in commandline.positionals:
+        if positional.when:
+            try:
+                positional.when_parsed = when.parse_when(positional.when)
+            except CrazyError as e:
+                raise CrazyError('%s: %s: %s: when: %s: %s' % (
+                    commandline.get_command_path(),
+                    positional.number,
+                    positional.metavar,
+                    positional.when,
+                    e)) from e
 
 def enhance_commandline(commandline, config):
     '''Enhance commandline.
@@ -81,7 +103,7 @@ def enhance_commandline(commandline, config):
 
     commandline = commandline.copy()
     commandline.visit_commandlines(lambda c: _apply_config(c, config))
-    commandline.visit_commandlines(lambda c: _add_parsed_when(c))
+    commandline.visit_commandlines(_add_parsed_when)
     completion_validator.validate_commandlines(commandline)
     return commandline
 

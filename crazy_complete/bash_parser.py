@@ -3,7 +3,7 @@
 from collections import namedtuple
 
 from . import utils
-from . import shell
+from .str_utils import indent
 from .bash_utils import make_option_variable_name, CasePatterns, get_OptionAbbreviationGenerator
 from .bash_parser_subcommand_code import *
 
@@ -71,7 +71,7 @@ def generate(commandline):
             r =  'case "$cmd" in %s)\n' % command
             r += '  case "$arg" in\n'
             for case in option_cases.long_options:
-                r += '%s\n' % utils.indent(case, 4)
+                r += '%s\n' % indent(case, 4)
             r += '  esac\n'
             r += 'esac'
             long_option_cases.append(r)
@@ -80,7 +80,7 @@ def generate(commandline):
             r =  'case "$cmd" in %s)\n' % command
             r += '  case "$char" in\n'
             for case in option_cases.short_options:
-                r += '%s\n' % utils.indent(case, 4)
+                r += '%s\n' % indent(case, 4)
             r += '  esac\n'
             r += 'esac'
             short_option_cases.append(r)
@@ -89,18 +89,18 @@ def generate(commandline):
 
     if long_option_cases:
         s = s.replace('%LONG_OPTION_CASES%',
-            utils.indent('\n\n'.join(long_option_cases), 6))
+            indent('\n\n'.join(long_option_cases), 6))
     else:
         s = s.replace('%LONG_OPTION_CASES%\n', '')
 
     if short_option_cases:
         s = s.replace('%SHORT_OPTION_CASES%',
-            utils.indent('\n\n'.join(short_option_cases), 8))
+            indent('\n\n'.join(short_option_cases), 8))
     else:
         s = s.replace('%SHORT_OPTION_CASES%\n', '')
 
     if subcommand_call_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', utils.indent(subcommand_call_code, 6))
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_call_code, 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 

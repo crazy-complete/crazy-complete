@@ -1,8 +1,9 @@
 '''YAML Parser with column and line information.'''
 
 import yaml
-from yaml.parser import ParserError
-from yaml.events import *
+from yaml.events import (StreamStartEvent, DocumentStartEvent, DocumentEndEvent,
+                         MappingStartEvent, SequenceStartEvent, ScalarEvent,
+                         MappingEndEvent, SequenceEndEvent, AliasEvent)
 
 from .value_with_trace import ValueWithTrace
 from .errors import CrazySchemaValidationError
@@ -10,6 +11,8 @@ from .errors import CrazySchemaValidationError
 _error = CrazySchemaValidationError
 
 class ExtendedYAMLParser:
+    '''Parse YAML with the ability to trace the origin of parsed values.'''
+
     def __init__(self):
         self.src = None
         self.data = []
@@ -19,6 +22,10 @@ class ExtendedYAMLParser:
     def parse(self, stream):
         """
         Parses the given YAML stream in a SAX-like way and reconstructs the structure.
+
+        Raises:
+            - yaml.parser.ParserError
+            - errors.CrazySchemaValidationError
         """
         self.src = stream
         self.data = []
@@ -32,8 +39,6 @@ class ExtendedYAMLParser:
                 if event is None:
                     break
                 self.handle_event(event)
-        except ParserError:
-            raise
         finally:
             loader.dispose()
 
@@ -107,21 +112,20 @@ class ExtendedYAMLParser:
             if lower in ("null", "~", ""):
                 return None
 
-            elif lower in ("true", "on", "yes"):
+            if lower in ("true", "on", "yes"):
                 return True
 
-            elif lower in ("false", "off", "no"):
+            if lower in ("false", "off", "no"):
                 return False
 
-            else:
-                try:
-                    return int(value)
-                except ValueError:
-                    pass
+            try:
+                return int(value)
+            except ValueError:
+                pass
 
-                try:
-                    return float(value)
-                except ValueError:
-                    pass
+            try:
+                return float(value)
+            except ValueError:
+                pass
 
         return value

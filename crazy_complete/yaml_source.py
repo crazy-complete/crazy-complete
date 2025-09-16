@@ -6,9 +6,9 @@ and vice versa.
 import json
 import yaml
 
-from . import utils
 from . import dictionary_source
 from . import scheme_validator
+from .str_utils import indent
 from .extended_yaml_parser import ExtendedYAMLParser
 from .cli import ExtendedBool
 
@@ -120,13 +120,13 @@ def to_yaml(dictionary):
     if options:
         r += 'options:\n'
         for option in options:
-            r += utils.indent(option_to_yaml(option), 2)
+            r += indent(option_to_yaml(option), 2)
             r += '\n\n'
 
     if positionals:
         r += 'positionals:\n'
         for positional in positionals:
-            r += utils.indent(positional_to_yaml(positional), 2)
+            r += indent(positional_to_yaml(positional), 2)
             r += '\n\n'
 
     return r.rstrip()

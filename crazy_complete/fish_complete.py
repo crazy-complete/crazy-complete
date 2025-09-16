@@ -54,8 +54,8 @@ class FishCompleteChoices(FishCompletionBase):
             self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
             funcname = self.ctxt.helpers.use_function(funcname)
             return ['-f', '-a', '(%s)' % funcname]
-        else:
-            return ['-f', '-a', ' '.join(shell.escape(str(c)) for c in self.choices)]
+
+        return ['-f', '-a', ' '.join(shell.escape(str(c)) for c in self.choices)]
 
     def get_code(self):
         if hasattr(self.choices, 'items'):
@@ -63,11 +63,11 @@ class FishCompleteChoices(FishCompletionBase):
             for item, description in self.choices.items():
                 code += '  %s %s \\\n' % (shell.escape(str(item)), shell.escape(str(description)))
             return code.rstrip(' \\\n')
-        else:
-            code = "printf '%s\\n' \\\n"
-            for item in self.choices:
-                code += '  %s \\\n' % (shell.escape(str(item)))
-            return code.rstrip(' \\\n')
+
+        code = "printf '%s\\n' \\\n"
+        for item in self.choices:
+            code += '  %s \\\n' % (shell.escape(str(item)))
+        return code.rstrip(' \\\n')
 
 class FishCompleteFileDir(FishCompletionBase):
     '''Class for completing file/dir completion.'''
@@ -84,12 +84,13 @@ class FishCompleteFileDir(FishCompletionBase):
                 return ['-f', '-a', '(%s -C %s)' % (funcname, shell.escape(self.directory))]
 
             return ['-F']
-        else: # self.mode == 'directory'
-            if self.directory is not None:
-                funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-                return ['-f', '-a', '(%s -D -C %s)' % (funcname, shell.escape(self.directory))]
 
-            return ['-f', '-a', '(__fish_complete_directories)']
+        # self.mode == 'directory'
+        if self.directory is not None:
+            funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
+            return ['-f', '-a', '(%s -D -C %s)' % (funcname, shell.escape(self.directory))]
+
+        return ['-f', '-a', '(__fish_complete_directories)']
 
     def get_code(self):
         if self.mode == 'file':
@@ -97,14 +98,15 @@ class FishCompleteFileDir(FishCompletionBase):
 
             if self.directory is not None:
                 return '%s -C %s' % (funcname, shell.escape(self.directory))
-            else:
-                return '%s' % funcname
-        else: # self.mode == 'directory'
-            if self.directory is not None:
-                funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-                return '%s -D -C %s' % (funcname, shell.escape(self.directory))
 
-            return '__fish_complete_directories'
+            return '%s' % funcname
+
+        # self.mode == 'directory'
+        if self.directory is not None:
+            funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
+            return '%s -D -C %s' % (funcname, shell.escape(self.directory))
+
+        return '__fish_complete_directories'
 
 class FishCompleteValueList(FishCompletionBase):
     '''Class for completing a list of values.'''

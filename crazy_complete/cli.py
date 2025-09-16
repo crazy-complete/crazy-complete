@@ -1,11 +1,10 @@
 '''This module contains the CommandLine, Option and Positional classes.'''
 
-import re
 from collections import OrderedDict
-from itertools import product
 from types import NoneType
 
 from .errors import CrazyError, CrazyTypeError
+from .str_utils import contains_space, is_valid_option_string
 
 # pylint: disable=redefined-builtin
 # pylint: disable=too-few-public-methods
@@ -24,22 +23,6 @@ def is_extended_bool(obj):
     '''Check if `obj` an instance of `ExtendedBool.INHERIT`.'''
 
     return obj in (True, False, ExtendedBool.INHERIT)
-
-_VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
-
-def validate_option_string(option_string):
-    '''Check if `option_string` is a valid option string.'''
-
-    if not _VALID_OPTION_STRING_RE.fullmatch(option_string):
-        return False
-
-    if option_string == '--':
-        return False
-
-    return True
-
-def _contains_space(string):
-    return (' ' in string or '\t' in string or '\n' in string)
 
 class CommandLine:
     '''Represents a command line interface with options, positionals, and subcommands.'''
@@ -82,7 +65,7 @@ class CommandLine:
             if not isinstance(alias, str):
                 raise CrazyTypeError(f'aliases[{index}]', 'str', alias)
 
-            if _contains_space(alias):
+            if contains_space(alias):
                 raise CrazyError(f'aliases[{index}]: cannot contain space')
 
         if not is_extended_bool(abbreviate_commands):
@@ -370,6 +353,13 @@ class CommandLine:
             for sub in self.get_subcommands_option().subcommands:
                 sub.visit_commandlines(callback)
 
+    def get_all_commandlines(self):
+        '''Get a list of all defined commandlines.'''
+
+        result = []
+        self.visit_commandlines(result.append)
+        return result
+
     def copy(self):
         '''Make a copy of the current CommandLine object, including sub-objects.'''
 
@@ -608,7 +598,7 @@ class Option:
             if not isinstance(option_string, str):
                 raise CrazyTypeError(f'option_strings[{index}]', 'str', option_string)
 
-            if not validate_option_string(option_string):
+            if not is_valid_option_string(option_string):
                 raise CrazyError(f"Invalid option string: {option_string!r}")
 
         if metavar and not complete:

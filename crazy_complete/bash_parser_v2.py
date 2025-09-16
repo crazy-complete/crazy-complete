@@ -3,8 +3,8 @@
 from collections import namedtuple
 
 from . import utils
-from . import shell
-from .bash_utils import make_option_variable_name, CasePatterns, get_OptionAbbreviationGenerator
+from .str_utils import indent
+from .bash_utils import make_option_variable_name, get_OptionAbbreviationGenerator
 from .bash_parser_subcommand_code import *
 
 _PARSER_CODE = '''\
@@ -140,7 +140,7 @@ def generate(commandline):
     s = _PARSER_CODE
 
     if subcommand_call_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', utils.indent(subcommand_call_code, 6))
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_call_code, 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 

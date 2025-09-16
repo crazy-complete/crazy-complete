@@ -54,4 +54,4 @@ def parse_when(s):
     if cmd == 'has_option':
         return HasOption(split)
 
-    raise CrazyError("parse_when: Invalid command: %r" % cmd)
+    raise CrazyError("Invalid command: %r" % cmd)

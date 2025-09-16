@@ -11,6 +11,7 @@ from . import utils
 from . import zsh_complete
 from . import zsh_helpers
 from . import zsh_utils
+from .str_utils import indent
 
 Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
 
@@ -32,19 +33,8 @@ class ZshCompletionFunction:
         self.code = None
         self._generate_completion_code()
 
-    def _get_option_strings(self):
-        r = []
-        for o in self.commandline.get_options(with_parent_options=True):
-            if o.complete and o.optional_arg is True:
-                r.extend('%s=?' % s for s in o.option_strings)
-            elif o.complete:
-                r.extend('%s=' % s for s in o.option_strings)
-            else:
-                r.extend('%s' % s for s in o.option_strings)
-        return ','.join(r)
-
     def _complete(self, option, command, *args):
-        context = self.ctxt.getOptionGenerationContext(self.commandline, option)
+        context = self.ctxt.get_option_context(self.commandline, option)
         return self.completer.complete(context, command, *args)
 
     def _complete_option(self, option):
@@ -105,7 +95,7 @@ class ZshCompletionFunction:
 
         if self.query_used:
             zsh_query = self.ctxt.helpers.use_function('zsh_query')
-            r  = 'local opts=%s\n' % shell.escape(self._get_option_strings())
+            r  = 'local opts=%s\n' % shell.escape(utils.get_query_option_strings(self.commandline))
             r += "local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''\n"
             r += '%s init "$opts" "${words[@]}"' % zsh_query
             self.code['0-init'] = r
@@ -195,17 +185,7 @@ class ZshCompletionFunction:
 
         return '%s() {\n%s\n}' % (
             self.funcname,
-            utils.indent('\n\n'.join(c for c in self.code.values() if c), 2))
-
-def _define_option_types(ctxt, commandline):
-    for option in commandline.options:
-        for option_string in option.option_strings:
-            if option_string.startswith('--'):
-                ctxt.helpers.use_function('zsh_query', 'long_options')
-            elif len(option_string) == 2:
-                ctxt.helpers.use_function('zsh_query', 'short_options')
-            else:
-                ctxt.helpers.use_function('zsh_query', 'old_options')
+            indent('\n\n'.join(c for c in self.code.values() if c), 2))
 
 def generate_completion(commandline, config=None):
     '''Code for generating a Zsh auto completion file.'''
@@ -220,8 +200,13 @@ def generate_completion(commandline, config=None):
     all_progs = ' '.join([commandline.prog] + commandline.aliases)
 
     if helpers.is_used('zsh_query'):
-        commandline.visit_commandlines(
-            lambda cmdline: _define_option_types(ctxt, cmdline))
+        types = utils.get_defined_option_types(commandline)
+        if types.short:
+            ctxt.helpers.use_function('zsh_query', 'short_options')
+        if types.long:
+            ctxt.helpers.use_function('zsh_query', 'long_options')
+        if types.old:
+            ctxt.helpers.use_function('zsh_query', 'old_options')
 
     output = []
 

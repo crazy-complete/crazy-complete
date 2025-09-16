@@ -2,8 +2,10 @@
 
 from types import NoneType
 
-from .cli import ExtendedBool, is_extended_bool, validate_option_string
-from .errors import CrazySchemaValidationError
+from .cli import ExtendedBool, is_extended_bool
+from .when import parse_when
+from .errors import CrazyError, CrazySchemaValidationError
+from .str_utils import contains_space, is_empty_or_whitespace, is_valid_option_string
 from .value_with_trace import ValueWithTrace
 
 _error = CrazySchemaValidationError
@@ -63,12 +65,6 @@ def _check_dictionary(dictionary, rules):
         if rule[0] is True and key not in dictionary.value:
             raise _error(f'Missing required key: {key}', dictionary)
 
-def _is_empty_or_whitespace(string):
-    return not string.strip()
-
-def _contains_space(string):
-    return (' ' in string or '\t' in string or '\n' in string)
-
 # =============================================================================
 # Actual validation code
 # =============================================================================
@@ -78,8 +74,11 @@ def _check_extended_bool(value):
         msg = f'Invalid value. Expected true, false or "{ExtendedBool.INHERIT}"'
         raise _error(msg, value)
 
-def _check_when(_value):
-    pass # TODO
+def _check_when(value):
+    try:
+        parse_when(value.value)
+    except CrazyError as e:
+        raise _error(f'when: {e}', value) from e
 
 def _check_void(args):
     _require_no_more(args)
@@ -246,7 +245,7 @@ def _check_option(option):
     for option_string in option_strings.value:
         _check_type(option_string, (str,), "option_string")
 
-        if not validate_option_string(option_string.value):
+        if not is_valid_option_string(option_string.value):
             raise _error('Invalid option string', option_string)
 
     if _has_set(option, 'metavar') and not _has_set(option, 'complete'):
@@ -302,14 +301,14 @@ def _check_definition(definition):
         'positionals':          (False, (list, NoneType)),
     })
 
-    if _is_empty_or_whitespace(definition.value['prog'].value):
+    if is_empty_or_whitespace(definition.value['prog'].value):
         raise _error('prog is empty', definition.value['prog'])
 
     if _has_set(definition, 'aliases'):
         for alias in definition.value['aliases'].value:
             _check_type(alias, (str,), 'alias')
 
-            if _contains_space(alias.value):
+            if contains_space(alias.value):
                 raise _error('alias contains space', alias)
 
     if _has_set(definition, 'abbreviate_commands'):

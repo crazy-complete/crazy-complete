@@ -1,9 +1,9 @@
 '''Classes for including functions in the generation process.'''
 
 from . import cli
-from . import utils
 from . import shell
 from . import preprocessor
+from .str_utils import indent
 
 # pylint: disable=too-few-public-methods
 
@@ -30,7 +30,7 @@ class ShellFunction(FunctionBase):
         code = preprocessor.strip_double_empty_lines(code)
 
         r  = '%s() {\n' % funcname
-        r += '%s\n'     % utils.indent(code, 2).rstrip()
+        r += '%s\n'     % indent(code, 2).rstrip()
         r += '}'
         return r
 
@@ -46,7 +46,7 @@ class FishFunction(FunctionBase):
         code = preprocessor.strip_double_empty_lines(code)
 
         r  = 'function %s\n' % funcname
-        r += '%s\n'          % utils.indent(code, 2).rstrip()
+        r += '%s\n'          % indent(code, 2).rstrip()
         r += 'end'
         return r
 

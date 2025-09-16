@@ -172,7 +172,7 @@ class FishCompletionGenerator:
         self.lines = []
         self.conditions = VariableManager('C')
         self.command_comment = '# command %s' % self.commandline.get_command_path()
-        self.options_for_query = 'set -l opts "%s"' % self._get_option_strings_for_query()
+        self.options_for_query = 'set -l opts "%s"' % utils.get_query_option_strings(self.commandline)
 
         complete_definitions = []
         for option in self.commandline.get_options():
@@ -196,19 +196,8 @@ class FishCompletionGenerator:
 
             self.lines.append(cmd.get())
 
-    def _get_option_strings_for_query(self):
-        r = []
-        for option in self.commandline.get_options(with_parent_options=True):
-            if option.complete and option.optional_arg is True:
-                r.extend('%s=?' % s for s in option.option_strings)
-            elif option.complete:
-                r.extend('%s=' % s for s in option.option_strings)
-            else:
-                r.extend(option.option_strings)
-        return ','.join(r)
-
     def _complete_option(self, option):
-        context = self.ctxt.getOptionGenerationContext(self.commandline, option)
+        context = self.ctxt.get_option_context(self.commandline, option)
 
         if option.complete:
             completion_args = self.completer.complete(context, *option.complete).get_args()
@@ -250,7 +239,7 @@ class FishCompletionGenerator:
         return definition
 
     def _complete_positional(self, option):
-        context = self.ctxt.getOptionGenerationContext(self.commandline, option)
+        context = self.ctxt.get_option_context(self.commandline, option)
 
         if option.complete:
             completion_args = self.completer.complete(context, *option.complete).get_args()
@@ -277,7 +266,7 @@ class FishCompletionGenerator:
 
     def _complete_subcommands(self, option):
         items = option.get_choices()
-        context = self.ctxt.getOptionGenerationContext(self.commandline, option)
+        context = self.ctxt.get_option_context(self.commandline, option)
         completion_args = self.completer.complete(context, 'choices', items).get_args()
 
         definition = FishCompletionDefinition(
@@ -291,16 +280,6 @@ class FishCompletionGenerator:
         definition.conditions.positional_contains = _get_positional_contains(option)
         return definition
 
-def _define_option_types(ctxt, commandline):
-    for option in commandline.options:
-        for option_string in option.option_strings:
-            if option_string.startswith('--'):
-                ctxt.helpers.use_function('fish_query', 'long_options')
-            elif len(option_string) == 2:
-                ctxt.helpers.use_function('fish_query', 'short_options')
-            else:
-                ctxt.helpers.use_function('fish_query', 'old_options')
-
 def generate_completion(commandline, config=None):
     '''Code for generating a Fish auto completion file.'''
 
@@ -313,8 +292,13 @@ def generate_completion(commandline, config=None):
     result = generation.visit_commandlines(FishCompletionGenerator, ctxt, commandline)
 
     if helpers.is_used('fish_query'):
-        commandline.visit_commandlines(
-            lambda cmdline: _define_option_types(ctxt, cmdline))
+        types = utils.get_defined_option_types(commandline)
+        if types.short:
+            ctxt.helpers.use_function('fish_query', 'short_options')
+        if types.long:
+            ctxt.helpers.use_function('fish_query', 'long_options')
+        if types.old:
+            ctxt.helpers.use_function('fish_query', 'old_options')
 
     output = []
 

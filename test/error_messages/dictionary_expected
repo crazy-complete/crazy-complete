@@ -37,6 +37,7 @@
 190-hidden-wrong-type                    | Parameter `hidden` has an invalid type. Expected types: bool. Received: 'wrong' (str)
 200-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: False (bool)
 210-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
+211-when-wrong-value                     | foo: -o: when: invalid: Invalid command: 'invalid'
 220-metavar-but-no-complete              | Option ['-o'] has metavar set, but has no complete
 230-optional-arg-but-no-complete         | Option ['-o'] has optional_arg=True, but has no complete
 ======= Directory "03-positional" =======
@@ -49,6 +50,7 @@
 230-repeatable-wrong-type                | Parameter `repeatable` has an invalid type. Expected types: bool. Received: 'wrong' (str)
 240-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: 'wrong' (str)
 250-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
+251-when-wrong-value                     | foo: 1: None: when: invalid: Invalid command: 'invalid'
 ======= Directory "04-complete" =======
 3_00_00-invalid-command                  | foo: -o: Unknown command for `complete`: wrong
 3_01_00-command-too-many-args            | foo: -o: Too many arguments: ['wrong']
