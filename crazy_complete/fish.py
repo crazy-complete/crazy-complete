@@ -15,26 +15,36 @@ from . import when
 from . import generation
 
 class FishQuery:
+    '''Class for querying the command line.'''
+
     def __init__(self, ctxt):
         self.ctxt = ctxt
 
     def positional_contains(self, num, words):
+        '''Check if a positional contains words.'''
+
         self.ctxt.helpers.use_function('fish_query', 'positional_contains')
         r = "$query '$opts' positional_contains %d %s" % (num, ' '.join(words))
         return r
 
     def has_option(self, options):
+        '''Check if certain option is present on command line.'''
+
         self.ctxt.helpers.use_function('fish_query', 'has_option')
         r = "$query '$opts' has_option %s" % ' '.join(options)
         return r
 
     def option_is(self, options, values):
+        '''Check if certain options have certain values.'''
+
         self.ctxt.helpers.use_function('fish_query', 'option_is')
         r = "$query '$opts' option_is %s -- %s" % (
             ' '.join(options), ' '.join(values))
         return r
 
     def num_of_positionals(self, operator, num):
+        '''Check the current count of positional arguments .'''
+
         self.ctxt.helpers.use_function('fish_query', 'num_of_positionals')
         r = "$query '$opts' num_of_positionals %s %d" % (operator, num)
         return r
@@ -92,8 +102,8 @@ class Conditions:
             conditions += [guard]
 
         if self.has_hidden_option:
-            func = self.ctxt.helpers.use_function('fish_query', 'with_incomplete')
-            func = self.ctxt.helpers.use_function('fish_query', 'has_option')
+            self.ctxt.helpers.use_function('fish_query', 'with_incomplete')
+            self.ctxt.helpers.use_function('fish_query', 'has_option')
             guard = "$query '$opts' has_option WITH_INCOMPLETE %s" % (
                 ' '.join(shell.escape(o) for o in self.has_hidden_option))
             conditions += [guard]

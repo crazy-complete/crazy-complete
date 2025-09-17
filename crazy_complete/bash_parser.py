@@ -5,7 +5,7 @@ from collections import namedtuple
 from . import utils
 from .str_utils import indent
 from .bash_utils import make_option_variable_name, CasePatterns
-from .bash_parser_subcommand_code import *
+from .bash_parser_subcommand_code import make_subcommand_call_code, get_subcommand_path
 
 _PARSER_CODE = '''\
 POSITIONALS=()
@@ -44,7 +44,7 @@ for ((; argi < ${#words[@]}; ++argi)); do
   arg="${words[$argi]}"
 
   case "$arg" in
-    -) POSITIONALS[POSITIONAL_NUM++]="$arg";;
+    -) POSITIONALS[POSITIONAL_NUM++]="-";;
     -*);;
     *) POSITIONALS[POSITIONAL_NUM++]="$arg";;
   esac
@@ -53,17 +53,13 @@ done'''
 _OPT_ISSET = '_OPT_ISSET_'
 
 def generate(commandline):
-    commandlines = []
-    commandline.visit_commandlines(lambda o: commandlines.append(o))
-    commandlines = list(reversed(commandlines))
-
-    long_option_cases = []
-    short_option_cases = []
-
+    commandlines         = list(reversed(commandline.get_all_commandlines()))
     subcommand_call_code = make_subcommand_call_code(commandline)
+    long_option_cases    = []
+    short_option_cases   = []
 
     for commandline in commandlines:
-        option_cases = generate_option_cases(commandline)
+        option_cases = _generate_option_cases(commandline)
         command = get_subcommand_path(commandline)
         #if commandline.inherit_options  ## TODO
 
@@ -88,14 +84,12 @@ def generate(commandline):
     s = _PARSER_CODE
 
     if long_option_cases:
-        s = s.replace('%LONG_OPTION_CASES%',
-            indent('\n\n'.join(long_option_cases), 6))
+        s = s.replace('%LONG_OPTION_CASES%', indent('\n\n'.join(long_option_cases), 6))
     else:
         s = s.replace('%LONG_OPTION_CASES%\n', '')
 
     if short_option_cases:
-        s = s.replace('%SHORT_OPTION_CASES%',
-            indent('\n\n'.join(short_option_cases), 8))
+        s = s.replace('%SHORT_OPTION_CASES%', indent('\n\n'.join(short_option_cases), 8))
     else:
         s = s.replace('%SHORT_OPTION_CASES%\n', '')
 
@@ -106,11 +100,7 @@ def generate(commandline):
 
     return s
 
-def make_long_option_case(
-        long_options,
-        complete,
-        optional_arg,
-        value_variable):
+def _make_long_option_case(long_options, complete, optional_arg, value_variable):
     r = ''
 
     if complete and optional_arg is True:
@@ -134,11 +124,7 @@ def make_long_option_case(
 
     return r
 
-def make_short_option_case(
-        short_options,
-        complete,
-        optional_arg,
-        value_variable):
+def _make_short_option_case(short_options, complete, optional_arg, value_variable):
     r = ''
 
     if complete and optional_arg is True:
@@ -161,7 +147,7 @@ def make_short_option_case(
 
     return r
 
-def generate_option_cases(commandline):
+def _generate_option_cases(commandline):
     OptionCases = namedtuple('OptionCases', ['long_options', 'short_options'])
     options = commandline.get_options()
     abbreviations = utils.get_option_abbreviator(commandline)
@@ -176,10 +162,10 @@ def generate_option_cases(commandline):
 
         if long_options:
             option_cases.long_options.append(
-                make_long_option_case(long_options, option.complete, option.optional_arg, value_variable))
+                _make_long_option_case(long_options, option.complete, option.optional_arg, value_variable))
 
         if short_options:
             option_cases.short_options.append(
-                make_short_option_case(short_options, option.complete, option.optional_arg, value_variable))
+                _make_short_option_case(short_options, option.complete, option.optional_arg, value_variable))
 
     return option_cases

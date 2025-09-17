@@ -3,6 +3,8 @@
 from . import shell
 
 def make_option_variable_name(option, prefix=''):
+    '''Make a variable for an option.'''
+
     long_options = option.get_long_option_strings()
     if long_options:
         return prefix + shell.make_identifier(long_options[0].lstrip('-'))
@@ -17,6 +19,7 @@ def make_option_variable_name(option, prefix=''):
 
     raise AssertionError("make_option_variable_name: Should not be reached")
 
+
 class VariableManager:
     '''Variable manager.'''
 
@@ -25,24 +28,35 @@ class VariableManager:
         self.variables = set()
 
     def make_variable(self, option):
+        '''Make a variable for an option.'''
+
         var = make_option_variable_name(option, self.prefix)
         self.variables.add(var)
         return var
 
     def get_variables(self):
+        '''Get a list of all defined variables.'''
+
         return list(sorted(self.variables))
+
 
 class CasePatterns:
     '''Functions for creating case patterns.'''
 
     @staticmethod
     def for_long_without_arg(option_strings):
+        '''Return a case pattern for long options that don't take an argument.'''
+
         return '|'.join(option_strings)
 
     @staticmethod
     def for_long_with_arg(option_strings):
+        '''Return a case pattern for long options that take an argument.'''
+
         return '|'.join(f'{o}=*' for o in option_strings)
 
     @staticmethod
     def for_short(option_strings):
+        '''Return a case pattern for short options.'''
+
         return '|'.join(o[1] for o in option_strings)

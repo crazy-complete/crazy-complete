@@ -155,13 +155,17 @@ class CommandLine:
         def __init__(self, commandline, with_parent_options=False, only_with_arguments=False):
             self.options = OrderedDict()
 
-            commandlines = commandline.get_parents(include_self=True) if with_parent_options else [commandline]
-            for commandline in reversed(commandlines):
-                for option in commandline.options:
-                    if not only_with_arguments or option.complete:
-                        self.add(option, commandline)
+            if with_parent_options:
+                commandlines = commandline.get_parents(include_self=True)
+            else:
+                commandlines = [commandline]
 
-        def add(self, option, commandline):
+            for cmdline in reversed(commandlines):
+                for option in cmdline.options:
+                    if not only_with_arguments or option.complete:
+                        self._add(option, cmdline)
+
+        def _add(self, option, commandline):
             key = option.get_option_strings_key()
 
             if key not in self.options:
@@ -409,6 +413,8 @@ class CommandLine:
             self.prog, self.help, self.abbreviate_commands, self.options, self.positionals, self.subcommands)
 
 class Positional:
+    '''Class representing a command line positional.'''
+
     def __init__(
             self,
             parent,
@@ -508,6 +514,8 @@ class Positional:
         )
 
 class Option:
+    '''Class representing a command line option.'''
+
     def __init__(
             self,
             parent,

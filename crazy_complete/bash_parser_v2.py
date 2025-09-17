@@ -5,7 +5,7 @@ from collections import namedtuple
 from . import utils
 from .str_utils import indent
 from .bash_utils import make_option_variable_name
-from .bash_parser_subcommand_code import *
+from .bash_parser_subcommand_code import make_subcommand_call_code, get_subcommand_path
 
 _PARSER_CODE = '''\
 POSITIONALS=()
@@ -95,7 +95,7 @@ for ((; argi < ${#words[@]}; ++argi)); do
   arg="${words[$argi]}"
 
   case "$arg" in
-    -) POSITIONALS[POSITIONAL_NUM++]="$arg";;
+    -) POSITIONALS[POSITIONAL_NUM++]="-";;
     -*);;
     *) POSITIONALS[POSITIONAL_NUM++]="$arg";;
   esac
@@ -103,10 +103,10 @@ done'''
 
 _OPT_ISSET = '_OPT_ISSET_'
 
-def make_find_option_code(commandlines):
+def _make_find_option_code(commandline):
     c = '__find_option() {\n'
 
-    for commandline in commandlines:
+    for commandline in reversed(commandline.get_all_commandlines()):
         option_cases = generate_option_cases(commandline)
         command = get_subcommand_path(commandline)
         if commandline.inherit_options:
@@ -130,11 +130,7 @@ def make_find_option_code(commandlines):
     return c
 
 def generate(commandline):
-    commandlines = []
-    commandline.visit_commandlines(lambda o: commandlines.append(o))
-    commandlines = list(reversed(commandlines))
-
-    find_option_code = make_find_option_code(commandlines)
+    find_option_code     = _make_find_option_code(commandline)
     subcommand_call_code = make_subcommand_call_code(commandline)
 
     s = _PARSER_CODE
