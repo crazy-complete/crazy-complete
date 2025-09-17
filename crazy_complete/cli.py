@@ -123,12 +123,8 @@ class CommandLine:
 
         return MutuallyExclusiveGroup(self, group)
 
-    def add_subcommands(self, name='command', help=None):
+    def add_subcommands(self):
         '''Adds a subcommands option to the command line if none exists already.
-
-        Args:
-            name (str): The name of the subcommands option.
-            help (str): The help message for the subcommands option.
 
         Returns:
             SubCommandsOption: The newly created subcommands option.
@@ -137,16 +133,10 @@ class CommandLine:
             CrazyError: If the command line object already has subcommands.
         '''
 
-        if not isinstance(name, str):
-            raise CrazyTypeError('name', 'str', name)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
-
         if self.subcommands:
             raise CrazyError('CommandLine object already has subcommands')
 
-        self.subcommands = SubCommandsOption(self, name, help)
+        self.subcommands = SubCommandsOption(self)
         return self.subcommands
 
     class OptionsGetter:
@@ -388,7 +378,7 @@ class CommandLine:
             )
 
         if self.subcommands is not None:
-            subcommands_option = copy.add_subcommands(self.subcommands.metavar, self.subcommands.help)
+            subcommands_option = copy.add_subcommands()
             for subparser in self.subcommands.subcommands:
                 subcommands_option.add_commandline_object(subparser.copy())
 
@@ -706,20 +696,31 @@ class Option:
             self.option_strings, self.metavar, self.help)
 
 class SubCommandsOption(Positional):
-    def __init__(self, parent, name, help):
+    '''Class holding subcommands of a commandline.'''
+
+    def __init__(self, parent):
         self.subcommands = []
 
         super().__init__(
             parent,
             parent.get_highest_positional_num() + 1,
-            metavar='command',
-            help=help)
+            metavar='command')
 
     def add_commandline_object(self, commandline):
+        '''Add an existing commandline object as a subcommand.'''
+
+        if self.get_subcommand_by_name(commandline.prog):
+            raise CrazyError(f'Duplicate subcommand. {commandline.prog} already defined.')
+
         commandline.parent = self.parent
         self.subcommands.append(commandline)
 
     def add_commandline(self, name, help=''):
+        '''Create a new commandline object and add it as a subcommand.'''
+
+        if self.get_subcommand_by_name(name):
+            raise CrazyError(f'Duplicate subcommand. {name} already defined.')
+
         commandline = CommandLine(name, help=help, parent=self.parent)
         self.subcommands.append(commandline)
         return commandline
@@ -734,6 +735,14 @@ class SubCommandsOption(Positional):
                 for alias in subcommand.aliases:
                     r[alias] = subcommand.help
         return r
+
+    def get_subcommand_by_name(self, name):
+        '''Return a subcommand by name or None if not found.'''
+
+        for subcommand in self.subcommands:
+            if subcommand.prog == name:
+                return subcommand
+        return None
 
     def __eq__(self, other):
         return (

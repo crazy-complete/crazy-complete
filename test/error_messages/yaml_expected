@@ -6,6 +6,8 @@
 004-too-many-programs-defined            | No error
 005-duplicate-programs                   | No error
 006-duplicate-subcommands                | No error
+007-missing-command                      | No error
+008-missing-command-2                    | No error
 010-aliases-wrong-type                   | line 2, column 10: aliases: Invalid type. Expected types: list|none
 011-aliases-not-str                      | line 2, column 11: alias: Invalid type. Expected types: string
 012-aliases-with-space                   | line 2, column 11: alias contains space

@@ -6,6 +6,8 @@
 004-too-many-programs-defined            | Too many main programs defined: ['test', 'test1']
 005-duplicate-programs                   | Multiple definition of program `test`
 006-duplicate-subcommands                | Multiple definition of program `subcommand`
+007-missing-command                      | Command not found: test bar
+008-missing-command-2                    | Command not found: test bar
 010-aliases-wrong-type                   | Parameter `aliases` has an invalid type. Expected types: list. Received: True (bool)
 011-aliases-not-str                      | Parameter `aliases[0]` has an invalid type. Expected types: str. Received: True (bool)
 012-aliases-with-space                   | aliases[0]: cannot contain space

@@ -16,6 +16,8 @@ def _validate_keys(dictionary, allowed_keys):
             raise CrazyError(f'Unknown key: {key}')
 
 def dictionary_to_commandline(dictionary, prog=None):
+    '''Convert a single dictionary to a cli.CommandLine object.'''
+
     _validate_keys(dictionary,
         ['prog', 'help', 'aliases', 'abbreviate_commands', 'abbreviate_options',
          'inherit_options', 'options', 'positionals'])
@@ -68,74 +70,65 @@ def dictionary_to_commandline(dictionary, prog=None):
 
     return commandline
 
-class CommandlineTree:
-    class Node:
-        def __init__(self, commandline, subcommands):
-            self.commandline = commandline
-            self.subcommands = subcommands
+def _check_prog_in_dictionary(dictionary):
+    if 'prog' not in dictionary:
+        raise CrazyError('Missing `prog` field')
 
-        def visit(self, callback):
-            callback(self)
-            for subcommand in self.subcommands.values():
-                subcommand.visit(callback)
+    if not isinstance(dictionary['prog'], str):
+        raise CrazyTypeError('prog', 'str', dictionary["prog"])
 
-    def __init__(self):
-        self.root = CommandlineTree.Node(None, {})
+    if is_empty_or_whitespace(dictionary['prog']):
+        raise CrazyError('The `prog` field must not be empty')
 
-    def add_commandline(self, commandline):
-        previous_commands = commandline['prog'].split()
-        command = previous_commands.pop()
+def _get_commandline_by_path(root, path):
+    current = root
 
-        node = self.root
+    for i, name in enumerate(path):
+        path_str = ' '.join(path[0:i + 1])
 
-        for previous_command in previous_commands:
-            try:
-                node = node.subcommands[previous_command]
-            except KeyError:
-                msg  = "Previous commands %r are missing. " % previous_commands
-                msg += "Cannot define command %r" % command
-                raise CrazyError(msg) from None
+        if not current.get_subcommands_option():
+            raise CrazyError(f"Command not found: {path_str}")
 
-        if command in node.subcommands:
-            raise CrazyError(f"Multiple definition of program `{command}`")
-        node.subcommands[command] = CommandlineTree.Node(dictionary_to_commandline(commandline, command), {})
+        current = current.get_subcommands_option().get_subcommand_by_name(name)
+        if not current:
+            raise CrazyError(f"Command not found: {path_str}")
 
-    def get_root_commandline(self):
-        if not self.root.subcommands:
-            raise CrazyError("No programs defined")
-
-        if len(self.root.subcommands) > 1:
-            progs = [node.commandline.prog for node in self.root.subcommands.values()]
-            raise CrazyError(f"Too many main programs defined: {progs}")
-
-        return next(iter(self.root.subcommands.values()))
+    return current
 
 def dictionaries_to_commandline(dictionaries):
+    '''Convert a list of dictionaries to a cli.CommandLine object.'''
+
     compat.fix_commandline_dictionaries(dictionaries)
 
-    def add_subcommands(node):
-        if node.subcommands:
-            subp = node.commandline.add_subcommands()
-            for subcommand in node.subcommands.values():
-                subp.add_commandline_object(subcommand.commandline)
-
-    commandline_tree = CommandlineTree()
+    root = CommandLine('root')
 
     for dictionary in dictionaries:
-        if 'prog' not in dictionary:
-            raise CrazyError('Missing `prog` field')
+        _check_prog_in_dictionary(dictionary)
 
-        if not isinstance(dictionary['prog'], str):
-            raise CrazyTypeError('prog', 'str', dictionary["prog"])
+        path = dictionary['prog'].split()
+        progname = path.pop()
 
-        if is_empty_or_whitespace(dictionary['prog']):
-            raise CrazyError('The `prog` field must not be empty')
+        cmdline = _get_commandline_by_path(root, path)
 
-        commandline_tree.add_commandline(dictionary)
+        subcommands = cmdline.get_subcommands_option()
+        if not subcommands:
+            subcommands = cmdline.add_subcommands()
 
-    root = commandline_tree.get_root_commandline()
-    root.visit(add_subcommands)
-    return root.commandline
+        new_cmdline = dictionary_to_commandline(dictionary, progname)
+
+        try:
+            subcommands.add_commandline_object(new_cmdline)
+        except CrazyError as e:
+            raise CrazyError(f"Multiple definition of program `{progname}`") from e
+
+    if not root.get_subcommands_option():
+        raise CrazyError("No programs defined")
+
+    if len(root.get_subcommands_option().subcommands) > 1:
+        progs = [c.prog for c in root.get_subcommands_option().subcommands]
+        raise CrazyError(f"Too many main programs defined: {progs}")
+
+    return root.get_subcommands_option().subcommands[0]
 
 def option_to_dictionary(self):
     '''Convert a cli.Option object to a dictionary.'''
