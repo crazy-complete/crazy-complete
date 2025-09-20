@@ -20,7 +20,7 @@ class ExtendedBool:
     INHERIT = 'INHERIT'
 
 def is_extended_bool(obj):
-    '''Check if `obj` an instance of `ExtendedBool.INHERIT`.'''
+    '''Check if `obj` an instance of `ExtendedBool`.'''
 
     return obj in (True, False, ExtendedBool.INHERIT)
 

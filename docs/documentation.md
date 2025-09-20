@@ -7,7 +7,7 @@ This documentation provides an overview of how to define shell completion for co
 
 To define a completion for a command, use the following structure:
 
-```
+```yaml
 prog: "<PROGRAM NAME>"
 help: "<PROGRAM DESCRIPTION>"
 options:
@@ -26,7 +26,7 @@ positionals:
 
 To define an option, use this format:
 
-```
+```yaml
 [...]
 options:
   - option_strings: ["<OPTION STRING>", ...]
@@ -57,7 +57,7 @@ options:
 
 Positional arguments are defined as follows:
 
-```
+```yaml
 [...]
 positionals:
   - number: <NUMBER>
@@ -80,7 +80,7 @@ positionals:
 
 To define subcommands, append the subcommand name directly to the program name:
 
-```
+```yaml
 prog: "<PROGRAM NAME> <SUBCOMMAND> ..."
 aliases: ["<ALIAS>", ...]
 help: "<SUBCOMMAND DESCRIPTION>"

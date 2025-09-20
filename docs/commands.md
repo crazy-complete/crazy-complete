@@ -1,10 +1,35 @@
-Completion commands
-===================
+# Completion commands
 
-**none**
+| Command                          | Description                                                                 |
+|----------------------------------|-----------------------------------------------------------------------------|
+| [none](#none)                    | No completion, but specifies that an argument is required                   |
+| [integer](#integer)              | Complete an integer                                                         |
+| [float](#float)                  | Complete a floating point number                                            |
+| [combine](#combine)              | Combine multiple completion commands                                        |
+| [file](#file)                    | Complete a file                                                             |
+| [directory](#directory)          | Complete a directory                                                        |
+| [choices](#choices)              | Complete from a set of values                                               |
+| [value\_list](#value_list)       | Complete a list                                                             |
+| [exec](#exec)                    | Complete by the output of a command or function                             |
+| [exec\_fast](#exec_fast)         | Complete by the output of a command or function (fast and unsafe)           |
+| [exec\_internal](#exec_internal) | Complete by a function that uses the shell's internal completion mechanisms |
+| [range](#range)                  | Complete a range of integers                                                |
+| [signal](#signal)                | Complete a signal                                                           |
+| [hostname](#hostname)            | Complete a hostname                                                         |
+| [process](#process)              | Complete a process                                                          |
+| [pid](#pid)                      | Complete a PID                                                              |
+| [command](#command)              | Complete a command                                                          |
+| [user](#user)                    | Complete a user                                                             |
+| [group](#group)                  | Complete a group                                                            |
+| [service](#service)              | Complete a SystemD service                                                  |
+| [variable](#variable)            | Complete a shell variable                                                   |
+| [environment](#environment)      | Complete a environment variable                                             |
 
-> Do not add any completion code.
-> This is the default.
+### none
+
+> Disables autocompletion for this option but still marks it as requiring an argument.
+>
+> Without specifying `complete`, the option would not take an argument.
 
 ```yaml
 prog: "example"
@@ -13,10 +38,12 @@ options:
     complete: ["none"]
 ```
 
-**integer**
+### integer
 
 > Complete an integer.
-> NOTE: This completion currently serves as documentation and does not provide actual functionality.
+>
+> **NOTE**: This completion currently serves as documentation and does not provide actual functionality.
+>
 > If you want to complete a range of integers, see **range**.
 
 ```yaml
@@ -26,10 +53,11 @@ options:
     complete: ["integer"]
 ```
 
-**float**
+### float
 
 > Complete a floating point number.
-> NOTE: This completion currently serves as documentation and does not provide actual functionality.
+>
+> **NOTE**: This completion currently serves as documentation and does not provide actual functionality.
 
 ```yaml
 prog: "example"
@@ -38,9 +66,9 @@ options:
     complete: ["float"]
 ```
 
-**combine**
+### combine
 
-> Combine two ore more completion commands
+> Combine two or more completion commands.
 
 ```yaml
 prog: "example"
@@ -49,10 +77,11 @@ options:
     complete: ["combine", [["user"], ["pid"]]]
 ```
 
-**file**
+### file
 
 > Complete a file.
-> A directory can be supplied by adding {"directory": ...}
+>
+> You can restrict completion to a specific directory by adding `{"directory": ...}`.
 
 ```yaml
 prog: "example"
@@ -68,10 +97,11 @@ options:
  dir1/  dir2/  file1  file2
 ```
 
-**directory**
+### directory
 
 > Complete a directory.
-> A directory can be supplied by adding {"directory": ...}
+>
+> You can restrict completion to a specific directory by adding `{"directory": ...}`.
 
 ```yaml
 prog: "example"
@@ -87,32 +117,38 @@ options:
  dir1/  dir2/
 ```
 
-**choices**
+### choices
 
-> Complete a list of items. Items can be a list or a dictionary.
+> Complete a list of items.
+>
+> Items can be a list or a dictionary.
+>
 > If a dictionary is supplied, the keys are used as items and the values are used
 > as description.
 
 ```yaml
 prog: "example"
 options:
-  - option_strings: ["--choices1"]
+  - option_strings: ["--choices-1"]
     complete: ["choices", ["Item 1", "Item 2"]]
-  - option_strings: ["--choices2"]
+  - option_strings: ["--choices-2"]
     complete: ["choices", {"Item 1": "Description 1", "Item 2": "Description 2"}]
 ```
 
 ```
- ~ > example --choices2=<TAB>
+ ~ > example --choices-2=<TAB>
 Item 1  (Description 1)  Item 2  (Description 2)
 ```
 
-**value_list**
+### value\_list
 
 > Complete one or more items from a list of items. Similar to `mount -o`.
+>
 > Arguments with assignable values (`mount -o uid=1000`) aren't supported.
-> Arguments are supplied by adding {"values": ...}
-> A separator can be supplied by adding {"separator": ...} (the default is ",")
+>
+> Arguments are supplied by adding `{"values": ...}`.
+>
+> A separator can be supplied by adding `{"separator": ...}` (the default is `","`).
 
 ```yaml
 prog: "example"
@@ -133,9 +169,10 @@ one  -- Description 1
 two  -- Description 2
 ```
 
-**exec**
+### exec
 
-> Execute commandline and parse the output.
+> Execute a command and parse the output.
+>
 > The output must be in form of:
 ```
 <item_1>\t<description_1>\n
@@ -143,13 +180,14 @@ two  -- Description 2
 [...]
 ```
 > An item and its description are delimited by a tabulator.
+>
 > These pairs are delimited by a newline.
 
 ```yaml
 prog: "example"
 options:
   - option_strings: ["--exec"]
-    complete: ["exec", "printf '%s\\t%s\\n' 'Item 1' 'Description 2' 'Item 2' 'Description 2'"]
+    complete: ["exec", "printf '%s\\t%s\\n' 'Item 1' 'Description 1' 'Item 2' 'Description 2'"]
 ```
 
 ```
@@ -157,9 +195,10 @@ options:
 Item 1  (Description 1)  Item 2  (Description 2)
 ```
 
-**exec_fast**
+### exec\_fast
 
 > Faster version of exec for handling large amounts of data.
+>
 > This implementation requires that the items of the parsed output do not include
 > special shell characters or whitespace.
 
@@ -170,9 +209,10 @@ options:
     complete: ["exec_fast", "printf '%s\\t%s\\n' 1 one 2 two"]
 ```
 
-**exec_internal**
+### exec\_internal
 
 > Execute a function that internally modifies the completion state.
+>
 > This is useful if a more advanced completion is needed.
 
 ```yaml
@@ -182,27 +222,27 @@ options:
     complete: ["exec_internal", "my_completion_func"]
 ```
 
-> For BASH, it might look like:
+> For Bash, it might look like:
 ```
 my_completion_func() {
     COMPREPLY=( $(compgen -W "foo bar baz") )
 }
 ```
-> For ZSH, it might look like:
+> For Zsh, it might look like:
 ```
 my_completion_func() {
     local items=( foo bar baz )
     _describe '' items
 }
 ```
-> For FISH, it might look like:
+> For Fish, it might look like:
 ```
 function my_completion_func
     printf '%s\n' foo bar baz
 end
 ```
 
-**range**
+### range
 
 > Complete a range of integers.
 
@@ -212,7 +252,7 @@ options:
   - option_strings: ["--range-1"]
     complete: ["range", 1, 9]
   - option_strings: ["--range-2"]
-    complete: ["range", 1, 9]
+    complete: ["range", 1, 9, 2]
 ```
 
 ```
@@ -222,7 +262,7 @@ options:
 1  3  5  7  9
 ```
 
-**signal**
+### signal
 
 > Complete signal names (INT, KILL, TERM, etc.).
 
@@ -247,9 +287,25 @@ INT     -- Terminal interrupt signal
 [...]
 ```
 
-**process**
+### hostname
 
-> List process names.
+> Complete a hostname.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--hostname"]
+    complete: ["hostname"]
+```
+
+```
+ ~ > example --hostname=<TAB>
+localhost
+```
+
+### process
+
+> Complete a process name.
 
 ```yaml
 prog: "example"
@@ -265,9 +321,9 @@ scsi_eh_5         sh              sudo           syndaemon  systemd
 systemd-journald  systemd-logind  systemd-udevd
 ```
 
-**pid**
+### pid
 
-> List PIDs.
+> Complete a PID.
 
 ```yaml
 prog: "example"
@@ -283,7 +339,7 @@ options:
 10150   1392    166442  195962  27      33      4609
 ```
 
-**command**
+### command
 
 > Complete a command.
 
@@ -299,7 +355,7 @@ options:
 base32    base64    basename  basenc    bash      bashbug
 ```
 
-**user**
+### user
 
 > Complete a username.
 
@@ -318,7 +374,7 @@ dhcpcd                  ftp                     git
 [...]
 ```
 
-**group**
+### group
 
 > Complete a group.
 
@@ -339,7 +395,7 @@ games                   git                     groups
 [...]
 ```
 
-**service**
+### service
 
 > Complete a SystemD service.
 
@@ -356,10 +412,11 @@ TODO
 [...]
 ```
 
-**variable**
+### variable
 
 > Complete a shell variable name.
-> To complete a environment variable, use **environment**.
+>
+> To complete an environment variable, use **environment**.
 
 ```yaml
 prog: "example"
@@ -373,7 +430,7 @@ options:
 HOME      HOSTNAME  HOSTTYPE
 ```
 
-**environment**
+### environment
 
 > Complete a shell environment variable name.
 
