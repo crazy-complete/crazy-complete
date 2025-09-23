@@ -65,13 +65,13 @@ class BashCompletionGenerator:
             conditions = []
 
             for final_option in self.commandline.get_final_options():
-                conditions += ["! ${#%s}" % self.variable_manager.make_variable(final_option)]
+                conditions += ["! ${#%s[@]}" % self.variable_manager.make_variable(final_option)]
 
             for exclusive_option in option.get_conflicting_options():
-                conditions += ["! ${#%s}" % self.variable_manager.make_variable(exclusive_option)]
+                conditions += ["! ${#%s[@]}" % self.variable_manager.make_variable(exclusive_option)]
 
             if not option.repeatable:
-                conditions += ["! ${#%s}" % self.variable_manager.make_variable(option)]
+                conditions += ["! ${#%s[@]}" % self.variable_manager.make_variable(option)]
 
             if conditions:
                 conditions = '(( %s )) && ' % ' && '.join(algo.uniq(conditions))
