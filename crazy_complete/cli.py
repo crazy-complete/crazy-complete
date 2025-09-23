@@ -4,7 +4,7 @@ from collections import OrderedDict
 from types import NoneType
 
 from .errors import CrazyError, CrazyTypeError
-from .str_utils import contains_space, is_valid_option_string
+from .str_utils import contains_space, is_valid_option_string, is_valid_variable_name
 
 # pylint: disable=redefined-builtin
 # pylint: disable=too-few-public-methods
@@ -367,7 +367,8 @@ class CommandLine:
                 repeatable      = option.repeatable,
                 final           = option.final,
                 hidden          = option.hidden,
-                when            = option.when
+                when            = option.when,
+                capture         = option.capture
             )
 
         for positional in self.positionals:
@@ -377,7 +378,8 @@ class CommandLine:
                 help            = positional.help,
                 repeatable      = positional.repeatable,
                 complete        = positional.complete,
-                when            = positional.when
+                when            = positional.when,
+                capture         = positional.capture
             )
 
         if self.subcommands is not None:
@@ -416,7 +418,8 @@ class Positional:
             help=None,
             complete=None,
             repeatable=False,
-            when=None):
+            when=None,
+            capture=None):
         '''Initializes a Positional object with the specified parameters.
 
         Args:
@@ -427,6 +430,7 @@ class Positional:
             repeatable (bool): Specifies if positional can be specified more times
             complete (list): The completion specification for the positional.
             when (str): Specifies a condition for showing this positional.
+            capture (str): Specifies the variable name for capturing
         '''
 
         if not isinstance(parent, (CommandLine, NoneType)):
@@ -450,6 +454,12 @@ class Positional:
         if not isinstance(when, (str, NoneType)):
             raise CrazyTypeError('when', 'str|None', when)
 
+        if not isinstance(capture, (str, NoneType)):
+            raise CrazyTypeError('capture', 'str|None', capture)
+
+        if capture is not None and not is_valid_variable_name(capture):
+            raise CrazyError(f"Invalid variable name: {capture!r}")
+
         if number <= 0:
             raise CrazyError(f'number: value ({number}) is invalid, number has to be >= 1')
 
@@ -460,6 +470,7 @@ class Positional:
         self.repeatable = repeatable
         self.complete = complete if complete else ['none']
         self.when = when
+        self.capture = capture
 
     def get_positional_index(self):
         '''Returns the index of the current positional argument within the current
@@ -503,7 +514,8 @@ class Positional:
             self.help       == other.help       and
             self.repeatable == other.repeatable and
             self.complete   == other.complete   and
-            self.when       == other.when
+            self.when       == other.when       and
+            self.capture    == other.capture
         )
 
 class Option:
@@ -521,7 +533,8 @@ class Option:
             repeatable=ExtendedBool.INHERIT,
             final=False,
             hidden=False,
-            when=None):
+            when=None,
+            capture=None):
         '''Initializes an Option object with the specified parameters.
 
         Args:
@@ -536,6 +549,7 @@ class Option:
             final (bool): If True, no more options are suggested after this one.
             hidden (bool): Specifies if this option is hidden.
             when (str): Specifies a condition for showing this option.
+            capture (str): Specifies the variable name for capturing
 
         Returns:
             Option: The newly added Option object.
@@ -579,6 +593,9 @@ class Option:
         if not isinstance(when, (str, NoneType)):
             raise CrazyTypeError('when', 'str|None', when)
 
+        if not isinstance(capture, (str, NoneType)):
+            raise CrazyTypeError('capture', 'str|None', capture)
+
         if not option_strings:
             raise CrazyError('Empty option strings')
 
@@ -588,6 +605,9 @@ class Option:
 
             if not is_valid_option_string(option_string):
                 raise CrazyError(f"Invalid option string: {option_string!r}")
+
+        if capture is not None and not is_valid_variable_name(capture):
+            raise CrazyError(f"Invalid variable name: {capture!r}")
 
         if metavar and not complete:
             raise CrazyError(f'Option {option_strings} has metavar set, but has no complete')
@@ -606,6 +626,7 @@ class Option:
         self.final = final
         self.hidden = hidden
         self.when = when
+        self.capture = capture
 
     def get_option_strings(self):
         '''Returns the option strings associated with the Option object.
@@ -691,7 +712,8 @@ class Option:
             self.hidden         == other.hidden         and
             self.complete       == other.complete       and
             self.groups         == other.groups         and
-            self.when           == other.when
+            self.when           == other.when           and
+            self.capture        == other.capture
         )
 
     def __repr__(self):

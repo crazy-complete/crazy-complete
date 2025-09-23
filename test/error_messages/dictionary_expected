@@ -42,6 +42,9 @@
 211-when-wrong-value                     | foo: -o: when: invalid: Invalid command: 'invalid'
 220-metavar-but-no-complete              | Option ['-o'] has metavar set, but has no complete
 230-optional-arg-but-no-complete         | Option ['-o'] has optional_arg=True, but has no complete
+240-capture-wrong-type                   | Parameter `capture` has an invalid type. Expected types: str|None. Received: False (bool)
+241-capture-empty                        | Invalid variable name: ''
+242-capture-wrong-value                  | Invalid variable name: '1'
 ======= Directory "03-positional" =======
 200-no-number                            | Parameter `number` has an invalid type. Expected types: int. Received: None (NoneType)
 201-number-wrong-type                    | Parameter `number` has an invalid type. Expected types: int. Received: 'wrong' (str)
@@ -53,6 +56,9 @@
 240-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: 'wrong' (str)
 250-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
 251-when-wrong-value                     | foo: 1: None: when: invalid: Invalid command: 'invalid'
+260-capture-wrong-type                   | Parameter `capture` has an invalid type. Expected types: str|None. Received: False (bool)
+261-capture-empty                        | Invalid variable name: ''
+262-capture-wrong-value                  | Invalid variable name: ''
 ======= Directory "04-complete" =======
 3_00_00-invalid-command                  | foo: -o: Unknown command for `complete`: wrong
 3_01_00-command-too-many-args            | foo: -o: Too many arguments: ['wrong']

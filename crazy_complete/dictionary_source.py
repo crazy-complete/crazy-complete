@@ -42,7 +42,7 @@ def dictionary_to_commandline(dictionary, prog=None):
     for option in options:
         _validate_keys(option,
             ['option_strings', 'metavar', 'help', 'optional_arg', 'groups',
-             'repeatable', 'final', 'hidden', 'complete', 'when'])
+             'repeatable', 'final', 'hidden', 'complete', 'when', 'capture'])
 
         commandline.add_option(
             option.get('option_strings',  None),
@@ -54,11 +54,12 @@ def dictionary_to_commandline(dictionary, prog=None):
             final           = option.get('final',           False),
             hidden          = option.get('hidden',          False),
             complete        = option.get('complete',        None),
-            when            = option.get('when',            None))
+            when            = option.get('when',            None),
+            capture         = option.get('capture',         None))
 
     for positional in positionals:
         _validate_keys(positional,
-            ['number', 'metavar', 'help', 'repeatable', 'complete', 'when'])
+            ['number', 'metavar', 'help', 'repeatable', 'complete', 'when', 'capture'])
 
         commandline.add_positional(
             positional.get('number', None),
@@ -66,7 +67,8 @@ def dictionary_to_commandline(dictionary, prog=None):
             help       = positional.get('help',       None),
             repeatable = positional.get('repeatable', False),
             complete   = positional.get('complete',   None),
-            when       = positional.get('when',       None))
+            when       = positional.get('when',       None),
+            capture    = positional.get('capture',    None))
 
     return commandline
 
@@ -164,6 +166,9 @@ def option_to_dictionary(self):
     if self.when is not None:
         r['when'] = self.when
 
+    if self.capture is not None:
+        r['capture'] = self.capture
+
     return r
 
 def positional_to_dictionary(self):
@@ -187,6 +192,9 @@ def positional_to_dictionary(self):
 
     if self.when is not None:
         r['when'] = self.when
+
+    if self.capture is not None:
+        r['capture'] = self.capture
 
     return r
 

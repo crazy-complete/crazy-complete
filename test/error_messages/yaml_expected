@@ -42,6 +42,9 @@
 211-when-wrong-value                     | line 4, column 11: when: Invalid command: 'invalid'
 220-metavar-but-no-complete              | line 3, column 5: metavar is set but complete is missing
 230-optional-arg-but-no-complete         | line 3, column 5: optional_arg is set but complete is missing
+240-capture-wrong-type                   | line 4, column 14: capture: Invalid type. Expected types: string|none
+241-capture-empty                        | line 4, column 14: Invalid variable name
+242-capture-wrong-value                  | line 4, column 14: Invalid variable name
 ======= Directory "03-positional" =======
 200-no-number                            | line 3, column 5: Missing required key: number
 201-number-wrong-type                    | line 3, column 13: number: Invalid type. Expected types: integer
@@ -53,6 +56,9 @@
 240-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected types: list|none
 250-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected types: string|none
 251-when-wrong-value                     | line 4, column 11: when: Invalid command: 'invalid'
+260-capture-wrong-type                   | line 4, column 14: capture: Invalid type. Expected types: string|none
+261-capture-empty                        | line 4, column 14: Invalid variable name
+262-capture-wrong-value                  | line 4, column 14: Invalid variable name
 ======= Directory "04-complete" =======
 3_00_00-invalid-command                  | line 4, column 16: Invalid command: wrong
 3_01_00-command-too-many-args            | line 4, column 15: Too many arguments provided

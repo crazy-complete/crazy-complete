@@ -43,3 +43,10 @@ def is_valid_option_string(option_string):
         return False
 
     return True
+
+_VALID_VARIABLE_RE = re.compile('[a-zA-Z_][a-zA-Z0-9_]*')
+
+def is_valid_variable_name(string):
+    '''Check if string is a valid shell variable name.'''
+
+    return _VALID_VARIABLE_RE.fullmatch(string)

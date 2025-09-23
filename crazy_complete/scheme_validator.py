@@ -5,7 +5,7 @@ from types import NoneType
 from .cli import ExtendedBool, is_extended_bool
 from .when import parse_when
 from .errors import CrazyError, CrazySchemaValidationError
-from .str_utils import contains_space, is_empty_or_whitespace, is_valid_option_string
+from .str_utils import contains_space, is_empty_or_whitespace, is_valid_option_string, is_valid_variable_name
 from .value_with_trace import ValueWithTrace
 
 _error = CrazySchemaValidationError
@@ -235,6 +235,7 @@ def _check_option(option):
         'hidden':               (False, (bool, NoneType)),
         'complete':             (False, (list, NoneType)),
         'when':                 (False, (str,  NoneType)),
+        'capture':              (False, (str,  NoneType)),
     })
 
     option_strings = option.value['option_strings']
@@ -270,6 +271,10 @@ def _check_option(option):
     if _has_set(option, 'when'):
         _check_when(option.value['when'])
 
+    if _has_set(option, 'capture'):
+        if not is_valid_variable_name(option.value['capture'].value):
+            raise _error('Invalid variable name', option.value['capture'])
+
 def _check_positional(positional):
     _check_dictionary(positional, {
         'number':               (True,  (int,)),
@@ -278,6 +283,7 @@ def _check_positional(positional):
         'repeatable':           (False, (bool, NoneType)),
         'complete':             (False, (list, NoneType)),
         'when':                 (False, (str,  NoneType)),
+        'capture':              (False, (str,  NoneType)),
     })
 
     if positional.value['number'].value < 1:
@@ -288,6 +294,10 @@ def _check_positional(positional):
 
     if _has_set(positional, 'when'):
         _check_when(positional.value['when'])
+
+    if _has_set(positional, 'capture'):
+        if not is_valid_variable_name(positional.value['capture'].value):
+            raise _error('Invalid variable name', positional.value['capture'])
 
 def _check_definition(definition):
     _check_dictionary(definition, {

@@ -27,6 +27,7 @@ def option_to_yaml(dictionary):
     hidden          = dictionary.get('hidden',          False)
     complete        = dictionary.get('complete',        None)
     when            = dictionary.get('when',            None)
+    capture         = dictionary.get('capture',         None)
 
     r = '- option_strings: %s\n' % json.dumps(option_strings)
 
@@ -57,6 +58,9 @@ def option_to_yaml(dictionary):
     if when is not None:
         r += '  when: %s\n' % json.dumps(when)
 
+    if capture is not None:
+        r += '  capture: %s\n' % json.dumps(capture)
+
     return r.rstrip()
 
 def positional_to_yaml(dictionary):
@@ -68,6 +72,7 @@ def positional_to_yaml(dictionary):
     repeatable = dictionary.get('repeatable', False)
     complete   = dictionary.get('complete',   None)
     when       = dictionary.get('when',       None)
+    capture    = dictionary.get('capture',    None)
 
     r = '- number: %d\n' % number
 
@@ -85,6 +90,9 @@ def positional_to_yaml(dictionary):
 
     if when is not None:
         r += '  when: %s\n' % json.dumps(when)
+
+    if capture is not None:
+        r += '  capture: %s\n' % json.dumps(capture)
 
     return r.rstrip()
 
