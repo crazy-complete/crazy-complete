@@ -1,0 +1,17 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ['--option']
+    repeatable: true
+    complete: ["choices", ["1", "2", "3"]]
+---
+prog: "crazy-complete-test subcommand"
+options:
+  - option_strings: ['--sub-bar']
+    repeatable: true
+    complete: ["choices", ["1", "2", "3"]]
+---
+prog: "crazy-complete-test subcommand lastcommand"
+options:
+  - option_strings: ['--last-option']
+    repeatable: true
+    complete: ["choices", ["1", "2", "3"]]

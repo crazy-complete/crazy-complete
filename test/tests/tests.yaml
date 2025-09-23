@@ -2,6 +2,8 @@ main: {"args": ["--input-type=python", "--include-file=include.$shell"], "defini
 when: {"args": ["--input-type=yaml"], "definition_file": "when-test.yaml"}
 groups: {"args": ["--input-type=yaml"], "definition_file": "groups-test.yaml"}
 combine: {"args": ["--input-type=yaml"], "definition_file": "combine-test.yaml"}
+inherit-on: {"args": ["--input-type=yaml", "--inherit-options=True"], "definition_file": "inherit-options.yaml"}
+inherit-off: {"args": ["--input-type=yaml", "--inherit-options=False"], "definition_file": "inherit-options.yaml"}
 ---
 number: 1
 definition_file: "main"
@@ -1057,3 +1059,55 @@ zsh_expected: |
   7  -- seven
   0                  1                  4                  5
   3  2  --
+---
+number: 70
+definition_file: "inherit-off"
+description: "Check if options are not inherited"
+send: "crazy-complete-test subcommand --"
+bash_expected: |
+  > crazy-complete-test subcommand --sub-bar=
+fish_expected: |
+  > crazy-complete-test subcommand --sub-bar
+zsh_expected: |
+  > crazy-complete-test subcommand --sub-bar=
+---
+number: 71
+definition_file: "inherit-off"
+description: "Check if options are not inherited (2)"
+send: "crazy-complete-test subcommand --option lastcommand --"
+bash_expected: |
+  > crazy-complete-test subcommand --option lastcommand --last-option=
+fish_expected: |
+  > crazy-complete-test subcommand --option lastcommand --sub-bar
+zsh_expected: |
+  > crazy-complete-test subcommand --option lastcommand --sub-bar=
+---
+number: 72
+definition_file: "inherit-on"
+description: "Check if options are inherited"
+send: "crazy-complete-test subcommand --"
+bash_expected: |
+  > crazy-complete-test subcommand --
+  --option=   --sub-bar=
+  > crazy-complete-test subcommand --
+fish_expected: |
+  > crazy-complete-test subcommand --option
+  --option  --sub-bar
+zsh_expected: |
+  > crazy-complete-test subcommand --
+  --option   --sub-bar
+---
+number: 73
+definition_file: "inherit-on"
+description: "Check if options are inherited (2)"
+send: "crazy-complete-test subcommand --option lastcommand --"
+bash_expected: |
+  > crazy-complete-test subcommand --option lastcommand --
+  --option=   --sub-bar=
+  > crazy-complete-test subcommand --option lastcommand --
+fish_expected: |
+  > crazy-complete-test subcommand --option lastcommand --option
+  --option  --sub-bar
+zsh_expected: |
+  > crazy-complete-test subcommand --option lastcommand --
+  --option   --sub-bar
