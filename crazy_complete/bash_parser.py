@@ -52,14 +52,14 @@ done'''
 
 _OPT_ISSET = '_OPT_ISSET_'
 
-def generate(commandline):
+def generate(commandline, variable_manager):
     commandlines         = list(reversed(commandline.get_all_commandlines()))
     subcommand_call_code = make_subcommand_call_code(commandline)
     long_option_cases    = []
     short_option_cases   = []
 
     for commandline in commandlines:
-        option_cases = _generate_option_cases(commandline)
+        option_cases = _generate_option_cases(commandline, variable_manager)
         command = get_subcommand_path(commandline)
         if commandline.inherit_options:
             command += '*'
@@ -148,7 +148,7 @@ def _make_short_option_case(short_options, complete, optional_arg, value_variabl
 
     return r
 
-def _generate_option_cases(commandline):
+def _generate_option_cases(commandline, variable_manager):
     OptionCases = namedtuple('OptionCases', ['long_options', 'short_options'])
     options = commandline.get_options()
     abbreviations = utils.get_option_abbreviator(commandline)
@@ -159,7 +159,7 @@ def _generate_option_cases(commandline):
         long_options += abbreviations.get_many_abbreviations(option.get_old_option_strings())
         short_options = option.get_short_option_strings()
 
-        value_variable = make_option_variable_name(option, prefix='OPT_')
+        value_variable = variable_manager.capture_variable(option)
 
         if long_options:
             option_cases.long_options.append(

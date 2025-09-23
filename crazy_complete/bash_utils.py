@@ -34,6 +34,11 @@ class VariableManager:
         self.variables.add(var)
         return var
 
+    def capture_variable(self, option):
+        if option.capture is None:
+            option.capture = self.make_variable(option)
+        return option.capture
+
     def get_variables(self):
         '''Get a list of all defined variables.'''
 

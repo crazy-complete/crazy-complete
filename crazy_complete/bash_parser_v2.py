@@ -103,11 +103,11 @@ done'''
 
 _OPT_ISSET = '_OPT_ISSET_'
 
-def _make_find_option_code(commandline):
+def _make_find_option_code(commandline, variable_manager):
     c = '__find_option() {\n'
 
     for commandline in reversed(commandline.get_all_commandlines()):
-        option_cases = generate_option_cases(commandline)
+        option_cases = generate_option_cases(commandline, variable_manager)
         command = get_subcommand_path(commandline)
         if commandline.inherit_options:
             command += '*'
@@ -129,8 +129,8 @@ def _make_find_option_code(commandline):
 
     return c
 
-def generate(commandline):
-    find_option_code     = _make_find_option_code(commandline)
+def generate(commandline, variable_manager):
+    find_option_code     = _make_find_option_code(commandline, variable_manager)
     subcommand_call_code = make_subcommand_call_code(commandline)
 
     s = _PARSER_CODE
@@ -147,7 +147,7 @@ def generate(commandline):
 
     return s
 
-def generate_option_cases(commandline):
+def generate_option_cases(commandline, variable_manager):
     OptionCase = namedtuple('OptionCase', ['option_strings', 'variable', 'mode'])
     options = commandline.get_options()
     abbreviations = utils.get_option_abbreviator(commandline)
@@ -158,7 +158,7 @@ def generate_option_cases(commandline):
         long_options += abbreviations.get_many_abbreviations(option.get_old_option_strings())
         short_options = option.get_short_option_strings()
 
-        value_variable = make_option_variable_name(option, prefix='OPT_')
+        value_variable = variable_manager.capture_variable(option)
 
         if option.complete and option.optional_arg is True:
             mode = '$ARG_OPTIONAL'

@@ -7,12 +7,12 @@ def _generate_option_is(commandline, variable_manager, obj):
     conditions = []
 
     for o in commandline.get_options_by_option_strings(obj.options):
-        have_option = '(( ${#[%s]} ))' % variable_manager.make_variable(o)
+        have_option = '(( ${#%s[@]} ))' % variable_manager.capture_variable(o)
         value_equals = []
 
         for value in obj.values:
             value_equals.append('[[ "${%s[-1]}" == %s ]]' % (
-                variable_manager.make_variable(o),
+                variable_manager.capture_variable(o),
                 shell.escape(value)
             ))
 
@@ -32,7 +32,7 @@ def _generate_has_option(commandline, variable_manager, obj):
     conditions = []
 
     for o in commandline.get_options_by_option_strings(obj.options):
-        cond = '(( ${#[%s]} ))' % variable_manager.make_variable(o)
+        cond = '(( ${#%s[@]} ))' % variable_manager.capture_variable(o)
         conditions.append(cond)
 
     if len(conditions) == 1:

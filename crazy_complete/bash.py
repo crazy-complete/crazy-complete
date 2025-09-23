@@ -35,12 +35,15 @@ class BashCompletionGenerator:
         return self.completer.complete(context, *option.complete).get_code(append)
 
     def _generate_commandline_parsing(self):
-        options = self.commandline.get_options(with_parent_options=True)
+        local_vars = []
+        for cmdline in self.commandline.get_all_commandlines():
+            for option in cmdline.options:
+                if option.capture is not None:
+                    local_vars.append(option.capture)
 
         r = 'local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM\n'
 
-        if options:
-            local_vars = [self.variable_manager.make_variable(o) for o in options]
+        if local_vars:
             r += 'local -a %s\n' % ' '.join(local_vars)
 
         r +=  '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
@@ -65,13 +68,13 @@ class BashCompletionGenerator:
             conditions = []
 
             for final_option in self.commandline.get_final_options():
-                conditions += ["! ${#%s[@]}" % self.variable_manager.make_variable(final_option)]
+                conditions += ["! ${#%s[@]}" % self.variable_manager.capture_variable(final_option)]
 
             for exclusive_option in option.get_conflicting_options():
-                conditions += ["! ${#%s[@]}" % self.variable_manager.make_variable(exclusive_option)]
+                conditions += ["! ${#%s[@]}" % self.variable_manager.capture_variable(exclusive_option)]
 
             if not option.repeatable:
-                conditions += ["! ${#%s[@]}" % self.variable_manager.make_variable(option)]
+                conditions += ["! ${#%s[@]}" % self.variable_manager.capture_variable(option)]
 
             if conditions:
                 conditions = '(( %s )) && ' % ' && '.join(algo.uniq(conditions))
@@ -144,21 +147,9 @@ class BashCompletionGenerator:
 
         code = OrderedDict()
 
-        if self.commandline.parent is None:
-            # The root parser makes those variables local and sets up the completion.
-            r  = 'local cur prev words cword split\n'
-            r += '_init_completion -n = || return'
-            code['init_completion'] = r
-
-            v1 = bash_parser.generate(self.commandline)
-            v2 = bash_parser_v2.generate(self.commandline)
-            c  = v1 if len(v1) < len(v2) else v2
-
-            func = helpers.ShellFunction('parse_commandline', c)
-            self.ctxt.helpers.add_function(func)
-
         # Here we want to parse commandline options. We set this to None because
         # we have to delay this call for collecting info.
+        code['init_completion'] = None
         code['command_line_parsing'] = None
 
         code['set_wordbreaks'] = "local COMP_WORDBREAKS=''"
@@ -177,8 +168,22 @@ class BashCompletionGenerator:
             # This code is used to complete positionals
             code['positional_completion'] = self._generate_positionals_completion()
 
-        # This sets up END_OF_OPTIONS, POSITIONALS, POSITIONAL_NUM and the OPT_* variables.
-        code['command_line_parsing'] = self._generate_commandline_parsing()
+        if self.commandline.parent is None:
+            # The root parser makes those variables local and sets up the completion.
+            r  = 'local cur prev words cword split\n'
+            r += '_init_completion -n = || return'
+            code['init_completion'] = r
+
+            v1 = bash_parser.generate(self.commandline, self.variable_manager)
+            v2 = bash_parser_v2.generate(self.commandline, self.variable_manager)
+            c  = v1 if len(v1) < len(v2) else v2
+
+            func = helpers.ShellFunction('parse_commandline', c)
+            self.ctxt.helpers.add_function(func)
+
+            # This sets up END_OF_OPTIONS, POSITIONALS, POSITIONAL_NUM and the OPT_* variables.
+            code['command_line_parsing'] = self._generate_commandline_parsing()
+
 
         r  = '%s() {\n' % shell.make_completion_funcname(self.commandline)
         r += '%s\n\n'   % indent('\n\n'.join(c for c in code.values() if c), 2)
