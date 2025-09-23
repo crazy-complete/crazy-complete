@@ -15,6 +15,24 @@ from .str_utils import indent
 
 Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
 
+class ZshQuery:
+    '''Helper class for using the `zsh_query` function.'''
+
+    def __init__(self, ctxt):
+        self.ctxt = ctxt
+        self.used = False
+
+    def use(self, define=None):
+        self.used = True
+        return self.ctxt.helpers.use_function('zsh_query', define)
+
+    def use_when(self, when):
+        if 'option_is' in when:
+            self.use('option_is')
+        if 'has_option' in when:
+            self.use('has_option')
+        return self.use()
+
 class ZshCompletionFunction:
     '''Class for generating a zsh completion function.'''
 
@@ -29,8 +47,8 @@ class ZshCompletionFunction:
         self.subcommands = commandline.get_subcommands_option()
         self.command_counter = 0
         self.completer = zsh_complete.ZshCompleter()
-        self.query_used = False
         self.code = None
+        self.query = ZshQuery(ctxt)
         self._generate_completion_code()
 
     def _complete(self, option, command, *args):
@@ -84,28 +102,49 @@ class ZshCompletionFunction:
 
     def _generate_completion_code(self):
         self.code = OrderedDict()
-        self.code['0-init'] = ''
-        self.code['1-subcommands'] = ''
-        self.code['2-options'] = ''
+        self.code['0-init']        = ''
+        self.code['1-capture']     = ''
+        self.code['2-subcommands'] = ''
+        self.code['3-options']     = ''
 
         # We have to call these functions first, because they tell us if
         # the zsh_query function is used.
-        self.code['1-subcommands'] = self._generate_subcommand_call()
-        self.code['2-options']     = self._generate_option_parsing()
+        self.code['1-capture']     = self._generate_option_capture()
+        self.code['2-subcommands'] = self._generate_subcommand_call()
+        self.code['3-options']     = self._generate_option_parsing()
 
-        if self.query_used:
-            zsh_query = self.ctxt.helpers.use_function('zsh_query')
+        if self.query.used:
             r  = 'local opts=%s\n' % shell.escape(utils.get_query_option_strings(self.commandline))
             r += "local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''\n"
-            r += '%s init "$opts" "${words[@]}"' % zsh_query
+            r += '%s init "$opts" "${words[@]}"' % self.query.use()
             self.code['0-init'] = r
+
+    def _generate_option_capture(self):
+        local_vars = []
+        set_cmds   = []
+
+        for option in self.commandline.options:
+            if option.capture:
+                local_vars.append(option.capture)
+                set_cmds.append('IFS=$"\\n" %s=($(%s get_option %s))' % (
+                    option.capture,
+                    self.zsh_query.use('get_option'),
+                    ' '.join(shell.escape(s) for s in option.option_strings)))
+
+        if local_vars:
+            r  = 'local %s' % ' '.join(f'{s}=()' for s in local_vars)
+            for cmd in set_cmds:
+                r += '\n%s' % cmd
+
+            return r
+
+        return ''
 
     def _generate_subcommand_call(self):
         if not self.subcommands:
             return ''
 
-        self.query_used = True
-        zsh_query = self.ctxt.helpers.use_function('zsh_query')
+        zsh_query = self.query.use('get_positional')
         positional_num = self.subcommands.get_positional_num()
 
         r =  'case "$(%s get_positional %d)" in\n' % (zsh_query, positional_num)
@@ -165,14 +204,13 @@ class ZshCompletionFunction:
 
         for arg in args_with_when:
             if arg.hidden:
-                self.query_used = True
-                func = self.ctxt.helpers.use_function('zsh_query', 'with_incomplete')
+                func = self.query.use('has_option')
+                func = self.query.use('with_incomplete')
                 r += '%s has_option WITH_INCOMPLETE %s &&\\\n' % (func,
                     ' '.join(shell.escape(o) for o in arg.option.option_strings))
 
             if arg.when:
-                self.query_used = True
-                func = self.ctxt.helpers.use_function('zsh_query')
+                func = self.query.use_when(arg.when)
                 r += '%s %s &&\\\n' % (func, arg.when)
 
             r += '  args+=(%s)\n' % arg.option_spec

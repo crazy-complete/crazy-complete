@@ -56,6 +56,7 @@ __zsh_query_contains() {
 local cmd="$1"; shift
 
 case "$cmd" in
+#ifdef get_positional
   get_positional)
     if (( $# != 1 )); then
       echo "%FUNCNAME%: get_positional: takes exactly one argument" >&2
@@ -69,6 +70,26 @@ case "$cmd" in
 
     printf "%s" "${POSITIONALS[$1]}"
     return 0;;
+#endif
+#ifdef get_option
+  get_option)
+    local i=0
+
+    if (( $# == 0 )); then
+      echo "%FUNCNAME%: get_option: arguments required" >&2
+      return 1
+    fi
+
+    for (( i=0; i <= ${#HAVING_OPTIONS[@]}; ++i )); do
+      local option="${HAVING_OPTIONS[$i]}"
+      if __zsh_query_contains "$option" "$@"; then
+        printf "%s\n" "${OPTION_VALUES[$i]}"
+      fi
+    done
+
+    return 0;;
+#endif
+#ifdef has_option
   has_option)
 #ifdef with_incomplete
     local option='' with_incomplete=0
@@ -90,6 +111,8 @@ case "$cmd" in
 
 #endif
     return 1;;
+#endif
+#ifdef option_is
   option_is)
     local i=0 dash_dash_pos=0 cmd_option_is_options=() cmd_option_is_values=()
 
@@ -116,6 +139,7 @@ case "$cmd" in
     done
 
     return 1;;
+#endif
   init)
     local IFS=','
     local -a options=(${=1})
