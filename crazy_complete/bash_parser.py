@@ -61,7 +61,8 @@ def generate(commandline):
     for commandline in commandlines:
         option_cases = _generate_option_cases(commandline)
         command = get_subcommand_path(commandline)
-        #if commandline.inherit_options  ## TODO
+        if commandline.inherit_options:
+            command += '*'
 
         if option_cases.long_options:
             r =  'case "$cmd" in %s)\n' % command
