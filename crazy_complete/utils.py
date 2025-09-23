@@ -204,7 +204,7 @@ def get_defined_option_types(commandline):
 
     return namedtuple('Types', ('short', 'long', 'old'))(short, long, old)
 
-def get_query_option_strings(commandline):
+def get_query_option_strings(commandline, with_parent_options=True):
     '''Return a string that can be used by {fish,zsh}_query functions.
 
     Returns something like:
@@ -213,7 +213,7 @@ def get_query_option_strings(commandline):
 
     r = []
 
-    for option in commandline.get_options(with_parent_options=True):
+    for option in commandline.get_options(with_parent_options=with_parent_options):
         if option.complete and option.optional_arg is True:
             r.extend('%s=?' % s for s in option.option_strings)
         elif option.complete:

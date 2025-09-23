@@ -320,11 +320,14 @@ class CommandLine:
         commandlines = self.get_parents(include_self=True)
         return commandlines[0].prog
 
-    def get_command_path(self):
+    def get_command_path(self, progname=None):
         '''Return the full command path.'''
+        prognames = [c.prog for c in self.get_parents(include_self=True)]
 
-        cmd = ' '.join(c.prog for c in self.get_parents(include_self=True))
-        return cmd
+        if progname is not None:
+            prognames[0] = progname
+
+        return ' '.join(prognames)
 
     def visit_commandlines(self, callback):
         '''Apply a callback to all CommandLine objects.'''
