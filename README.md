@@ -140,7 +140,7 @@ Definition file examples
 
 See [examples](https://github.com/crazy-complete/crazy-complete/tree/main/examples) for examples.
 
-See [completions](https://github.com/crazy-complete/crazy-complete/tree/main/completions) for real world applications of crazy-complete.
+See [completions](https://github.com/crazy-complete/completions) for real world applications of crazy-complete.
 
 You can even have a look at the [tests](https://github.com/crazy-complete/crazy-complete/tree/main/test).
 
