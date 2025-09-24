@@ -44,7 +44,7 @@ class ZshCompletionFunction:
         self.commandline = commandline
         self.ctxt = ctxt
         self.funcname = shell.make_completion_funcname(commandline)
-        self.subcommands = commandline.get_subcommands_option()
+        self.subcommands = commandline.get_subcommands()
         self.command_counter = 0
         self.completer = zsh_complete.ZshCompleter()
         self.code = None
@@ -172,8 +172,8 @@ class ZshCompletionFunction:
             for option in cmdline.get_positionals():
                 args.append(self._complete_positional(option))
 
-            if cmdline.get_subcommands_option():
-                args.append(self._complete_subcommands(cmdline.get_subcommands_option()))
+            if cmdline.get_subcommands():
+                args.append(self._complete_subcommands(cmdline.get_subcommands()))
 
         for option in self.commandline.get_positionals():
             args.append(self._complete_positional(option))

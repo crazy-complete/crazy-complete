@@ -235,7 +235,7 @@ def is_worth_a_function(commandline):
     if len(commandline.get_positionals()) > 0:
         return True
 
-    if commandline.get_subcommands_option():
+    if commandline.get_subcommands():
         return True
 
     options = commandline.get_options()

@@ -252,8 +252,8 @@ class CommandLine:
 
         return list(self.positionals)
 
-    def get_subcommands_option(self):
-        '''Gets the subcommands option of the command line.
+    def get_subcommands(self):
+        '''Gets the subcommands of the command line.
 
         Returns:
             SubCommandsOption or None: The subcommands option if it exists, otherwise None.
@@ -333,8 +333,8 @@ class CommandLine:
         '''Apply a callback to all CommandLine objects.'''
 
         callback(self)
-        if self.get_subcommands_option():
-            for sub in self.get_subcommands_option().subcommands:
+        if self.get_subcommands():
+            for sub in self.get_subcommands().subcommands:
                 sub.visit_commandlines(callback)
 
     def get_all_commandlines(self):
@@ -488,7 +488,7 @@ class Positional:
                 highest = max(highest, positional.number)
             positional_no += highest
 
-            if commandline.get_subcommands_option():
+            if commandline.get_subcommands():
                 positional_no += 1
 
         return positional_no

@@ -14,13 +14,13 @@ def make_subcommand_call_code(commandline):
     code = []
 
     for cmdline in commandline.get_all_commandlines():
-        if cmdline.get_subcommands_option():
-            positional_num = cmdline.get_subcommands_option().get_positional_num()
+        if cmdline.get_subcommands():
+            positional_num = cmdline.get_subcommands().get_positional_num()
 
             r = 'if [[ "$cmd" == "%s" ]] &&'            % get_subcommand_path(cmdline)
             r += ' (( POSITIONAL_NUM == %d )); then\n'  % positional_num
             r += '  case "$arg" in\n'
-            for subcommand in cmdline.get_subcommands_option().subcommands:
+            for subcommand in cmdline.get_subcommands().subcommands:
                 commands = utils.get_all_command_variations(subcommand)
                 commands.remove(subcommand.prog)
                 if commands:

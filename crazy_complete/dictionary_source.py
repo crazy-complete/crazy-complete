@@ -88,10 +88,10 @@ def _get_commandline_by_path(root, path):
     for i, name in enumerate(path):
         path_str = ' '.join(path[0:i + 1])
 
-        if not current.get_subcommands_option():
+        if not current.get_subcommands():
             raise CrazyError(f"Command not found: {path_str}")
 
-        current = current.get_subcommands_option().get_subcommand_by_name(name)
+        current = current.get_subcommands().get_subcommand_by_name(name)
         if not current:
             raise CrazyError(f"Command not found: {path_str}")
 
@@ -112,7 +112,7 @@ def dictionaries_to_commandline(dictionaries):
 
         cmdline = _get_commandline_by_path(root, path)
 
-        subcommands = cmdline.get_subcommands_option()
+        subcommands = cmdline.get_subcommands()
         if not subcommands:
             subcommands = cmdline.add_subcommands()
 
@@ -123,14 +123,14 @@ def dictionaries_to_commandline(dictionaries):
         except CrazyError as e:
             raise CrazyError(f"Multiple definition of program `{progname}`") from e
 
-    if not root.get_subcommands_option():
+    if not root.get_subcommands():
         raise CrazyError("No programs defined")
 
-    if len(root.get_subcommands_option().subcommands) > 1:
-        progs = [c.prog for c in root.get_subcommands_option().subcommands]
+    if len(root.get_subcommands().subcommands) > 1:
+        progs = [c.prog for c in root.get_subcommands().subcommands]
         raise CrazyError(f"Too many main programs defined: {progs}")
 
-    return root.get_subcommands_option().subcommands[0]
+    return root.get_subcommands().subcommands[0]
 
 def option_to_dictionary(self):
     '''Convert a cli.Option object to a dictionary.'''

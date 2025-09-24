@@ -170,7 +170,7 @@ def _get_positional_contains(option):
 
     for cmdline in cmdlines:
         cmds = utils.get_all_command_variations(cmdline)
-        r[cmdline.parent.get_subcommands_option().get_positional_num()] = cmds
+        r[cmdline.parent.get_subcommands().get_positional_num()] = cmds
 
     return r
 
@@ -191,8 +191,8 @@ class FishCompletionGenerator:
         for positional in self.commandline.get_positionals():
             complete_definitions.append(self._complete_positional(positional))
 
-        if self.commandline.get_subcommands_option():
-            complete_definitions.append(self._complete_subcommands(self.commandline.get_subcommands_option()))
+        if self.commandline.get_subcommands():
+            complete_definitions.append(self._complete_subcommands(self.commandline.get_subcommands()))
 
         for definition in complete_definitions:
             cmd = definition.get_complete_cmd(self.ctxt.config.fish_fast)
@@ -239,8 +239,8 @@ class FishCompletionGenerator:
 
         # If we don't inherit options, add a condition to the option that
         # ensures that we're in the right (sub)command.
-        if not self.commandline.inherit_options and self.commandline.get_subcommands_option():
-            positional = self.commandline.get_subcommands_option().get_positional_num()
+        if not self.commandline.inherit_options and self.commandline.get_subcommands():
+            positional = self.commandline.get_subcommands().get_positional_num()
             definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
 
         definition.conditions.positional_contains = _get_positional_contains(option)

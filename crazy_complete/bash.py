@@ -25,7 +25,7 @@ class BashCompletionGenerator:
         self.ctxt        = ctxt
         self.options     = commandline.get_options()
         self.positionals = commandline.get_positionals()
-        self.subcommands = commandline.get_subcommands_option()
+        self.subcommands = commandline.get_subcommands()
         self.completer   = bash_complete.BashCompleter()
         self.variable_manager = VariableManager('OPT_')
         self._generate()
