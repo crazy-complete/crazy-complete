@@ -128,7 +128,7 @@ class ZshCompletionFunction:
                 local_vars.append(option.capture)
                 set_cmds.append('IFS=$"\\n" %s=($(%s get_option %s))' % (
                     option.capture,
-                    self.zsh_query.use('get_option'),
+                    self.query.use('get_option'),
                     ' '.join(shell.escape(s) for s in option.option_strings)))
 
         if local_vars:
