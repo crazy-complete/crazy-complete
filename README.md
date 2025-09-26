@@ -5,13 +5,65 @@ Every program should have autocompletion in the shell to enhance user experience
 
 **Key Features**:
 - **Generates Robust Scripts**: Ensures that the autocompletion scripts are reliable and efficient.
-- **Multi-Shell Support**: Works seamlessly with Bash, Fish, and Zsh, providing flexibility across different environments.
+- **Multi-Shell Support**: Works seamlessly with **Bash**, **Fish**, and **Zsh**, providing flexibility across different environments.
 - **Minimal Dependencies**: The only external dependency is PyYAML.
 - **Configurable and Extendable**: The generated autocompletion scripts are highly configurable and can be easily extended to suit your specific needs.
 - **Standalone Scripts**: The generated scripts are standalone and do not depend on modified environments, unlike some alternatives like argcomplete.
 - **Easy to Use**: Simple and intuitive to set up, allowing you to quickly add autocompletion functionality to your programs.
 
 With crazy-complete, adding autocompletion to your programs has never been easier. Try it out and see the difference it makes in your command-line applications!
+
+Table of Contents
+=================
+
+- [Benefits of Using crazy-complete](#benefits-of-using-crazy-complete)
+- [Disadvantages of crazy-complete](#disadvantages-of-crazy-complete)
+- [Installation](#installation)
+- [Synposis](#synopsis)
+- [Options](#options)
+- [Usage examples](#usage-examples)
+- [Definition file examples](#definition-file-examples)
+- [Documentation](#documentation)
+- [Comparision with other auto-complete generators](#comparision-with-other-auto-complete-generators)
+- [Questions or problems](#questions-or-problems)
+
+Benefits of Using crazy-complete
+================================
+
+- **Focus on what matters:**
+  crazy-complete generates the basic structure of your autocompletion scripts,
+  so you can focus entirely on defining options and their completions instead of dealing with repetitive setup code.
+
+- **Cross-shell consistency:**
+  Write your completion logic once and get reliable completions for **Bash**, **Zsh**, and **Fish**, with identical behavior across all shells.
+
+- **Powerful argument completion:**
+  crazy-complete provides a rich set of [built-in](docs/documentation.md#built-in-commands) helpers for argument completion and makes it simple to define your own [custom argument handlers](docs/documentation.md#user-defined-commands).
+
+- **Arbitrary levels of subcommands:**
+  No matter how deeply nested your CLI structure is, crazy-complete can handle it.
+  You can define completions for commands, subcommands, and even sub-subcommands without extra effort.
+
+- **Full control over options:**
+  - **Repeatable / non-repeatable options**: control whether options can be used once or multiple times.
+  - **Mutually exclusive options**: ensure that incompatible options cannot appear together.
+  - **Conditional options**: only suggest options when certain conditions are met.
+  - **Final options**: options that prevent any further options from being completed.
+  - **Hidden options**: completable options that are not shown in the suggestion list.
+  - **Capturing options**: collect options and their values to enable advanced, context-sensitive completions.
+
+Disadvantages of crazy-complete
+===============================
+
+While crazy-complete offers many advantages, there are some trade-offs to be aware of:
+
+- **Code size and verbosity:**
+  Its biggest strength - **secure, fully controlled completions** - can also be its biggest weakness.
+  - For **Bash**, this means the generated scripts contain a significant amount of boilerplate code for parsing options and positional arguments.
+  - For **Fish**, large command-line definitions may result in slower completions, although performance is usually acceptable for most use cases.
+  - **Mitigation:** There are ways to reduce script size and improve performance. See [Tips And Tricks](docs/documentation.md#tips-and-tricks) for more details.
+- **Not as optimized as hand-written scripts:**
+   The generated scripts prioritize correctness and reliability over minimal size or maximum performance. Hand-written scripts may be more compact and slightly faster in some cases.
 
 Installation
 ============
@@ -151,12 +203,12 @@ You can even have a look at the [tests](https://github.com/crazy-complete/crazy-
 Documentation
 =============
 
-See [documentation.md](docs/documentation.md) and [commands.md](docs/commands.md).
+See [docs/documentation.md](docs/documentation.md).
 
 Comparision with other auto-complete generators
 ===============================================
 
-See [comparision](docs/comparision.md) for a comparision with other tools.
+See [docs/comparision.md](docs/comparision.md) for a comparision with other tools.
 
 Questions or problems
 =====================
