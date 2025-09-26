@@ -67,6 +67,29 @@ def _apply_config(commandline, config):
         if option.repeatable == cli.ExtendedBool.INHERIT:
             option.repeatable = config.repeatable_options
 
+    if config.disabled_hidden:
+        for option in commandline.options:
+            option.hidden = False
+
+    if config.disabled_final:
+        for option in commandline.options:
+            option.final = False
+
+    if config.disabled_groups:
+        for option in commandline.options:
+            option.groups = []
+
+    if config.disabled_repeatable:
+        for option in commandline.options:
+            option.repeatable = True
+
+    if config.disabled_when:
+        for option in commandline.options:
+            option.when = None
+
+        for positional in commandline.positionals:
+            positional.when = None
+
 def _add_parsed_when(commandline):
     for option in commandline.options:
         if option.when:

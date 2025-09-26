@@ -26,6 +26,18 @@ def boolean(string):
         raise ValueError(f"Not a bool: {string}") from e
 
 
+def feature_list(string):
+    '''Convert a comma separated string of features to list.'''
+
+    features = string.split(',')
+
+    for feature in features:
+        if feature not in ('hidden', 'final', 'groups', 'repeatable', 'when'):
+            raise ValueError(f"Invalid feature: {feature}")
+
+    return features
+
+
 p = argparse.ArgumentParser('crazy-complete',
     description='Generate shell auto completion files for all major shells',
     exit_on_error=False)
@@ -61,6 +73,16 @@ p.add_argument('--repeatable-options', metavar='BOOL', default=False, type=boole
 p.add_argument('--inherit-options', metavar='BOOL', default=False, type=boolean,
     help='Sets whether parent options are visible to subcommands'
 ).complete('choices', ('True', 'False'))
+
+p.add_argument('--disable', metavar='FEATURES', default=[], type=feature_list,
+    help='Disable features (hidden,final,groups,repeatable,when)'
+).complete('value_list', {'values': {
+    'hidden':     'Disable hidden options',
+    'final':      'Disable final options',
+    'groups':     'Disable option groups',
+    'repeatable': 'Disable check for repeatable options',
+    'when':       'Disable conditional options and positionals',
+}})
 
 p.add_argument('--vim-modeline', metavar='BOOL', default=True, type=boolean,
     help='Sets whether a vim modeline comment shall be appended to the generated code'
@@ -169,6 +191,18 @@ def generate(opts):
     conf.set_fish_fast(opts.fish_fast)
     conf.set_fish_inline_conditions(opts.fish_inline_conditions)
     conf.include_many_files(opts.include_file or [])
+
+    for feature in opts.disable:
+        if feature == 'hidden':
+            conf.disable_hidden(True)
+        elif feature == 'final':
+            conf.disable_final(True)
+        elif feature == 'groups':
+            conf.disable_groups(True)
+        elif feature == 'repeatable':
+            conf.disable_repeatable(True)
+        elif feature == 'when':
+            conf.disable_when(True)
 
     if opts.shell == 'bash':
         output = bash.generate_completion(cmdline, conf)

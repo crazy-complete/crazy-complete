@@ -72,6 +72,10 @@ Options
 
 > Sets whether parent options are visible to subcommands.
 
+**--disable=FEATURES** *(hidden,final,groups,repeatable,when)*
+
+> Disable a list of features.
+
 **--vim-modeline={True,False}**
 
 > Sets whether a vim modeline comment shall be appended to the generated code.

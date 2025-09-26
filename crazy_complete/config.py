@@ -10,15 +10,21 @@ class Config:
     '''Class representing configuration settings for command line completion.'''
 
     def __init__(self):
-        self.abbreviate_commands = False
-        self.abbreviate_options = False
-        self.repeatable_options = False
-        self.inherit_options = False
-        self.vim_modeline = True
-        self.include_files = []
-        self.zsh_compdef = True
-        self.fish_fast = False
+        self.abbreviate_commands    = False
+        self.abbreviate_options     = False
+        self.repeatable_options     = False
+        self.inherit_options        = False
+        self.vim_modeline           = True
+        self.include_files          = []
+        self.zsh_compdef            = True
+        self.fish_fast              = False
         self.fish_inline_conditions = False
+
+        self.disabled_hidden        = False
+        self.disabled_final         = False
+        self.disabled_groups        = False
+        self.disabled_repeatable    = False
+        self.disabled_when          = False
 
     def set_abbreviate_commands(self, enable):
         '''Sets whether commands can be abbreviated.
@@ -221,3 +227,57 @@ class Config:
                 content.append(fh.read().strip())
 
         return content
+
+    def disable_hidden(self, disable):
+        '''Disable hidden options.
+
+        This disables hidden options completely.
+        '''
+
+        _assert_is_bool(disable, "disable_hidden", "disable")
+
+        self.disabled_hidden = disable
+
+    def disable_final(self, disable):
+        '''Disable final options.
+
+        This disables final options completely.
+        '''
+
+        _assert_is_bool(disable, "disable_final", "disable")
+
+        self.disabled_final = disable
+
+    def disable_groups(self, disable):
+        '''Disable option grouping.
+
+        This disables the mutually exclusive feature for options completely.
+        '''
+
+        _assert_is_bool(disable, "disable_groups", "disable")
+
+        self.disabled_groups = disable
+
+    def disable_repeatable(self, disable):
+        '''Disable repeatable options.
+
+        This disables repeatable options completely.
+
+        Despite its name, this function actually does the opposite:
+        Instead of making all options non-repeatable, it makes all options
+        repeatable.
+        '''
+
+        _assert_is_bool(disable, "disable_repeatable", "disable")
+
+        self.disabled_repeatable = disable
+
+    def disable_when(self, disable):
+        '''Disable when feature.
+
+        This disables conditional options and positionals completely.
+        '''
+
+        _assert_is_bool(disable, "disable_when", "disable")
+
+        self.disabled_when = disable
