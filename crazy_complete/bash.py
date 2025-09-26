@@ -44,7 +44,7 @@ class BashCompletionGenerator:
         r = 'local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM\n'
 
         if local_vars:
-            r += 'local -a %s\n' % ' '.join(local_vars)
+            r += 'local -a %s\n' % ' '.join(algo.uniq(local_vars))
 
         r +=  '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
         return r
