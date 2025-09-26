@@ -1,0 +1,8 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ["--database", "-d"]
+    complete: ["choices", ["mysql", "postgres", "sqlite"]]
+    capture: "CAPTURED_DB"
+
+  - option_strings: ["--table", "-t"]
+    complete: ["exec", "_complete_table"]

@@ -4,6 +4,7 @@ groups: {"args": ["--input-type=yaml"], "definition_file": "groups-test.yaml"}
 combine: {"args": ["--input-type=yaml"], "definition_file": "combine-test.yaml"}
 inherit-on: {"args": ["--input-type=yaml", "--inherit-options=True"], "definition_file": "inherit-options.yaml"}
 inherit-off: {"args": ["--input-type=yaml", "--inherit-options=False"], "definition_file": "inherit-options.yaml"}
+capture: {"args": ["--input-type=yaml", "--include-file=include.capture.$shell"], "definition_file": "capture.yaml"}
 ---
 number: 1
 definition_file: "main"
@@ -1111,3 +1112,31 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test subcommand --option lastcommand --
   --option   --sub-bar
+---
+number: 74
+definition_file: "capture"
+description: "Check if capture works (1)"
+send: "crazy-complete-test --database mysql -t "
+bash_expected: |
+  > crazy-complete-test --database mysql -t
+  orders    products  users
+  > crazy-complete-test --database mysql -t
+fish_expected: |
+  > crazy-complete-test --database mysql -t
+zsh_expected: |
+  > crazy-complete-test --database mysql -t
+  products  orders  users  --
+---
+number: 75
+definition_file: "capture"
+description: "Check if capture works (2)"
+send: "crazy-complete-test --database postgres -t "
+bash_expected: |
+  > crazy-complete-test --database postgres -t
+  customers     invoices      transactions
+  > crazy-complete-test --database postgres -t
+fish_expected: |
+  > crazy-complete-test --database postgres -t
+zsh_expected: |
+  > crazy-complete-test --database postgres -t
+  transactions  customers  invoices  --
