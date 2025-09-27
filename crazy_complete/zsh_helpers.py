@@ -300,7 +300,7 @@ local item='' desc='' describe=()
 
 while IFS=$'\t' read -r item desc; do
   item="${item//:/\\:}"
-  describe+=("$item:$desc")
+  [[ -n "$desc" ]] && describe+=("$item:$desc") || describe+=("$item")
 done < <(eval "$1")
 
 _describe '' describe

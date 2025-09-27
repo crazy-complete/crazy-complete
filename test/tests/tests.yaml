@@ -1058,8 +1058,7 @@ zsh_expected: |
   > crazy-complete-test -o
   6  -- six
   7  -- seven
-  0                  1                  4                  5
-  3  2  --
+  2  3  0  1  4  5
 ---
 number: 70
 definition_file: "inherit-off"
@@ -1125,7 +1124,7 @@ fish_expected: |
   > crazy-complete-test --database mysql -t
 zsh_expected: |
   > crazy-complete-test --database mysql -t
-  products  orders  users  --
+  orders    products  users
 ---
 number: 75
 definition_file: "capture"
@@ -1139,4 +1138,4 @@ fish_expected: |
   > crazy-complete-test --database postgres -t
 zsh_expected: |
   > crazy-complete-test --database postgres -t
-  transactions  customers  invoices  --
+  customers     invoices      transactions
