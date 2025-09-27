@@ -5,6 +5,7 @@ combine: {"args": ["--input-type=yaml"], "definition_file": "combine-test.yaml"}
 inherit-on: {"args": ["--input-type=yaml", "--inherit-options=True"], "definition_file": "inherit-options.yaml"}
 inherit-off: {"args": ["--input-type=yaml", "--inherit-options=False"], "definition_file": "inherit-options.yaml"}
 capture: {"args": ["--input-type=yaml", "--include-file=include.capture.$shell"], "definition_file": "capture.yaml"}
+choices: {"args": ["--input-type=yaml"], "definition_file": "choices.yaml"}
 ---
 number: 1
 definition_file: "main"
@@ -1139,3 +1140,175 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --database postgres -t
   customers     invoices      transactions
+---
+number: 76
+definition_file: "choices"
+description: "Check choices list (short)"
+send: "crazy-complete-test --choices-list-short "
+bash_expected: |
+  > crazy-complete-test --choices-list-short
+  a  b  c
+  > crazy-complete-test --choices-list-short
+fish_expected: |
+  > crazy-complete-test --choices-list-short
+  a  b  c
+zsh_expected: |
+  > crazy-complete-test --choices-list-short
+  a  b  c
+---
+number: 77
+definition_file: "choices"
+description: "Check choices list (short) (colon)"
+send: "crazy-complete-test --choices-list-short-colon "
+bash_expected: |
+  > crazy-complete-test --choices-list-short-colon
+  a:a  b:b  c:c
+  > crazy-complete-test --choices-list-short-colon
+fish_expected: |
+  > crazy-complete-test --choices-list-short-colon
+  a:a  b:b  c:c
+zsh_expected: |
+  > crazy-complete-test --choices-list-short-colon
+  a:a  b:b  c:c
+---
+number: 78
+definition_file: "choices"
+description: "Check choices list (long)"
+send: "crazy-complete-test --choices-list-long "
+bash_expected: |
+  > crazy-complete-test --choices-list-long
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  ccccccccccccccccccccccccccccccccccccccccc
+  ddddddddddddddddddddddddddddddddddddddddd
+  eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+  fffffffffffffffffffffffffffffffffffffffff
+  > crazy-complete-test --choices-list-long
+fish_expected: |
+  > crazy-complete-test --choices-list-long
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  ccccccccccccccccccccccccccccccccccccccccc
+  ddddddddddddddddddddddddddddddddddddddddd
+  eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+  fffffffffffffffffffffffffffffffffffffffff
+zsh_expected: |
+  > crazy-complete-test --choices-list-long
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  ccccccccccccccccccccccccccccccccccccccccc
+  ddddddddddddddddddddddddddddddddddddddddd
+  eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+  fffffffffffffffffffffffffffffffffffffffff
+---
+number: 79
+definition_file: "choices"
+description: "Check choices list (long) (colon)"
+send: "crazy-complete-test --choices-list-long-colon "
+bash_expected: |
+  > crazy-complete-test --choices-list-long-colon
+  a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a
+  b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b
+  c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c
+  d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d
+  e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e
+  f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f
+  > crazy-complete-test --choices-list-long-colon
+fish_expected: |
+  > crazy-complete-test --choices-list-long-colon
+  a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a
+  b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b
+  c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c
+  d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d
+  e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e
+  f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f
+zsh_expected: |
+  > crazy-complete-test --choices-list-long-colon
+  a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a
+  b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b
+  c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c
+  d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d
+  e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e
+  f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f
+---
+number: 80
+definition_file: "choices"
+description: "Check choices dict (short)"
+send: "crazy-complete-test --choices-dict-short "
+bash_expected: |
+  > crazy-complete-test --choices-dict-short
+  a  b
+  > crazy-complete-test --choices-dict-short
+fish_expected: |
+  > crazy-complete-test --choices-dict-short
+  a  (letter a)  b  (letter b)
+zsh_expected: |
+  > crazy-complete-test --choices-dict-short
+  a  -- letter a
+  b  -- letter b
+---
+number: 81
+definition_file: "choices"
+description: "Check choices dict (short) (colon)"
+send: "crazy-complete-test --choices-dict-short-colon "
+bash_expected: |
+  > crazy-complete-test --choices-dict-short-colon
+  a:a  b:b
+  > crazy-complete-test --choices-dict-short-colon
+fish_expected: |
+  > crazy-complete-test --choices-dict-short-colon
+  a:a  (letter:a)  b:b  (letter:b)
+zsh_expected: |
+  > crazy-complete-test --choices-dict-short-colon
+  a:a  -- letter:a
+  b:b  -- letter:b
+---
+number: 82
+definition_file: "choices"
+description: "Check choices dict (long)"
+send: "crazy-complete-test --choices-dict-long "
+bash_expected: |
+  > crazy-complete-test --choices-dict-long
+  a  b  c  d  e  f
+  > crazy-complete-test --choices-dict-long
+fish_expected: |
+  > crazy-complete-test --choices-dict-long
+  a  (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
+  b  (bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
+  c  (ccccccccccccccccccccccccccccccccccccccccc)
+  d  (ddddddddddddddddddddddddddddddddddddddddd)
+  e  (eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)
+  f  (fffffffffffffffffffffffffffffffffffffffff)
+zsh_expected: |
+  > crazy-complete-test --choices-dict-long
+  a  -- aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  b  -- bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  c  -- ccccccccccccccccccccccccccccccccccccccccc
+  d  -- ddddddddddddddddddddddddddddddddddddddddd
+  e  -- eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+  f  -- fffffffffffffffffffffffffffffffffffffffff
+---
+number: 83
+definition_file: "choices"
+description: "Check choices dict (long) (colon)"
+send: "crazy-complete-test --choices-dict-long-colon "
+bash_expected: |
+  > crazy-complete-test --choices-dict-long-colon
+  a:a  b:b  c:c  d:d  e:e  f:f
+  > crazy-complete-test --choices-dict-long-colon
+fish_expected: |
+  > crazy-complete-test --choices-dict-long-colon
+  a:a  (a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a)
+  b:b  (b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b)
+  c:c  (c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c)
+  d:d  (d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d)
+  e:e  (e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e)
+  f:f  (f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f)
+zsh_expected: |
+  > crazy-complete-test --choices-dict-long-colon
+  a:a  -- a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a
+  b:b  -- b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b
+  c:c  -- c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c
+  d:d  -- d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d
+  e:e  -- e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e
+  f:f  -- f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f

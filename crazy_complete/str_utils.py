@@ -31,6 +31,37 @@ def indent(string, num_spaces):
     indented_lines = [((' ' * num_spaces) + line) if line.strip() else line for line in lines]
     return '\n'.join(indented_lines)
 
+def join_with_wrap(primary_sep, secondary_sep, max_line_length, items):
+    '''
+    Join a list of strings with a primary separator, automatically wrapping
+    to a new line (using the secondary separator) when the current line
+    would exceed max_line_length.
+
+    Args:
+        primary_sep: String used to separate items on the same line.
+        secondary_sep: String used to separate wrapped lines.
+        max_line_length: Maximum number of characters per line.
+        items: List of strings to join.
+
+    Returns:
+        str: Joined string with line wrapping
+    '''
+    lines = []
+    current_line = ""
+
+    for item in items:
+        candidate = (current_line + primary_sep + item) if current_line else item
+        if len(candidate) > max_line_length and current_line:
+            lines.append(current_line)
+            current_line = item
+        else:
+            current_line = candidate
+
+    if current_line:
+        lines.append(current_line)
+
+    return secondary_sep.join(lines)
+
 _VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
 
 def is_valid_option_string(option_string):

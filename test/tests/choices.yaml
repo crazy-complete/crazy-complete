@@ -1,0 +1,49 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ["--choices-list-short"]
+    complete: ["choices", ["a", "b", "c"]]
+
+  - option_strings: ["--choices-list-short-colon"]
+    complete: ["choices", ["a:a", "b:b", "c:c"]]
+
+  - option_strings: ["--choices-list-long"]
+    complete: ["choices", [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "ccccccccccccccccccccccccccccccccccccccccc",
+      "ddddddddddddddddddddddddddddddddddddddddd",
+      "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "fffffffffffffffffffffffffffffffffffffffff"]]
+
+  - option_strings: ["--choices-list-long-colon"]
+    complete: ["choices", [
+      "a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a",
+      "b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b",
+      "c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c",
+      "d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d",
+      "e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e",
+      "f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f"]]
+
+  - option_strings: ["--choices-dict-short"]
+    complete: ["choices", {"a": "letter a", "b": "letter b"}]
+    
+  - option_strings: ["--choices-dict-short-colon"]
+    complete: ["choices", {"a:a": "letter:a", "b:b": "letter:b"}]
+
+  - option_strings: ["--choices-dict-long"]
+    complete: ["choices", {
+      "a": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "b": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "c": "ccccccccccccccccccccccccccccccccccccccccc",
+      "d": "ddddddddddddddddddddddddddddddddddddddddd",
+      "e": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "f": "fffffffffffffffffffffffffffffffffffffffff"}]
+
+  - option_strings: ["--choices-dict-long-colon"]
+    complete: ["choices", {
+      "a:a": "a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a:a",
+      "b:b": "b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b:b",
+      "c:c": "c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c:c",
+      "d:d": "d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d",
+      "e:e": "e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e",
+      "f:f": "f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f"}]

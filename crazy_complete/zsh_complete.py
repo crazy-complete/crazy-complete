@@ -2,7 +2,17 @@
 
 from . import shell
 from . import helpers
+from .str_utils import join_with_wrap, indent
 from .zsh_utils import escape_colon, escape_square_brackets
+
+CHOICES_INLINE_THRESHOLD = 80
+# The `choices` command can in Zsh be expressed inline in an optspec, like this:
+#   (foo bar baz)
+# or:
+#   (foo\:"Foo value" bar\:"Bar value" baz\:"Baz value)
+#
+# This variable defines how big this string can get before a function
+# is used instead.
 
 class ZshCompleter(shell.ShellCompleter):
     '''Code generator for completing arguments in Zsh.'''
@@ -21,22 +31,60 @@ class ZshCompleter(shell.ShellCompleter):
 
     def choices(self, ctxt, choices):
         if hasattr(choices, 'items'):
-            funcname = ctxt.helpers.get_unique_function_name(ctxt)
-            metavar  = shell.escape(ctxt.option.metavar or '')
+            return self._choices_dict(ctxt, choices)
 
-            code  = 'local items=(\n'
-            for item, desc in choices.items():
-                item = shell.escape(escape_colon(str(item)))
-                desc = shell.escape(str(desc))
-                code += f'  {item}:{desc}\n'
-            code += ')\n\n'
-            code += f'_describe -- {metavar} items'
+        return self._choices_list(ctxt, choices)
 
-            ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
-            funcname = ctxt.helpers.use_function(funcname)
-            return funcname
+    def _choices_list(self, ctxt, choices):
+        # Inline choices
+        items   = [str(item) for item in choices]
+        escaped = [shell.escape(escape_colon(item)) for item in items]
+        action  = shell.escape('(%s)' % ' '.join(escaped))
+        if len(action) <= CHOICES_INLINE_THRESHOLD:
+            return action
 
-        return shell.escape("(%s)" % (' '.join(shell.escape(str(c)) for c in choices)))
+        # Make a function
+        funcname = ctxt.helpers.get_unique_function_name(ctxt)
+        metavar  = shell.escape(ctxt.option.metavar or '')
+        escaped  = [shell.escape(escape_colon(c)) for c in choices]
+
+        code  = 'local items=(\n'
+        code += indent(join_with_wrap(' ', '\n', 78, escaped), 2)
+        code += '\n)\n\n'
+        code += f'_describe -- {metavar} items'
+
+        ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
+        funcname = ctxt.helpers.use_function(funcname)
+        return funcname
+
+    def _choices_dict(self, ctxt, choices):
+        # Inline choices
+        #   This does not work with `combine`; maybe we have to introduce
+        #   a `combined` parameter to fix this
+        #
+        #   items   = [str(item) for item in choices.keys()]
+        #   values  = [str(value) for value in choices.values()]
+        #   colon   = any(':' in s for s in items + values)
+        #   escaped = ['%s\\:%s' % (shell.escape(item), shell.escape(value)) for item, value in zip(items, values)]
+        #   action  = shell.escape('((%s))' % ' '.join(escaped))
+        #   if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
+        #       return action
+
+        # Make a function
+        funcname = ctxt.helpers.get_unique_function_name(ctxt)
+        metavar  = shell.escape(ctxt.option.metavar or '')
+
+        code  = 'local items=(\n'
+        for item, desc in choices.items():
+            item = shell.escape(escape_colon(str(item)))
+            desc = shell.escape(str(desc))
+            code += f'  {item}:{desc}\n'
+        code += ')\n\n'
+        code += f'_describe -- {metavar} items'
+
+        ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
+        funcname = ctxt.helpers.use_function(funcname)
+        return funcname
 
     def command(self, _ctxt):
         return '_command_names'
