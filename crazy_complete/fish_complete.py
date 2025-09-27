@@ -3,6 +3,16 @@
 from . import shell
 from . import helpers
 
+CHOICES_INLINE_THRESHOLD = 80
+# The `choices` command can in Fish be expressed inline in a complete command
+# like this:
+#   complete -c program -a 'foo bar baz'
+# or:
+#   complete -c program -a 'foo\t"Foo value" bar\t"Bar value" baz\t"Baz value"'
+#
+# This variable defines how big this string can get before a function
+# is used instead.
+
 class FishCompletionBase:
     '''Base class for Fish completions.'''
 
@@ -47,27 +57,50 @@ class FishCompleteChoices(FishCompletionBase):
         self.ctxt = ctxt
         self.choices = choices
 
+    @staticmethod
+    def _get_inline_for_list(choices):
+        return ' '.join(shell.escape(str(c)) for c in choices)
+
+    @staticmethod
+    def _get_inline_for_dict(choices):
+        stringified = {str(item): str(desc) for item, desc in choices.items()}
+        r = ['%s\\t%s' % (shell.escape(item), shell.escape(desc)) for item, desc in stringified.items()]
+        return ' '.join(r)
+
+    @staticmethod
+    def _get_code_for_list(choices):
+        code = "printf '%s\\n' \\\n"
+        for item in choices:
+            code += '  %s \\\n' % shell.escape(str(item))
+        return code.rstrip(' \\\n')
+
+    @staticmethod
+    def _get_code_for_dict(choices):
+        code = "printf '%s\\t%s\\n' \\\n"
+        for item, description in choices.items():
+            code += '  %s %s \\\n' % (shell.escape(str(item)), shell.escape(str(description)))
+        return code.rstrip(' \\\n')
+
     def get_args(self):
         if hasattr(self.choices, 'items'):
-            code = self.get_code()
-            funcname = self.ctxt.helpers.get_unique_function_name(self.ctxt)
-            self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
-            funcname = self.ctxt.helpers.use_function(funcname)
-            return ['-f', '-a', '(%s)' % funcname]
+            arg = self._get_inline_for_dict(self.choices)
+        else:
+            arg = self._get_inline_for_list(self.choices)
 
-        return ['-f', '-a', ' '.join(shell.escape(str(c)) for c in self.choices)]
+        if len(arg) <= CHOICES_INLINE_THRESHOLD:
+            return ['-f', '-a', arg]
+
+        code = self.get_code()
+        funcname = self.ctxt.helpers.get_unique_function_name(self.ctxt)
+        self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
+        funcname = self.ctxt.helpers.use_function(funcname)
+        return ['-f', '-a', '(%s)' % funcname]
 
     def get_code(self):
         if hasattr(self.choices, 'items'):
-            code = "printf '%s\\t%s\\n' \\\n"
-            for item, description in self.choices.items():
-                code += '  %s %s \\\n' % (shell.escape(str(item)), shell.escape(str(description)))
-            return code.rstrip(' \\\n')
+            return self._get_code_for_dict(self.choices)
+        return self._get_code_for_list(self.choices)
 
-        code = "printf '%s\\n' \\\n"
-        for item in self.choices:
-            code += '  %s \\\n' % (shell.escape(str(item)))
-        return code.rstrip(' \\\n')
 
 class FishCompleteFileDir(FishCompletionBase):
     '''Class for completing file/dir completion.'''
