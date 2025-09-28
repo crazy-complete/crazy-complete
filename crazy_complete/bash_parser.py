@@ -101,50 +101,50 @@ def generate(commandline, variable_manager):
 
     return s
 
-def _make_long_option_case(long_options, complete, optional_arg, value_variable):
+def _make_long_option_case(long_options, option, variable):
     r = ''
 
-    if complete and optional_arg is True:
+    if option.complete and option.optional_arg is True:
         r += '%s)\n'                        % CasePatterns.for_long_without_arg(long_options)
-        r += '  %s+=(%s);\n'                % (value_variable, _OPT_ISSET)
+        r += '  %s+=(%s);\n'                % (variable, _OPT_ISSET)
         r += '  continue;;\n'
         r += '%s)\n'                        % CasePatterns.for_long_with_arg(long_options)
-        r += '  %s+=("${arg#*=}")\n'        % value_variable
+        r += '  %s+=("${arg#*=}")\n'        % variable
         r += '  continue;;'
-    elif complete:
+    elif option.complete:
         r += '%s)\n'                        % CasePatterns.for_long_without_arg(long_options)
-        r += '  %s+=("${words[++argi]}")\n' % value_variable
+        r += '  %s+=("${words[++argi]}")\n' % variable
         r += '  continue;;\n'
         r += '%s)\n'                        % CasePatterns.for_long_with_arg(long_options)
-        r += '  %s+=("${arg#*=}")\n'        % value_variable
+        r += '  %s+=("${arg#*=}")\n'        % variable
         r += '  continue;;'
     else:
         r += '%s)\n'        % CasePatterns.for_long_without_arg(long_options)
-        r += '  %s+=(%s)\n' % (value_variable, _OPT_ISSET)
+        r += '  %s+=(%s)\n' % (variable, _OPT_ISSET)
         r += '  continue;;'
 
     return r
 
-def _make_short_option_case(short_options, complete, optional_arg, value_variable):
+def _make_short_option_case(short_options, option, variable):
     r = ''
 
-    if complete and optional_arg is True:
+    if option.complete and option.optional_arg is True:
         r += '%s)\n' % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
-        r += '  then %s+=("$trailing_chars")\n' % value_variable
-        r += '  else %s+=(%s)\n'                % (value_variable, _OPT_ISSET)
+        r += '  then %s+=("$trailing_chars")\n' % variable
+        r += '  else %s+=(%s)\n'                % (variable, _OPT_ISSET)
         r += '  fi\n'
         r += '  continue 2;;'
-    elif complete:
+    elif option.complete:
         r += '%s)\n' % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
-        r += '  then %s+=("$trailing_chars")\n'   % value_variable
-        r += '  else %s+=("${words[++argi]}")\n'  % value_variable
+        r += '  then %s+=("$trailing_chars")\n'   % variable
+        r += '  else %s+=("${words[++argi]}")\n'  % variable
         r += '  fi\n'
         r += '  continue 2;;'
     else:
         r += '%s)\n'        % CasePatterns.for_short(short_options)
-        r += '  %s+=(%s);;' % (value_variable, _OPT_ISSET)
+        r += '  %s+=(%s);;' % (variable, _OPT_ISSET)
 
     return r
 
@@ -159,14 +159,14 @@ def _generate_option_cases(commandline, variable_manager):
         long_options += abbreviations.get_many_abbreviations(option.get_old_option_strings())
         short_options = option.get_short_option_strings()
 
-        value_variable = variable_manager.capture_variable(option)
+        variable = variable_manager.capture_variable(option)
 
         if long_options:
             option_cases.long_options.append(
-                _make_long_option_case(long_options, option.complete, option.optional_arg, value_variable))
+                _make_long_option_case(long_options, option, variable))
 
         if short_options:
             option_cases.short_options.append(
-                _make_short_option_case(short_options, option.complete, option.optional_arg, value_variable))
+                _make_short_option_case(short_options, option, variable))
 
     return option_cases

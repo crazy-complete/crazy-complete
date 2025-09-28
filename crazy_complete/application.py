@@ -159,28 +159,7 @@ def load_definition_file(opts):
 
     raise AssertionError("Should not be reached")
 
-def generate(opts):
-    '''Generate output file as specified in `opts`.'''
-
-    if opts.input_type == 'help':
-        if opts.shell != 'yaml':
-            raise CrazyError('The `help` input-type currently only supports YAML generation')
-        output = help_converter.from_file_to_yaml(opts.definition_file)
-        write_string_to_file(output, opts.output_file)
-        return
-
-    cmdline = load_definition_file(opts)
-
-    if opts.shell == 'json':
-        output = json_source.commandline_to_json(cmdline)
-        write_string_to_file(output, opts.output_file)
-        return
-
-    if opts.shell == 'yaml':
-        output = yaml_source.commandline_to_yaml(cmdline)
-        write_string_to_file(output, opts.output_file)
-        return
-
+def _get_config_from_options(opts):
     conf = config.Config()
     conf.set_abbreviate_commands(opts.abbreviate_commands)
     conf.set_abbreviate_options(opts.abbreviate_options)
@@ -203,6 +182,32 @@ def generate(opts):
             conf.disable_repeatable(True)
         elif feature == 'when':
             conf.disable_when(True)
+
+    return conf
+
+def generate(opts):
+    '''Generate output file as specified in `opts`.'''
+
+    if opts.input_type == 'help':
+        if opts.shell != 'yaml':
+            raise CrazyError('The `help` input-type currently only supports YAML generation')
+        output = help_converter.from_file_to_yaml(opts.definition_file)
+        write_string_to_file(output, opts.output_file)
+        return
+
+    cmdline = load_definition_file(opts)
+
+    if opts.shell == 'json':
+        output = json_source.commandline_to_json(cmdline)
+        write_string_to_file(output, opts.output_file)
+        return
+
+    if opts.shell == 'yaml':
+        output = yaml_source.commandline_to_yaml(cmdline)
+        write_string_to_file(output, opts.output_file)
+        return
+
+    conf = _get_config_from_options(opts)
 
     if opts.shell == 'bash':
         output = bash.generate_completion(cmdline, conf)
