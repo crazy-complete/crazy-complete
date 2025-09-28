@@ -1,6 +1,7 @@
 '''This module contains code for validating the `complete` attribute.'''
 
 from .errors import CrazyError, CrazyTypeError
+from .type_utils import is_dict_type, is_list_type
 
 # =============================================================================
 # Helper functions
@@ -36,7 +37,7 @@ def _validate_choices(args):
     choices = _get_required_arg(args, 'values')
     _require_no_more(args)
 
-    if hasattr(choices, 'items'):
+    if is_dict_type(choices):
         for item, desc in choices.items():
             if not isinstance(item, (str, int, float)):
                 raise CrazyError(f'Item not a string/int/float: {item}')
@@ -44,7 +45,7 @@ def _validate_choices(args):
             if not isinstance(desc, (str, int, float)):
                 raise CrazyError(f'Description not a string/int/float: {desc}')
 
-    elif isinstance(choices, (list, tuple)):
+    elif is_list_type(choices):
         for item in choices:
             if not isinstance(item, (str, int, float)):
                 raise CrazyError(f'Item not a string/int/float: {item}')
@@ -118,13 +119,13 @@ def _validate_value_list(args):
     if values is None:
         raise CrazyError(f'Missing `values` option: {opts}')
 
-    if not isinstance(values, (list, tuple)) and not hasattr(values, 'items'):
+    if not is_list_type(values) and not is_dict_type(values):
         raise CrazyError(f'values: not a list|dictionary: {values}')
 
     if len(values) == 0:
         raise CrazyError('values: cannot be empty')
 
-    if hasattr(values, 'items'):
+    if is_dict_type(values):
         for item, desc in values.items():
             if not isinstance(item, str):
                 raise CrazyError(f'values: Not a string: {item}')

@@ -2,6 +2,7 @@
 
 import sys
 from collections import namedtuple
+from .type_utils import is_list_type
 
 def warn(*a):
     '''Print a warning.'''
@@ -12,18 +13,6 @@ def print_err(*a):
     '''Print to STDERR.'''
 
     print(*a, file=sys.stderr)
-
-def is_iterable(obj):
-    '''Check if an object is iterable.
-
-    Args:
-        obj: The object to check.
-
-    Returns:
-        bool: True if the object is iterable, False otherwise.
-    '''
-
-    return hasattr(obj, '__iter__') and not isinstance(obj, str)
 
 class GeneralAbbreviationGenerator:
     '''A class for generating abbreviations from a list of words.
@@ -44,7 +33,7 @@ class GeneralAbbreviationGenerator:
         assert isinstance(min_abbreviated_length, int), \
             "GeneralAbbreviationGenerator: min_abbreviated_length: expected int, got %r" % min_abbreviated_length
 
-        assert is_iterable(words), \
+        assert is_list_type(words), \
             "GeneralAbbreviationGenerator: words: expected iterable, got %r" % words
 
         self.min_abbreviated_length = min_abbreviated_length
@@ -93,7 +82,7 @@ class GeneralAbbreviationGenerator:
             list: A list of abbreviations for the given words.
         '''
 
-        assert is_iterable(words), \
+        assert is_list_type(words), \
             "GeneralAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
         r = []
@@ -105,7 +94,7 @@ class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
     '''AbbreviationGenerator for abbreviating long and old-style options.'''
 
     def __init__(self, words):
-        assert is_iterable(words), \
+        assert is_list_type(words), \
             "OptionAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
         words = list(words)
@@ -146,7 +135,7 @@ class DummyAbbreviationGenerator:
     def get_many_abbreviations(self, words):
         '''Don't abbreviate, just return the input.'''
 
-        assert is_iterable(words), \
+        assert is_list_type(words), \
             "DummyAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
 
         return words

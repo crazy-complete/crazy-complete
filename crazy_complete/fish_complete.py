@@ -2,6 +2,7 @@
 
 from . import shell
 from . import helpers
+from .type_utils import is_dict_type
 
 CHOICES_INLINE_THRESHOLD = 80
 # The `choices` command can in Fish be expressed inline in a complete command
@@ -82,7 +83,7 @@ class FishCompleteChoices(FishCompletionBase):
         return code.rstrip(' \\\n')
 
     def get_args(self):
-        if hasattr(self.choices, 'items'):
+        if is_dict_type(self.choices):
             arg = self._get_inline_for_dict(self.choices)
         else:
             arg = self._get_inline_for_list(self.choices)
@@ -97,7 +98,7 @@ class FishCompleteChoices(FishCompletionBase):
         return ['-f', '-a', '(%s)' % funcname]
 
     def get_code(self):
-        if hasattr(self.choices, 'items'):
+        if is_dict_type(self.choices):
             return self._get_code_for_dict(self.choices)
         return self._get_code_for_list(self.choices)
 
@@ -149,7 +150,7 @@ class FishCompleteValueList(FishCompletionBase):
         values = opts['values']
         funcname = ctxt.helpers.get_unique_function_name(ctxt)
 
-        if hasattr(values, 'items'):
+        if is_dict_type(values):
             code = "printf '%s\\t%s\\n' \\\n"
             for item, desc in values.items():
                 code += '  %s %s \\\n' % (shell.escape(item), shell.escape(desc))

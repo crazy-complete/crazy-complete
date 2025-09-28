@@ -1,6 +1,7 @@
 '''This module contains code for completing arguments in Bash.'''
 
 from . import shell
+from .type_utils import is_dict_type
 
 # pylint: disable=too-few-public-methods
 
@@ -186,7 +187,7 @@ class BashCompleter(shell.ShellCompleter):
         separator = opts.get('separator', ',')
         values = opts['values']
 
-        if hasattr(values, 'items'):
+        if is_dict_type(values):
             values = list(values.keys())
 
         return BashCompletionCommand(ctxt, '%s %s %s' % (

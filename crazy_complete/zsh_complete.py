@@ -4,6 +4,7 @@ from . import shell
 from . import helpers
 from .str_utils import join_with_wrap, indent
 from .zsh_utils import escape_colon, escape_square_brackets
+from .type_utils import is_dict_type
 
 CHOICES_INLINE_THRESHOLD = 80
 # The `choices` command can in Zsh be expressed inline in an optspec, like this:
@@ -30,7 +31,7 @@ class ZshCompleter(shell.ShellCompleter):
         return "'_numbers -f'"
 
     def choices(self, ctxt, choices):
-        if hasattr(choices, 'items'):
+        if is_dict_type(choices):
             return self._choices_dict(ctxt, choices)
 
         return self._choices_list(ctxt, choices)
@@ -147,7 +148,7 @@ class ZshCompleter(shell.ShellCompleter):
         desc   = ctxt.option.metavar or ''
         values = opts['values']
 
-        if hasattr(values, 'items'):
+        if is_dict_type(values):
             values_arg = ' '.join(
                 shell.escape('%s[%s]' % (
                     escape_square_brackets(item),
