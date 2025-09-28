@@ -687,6 +687,11 @@ This helps crazy-complete generate reliable completions. Key practices include:
 - **Mutually exclusive options**: Use `groups: [...]` to define sets of options that cannot appear
     together
 
+### Trying out zsh autocompletion scripts
+
+By default, crazy-complete generates scripts that should be installed under `/usr/share/zsh/site-functions`
+and loaded from there. If you want to try the generated scripts directly, use `--zsh-compdef=False`.
+
 ### Optimizing Script Output
 
 Especially for **Fish** scripts, performance can decrease if many options are defined.
