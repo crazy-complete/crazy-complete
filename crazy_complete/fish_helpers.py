@@ -392,6 +392,50 @@ if set -q files[1]
 end
 ''')
 
+# =============================================================================
+# Bonus
+# =============================================================================
+
+_NET_INTERFACES_LIST = helpers.FishFunction('net_interfaces_list', r'''
+if test -d /sys/class/net
+  command ls /sys/class/net
+else if ifconfig -l &>/dev/null
+  command ifconfig -l # BSD / macOS
+else
+  command ifconfig 2>/dev/null | command awk '/^[a-z0-9]/ {print $1}' | command sed 's/://'
+end''')
+
+_TIMEZONE_LIST = helpers.FishFunction('timezone_list', r'''
+if ! command timedatectl list-timezones 2>/dev/null
+  command find /usr/share/zoneinfo -type f |\
+  command sed 's|/usr/share/zoneinfo/||g'  |\
+  command egrep -v '^(posix|right)'
+end''')
+
+_ALSA_LIST_CARDS = helpers.FishFunction('alsa_list_cards', r'''
+set -l card
+
+for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
+  set card (string replace 'card ' '' $card)
+  set -l split (string split ': ' $card)
+
+  if set -q split[2]
+    printf "%s\t%s\n" $split[1] $split[2]
+  end
+end''')
+
+_ALSA_LIST_DEVICES = helpers.FishFunction('alsa_list_devices', r'''
+set -l card
+
+for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
+  set card (string replace 'card ' '' $card)
+  set -l split (string split ': ' $card)
+
+  if set -q split[2]
+    printf "hw:%s\t%s\n" $split[1] $split[2]
+  end
+end''')
+
 class FishHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Fish.'''
 
@@ -399,3 +443,7 @@ class FishHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix)
         self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
+        self.add_function(_NET_INTERFACES_LIST)
+        self.add_function(_TIMEZONE_LIST)
+        self.add_function(_ALSA_LIST_CARDS)
+        self.add_function(_ALSA_LIST_DEVICES)

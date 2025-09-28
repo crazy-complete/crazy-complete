@@ -269,3 +269,23 @@ class FishCompleter(shell.ShellCompleter):
 
     def combine(self, ctxt, commands):
         return FishCompleteCombine(ctxt, self, commands)
+
+    # =========================================================================
+    # Bonus
+    # =========================================================================
+
+    def net_interface(self, ctxt):
+        func = ctxt.helpers.use_function('net_interfaces_list')
+        return FishCompletionCommand(func)
+
+    def timezone(self, ctxt):
+        func = ctxt.helpers.use_function('timezone_list')
+        return FishCompletionCommand(func)
+
+    def alsa_card(self, ctxt):
+        func = ctxt.helpers.use_function('alsa_list_cards')
+        return FishCompletionCommand(func)
+
+    def alsa_device(self, ctxt):
+        func = ctxt.helpers.use_function('alsa_list_devices')
+        return FishCompletionCommand(func)

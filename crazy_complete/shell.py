@@ -144,3 +144,19 @@ class ShellCompleter:
 
     def command(self, ctxt):
         return self.fallback(ctxt, 'command', 'file')
+
+    # =========================================================================
+    # Bonus
+    # =========================================================================
+
+    def login_shell(self, ctxt):
+        return self.exec(ctxt, "command egrep '^[^#]' /etc/shells")
+
+    def locale(self, ctxt):
+        return self.exec(ctxt, "command locale -a")
+
+    def charset(self, ctxt):
+        return self.exec(ctxt, "command locale -m")
+
+    def mountpoint(self, ctxt):
+        return self.exec(ctxt, "command mount | command cut -d' ' -f3")

@@ -197,3 +197,27 @@ class BashCompleter(shell.ShellCompleter):
 
     def combine(self, ctxt, commands):
         return BashCompleteCombine(ctxt, self, commands)
+
+    # =========================================================================
+    # Bonus
+    # =========================================================================
+
+    def net_interface(self, ctxt):
+        exec_func = ctxt.helpers.use_function('exec')
+        list_func = ctxt.helpers.use_function('net_interfaces_list')
+        return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
+
+    def timezone(self, ctxt):
+        exec_func = ctxt.helpers.use_function('exec')
+        list_func = ctxt.helpers.use_function('timezone_list')
+        return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
+
+    def alsa_card(self, ctxt):
+        exec_func = ctxt.helpers.use_function('exec')
+        list_func = ctxt.helpers.use_function('alsa_list_cards')
+        return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
+
+    def alsa_device(self, ctxt):
+        exec_func = ctxt.helpers.use_function('exec')
+        list_func = ctxt.helpers.use_function('alsa_list_devices')
+        return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))

@@ -144,6 +144,20 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [variable](#variable)            | Complete a shell variable                                                   |
 | [environment](#environment)      | Complete a environment variable                                             |
 
+
+### Bonus Commands
+
+| Command                          | Description                                                                 |
+|----------------------------------|-----------------------------------------------------------------------------|
+| net\_interface                   | Complete a network interface                                                |
+| mountpoint                       | Complete a mountpoint                                                       |
+| login\_shell                     | Complete a login shell                                                      |
+| charset                          | Complete a charset                                                          |
+| locale                           | Complete a locale                                                           |
+| timezone                         | Complete a timezone                                                         |
+| alsa\_card                       | Complete an ALSA card                                                       |
+| alsa\_device                     | Complete an ALSA device                                                     |
+
 ### User-defined Commands
 
 > User-defined commands may require including additional code with `--include-file=FILE`

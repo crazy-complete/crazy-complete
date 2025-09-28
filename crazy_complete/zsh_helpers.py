@@ -306,6 +306,38 @@ done < <(eval "$1")
 _describe '' describe
 ''')
 
+# =============================================================================
+# Bonus
+# =============================================================================
+
+_ALSA_COMPLETE_CARDS = helpers.ShellFunction('alsa_complete_cards', r'''
+local card='' cards=()
+command aplay -l \
+  | command grep -Eo '^card [0-9]+: [^,]+' \
+  | command uniq \
+  | while builtin read card; do
+  card="${card#card }"
+  local id="${card%%: *}"
+  local name="${card#*: }"
+  cards+=("$id:$name")
+done
+
+_describe 'ALSA card' cards''')
+
+_ALSA_COMPLETE_DEVICES = helpers.ShellFunction('alsa_complete_devices', r'''
+local card='' id='' name='' devices=()
+command aplay -l \
+  | command grep -Eo '^card [0-9]+: [^,]+' \
+  | command uniq \
+  | while builtin read card; do
+  card="${card#card }"
+  id="${card%%: *}"
+  name="${card#*: }"
+  devices+=("hw\\:$id:$name")
+done
+
+_describe 'ALSA device' devices''')
+
 class ZshHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Zsh.'''
 
@@ -313,3 +345,5 @@ class ZshHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix)
         self.add_function(_ZSH_QUERY_FUNC)
         self.add_function(_EXEC)
+        self.add_function(_ALSA_COMPLETE_CARDS)
+        self.add_function(_ALSA_COMPLETE_DEVICES)

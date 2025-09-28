@@ -215,6 +215,15 @@ def _check_complete(args):
         'exec_internal':    _check_exec,
         'value_list':       _check_value_list,
         'combine':          _check_combine,
+        # Bonus
+        'mountpoint':       _check_void,
+        'net_interface':    _check_void,
+        'login_shell':      _check_void,
+        'locale':           _check_void,
+        'charset':          _check_void,
+        'timezone':         _check_void,
+        'alsa_card':        _check_void,
+        'alsa_device':      _check_void,
     }
 
     if cmd.value not in commands:

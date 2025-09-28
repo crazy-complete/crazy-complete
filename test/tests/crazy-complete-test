@@ -41,6 +41,14 @@ cmdp.add_argument('--value-list',       help='Complete a list').complete('value_
 cmdp.add_argument('--value-list-2',     help='Complete a list').complete('value_list', {'values': {'foo': 'Some foo', 'bar': 'Some bar'}})
 cmdp.add_argument('--range-1',          help='Complete a range', type=int, choices=range(1,10))
 cmdp.add_argument('--range-2',          help='Complete a range', type=int, choices=range(1,10,2))
+cmdp.add_argument('--mountpoint',       help='Complete a mountpoint').complete('mountpoint')
+cmdp.add_argument('--net',              help='Complete a network interface').complete('net_interface')
+cmdp.add_argument('--shell',            help='Complete a login shell').complete('login_shell')
+cmdp.add_argument('--locale',           help='Complete a locale').complete('locale')
+cmdp.add_argument('--charset',          help='Complete a charset').complete('charset')
+cmdp.add_argument('--timezone',         help='Complete a timezone').complete('timezone')
+cmdp.add_argument('--alsa-card',        help='Complete an ALSA card').complete('alsa_card')
+cmdp.add_argument('--alsa-device',      help='Complete an ALSA device').complete('alsa_device')
 
 # =============================================================================
 # Command 'when'

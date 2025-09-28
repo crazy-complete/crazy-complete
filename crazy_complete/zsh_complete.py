@@ -184,3 +184,30 @@ class ZshCompleter(shell.ShellCompleter):
         ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
         funcname = ctxt.helpers.use_function(funcname)
         return funcname
+
+    # =========================================================================
+    # Bonus
+    # =========================================================================
+
+    def net_interface(self, _ctxt):
+        return '_net_interfaces'
+
+    def timezone(self, _ctxt):
+        return '_time_zone'
+
+    def locale(self, _ctxt):
+        return '_locales'
+
+    def charset(self, _ctxt):
+        return '_charset'
+
+    def login_shell(self, _ctxt):
+        return '_shells'
+
+    def alsa_card(self, ctxt):
+        func = ctxt.helpers.use_function('alsa_complete_cards')
+        return func
+
+    def alsa_device(self, ctxt):
+        func = ctxt.helpers.use_function('alsa_complete_devices')
+        return func

@@ -209,6 +209,15 @@ def validate_complete(complete):
         'exec_internal': _validate_exec,
         'value_list':    _validate_value_list,
         'combine':       _validate_combine,
+        # Bonus
+        'mountpoint':    _validate_void,
+        'net_interface': _validate_void,
+        'login_shell':   _validate_void,
+        'locale':        _validate_void,
+        'charset':       _validate_void,
+        'timezone':      _validate_void,
+        'alsa_card':     _validate_void,
+        'alsa_device':   _validate_void,
     }
 
     if command not in validate_commands:

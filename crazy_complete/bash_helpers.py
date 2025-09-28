@@ -90,6 +90,48 @@ for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
 done
 ''')
 
+# =============================================================================
+# Bonus
+# =============================================================================
+
+_NET_INTERFACES_LIST = helpers.ShellFunction('net_interfaces_list', r'''
+if [[ -d /sys/class/net ]]; then
+  command ls /sys/class/net
+elif ifconfig -l &>/dev/null; then
+  command ifconfig -l # BSD / macOS
+else
+  command ifconfig 2>/dev/null | command awk '/^[a-z0-9]/ {print $1}' | command sed 's/://'
+fi''')
+
+_TIMEZONE_LIST = helpers.ShellFunction('timezone_list', r'''
+if ! command timedatectl list-timezones 2>/dev/null; then
+  command find /usr/share/zoneinfo -type f |\
+  command sed 's|/usr/share/zoneinfo/||g'  |\
+  command egrep -v '^(posix|right)'
+fi''')
+
+_ALSA_LIST_CARDS = helpers.ShellFunction('alsa_list_cards', r'''
+local card
+command aplay -l \
+  | command grep -Eo '^card [0-9]+: [^,]+' \
+  | command uniq \
+  | while builtin read card; do
+  card="${card#card }"
+  local id="${card%%: *}"
+  builtin echo "$id"
+done''')
+
+_ALSA_LIST_DEVICES = helpers.ShellFunction('alsa_list_devices', r'''
+local card
+command aplay -l \
+  | command grep -Eo '^card [0-9]+: [^,]+' \
+  | command uniq \
+  | while builtin read card; do
+  card="${card#card }"
+  local id="${card%%: *}"
+  builtin echo "hw:$id"
+done''')
+
 class BashHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Bash.'''
 
@@ -100,3 +142,7 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
         self.add_function(_PREFIX_COMPREPLY)
+        self.add_function(_NET_INTERFACES_LIST)
+        self.add_function(_TIMEZONE_LIST)
+        self.add_function(_ALSA_LIST_CARDS)
+        self.add_function(_ALSA_LIST_DEVICES)
