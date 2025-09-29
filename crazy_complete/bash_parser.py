@@ -5,7 +5,7 @@ from collections import namedtuple
 from . import utils
 from .str_utils import indent
 from .bash_utils import make_option_variable_name, CasePatterns
-from .bash_parser_subcommand_code import make_subcommand_call_code, get_subcommand_path
+from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
 
 _PARSER_CODE = '''\
 POSITIONALS=()
@@ -53,10 +53,10 @@ done'''
 _OPT_ISSET = '_OPT_ISSET_'
 
 def generate(commandline, variable_manager):
-    commandlines         = list(reversed(commandline.get_all_commandlines()))
-    subcommand_call_code = make_subcommand_call_code(commandline)
-    long_option_cases    = []
-    short_option_cases   = []
+    commandlines           = list(reversed(commandline.get_all_commandlines()))
+    subcommand_switch_code = make_subcommand_switch_code(commandline)
+    long_option_cases      = []
+    short_option_cases     = []
 
     for commandline in commandlines:
         option_cases = _generate_option_cases(commandline, variable_manager)
@@ -94,8 +94,8 @@ def generate(commandline, variable_manager):
     else:
         s = s.replace('%SHORT_OPTION_CASES%\n', '')
 
-    if subcommand_call_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_call_code, 6))
+    if subcommand_switch_code:
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_switch_code, 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 

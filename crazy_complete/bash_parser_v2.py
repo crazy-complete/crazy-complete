@@ -5,7 +5,7 @@ from collections import namedtuple
 from . import utils
 from .str_utils import indent
 from .bash_utils import make_option_variable_name
-from .bash_parser_subcommand_code import make_subcommand_call_code, get_subcommand_path
+from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
 
 _PARSER_CODE = '''\
 POSITIONALS=()
@@ -130,13 +130,13 @@ def _make_find_option_code(commandline, variable_manager):
     return c
 
 def generate(commandline, variable_manager):
-    find_option_code     = _make_find_option_code(commandline, variable_manager)
-    subcommand_call_code = make_subcommand_call_code(commandline)
+    find_option_code       = _make_find_option_code(commandline, variable_manager)
+    subcommand_switch_code = make_subcommand_switch_code(commandline)
 
     s = _PARSER_CODE
 
-    if subcommand_call_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_call_code, 6))
+    if subcommand_switch_code:
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_switch_code, 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 
