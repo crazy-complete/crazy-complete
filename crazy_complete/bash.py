@@ -14,6 +14,7 @@ from . import bash_complete
 from . import bash_parser
 from . import bash_parser_v2
 from . import bash_option_completion
+from . import bash_option_strings_completion
 from . import bash_when
 from .str_utils import indent
 from .bash_utils import VariableManager
@@ -47,51 +48,6 @@ class BashCompletionGenerator:
             r += 'local -a %s\n' % ' '.join(algo.uniq(local_vars))
 
         r +=  '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
-        return r
-
-    def _generate_option_strings_completion(self):
-        def make_option_strings(option):
-            r = []
-            for option_string in option.option_strings:
-                if len(option_string) != 2 and option.complete:
-                    r.append(f'{option_string}=')
-                else:
-                    r.append(option_string)
-            return ' '.join(shell.escape(option_string) for option_string in r)
-
-        r  = 'if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then\n'
-        r += '  local -a opts\n'
-        for option in self.options:
-            if option.hidden:
-                continue
-
-            conditions = []
-
-            for final_option in self.commandline.get_final_options():
-                conditions += ["! ${#%s[@]}" % self.variable_manager.capture_variable(final_option)]
-
-            for exclusive_option in option.get_conflicting_options():
-                conditions += ["! ${#%s[@]}" % self.variable_manager.capture_variable(exclusive_option)]
-
-            if not option.repeatable:
-                conditions += ["! ${#%s[@]}" % self.variable_manager.capture_variable(option)]
-
-            if conditions:
-                conditions = '(( %s )) && ' % ' && '.join(algo.uniq(conditions))
-            else:
-                conditions = ''
-
-            when_guard = ''
-            if option.when is not None:
-                when_guard = bash_when.generate_when_conditions(self.commandline, self.variable_manager, option.when)
-                when_guard = '%s && ' % when_guard
-
-            r += '  %s%sopts+=(%s)\n' % (conditions, when_guard, make_option_strings(option))
-
-        r += '  COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))\n'
-        r += '  [[ ${COMPREPLY-} == *= ]] && compopt -o nospace\n'
-        r += '  return 1\n'
-        r += 'fi'
         return r
 
     def _generate_positionals_completion(self):
@@ -162,7 +118,7 @@ class BashCompletionGenerator:
             code['option_completion'] = bash_option_completion.generate_option_completion(self)
 
             # This code is used to complete option strings (--foo, ...)
-            code['option_strings_completion'] = self._generate_option_strings_completion()
+            code['option_strings_completion'] = bash_option_strings_completion.generate(self)
 
         if len(self.positionals) or self.subcommands:
             # This code is used to complete positionals
