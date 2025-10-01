@@ -3,6 +3,7 @@
 from collections import namedtuple
 
 from . import utils
+from . import shell
 from .str_utils import indent
 from .bash_utils import make_option_variable_name
 from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
@@ -109,10 +110,11 @@ def _make_find_option_code(commandline, variable_manager):
     for commandline in reversed(commandline.get_all_commandlines()):
         option_cases = generate_option_cases(commandline, variable_manager)
         command = get_subcommand_path(commandline)
+        command = shell.escape(command)
         if commandline.inherit_options:
             command += '*'
 
-        c += f'  case "$1" in "{command}")\n'
+        c += f'  case "$1" in {command})\n'
         c +=  '    case "$2" in\n'
 
         for case in option_cases:
