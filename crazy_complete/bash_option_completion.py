@@ -3,6 +3,7 @@
 from . import algo
 from . import utils
 from . import bash_when
+from . import bash_utils
 from .str_utils import indent
 
 class MasterCompletionFunction:
@@ -12,6 +13,7 @@ class MasterCompletionFunction:
         self.abbreviations = abbreviations
         self.complete = generator._complete_option
         self.generator = generator
+        self.optionals = False
         self.code = []
 
         optional_arg = list(filter(lambda o: o.complete and o.optional_arg is True, options))
@@ -20,6 +22,7 @@ class MasterCompletionFunction:
         self._add_options(required_arg)
 
         if optional_arg:
+            self.optionals = True
             self.code.append('[[ "$mode" == WITH_OPTIONAL ]] || return 1')
             self._add_options(optional_arg)
 
@@ -72,7 +75,10 @@ class MasterCompletionFunction:
 
         if self.code:
             r  = '%s() {\n' % funcname
-            r += '  local opt="$1" cur="$2" mode="$3"\n\n'
+            if self.optionals:
+                r += '  local opt="$1" cur="$2" mode="$3"\n\n'
+            else:
+                r += '  local opt="$1" cur="$2"\n\n'
             r += '%s\n\n' % indent('\n\n'.join(self.code), 2)
             r += '  return 1\n'
             r += '}'
@@ -80,118 +86,154 @@ class MasterCompletionFunction:
 
         return None
 
+class _Info:
+    def __init__(self, options, abbreviations, commandline, ctxt):
+        self.commandline    = commandline
+        self.ctxt           = ctxt
+        self.short_required = False # Short with required argument
+        self.short_optional = False # Short with optional argument
+        self.long_required  = False # Long with required argument
+        self.long_optional  = False # Long with optional argument
+        self.old_required   = False # Old-Style with required argument
+        self.old_optional   = False # Old-Style with optional argument
+
+        self._collect_options_info(options)
+
+        all_options = self.commandline.get_options(
+            with_parent_options=self.commandline.inherit_options)
+
+        old_option_strings = algo.flatten([o.get_old_option_strings() for o in all_options])
+        old_option_strings = abbreviations.get_many_abbreviations(old_option_strings)
+        self.old_option_strings = bash_utils.CasePatterns.for_old_without_arg(old_option_strings)
+
+        self.short_no_args = ''
+        self.short_required_args = ''
+        self.short_optional_args = ''
+
+        for option in all_options:
+            short_opts = ''.join(o.lstrip('-') for o in option.get_short_option_strings())
+
+            if option.complete and option.optional_arg is False:
+                self.short_required_args += short_opts
+            elif option.complete and option.optional_arg is True:
+                self.short_optional_args += short_opts
+            elif option.complete is None:
+                self.short_no_args += short_opts
+
+        if self.short_no_args:
+            self.short_no_args_pattern = '*([%s])' % self.short_no_args
+        else:
+            self.short_no_args_pattern = ''
+
+    def _collect_options_info(self, options):
+        for option in options:
+            if option.get_long_option_strings():
+                if option.complete and option.optional_arg is True:
+                    self.long_optional = True
+                elif option.complete:
+                    self.long_required = True
+
+            if option.get_old_option_strings():
+                if option.complete and option.optional_arg is True:
+                    self.old_optional = True
+                elif option.complete:
+                    self.old_required = True
+
+            if option.get_short_option_strings():
+                if option.complete and option.optional_arg is True:
+                    self.short_optional = True
+                elif option.complete:
+                    self.short_required = True
+
+def _get_prev_completion(info):
+    r =  'case "$prev" in\n'
+
+    if info.long_required:
+        r += '  --*) __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0;;\n'
+    else:
+        r += '  --*);;\n'
+
+    if info.old_required and info.short_required:
+        r += '  -*)  __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0;&\n'
+        r += '  -%s[%s])\n' % (info.short_no_args_pattern, info.short_required_args)
+        r += '       __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONAL && return 0;;\n'
+    elif info.old_required:
+        r += '  -*)  __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0;;\n'
+    elif info.short_required:
+        r += '  -%s[%s])\n' % (info.short_no_args_pattern, info.short_required_args)
+        r += '       __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONAL && return 0;;\n'
+
+    r += 'esac'
+    return r
+
+def _get_cur_completion(info):
+    r =  'case "$cur" in\n'
+
+    if info.long_required or info.long_optional:
+        r += '  --*=*)\n'
+        r += '    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0;;\n'
+    else:
+        r += '  --*=*);;\n'
+
+    r += '  --*);;\n'
+
+    if info.old_required or info.old_optional:
+        r += '  -*=*)\n'
+        r += '    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0;;\n'
+    else:
+        r += '  -*=*);;\n'
+
+    if (info.short_required or info.short_optional) and info.old_option_strings:
+        r += '  %s);;\n' % info.old_option_strings
+
+    if info.short_required or info.short_optional:
+        r += '  -%s[%s%s]*)\n' % (info.short_no_args_pattern, info.short_required_args, info.short_optional_args)
+        r += '    local i\n'
+        r += '    for ((i=2; i <= ${#cur}; ++i)); do\n'
+        r += '      local pre="${cur:0:$i}" value="${cur:$i}"\n'
+        r += '      __complete_option "-${pre: -1}" "$value" WITH_OPTIONAL && {\n'
+        r += '        %s "$pre"\n' % info.ctxt.helpers.use_function('prefix_compreply')
+        r += '        return 0\n'
+        r += '      }\n'
+        r += '    done;;\n'
+
+    # Optimization: Strip unused case patterns at the end
+    if r.endswith('  -*=*);;\n'):
+        r = r.replace('  -*=*);;\n', '')
+
+    if r.endswith('  --*);;\n'):
+        r = r.replace('  --*);;\n', '')
+
+    r += 'esac'
+    return r
+
+def _get_dispatcher(info):
+    r = []
+
+    if info.short_required or info.long_required or info.old_required:
+        r += [_get_prev_completion(info)]
+
+    if info.short_required or info.long_required or info.old_required or \
+       info.short_optional or info.long_optional or info.old_optional:
+        r += [_get_cur_completion(info)]
+
+    return '\n\n'.join(r)
+
 def generate_option_completion(self):
-    r = ''
     options = self.commandline.get_options(only_with_arguments=True)
     abbreviations = utils.get_option_abbreviator(self.commandline)
 
-    complete_option = MasterCompletionFunction(options, abbreviations, self)
-    code = complete_option.get('__complete_option')
+    complete_function = MasterCompletionFunction(options, abbreviations, self)
+    complete_function_code = complete_function.get('__complete_option')
 
-    if not code:
+    if not complete_function_code:
         return None
 
-    r += '%s\n\n' % code
+    info = _Info(options, abbreviations, self.commandline, self.ctxt)
+    dispatcher_code = _get_dispatcher(info)
 
-    # pylint: disable=invalid-name
-    LR = False # Long with required argument
-    LO = False # Long with optional argument
-    SR = False # Short with required argument
-    SO = False # Short with optional argument
-    OR = False # Old-Style with required argument
-    OO = False # Old-Style with optional argument
+    if not complete_function.optionals:
+        dispatcher_code = dispatcher_code.replace('WITH_OPTIONAL ', '')
+        dispatcher_code = dispatcher_code.replace('WITHOUT_OPTIONAL ', '')
 
-    for option in options:
-        if option.get_long_option_strings():
-            if option.complete and option.optional_arg is True:
-                LO = True
-            elif option.complete:
-                LR = True
-
-        if option.get_old_option_strings():
-            if option.complete and option.optional_arg is True:
-                OO = True
-            elif option.complete:
-                OR = True
-
-        if option.get_short_option_strings():
-            if option.complete and option.optional_arg is True:
-                SO = True
-            elif option.complete:
-                SR = True
-
-    G0 = LR or OR or SR
-    G1 = LR or LO or OR or OO or SR or SO
-    G2 = SR or SO
-
-    prefix_compreply_func = ''
-    if G2:
-        prefix_compreply_func = self.ctxt.helpers.use_function('prefix_compreply')
-
-    is_oldstyle_option = None
-    if G2:
-        all_options = algo.flatten(abbreviations.get_many_abbreviations(
-            o.get_old_option_strings()) for o in self.commandline.get_options(with_parent_options=True))
-        if all_options:
-            is_oldstyle_option = '''\
-__is_oldstyle_option() {
-case "$1" in %s) return 0;; esac
-return 1
-}\n\n''' % '|'.join(all_options)
-            r += is_oldstyle_option
-
-    OLD = is_oldstyle_option
-
-    short_no_args = ''
-    short_required_args = ''
-    for option in self.commandline.get_options(with_parent_options=True):
-        if option.complete and option.optional_arg is False:
-            short_required_args += ''.join(o.lstrip('-') for o in option.get_short_option_strings())
-        elif option.complete is None:
-            short_no_args += ''.join(o.lstrip('-') for o in option.get_short_option_strings())
-
-    short_no_args_pattern = ''
-    if short_no_args:
-        short_no_args_pattern = '*([%s])' % short_no_args
-
-    code = [
-      # CONDITION, TEXT
-      (G0        , 'case "$prev" in\n'),
-      (G0        , '  --*)'),
-      (LR        , '\n    __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0'),
-      (G0        , ';;\n'),
-      (G0        , '  -*)'),
-      (OR        , '\n    __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0'),
-      (SR        , '\n    case "$prev" in -%s[%s])' % (short_no_args_pattern, short_required_args)),
-      (SR        , '\n      __complete_option "-${prev: -1}" "$cur" WITHOUT_OPTIONAL && return 0'),
-      (SR        , '\n    esac'),
-      (G0        , ';;\n'),
-      (G0        , 'esac\n'),
-      (G0        , '\n'),
-
-      (G1        , 'case "$cur" in\n'),
-      (G1        , '  --*=*)'),
-      (LR|LO     , '\n    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0'),
-      (G1        , ';;\n'),
-      (G1        , '  -*=*)'),
-      (OR|OO     , '\n    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0'),
-      (G1        , ';;\n'),
-      (G1        , '  --*);;\n'),
-      (G1        , '  -*)'),
-      (G2 and OLD, '\n    if ! __is_oldstyle_option "$cur"; then'),
-      (G2        , '\n      local i'),
-      (G2        , '\n      for ((i=2; i <= ${#cur}; ++i)); do'),
-      (G2        , '\n        local pre="${cur:0:$i}" value="${cur:$i}"'),
-      (SR|SO     , '\n        __complete_option "-${pre: -1}" "$value" WITH_OPTIONAL && {'),
-      (SR|SO     , '\n          %s "$pre"' % prefix_compreply_func),
-      (SR|SO     , '\n          return 0'),
-      (SR|SO     , '\n        }'),
-      (G2        , '\n      done'),
-      (G2 and OLD, '\n    fi'),
-      (G1        , ';;\n'),
-      (G1        , 'esac')
-    ]
-
-    r += ''.join(c[1] for c in code if c[0])
-
-    return r.strip()
+    return f'{complete_function_code}\n\n{dispatcher_code}'

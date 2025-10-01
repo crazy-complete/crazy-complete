@@ -4,7 +4,6 @@ from . import shell
 
 def make_option_variable_name(option, prefix=''):
     '''Make a variable for an option.'''
-
     long_options = option.get_long_option_strings()
     if long_options:
         return prefix + shell.make_identifier(long_options[0].lstrip('-'))
@@ -65,3 +64,12 @@ class CasePatterns:
         '''Return a case pattern for short options.'''
 
         return '|'.join(o[1] for o in option_strings)
+
+    @staticmethod
+    def for_old_without_arg(option_strings):
+        '''Return a case pattern for old options that don't take an argument.'''
+
+        if len(option_strings) <= 2:
+            return '|'.join(option_strings)
+
+        return '-@(%s)' % '|'.join(o.lstrip('-') for o in option_strings)
