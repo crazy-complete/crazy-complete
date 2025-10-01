@@ -108,7 +108,10 @@ def _make_find_option_code(commandline, variable_manager):
     c = '__find_option() {\n'
 
     for commandline in reversed(commandline.get_all_commandlines()):
-        option_cases = generate_option_cases(commandline, variable_manager)
+        option_cases = _generate_option_cases(commandline, variable_manager)
+        if not option_cases:
+            continue
+
         command = get_subcommand_path(commandline)
         command = shell.escape(command)
         if commandline.inherit_options:
@@ -119,9 +122,7 @@ def _make_find_option_code(commandline, variable_manager):
 
         for case in option_cases:
             c += '      %s) VAR=%s; MODE=%s; return;;\n' % (
-                '|'.join(case.option_strings),
-                case.variable,
-                case.mode)
+                '|'.join(case.option_strings), case.variable, case.mode)
 
         c += '    esac\n'
         c += '  esac\n'
@@ -149,7 +150,7 @@ def generate(commandline, variable_manager):
 
     return s
 
-def generate_option_cases(commandline, variable_manager):
+def _generate_option_cases(commandline, variable_manager):
     OptionCase = namedtuple('OptionCase', ['option_strings', 'variable', 'mode'])
     options = commandline.get_options()
     abbreviations = utils.get_option_abbreviator(commandline)
