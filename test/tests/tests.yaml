@@ -1312,3 +1312,47 @@ zsh_expected: |
   d:d  -- d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d
   e:e  -- e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e
   f:f  -- f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f
+---
+number: 84
+definition_file: "main"
+description: "Check if end-of-options (--) terminates options"
+send: "crazy-complete-test -- -"
+bash_expected: |
+  > crazy-complete-test -- -
+fish_expected: |
+  > crazy-complete-test -- -
+  argparse-actions  (argparse tool actions)  when  (Test the "when"-feature)
+zsh_expected: |
+  > crazy-complete-test -- -
+---
+number: 85
+definition_file: "main"
+description: "Check if after end-of-options (--) positionals are completed"
+send: "crazy-complete-test -- a"
+bash_expected: |
+  > crazy-complete-test -- a
+  alias1            alias2            argparse-actions
+  > crazy-complete-test -- a
+fish_expected: |
+  > crazy-complete-test -- a
+  alias1  (For testing the completer)  argparse-actions  (argparse tool actions)
+  alias2  (For testing the completer)
+zsh_expected: |
+  > crazy-complete-test -- a
+  alias2            alias1  -- For testing the completer
+  argparse-actions          -- argparse tool actions
+---
+number: 86
+definition_file: "main"
+description: "Check if after end-of-options (--) positionals are completed (2)"
+send: "crazy-complete-test -- test "
+bash_expected: |
+  > crazy-complete-test -- test
+  first1  first2  first3
+  > crazy-complete-test -- test first
+fish_expected: |
+  > crazy-complete-test -- test first
+  first1  (First positional)  first3  (First positional)
+  first2  (First positional)
+zsh_expected: |
+  > crazy-complete-test -- test first
