@@ -19,10 +19,8 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
   case "$arg" in
     --)
       END_OF_OPTIONS=1
-      for ((++argi; argi < ${#words[@]}; ++argi)); do
-        POSITIONALS+=("${words[argi]}")
-      done
-      break;;
+      POSITIONALS+=("${words[@]:$((++argi))}")
+      return;;
     -)
       POSITIONALS+=("-");;
     -*)
@@ -40,12 +38,10 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
 done
 
 for ((; argi < ${#words[@]}; ++argi)); do
-  arg="${words[$argi]}"
-
-  case "$arg" in
+  case "${words[argi]}" in
     -) POSITIONALS+=("-");;
     -*);;
-    *) POSITIONALS+=("$arg");;
+    *) POSITIONALS+=("${words[argi]}");;
   esac
 done'''
 
