@@ -21,9 +21,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
       END_OF_OPTIONS=1
       POSITIONALS+=("${words[@]:$((++argi))}")
       return;;
-    -)
-      POSITIONALS+=("-");;
-    -*)
+    -?*) # ignore '-'
 %LONG_OPTION_CASES%
       for ((i=1; i < ${#arg}; ++i)); do
         char="${arg:$i:1}"

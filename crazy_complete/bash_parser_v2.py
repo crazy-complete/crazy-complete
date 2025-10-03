@@ -30,8 +30,6 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
       END_OF_OPTIONS=1
       POSITIONALS+=("${words[@]:$((++argi))}")
       return;;
-    -)
-      POSITIONALS+=("-");;
     --*=*)
       if __find_option "$cmd" "${arg%%=*}"
       then __append_to_array "$VAR" "${arg#*=}"
@@ -43,7 +41,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
         else __append_to_array "$VAR" "_OPT_ISSET_"
         fi
       fi;;
-    -*)
+    -?*) # ignore '-'
       if [[ "$arg" == -*=* ]]; then
         if __find_option "$cmd" "${arg%%=*}"; then
           __append_to_array "$VAR" "${arg#*=}"
