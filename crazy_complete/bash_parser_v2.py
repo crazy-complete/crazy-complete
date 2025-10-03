@@ -89,8 +89,7 @@ done
 
 for ((; argi < ${#words[@]}; ++argi)); do
   case "${words[argi]}" in
-    -) POSITIONALS+=("-");;
-    -*);;
+    -?*);;
     *) POSITIONALS+=("${words[argi]}");;
   esac
 done'''
