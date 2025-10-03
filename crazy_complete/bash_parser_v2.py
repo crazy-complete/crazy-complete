@@ -5,7 +5,6 @@ from collections import namedtuple
 from . import utils
 from . import shell
 from .str_utils import indent
-from .bash_utils import make_option_variable_name
 from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
 
 _PARSER_CODE = '''\
@@ -97,31 +96,50 @@ done'''
 _OPT_ISSET = '_OPT_ISSET_'
 
 def _make_find_option_code(commandline, variable_manager):
-    c = '__find_option() {\n'
+    cmdlines = list(reversed(commandline.get_all_commandlines()))
+    code = []
 
-    for commandline in reversed(commandline.get_all_commandlines()):
-        option_cases = _generate_option_cases(commandline, variable_manager)
-        if not option_cases:
-            continue
+    if len(cmdlines) == 1:
+        code += [_make_cmd_plus_option_switch_code(cmdlines[0], variable_manager, True)]
+    else:
+        for cmdline in cmdlines:
+            code += [_make_cmd_plus_option_switch_code(cmdline, variable_manager)]
 
-        command = get_subcommand_path(commandline)
-        command = shell.escape(command)
-        if commandline.inherit_options:
-            command += '*'
-
-        c += f'  case "$1" in {command})\n'
-        c +=  '    case "$2" in\n'
-
-        for case in option_cases:
-            c += '      %s) VAR=%s; MODE=%s; return;;\n' % (
-                '|'.join(case.option_strings), case.variable, case.mode)
-
-        c += '    esac\n'
-        c += '  esac\n'
-
+    c =  '__find_option() {\n'
+    c += '%s\n' % indent('\n'.join(filter(None, code)), 2)
     c += '  return 1\n'
     c += '}'
 
+    return c
+
+def _make_cmd_plus_option_switch_code(commandline, variable_manager, omit_cmd_check=False):
+    option_cases = _generate_option_cases(commandline, variable_manager)
+    if not option_cases:
+        return None
+
+    if omit_cmd_check:
+        return _make_option_switch_code(option_cases)
+
+    command = get_subcommand_path(commandline)
+    command = shell.escape(command)
+    if commandline.inherit_options:
+        command += '*'
+
+    c  = f'case "$1" in {command})\n'
+    c += '%s\n' % indent(_make_option_switch_code(option_cases), 2)
+    c += 'esac'
+    return c
+
+def _make_option_switch_code(option_cases):
+    c  = 'case "$2" in\n'
+
+    for case in option_cases:
+        c += '  %s)'        % '|'.join(case.option_strings)
+        c += ' VAR=%s;'     % case.variable
+        c += ' MODE=%s;'    % case.mode
+        c += ' return;;\n'
+
+    c += 'esac'
     return c
 
 def generate(commandline, variable_manager):
