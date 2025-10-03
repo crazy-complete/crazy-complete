@@ -11,7 +11,6 @@ from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcom
 _PARSER_CODE = '''\
 POSITIONALS=()
 END_OF_OPTIONS=0
-POSITIONAL_NUM=0
 
 local cmd="root" argi arg i char trailing_chars
 local ARG_NONE=0 ARG_REQUIRED=1 ARG_OPTIONAL=2 VAR MODE
@@ -30,11 +29,11 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
     --)
       END_OF_OPTIONS=1
       for ((++argi; argi < ${#words[@]}; ++argi)); do
-        POSITIONALS[POSITIONAL_NUM++]="${words[argi]}"
+        POSITIONALS+=("${words[argi]}")
       done
       break;;
     -)
-      POSITIONALS[POSITIONAL_NUM++]="-";;
+      POSITIONALS+=("-");;
     --*=*)
       if __find_option "$cmd" "${arg%%=*}"
       then __append_to_array "$VAR" "${arg#*=}"
@@ -86,7 +85,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
         fi
       done;;
     *)
-      POSITIONALS[POSITIONAL_NUM++]="$arg"
+      POSITIONALS+=("$arg")
 %SUBCOMMAND_SWITCH_CODE%
       ;;
   esac
@@ -96,9 +95,9 @@ for ((; argi < ${#words[@]}; ++argi)); do
   arg="${words[$argi]}"
 
   case "$arg" in
-    -) POSITIONALS[POSITIONAL_NUM++]="-";;
+    -) POSITIONALS+=("-");;
     -*);;
-    *) POSITIONALS[POSITIONAL_NUM++]="$arg";;
+    *) POSITIONALS+=("$arg");;
   esac
 done'''
 

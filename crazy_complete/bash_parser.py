@@ -10,7 +10,6 @@ from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcom
 _PARSER_CODE = '''\
 POSITIONALS=()
 END_OF_OPTIONS=0
-POSITIONAL_NUM=0
 
 local cmd="root" argi arg i char trailing_chars
 
@@ -21,11 +20,11 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
     --)
       END_OF_OPTIONS=1
       for ((++argi; argi < ${#words[@]}; ++argi)); do
-        POSITIONALS[POSITIONAL_NUM++]="${words[argi]}"
+        POSITIONALS+=("${words[argi]}")
       done
       break;;
     -)
-      POSITIONALS[POSITIONAL_NUM++]="-";;
+      POSITIONALS+=("-");;
     -*)
 %LONG_OPTION_CASES%
       for ((i=1; i < ${#arg}; ++i)); do
@@ -34,7 +33,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
 %SHORT_OPTION_CASES%
       done;;
     *)
-      POSITIONALS[POSITIONAL_NUM++]="$arg"
+      POSITIONALS+=("$arg")
 %SUBCOMMAND_SWITCH_CODE%
       ;;
   esac
@@ -44,9 +43,9 @@ for ((; argi < ${#words[@]}; ++argi)); do
   arg="${words[$argi]}"
 
   case "$arg" in
-    -) POSITIONALS[POSITIONAL_NUM++]="-";;
+    -) POSITIONALS+=("-");;
     -*);;
-    *) POSITIONALS[POSITIONAL_NUM++]="$arg";;
+    *) POSITIONALS+=("$arg");;
   esac
 done'''
 

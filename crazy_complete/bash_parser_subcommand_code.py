@@ -33,8 +33,8 @@ def make_subcommand_switch_code(commandline):
         if cmdline.get_subcommands():
             positional_num = cmdline.get_subcommands().get_positional_num()
 
-            r = 'if [[ "$cmd" == "%s" ]] &&'            % get_subcommand_path(cmdline)
-            r += ' (( POSITIONAL_NUM == %d )); then\n'  % positional_num
+            r = 'if [[ "$cmd" == "%s" ]] &&'               % get_subcommand_path(cmdline)
+            r += ' (( ${#POSITIONALS[@]} == %d )); then\n' % positional_num
             r += '%s\n' % indent(_make_switch_case(cmdline), 2)
             r += 'fi'
             code.append(r)

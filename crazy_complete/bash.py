@@ -42,7 +42,7 @@ class BashCompletionGenerator:
                 if option.capture is not None:
                     local_vars.append(option.capture)
 
-        r = 'local END_OF_OPTIONS POSITIONALS POSITIONAL_NUM\n'
+        r = 'local END_OF_OPTIONS POSITIONALS\n'
 
         if local_vars:
             r += 'local -a %s\n' % ' '.join(algo.uniq(local_vars))
@@ -62,7 +62,7 @@ class BashCompletionGenerator:
             operator = '=='
             if positional.repeatable:
                 operator = '>='
-            r += '(( POSITIONAL_NUM %s %d )) && ' % (operator, positional.get_positional_num())
+            r += '(( ${#POSITIONALS[@]} %s %d )) && ' % (operator, positional.get_positional_num())
             if positional.when:
                 r += '%s && ' % bash_when.generate_when_conditions(self.commandline, self.variable_manager, positional.when)
             r += '%s\n\n' % make_block(self._complete_option(positional, False))
@@ -70,14 +70,14 @@ class BashCompletionGenerator:
         if self.subcommands:
             cmds = self.subcommands.get_choices().keys()
             complete = self.completer.choices(self.ctxt, cmds).get_code()
-            r += '(( POSITIONAL_NUM == %d )) && ' % self.subcommands.get_positional_num()
+            r += '(( ${#POSITIONALS[@]} == %d )) && ' % self.subcommands.get_positional_num()
             r += '%s\n\n' % make_block(complete)
         return r.strip()
 
     def _generate_subcommand_call(self):
         # This code is used to call subcommand functions
 
-        r  = 'if (( %i < POSITIONAL_NUM )); then\n' % (self.subcommands.get_positional_num() - 1)
+        r  = 'if (( %i < ${#POSITIONALS[@]} )); then\n' % (self.subcommands.get_positional_num() - 1)
         r += '  case "${POSITIONALS[%i]}" in\n' % (self.subcommands.get_positional_num() - 1)
         for subcommand in self.subcommands.subcommands:
             cmds = utils.get_all_command_variations(subcommand)
@@ -137,7 +137,7 @@ class BashCompletionGenerator:
             func = helpers.ShellFunction('parse_commandline', c)
             self.ctxt.helpers.add_function(func)
 
-            # This sets up END_OF_OPTIONS, POSITIONALS, POSITIONAL_NUM and the OPT_* variables.
+            # This sets up END_OF_OPTIONS, POSITIONALS and the OPT_* variables.
             code['command_line_parsing'] = self._generate_commandline_parsing()
 
 
