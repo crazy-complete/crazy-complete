@@ -11,8 +11,7 @@ _PARSER_CODE = '''\
 POSITIONALS=()
 END_OF_OPTIONS=0
 
-local cmd="root" argi arg i char trailing_chars
-local ARG_NONE=0 ARG_REQUIRED=1 ARG_OPTIONAL=2 VAR MODE
+local cmd="root" argi arg i char trailing_chars VAR ARGS
 
 %FIND_OPTION_CODE%
 
@@ -35,7 +34,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
       fi;;
     --*)
       if __find_option "$cmd" "$arg"; then
-        if (( MODE == ARG_REQUIRED ))
+        if [[ "$ARGS" == 1 ]]
         then __append_to_array "$VAR" "${words[++argi]}"
         else __append_to_array "$VAR" "_OPT_ISSET_"
         fi
@@ -49,7 +48,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
       fi
 
       if __find_option "$cmd" "$arg"; then
-        if (( MODE == ARG_REQUIRED ));
+        if [[ "$ARGS" == 1 ]]
         then __append_to_array "$VAR" "${words[++argi]}"
         else __append_to_array "$VAR" "_OPT_ISSET_"
         fi
@@ -62,13 +61,13 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
         trailing_chars="${arg:$((i + 1))}"
 
         if __find_option "$cmd" "-$char"; then
-          if (( MODE == ARG_REQUIRED )); then
+          if [[ "$ARGS" == 1 ]]; then
             if [[ -n "$trailing_chars" ]]
             then __append_to_array "$VAR" "$trailing_chars"
             else __append_to_array "$VAR" "${words[++argi]}"
             fi
             break;
-          elif (( MODE == ARG_OPTIONAL )); then
+          elif [[ "$ARGS" == '?' ]]; then
             if [[ -n "$trailing_chars" ]]
             then __append_to_array "$VAR" "$trailing_chars"
             else __append_to_array "$VAR" _OPT_ISSET_
@@ -136,7 +135,7 @@ def _make_option_switch_code(option_cases):
     for case in option_cases:
         c += '  %s)'        % '|'.join(case.option_strings)
         c += ' VAR=%s;'     % case.variable
-        c += ' MODE=%s;'    % case.mode
+        c += ' ARGS=%s;'    % case.args
         c += ' return;;\n'
 
     c += 'esac'
@@ -161,7 +160,7 @@ def generate(commandline, variable_manager):
     return s
 
 def _generate_option_cases(commandline, variable_manager):
-    OptionCase = namedtuple('OptionCase', ['option_strings', 'variable', 'mode'])
+    OptionCase = namedtuple('OptionCase', ['option_strings', 'variable', 'args'])
     options = commandline.get_options()
     abbreviations = utils.get_option_abbreviator(commandline)
     option_cases = []
@@ -174,12 +173,12 @@ def _generate_option_cases(commandline, variable_manager):
         value_variable = variable_manager.capture_variable(option)
 
         if option.complete and option.optional_arg is True:
-            mode = '$ARG_OPTIONAL'
+            args = "'?'"
         elif option.complete:
-            mode = '$ARG_REQUIRED'
+            args = '1'
         else:
-            mode = '$ARG_NONE'
+            args = '0'
 
-        option_cases.append(OptionCase(short_options + long_options, value_variable, mode))
+        option_cases.append(OptionCase(short_options + long_options, value_variable, args))
 
     return option_cases
