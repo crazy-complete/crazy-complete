@@ -3,7 +3,9 @@
 from . import shell
 from .type_utils import is_dict_type
 
+
 # pylint: disable=too-few-public-methods
+
 
 class BashCompletionBase:
     '''Base class for Bash completions.'''
@@ -21,6 +23,7 @@ class BashCompletionBase:
             str: The command for Bash completion.
         '''
         raise NotImplementedError
+
 
 class BashCompletionCommand(BashCompletionBase):
     '''Used for completion functions that internally modify $COMPREPLY.'''
@@ -45,6 +48,7 @@ class BashCompletionCommand(BashCompletionBase):
 
         return '\n'.join(r)
 
+
 class CompgenW(BashCompletionBase):
     '''Used for completing a list of words.'''
 
@@ -66,6 +70,7 @@ class CompgenW(BashCompletionBase):
             ('+' if append else ''),
             shell.escape(' '.join(str(v) for v in self.values)))
 
+
 class BashCompletionCompgen(BashCompletionBase):
     '''Used for completion that uses Bash's `compgen` command.'''
 
@@ -78,6 +83,7 @@ class BashCompletionCompgen(BashCompletionBase):
             ('+' if append else ''),
             self.compgen_args,
             self.word)
+
 
 class BashCompleteCombine(BashCompletionBase):
     '''Used for combining multiple complete commands.'''
@@ -95,6 +101,7 @@ class BashCompleteCombine(BashCompletionBase):
         for obj in self.completion_objects[1:]:
             code.append(obj.get_code(append=True))
         return '\n'.join(code)
+
 
 class BashCompleter(shell.ShellCompleter):
     '''Code generator for completing arguments in Bash.'''

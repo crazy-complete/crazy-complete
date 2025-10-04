@@ -10,6 +10,7 @@ from .cli import ExtendedBool
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access
 
+
 def dummy():
     '''Since this module only modifies the classes by argparse we provide this
     function so it can be called to silence warnings.'''

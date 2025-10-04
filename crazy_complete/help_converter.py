@@ -4,6 +4,7 @@ from . import help_parser
 from . import yaml_source
 from .str_utils import indent
 
+
 def fix_description(s):
     '''Fix description.'''
 
@@ -18,6 +19,7 @@ def fix_description(s):
     s = s.replace('\n', ' ')
     return s
 
+
 def strip_metavar(s):
     '''Strip metavar.'''
 
@@ -31,6 +33,7 @@ def strip_metavar(s):
         s = s[1:-1]
 
     return s
+
 
 def complete_for_metavar(string):
     '''Return completion for metavar.'''
@@ -84,6 +87,7 @@ def complete_for_metavar(string):
                 return ['choices', [item.strip() for item in string.split(sep)]]
 
     return ['none']
+
 
 def from_file_to_yaml(file):
     '''Parse help text in a file and return YAML.'''

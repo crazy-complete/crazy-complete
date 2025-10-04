@@ -7,15 +7,18 @@ from . import shell
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-positional-arguments
 
+
 def escape_colon(s):
     '''Escape colons in a string with backslash.'''
 
     return s.replace(':', '\\:')
 
+
 def escape_square_brackets(s):
     '''Escape square brackets with backslash.'''
 
     return s.replace('[', '\\[').replace(']', '\\]')
+
 
 def make_option_spec(
         option_strings,

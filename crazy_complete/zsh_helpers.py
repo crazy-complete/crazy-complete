@@ -2,6 +2,7 @@
 
 from . import helpers
 
+
 _ZSH_QUERY_FUNC = helpers.ShellFunction('zsh_query', r'''
 # ===========================================================================
 #
@@ -337,6 +338,7 @@ command aplay -l \
 done
 
 _describe 'ALSA device' devices''')
+
 
 class ZshHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Zsh.'''

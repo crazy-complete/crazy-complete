@@ -10,10 +10,12 @@ from .cli import CommandLine, ExtendedBool
 from .str_utils import is_empty_or_whitespace
 from . import compat
 
+
 def _validate_keys(dictionary, allowed_keys):
     for key in dictionary.keys():
         if key not in allowed_keys:
             raise CrazyError(f'Unknown key: {key}')
+
 
 def dictionary_to_commandline(dictionary, prog=None):
     '''Convert a single dictionary to a cli.CommandLine object.'''
@@ -72,6 +74,7 @@ def dictionary_to_commandline(dictionary, prog=None):
 
     return commandline
 
+
 def _check_prog_in_dictionary(dictionary):
     if 'prog' not in dictionary:
         raise CrazyError('Missing `prog` field')
@@ -81,6 +84,7 @@ def _check_prog_in_dictionary(dictionary):
 
     if is_empty_or_whitespace(dictionary['prog']):
         raise CrazyError('The `prog` field must not be empty')
+
 
 def _get_commandline_by_path(root, path):
     current = root
@@ -96,6 +100,7 @@ def _get_commandline_by_path(root, path):
             raise CrazyError(f"Command not found: {path_str}")
 
     return current
+
 
 def dictionaries_to_commandline(dictionaries):
     '''Convert a list of dictionaries to a cli.CommandLine object.'''
@@ -133,6 +138,7 @@ def dictionaries_to_commandline(dictionaries):
     cmdline = root.get_subcommands().subcommands[0]
     cmdline.parent = None
     return cmdline
+
 
 def option_to_dictionary(self):
     '''Convert a cli.Option object to a dictionary.'''
@@ -173,6 +179,7 @@ def option_to_dictionary(self):
 
     return r
 
+
 def positional_to_dictionary(self):
     '''Convert a cli.Positional object to a dictionary.'''
 
@@ -199,6 +206,7 @@ def positional_to_dictionary(self):
         r['capture'] = self.capture
 
     return r
+
 
 def commandline_to_dictionary(commandline):
     '''Convert a cli.CommandLine object to a dictionary.'''
@@ -233,6 +241,7 @@ def commandline_to_dictionary(commandline):
             positionals.append(positional_to_dictionary(positional))
 
     return r
+
 
 def commandline_to_dictionaries(commandline):
     '''Convert a cli.CommandLine object to dictionaries.'''

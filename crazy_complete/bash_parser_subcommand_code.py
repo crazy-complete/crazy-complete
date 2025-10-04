@@ -3,10 +3,12 @@
 from . import utils
 from .str_utils import indent
 
+
 def get_subcommand_path(commandline):
     commandlines = commandline.get_parents(include_self=True)[1:]
     prognames = ['root'] + [c.prog for c in commandlines]
     return ':'.join(prognames)
+
 
 def make_subcommand_switch_code(commandline):
     '''
@@ -40,6 +42,7 @@ def make_subcommand_switch_code(commandline):
             code.append(r)
 
     return '\n\n'.join(code)
+
 
 def _make_switch_case(cmdline):
     subcommand_aliases = {}

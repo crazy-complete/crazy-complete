@@ -114,6 +114,7 @@ done
 
 _OPT_ISSET = '_OPT_ISSET_'
 
+
 def _make_find_option_code(commandline, variable_manager):
     cmdlines = list(reversed(commandline.get_all_commandlines()))
     code = []
@@ -130,6 +131,7 @@ def _make_find_option_code(commandline, variable_manager):
     c += '}'
 
     return c
+
 
 def _make_cmd_plus_option_switch_code(commandline, variable_manager, omit_cmd_check=False):
     option_cases = _generate_option_cases(commandline, variable_manager)
@@ -149,6 +151,7 @@ def _make_cmd_plus_option_switch_code(commandline, variable_manager, omit_cmd_ch
     c += 'esac'
     return c
 
+
 def _make_option_switch_code(option_cases):
     c  = 'case "$2" in\n'
 
@@ -160,6 +163,7 @@ def _make_option_switch_code(option_cases):
 
     c += 'esac'
     return c
+
 
 def generate(commandline, variable_manager):
     find_option_code       = _make_find_option_code(commandline, variable_manager)
@@ -191,6 +195,7 @@ def generate(commandline, variable_manager):
         s = s.replace('%FIND_OPTION_CODE%\n', '')
 
     return s
+
 
 def _generate_option_cases(commandline, variable_manager):
     OptionCase = namedtuple('OptionCase', ['option_strings', 'variable', 'args'])

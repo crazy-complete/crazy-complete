@@ -124,6 +124,7 @@ grp.add_argument('-u', '--uninstall-system-wide', default=False, action='store_t
 _crazy_complete_argument_parser = p
 del p
 
+
 def write_string_to_file(string, file):
     '''Writes string to file if file is given.'''
 
@@ -132,6 +133,7 @@ def write_string_to_file(string, file):
             fh.write(string)
     else:
         print(string)
+
 
 def load_definition_file(opts):
     '''Load a definition file as specified in `opts`.'''
@@ -159,6 +161,7 @@ def load_definition_file(opts):
 
     raise AssertionError("Should not be reached")
 
+
 def _get_config_from_options(opts):
     conf = config.Config()
     conf.set_abbreviate_commands(opts.abbreviate_commands)
@@ -184,6 +187,7 @@ def _get_config_from_options(opts):
             conf.disable_when(True)
 
     return conf
+
 
 def generate(opts):
     '''Generate output file as specified in `opts`.'''
@@ -231,6 +235,7 @@ def generate(opts):
             os.remove(file)
     else:
         write_string_to_file(output, opts.output_file)
+
 
 class Application:
     '''Class for main command line application.'''

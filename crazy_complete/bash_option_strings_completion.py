@@ -7,7 +7,9 @@ from . import shell
 from . import bash_when
 from .str_utils import indent
 
+
 _Option = namedtuple('_Option', ('option', 'conditions', 'when'))
+
 
 def _make_option_strings(options):
     r = []
@@ -19,6 +21,7 @@ def _make_option_strings(options):
                 r.append(option_string)
     return ' '.join(shell.escape(option_string) for option_string in r)
 
+
 def _get_option_full_condition(option):
     if option.conditions and option.when:
         return '(( %s )) && %s' % (' && '.join(option.conditions), option.when)
@@ -28,6 +31,7 @@ def _get_option_full_condition(option):
         return '%s' % option.when
 
     return ''
+
 
 def _generate_option_strings_completion(options):
     r = []
@@ -41,6 +45,7 @@ def _generate_option_strings_completion(options):
 
     return '\n'.join(r)
 
+
 def _generate_final_check_with_options(final_conditions, options):
     option_strings_completion = _generate_option_strings_completion(options)
 
@@ -51,6 +56,7 @@ def _generate_final_check_with_options(final_conditions, options):
     r += '%s\n' % indent(option_strings_completion, 2)
     r += 'fi'
     return r
+
 
 def generate(generator):
     '''Generate option strings completion code.'''

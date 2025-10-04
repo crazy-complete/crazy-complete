@@ -12,6 +12,7 @@ from .str_utils import contains_space, is_valid_option_string, is_valid_variable
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-positional-arguments
 
+
 class ExtendedBool:
     '''Class that holds an extended bool.'''
 
@@ -19,10 +20,12 @@ class ExtendedBool:
     FALSE   = False
     INHERIT = 'INHERIT'
 
+
 def is_extended_bool(obj):
     '''Check if `obj` an instance of `ExtendedBool`.'''
 
     return obj in (True, False, ExtendedBool.INHERIT)
+
 
 class CommandLine:
     '''Represents a command line interface with options, positionals, and subcommands.'''
@@ -407,6 +410,7 @@ class CommandLine:
         return '{\nprog: %r,\nhelp: %r,\nabbreviate_commands: %r,\noptions: %r,\npositionals: %r,\nsubcommands: %r}' % (
             self.prog, self.help, self.abbreviate_commands, self.options, self.positionals, self.subcommands)
 
+
 class Positional:
     '''Class representing a command line positional.'''
 
@@ -517,6 +521,7 @@ class Positional:
             self.when       == other.when       and
             self.capture    == other.capture
         )
+
 
 class Option:
     '''Class representing a command line option.'''
@@ -720,6 +725,7 @@ class Option:
         return '{option_strings: %r, metavar: %r, help: %r}' % (
             self.option_strings, self.metavar, self.help)
 
+
 class SubCommandsOption(Positional):
     '''Class holding subcommands of a commandline.'''
 
@@ -780,6 +786,7 @@ class SubCommandsOption(Positional):
 
     def __repr__(self):
         return '{help: %r, subcommands %r}' % (self.help, self.subcommands)
+
 
 class MutuallyExclusiveGroup:
     '''Helper class for adding mutually exclusive options.'''

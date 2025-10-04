@@ -7,8 +7,10 @@ import subprocess
 
 from . import utils
 
+
 # pylint: disable=broad-exception-caught
 # pylint: disable=broad-exception-raised
+
 
 def _pkg_config(args):
     '''
@@ -33,6 +35,7 @@ def _pkg_config(args):
 
     raise Exception('Command `%s` failed: %s' % (' '.join(command), result.stderr.strip()))
 
+
 def get_bash_completion_file(program_name):
     '''Get the path for a Bash completion file.'''
 
@@ -45,6 +48,7 @@ def get_bash_completion_file(program_name):
 
     return f'{directory}/{program_name}'
 
+
 def get_fish_completion_file(program_name):
     '''Get the path for a Fish completion file.'''
 
@@ -56,6 +60,7 @@ def get_fish_completion_file(program_name):
         utils.warn(e)
 
     return f'{directory}/{program_name}.fish'
+
 
 def get_zsh_completion_file(program_name):
     '''Get the path for a Zsh completion file.'''

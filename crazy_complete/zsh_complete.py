@@ -6,6 +6,7 @@ from .str_utils import join_with_wrap, indent
 from .zsh_utils import escape_colon, escape_square_brackets
 from .type_utils import is_dict_type
 
+
 CHOICES_INLINE_THRESHOLD = 80
 # The `choices` command can in Zsh be expressed inline in an optspec, like this:
 #   (foo bar baz)
@@ -14,6 +15,7 @@ CHOICES_INLINE_THRESHOLD = 80
 #
 # This variable defines how big this string can get before a function
 # is used instead.
+
 
 class ZshCompleter(shell.ShellCompleter):
     '''Code generator for completing arguments in Zsh.'''

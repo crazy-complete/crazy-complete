@@ -14,8 +14,10 @@ _error = CrazySchemaValidationError
 # Helper functions for validating
 # =============================================================================
 
+
 def _has_set(dictionary, key):
     return (key in dictionary.value and dictionary.value[key].value is not None)
+
 
 def _get_required_arg(args, name):
     try:
@@ -23,15 +25,18 @@ def _get_required_arg(args, name):
     except IndexError:
         raise _error(f'Missing required arg `{name}`', args) from None
 
+
 def _get_optional_arg(args, default=None):
     try:
         return args.value.pop(0)
     except IndexError:
         return ValueWithTrace(default, '<default value>', 1, 1)
 
+
 def _require_no_more(args):
     if len(args.value) > 0:
         raise _error('Too many arguments provided', args)
+
 
 def _check_type(value, types, parameter_name=None):
     if not isinstance(value.value, types):
@@ -52,6 +57,7 @@ def _check_type(value, types, parameter_name=None):
             msg = f'{parameter_name}: {msg}'
         raise _error(msg, value)
 
+
 def _check_dictionary(dictionary, rules):
     _check_type(dictionary, (dict,))
 
@@ -65,14 +71,17 @@ def _check_dictionary(dictionary, rules):
         if rule[0] is True and key not in dictionary.value:
             raise _error(f'Missing required key: {key}', dictionary)
 
+
 # =============================================================================
 # Actual validation code
 # =============================================================================
+
 
 def _check_extended_bool(value):
     if not is_extended_bool(value.value):
         msg = f'Invalid value. Expected true, false or "{ExtendedBool.INHERIT}"'
         raise _error(msg, value)
+
 
 def _check_when(value):
     try:
@@ -80,8 +89,10 @@ def _check_when(value):
     except CrazyError as e:
         raise _error(f'when: {e}', value) from e
 
+
 def _check_void(args):
     _require_no_more(args)
+
 
 def _check_choices(args):
     choices = _get_required_arg(args, 'choices')
@@ -90,12 +101,13 @@ def _check_choices(args):
 
     if isinstance(choices.value, dict):
         for value, desc in choices.value.items():
-            _check_type(value, (str,int,float))
-            _check_type(desc,  (str,int,float))
+            _check_type(value, (str, int, float))
+            _check_type(desc,  (str, int, float))
 
     elif isinstance(choices.value, list):
         for value in choices.value:
-            _check_type(value, (str,int,float))
+            _check_type(value, (str, int, float))
+
 
 def _check_file(args):
     options = _get_optional_arg(args, {})
@@ -106,6 +118,7 @@ def _check_file(args):
     if _has_set(options, 'directory'):
         if options.value['directory'].value == '':
             raise _error('directory may not be empty', options.value['directory'])
+
 
 def _check_range(args):
     start = _get_required_arg(args, "start")
@@ -130,10 +143,12 @@ def _check_range(args):
     else:
         raise _error("step: cannot be 0", step)
 
+
 def _check_exec(args):
     command = _get_required_arg(args, "command")
     _check_type(command, (str,), "command")
     _require_no_more(args)
+
 
 def _check_value_list(args):
     options = _get_required_arg(args, 'options')
@@ -163,6 +178,7 @@ def _check_value_list(args):
         if len(separator.value) != 1:
             raise _error('Invalid length for separator', separator)
 
+
 def _check_combine(args):
     commands = _get_required_arg(args, 'commands')
     _require_no_more(args)
@@ -188,6 +204,7 @@ def _check_combine(args):
 
     if len(commands.value) == 1:
         raise _error('commands: Must contain more than one command', commands)
+
 
 def _check_complete(args):
     cmd = _get_required_arg(args, 'command')
@@ -230,6 +247,7 @@ def _check_complete(args):
         raise _error(f'Invalid command: {cmd.value}', cmd)
 
     commands[cmd.value](args)
+
 
 def _check_option(option):
     _check_dictionary(option, {
@@ -284,6 +302,7 @@ def _check_option(option):
         if not is_valid_variable_name(option.value['capture'].value):
             raise _error('Invalid variable name', option.value['capture'])
 
+
 def _check_positional(positional):
     _check_dictionary(positional, {
         'number':               (True,  (int,)),
@@ -307,6 +326,7 @@ def _check_positional(positional):
     if _has_set(positional, 'capture'):
         if not is_valid_variable_name(positional.value['capture'].value):
             raise _error('Invalid variable name', positional.value['capture'])
+
 
 def _check_definition(definition):
     _check_dictionary(definition, {
@@ -346,6 +366,7 @@ def _check_definition(definition):
     if _has_set(definition, 'positionals'):
         for positional in definition.value['positionals'].value:
             _check_positional(positional)
+
 
 def validate(definition_list):
     '''Validate a list of definitions.'''

@@ -5,7 +5,9 @@ from . import shell
 from . import preprocessor
 from .str_utils import indent
 
+
 # pylint: disable=too-few-public-methods
+
 
 class FunctionBase:
     '''Base class for functions.'''
@@ -17,6 +19,7 @@ class FunctionBase:
     def get_code(self):
         '''Return the whole function.'''
         raise NotImplementedError
+
 
 class ShellFunction(FunctionBase):
     '''Class for generating Bash and Zsh functions.'''
@@ -34,6 +37,7 @@ class ShellFunction(FunctionBase):
         r += '}'
         return r
 
+
 class FishFunction(FunctionBase):
     '''Class for generating Fish functions.'''
 
@@ -50,6 +54,7 @@ class FishFunction(FunctionBase):
         r += 'end'
         return r
 
+
 def make_completion_funcname_for_context(ctxt):
     '''TODO.'''
 
@@ -64,6 +69,7 @@ def make_completion_funcname_for_context(ctxt):
         return '%s_%s' % (funcname, shell.make_identifier(ctxt.option.metavar))
 
     raise AssertionError('make_completion_funcname_for_context: Should not be reached')
+
 
 class GeneralHelpers:
     '''Class for including functions in the generation process.'''

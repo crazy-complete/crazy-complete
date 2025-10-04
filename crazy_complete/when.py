@@ -4,7 +4,9 @@ import shlex
 
 from .errors import CrazyError
 
+
 # pylint: disable=too-few-public-methods
+
 
 class OptionIs:
     '''Class for holding `option_is`.'''
@@ -28,6 +30,7 @@ class OptionIs:
         if not self.values:
             raise CrazyError('OptionIs: Empty values')
 
+
 class HasOption:
     '''Class for holding `has_option`.'''
 
@@ -36,6 +39,7 @@ class HasOption:
 
         if not self.options:
             raise CrazyError('HasOption: Empty options')
+
 
 def parse_when(s):
     '''Parse `when` string and return an object.'''

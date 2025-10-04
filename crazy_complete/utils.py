@@ -4,15 +4,18 @@ import sys
 from collections import namedtuple
 from .type_utils import is_list_type
 
+
 def warn(*a):
     '''Print a warning.'''
 
     print('WARNING:', *a, file=sys.stderr)
 
+
 def print_err(*a):
     '''Print to STDERR.'''
 
     print(*a, file=sys.stderr)
+
 
 class GeneralAbbreviationGenerator:
     '''A class for generating abbreviations from a list of words.
@@ -90,6 +93,7 @@ class GeneralAbbreviationGenerator:
             r.extend(self.get_abbreviations(word))
         return r
 
+
 class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
     '''AbbreviationGenerator for abbreviating long and old-style options.'''
 
@@ -109,11 +113,13 @@ class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
 
         super().__init__(3, words)
 
+
 class CommandAbbreviationGenerator(GeneralAbbreviationGenerator):
     '''AbbreviationGenerator for abbreviating commands.'''
 
     def __init__(self, words):
         super().__init__(1, words)
+
 
 class DummyAbbreviationGenerator:
     '''A dummy abbreviation generator that returns the original word as the abbreviation.
@@ -140,6 +146,7 @@ class DummyAbbreviationGenerator:
 
         return words
 
+
 def get_option_abbreviator(commandline):
     '''Return an OptionAbbreviationGenerator for options in `commandline`.'''
 
@@ -154,6 +161,7 @@ def get_option_abbreviator(commandline):
         option_strings.extend(option.get_old_option_strings())
 
     return OptionAbbreviationGenerator(option_strings)
+
 
 def get_all_command_variations(commandline):
     '''Return all possible names for this command.
@@ -173,6 +181,7 @@ def get_all_command_variations(commandline):
         abbrevs = DummyAbbreviationGenerator()
 
     return abbrevs.get_abbreviations(commandline.prog) + commandline.aliases
+
 
 def get_defined_option_types(commandline):
     '''Return a tuple of defined option types.'''
@@ -233,6 +242,7 @@ def get_defined_option_types(commandline):
         old_required,      old_optional,     old_flag,
         old_required   or  old_optional   or old_flag)
 
+
 def get_query_option_strings(commandline, with_parent_options=True):
     '''Return a string that can be used by {fish,zsh}_query functions.
 
@@ -251,6 +261,7 @@ def get_query_option_strings(commandline, with_parent_options=True):
             r.extend(option.option_strings)
 
     return ','.join(r)
+
 
 def is_worth_a_function(commandline):
     '''Check if a commandline "is worth a function".

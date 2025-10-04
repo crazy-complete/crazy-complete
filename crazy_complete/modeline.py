@@ -1,5 +1,6 @@
 '''Vim modeline string.'''
 
+
 def get_vim_modeline(filetype):
     '''Return a vim modeline string.'''
 

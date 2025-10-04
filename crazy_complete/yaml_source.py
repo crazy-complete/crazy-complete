@@ -12,7 +12,9 @@ from .str_utils import indent
 from .extended_yaml_parser import ExtendedYAMLParser
 from .cli import ExtendedBool
 
+
 # pylint: disable=redefined-builtin
+
 
 def option_to_yaml(dictionary):
     '''Convert an option dictionary to YAML.'''
@@ -63,6 +65,7 @@ def option_to_yaml(dictionary):
 
     return r.rstrip()
 
+
 def positional_to_yaml(dictionary):
     '''Convert a positional dictionary to YAML.'''
 
@@ -95,6 +98,7 @@ def positional_to_yaml(dictionary):
         r += '  capture: %s\n' % json.dumps(capture)
 
     return r.rstrip()
+
 
 def to_yaml(dictionary):
     '''Convert a single dictionary to YAML.'''
@@ -139,6 +143,7 @@ def to_yaml(dictionary):
 
     return r.rstrip()
 
+
 def commandline_to_yaml(commandline):
     '''Convert a cli.CommandLine object to YAML.'''
 
@@ -149,6 +154,7 @@ def commandline_to_yaml(commandline):
         r.append(to_yaml(dictionary))
 
     return '\n---\n'.join(r)
+
 
 def load_from_file(file):
     '''Load a YAML file and turn it into a cli.CommandLine object.'''

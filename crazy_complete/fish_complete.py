@@ -15,6 +15,7 @@ CHOICES_INLINE_THRESHOLD = 80
 # This variable defines how big this string can get before a function
 # is used instead.
 
+
 class FishCompletionBase:
     '''Base class for Fish completions.'''
 
@@ -31,6 +32,7 @@ class FishCompletionBase:
         '''Return the code that can be used for completing an argument.'''
         raise NotImplementedError
 
+
 class FishCompleteNone(FishCompletionBase):
     '''Class for completing an argument without a completer.'''
 
@@ -40,10 +42,11 @@ class FishCompleteNone(FishCompletionBase):
     def get_code(self):
         return ''
 
+
 class FishCompletionCommand(FishCompletionBase):
     '''Class for executing a command and parsing its output.'''
 
-    def  __init__(self, command):
+    def __init__(self, command):
         self.command = command
 
     def get_code(self):
@@ -51,6 +54,7 @@ class FishCompletionCommand(FishCompletionBase):
 
     def get_args(self):
         return ['-f', '-a', '(%s)' % self.command]
+
 
 class FishCompleteChoices(FishCompletionBase):
     '''Class for completing choices.'''
@@ -143,6 +147,7 @@ class FishCompleteFileDir(FishCompletionBase):
 
         return '__fish_complete_directories'
 
+
 class FishCompleteValueList(FishCompletionBase):
     '''Class for completing a list of values.'''
 
@@ -173,6 +178,7 @@ class FishCompleteValueList(FishCompletionBase):
     def get_code(self):
         return self.cmd
 
+
 class FishCompleteCombine(FishCompletionBase):
     '''Used for combining multiple complete commands.'''
 
@@ -198,6 +204,7 @@ class FishCompleteCombine(FishCompletionBase):
         funcname = self.ctxt.helpers.get_unique_function_name(self.ctxt)
         self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
         return ['-f', '-a', '(%s)' % self.ctxt.helpers.use_function(funcname)]
+
 
 class FishCompleter(shell.ShellCompleter):
     '''Code generator for completing arguments in Fish.'''

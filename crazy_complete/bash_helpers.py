@@ -132,6 +132,7 @@ command aplay -l \
   builtin echo "hw:$id"
 done''')
 
+
 class BashHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Bash.'''
 

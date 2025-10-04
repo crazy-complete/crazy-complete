@@ -44,6 +44,7 @@ done'''
 
 _OPT_ISSET = '_OPT_ISSET_'
 
+
 def generate(commandline, variable_manager):
     commandlines           = list(reversed(commandline.get_all_commandlines()))
     subcommand_switch_code = make_subcommand_switch_code(commandline)
@@ -93,6 +94,7 @@ def generate(commandline, variable_manager):
 
     return s
 
+
 def _make_long_option_case(long_options, option, variable):
     r = ''
 
@@ -117,6 +119,7 @@ def _make_long_option_case(long_options, option, variable):
 
     return r
 
+
 def _make_short_option_case(short_options, option, variable):
     r = ''
 
@@ -139,6 +142,7 @@ def _make_short_option_case(short_options, option, variable):
         r += '  %s+=(%s);;' % (variable, _OPT_ISSET)
 
     return r
+
 
 def _generate_option_cases(commandline, variable_manager):
     OptionCases = namedtuple('OptionCases', ['long_options', 'short_options'])

@@ -6,6 +6,7 @@ import collections
 from . import cli
 from . import utils
 
+
 def make_identifier(string):
     '''Make `string` a valid shell identifier.
 
@@ -27,10 +28,12 @@ def make_identifier(string):
         return '_' + string
     return string
 
+
 def needs_escape(string):
     '''Return if string needs escaping.'''
 
     return not re.fullmatch('[a-zA-Z0-9_@%+=:,./-]+', string)
+
 
 def escape(string, escape_empty_string=True):
     '''Escapes special characters in a string for safe usage in shell commands or scripts.
@@ -57,6 +60,7 @@ def escape(string, escape_empty_string=True):
         return '"%s"' % string.replace('\\', '\\\\').replace('$', '\\$').replace('`', '\\`')
 
     return "'%s'" % string.replace("'", '\'"\'"\'')
+
 
 def make_completion_funcname(cmdline, prefix='_', suffix=''):
     '''Generates a function name for auto-completing a program or subcommand.
@@ -85,6 +89,7 @@ def make_completion_funcname(cmdline, prefix='_', suffix=''):
     identifier = make_identifier('_'.join(p.prog for p in commandlines))
 
     return f'{prefix}{identifier}{suffix}'
+
 
 class ShellCompleter:
     '''Base class for argument completion.'''

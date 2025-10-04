@@ -3,6 +3,7 @@
 from . import when
 from . import shell
 
+
 def _generate_option_is(commandline, variable_manager, obj):
     conditions = []
 
@@ -28,6 +29,7 @@ def _generate_option_is(commandline, variable_manager, obj):
 
     return '{ %s; }' % ' || '.join(conditions)
 
+
 def _generate_has_option(commandline, variable_manager, obj):
     conditions = []
 
@@ -39,6 +41,7 @@ def _generate_has_option(commandline, variable_manager, obj):
         return conditions[0]
 
     return '{ %s; }' % ' || '.join(conditions)
+
 
 def generate_when_conditions(commandline, variable_manager, when_):
     '''Generate when condition code.'''

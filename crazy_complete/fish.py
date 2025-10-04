@@ -14,6 +14,7 @@ from .fish_utils import FishCompleteCommand, VariableManager
 from . import when
 from . import generation
 
+
 class FishQuery:
     '''Class for querying the command line.'''
 
@@ -55,6 +56,7 @@ class FishQuery:
         if isinstance(obj, when.HasOption):
             return self.has_option(obj.options)
         raise AssertionError("Should not be reached")
+
 
 class Conditions:
     NumOfPositionals = namedtuple('NumOfPositionals', ['operator', 'value'])
@@ -118,6 +120,7 @@ class Conditions:
 
         return '"%s"' % ' && '.join(conditions)
 
+
 class FishCompletionDefinition:
     def __init__(
           self,
@@ -162,6 +165,7 @@ class FishCompletionDefinition:
 
         return cmd
 
+
 def _get_positional_contains(option):
     cmdlines = option.parent.get_parents(include_self=True)
     del cmdlines[0]
@@ -173,6 +177,7 @@ def _get_positional_contains(option):
         r[cmdline.parent.get_subcommands().get_positional_num()] = cmds
 
     return r
+
 
 class FishCompletionGenerator:
     def __init__(self, ctxt, commandline):
@@ -289,6 +294,7 @@ class FishCompletionGenerator:
         definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
         definition.conditions.positional_contains = _get_positional_contains(option)
         return definition
+
 
 def generate_completion(commandline, config=None):
     '''Code for generating a Fish auto completion file.'''

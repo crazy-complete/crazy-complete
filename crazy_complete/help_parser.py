@@ -3,6 +3,7 @@
 import re
 from collections import namedtuple
 
+
 # Characters that should not be considered option chars
 OPTION_BREAK_CHARS = [' ', '\t', '\n', ',', '|', '=', '[']
 
@@ -12,6 +13,7 @@ OPTION_DELIMITER_CHARS = [',', '|']
 Unparsed = namedtuple('Unparsed', ['text'])
 OptionWithMetavar = namedtuple('OptionWithMetavar', ['option', 'metavar', 'optional'])
 OptionsWithDescription = namedtuple('OptionsWithDescription', ['options', 'description'])
+
 
 class CharStream:
     """A utility class for sequentially reading characters from a string."""
@@ -23,7 +25,7 @@ class CharStream:
 
     def peek(self, relative_pos = 0):
         """
-        Returns the character at the current position plus an optional relative offset 
+        Returns the character at the current position plus an optional relative offset
         without advancing the stream. Returns None if the position is out of bounds.
         """
         try:
@@ -33,7 +35,7 @@ class CharStream:
 
     def peek_str(self, length):
         """
-        Returns a substring of the specified length starting from the current position 
+        Returns a substring of the specified length starting from the current position
         without advancing the stream.
         """
         return self.string[self.pos:self.pos + length]
@@ -66,6 +68,7 @@ class CharStream:
             i += 1
         return f"CharStream({line!r})"
 
+
 def eat_line(stream):
     '''Read the remainling line and return it (including the newline character).'''
     content = ''
@@ -76,12 +79,14 @@ def eat_line(stream):
             break
     return content
 
+
 def eat_space(stream):
     '''Read spaces and tabs and return it.'''
     content = ''
     while stream.is_space():
         content += stream.get()
     return content
+
 
 def parse_option_string(stream):
     '''Read an option string and return it.
@@ -109,6 +114,7 @@ def parse_option_string(stream):
     stream.pos = p.pos
     return option
 
+
 def parse_bracket(stream):
     '''Read and return a bracketed expression.
 
@@ -132,6 +138,7 @@ def parse_bracket(stream):
             break
 
     return content
+
 
 def parse_quoted_string(stream):
     '''Read and return a string.
@@ -157,15 +164,16 @@ def parse_quoted_string(stream):
 
     return content
 
+
 def parse_metavar(stream):
     '''Read and return a metavar.
 
     Everything until a tab, space or newline is considered a metavar.
 
     Special cases:
-      - Bracketed expressions (e.g., '<foo bar>') and quoted strings (e.g., '"foo bar"') 
+      - Bracketed expressions (e.g., '<foo bar>') and quoted strings (e.g., '"foo bar"')
         are handled, and the spaces within them are preserved.
-      - The function supports metavars enclosed by `<`, `[`, `(`, `{`, as well as 
+      - The function supports metavars enclosed by `<`, `[`, `(`, `{`, as well as
         single (`'`) and double (`"`) quotes.
 
     Metavars are:
@@ -188,6 +196,7 @@ def parse_metavar(stream):
 
     return metavar
 
+
 def parse_trailing_description_line(stream):
     '''Reads and returns a trailing description line.
 
@@ -209,6 +218,7 @@ def parse_trailing_description_line(stream):
     stream.pos = p.pos
     return content
 
+
 def parse_description(stream):
     '''Reads and returns the description of an option.'''
     eat_space(stream)
@@ -221,6 +231,7 @@ def parse_description(stream):
             break
 
     return content
+
 
 def parse_option_with_metavar(stream):
     '''Read and return an option with its metavar (if any).
@@ -262,6 +273,7 @@ def parse_option_with_metavar(stream):
 
     return None
 
+
 def parse_option_delimiter(stream):
     '''Parse an option delimiter and return True if it was found, False otherwise.'''
     p = stream.copy()
@@ -270,6 +282,7 @@ def parse_option_delimiter(stream):
         stream.pos = p.pos
         return True
     return False
+
 
 def parse_options_with_description(stream):
     '''Parse options with description.'''
@@ -295,6 +308,7 @@ def parse_options_with_description(stream):
 
     return OptionsWithDescription(options, description)
 
+
 def parse(stream):
     """Parses the stream and returns a list of options with descriptions or unparsed lines."""
     r = []
@@ -308,6 +322,7 @@ def parse(stream):
             r.append(Unparsed(line))
 
     return r
+
 
 def get_program_name_from_help(string):
     """Extracts the program name from the help string."""

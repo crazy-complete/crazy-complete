@@ -13,7 +13,9 @@ from . import zsh_helpers
 from . import zsh_utils
 from .str_utils import indent
 
+
 Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
+
 
 class ZshQuery:
     '''Helper class for using the `zsh_query` function.'''
@@ -32,6 +34,7 @@ class ZshQuery:
         if 'has_option' in when:
             self.use('has_option')
         return self.use()
+
 
 class ZshCompletionFunction:
     '''Class for generating a zsh completion function.'''
@@ -224,6 +227,7 @@ class ZshCompletionFunction:
         return '%s() {\n%s\n}' % (
             self.funcname,
             indent('\n\n'.join(c for c in self.code.values() if c), 2))
+
 
 def generate_completion(commandline, config=None):
     '''Code for generating a Zsh auto completion file.'''

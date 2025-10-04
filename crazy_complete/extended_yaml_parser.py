@@ -8,7 +8,9 @@ from yaml.events import (StreamStartEvent, DocumentStartEvent, DocumentEndEvent,
 from .value_with_trace import ValueWithTrace
 from .errors import CrazySchemaValidationError
 
+
 _error = CrazySchemaValidationError
+
 
 class ExtendedYAMLParser:
     '''Parse YAML with the ability to trace the origin of parsed values.'''

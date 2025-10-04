@@ -1,5 +1,6 @@
 '''Contains code for preprocessing text.'''
 
+
 def preprocess(string, defines):
     '''Simple preprocessor function with #ifdef, #else, and #endif support.'''
 
@@ -44,6 +45,7 @@ def strip_double_empty_lines(string):
 
     return string.replace('\n\n\n', '\n\n')
 
+
 def _test():
     string = """\
 Lorem Ipsum
@@ -60,6 +62,7 @@ Dolor Sit Amet\
     defines = ["DEBUG"]
     result = preprocess(string, defines)
     print(result)
+
 
 if __name__ == '__main__':
     _test()

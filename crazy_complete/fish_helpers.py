@@ -436,6 +436,7 @@ for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
   end
 end''')
 
+
 class FishHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Fish.'''
 

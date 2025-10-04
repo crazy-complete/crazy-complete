@@ -1,5 +1,6 @@
 '''Value holder class with line and column information'''
 
+
 class ValueWithTrace:
     '''Represents a value from a configuration file along with its metadata.
 

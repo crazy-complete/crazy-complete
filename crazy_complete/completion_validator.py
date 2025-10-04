@@ -7,17 +7,20 @@ from .type_utils import is_dict_type, is_list_type
 # Helper functions
 # =============================================================================
 
+
 def _get_required_arg(args, name):
     try:
         return args.pop(0)
     except IndexError:
         raise CrazyError(f'Missing argument: {name}') from None
 
+
 def _get_optional_arg(args, default=None):
     try:
         return args.pop(0)
     except IndexError:
         return default
+
 
 def _require_no_more(args):
     if args:
@@ -27,11 +30,14 @@ def _require_no_more(args):
 # Command validation functions
 # =============================================================================
 
+
 def _validate_none(_args):
     pass
 
+
 def _validate_void(args):
     _require_no_more(args)
+
 
 def _validate_choices(args):
     choices = _get_required_arg(args, 'values')
@@ -53,6 +59,7 @@ def _validate_choices(args):
     else:
         raise CrazyError('values: Not a list or dictionary')
 
+
 def _validate_file(args):
     opts = _get_optional_arg(args, {})
     _require_no_more(args)
@@ -69,6 +76,7 @@ def _validate_file(args):
                 raise CrazyError('directory: Cannot be empty')
         else:
             raise CrazyError(f'Unknown option: {key}')
+
 
 def _validate_range(args):
     start = _get_required_arg(args, "start")
@@ -94,12 +102,14 @@ def _validate_range(args):
     else:
         raise CrazyError("step: cannot be 0")
 
+
 def _validate_exec(args):
     cmd = _get_required_arg(args, 'command')
     _require_no_more(args)
 
     if not isinstance(cmd, str):
         raise CrazyError(f"Command is not a string: {cmd}")
+
 
 def _validate_value_list(args):
     opts = _get_required_arg(args, 'options')
@@ -143,6 +153,7 @@ def _validate_value_list(args):
     if len(separator) != 1:
         raise CrazyError(f'Invalid length for separator: {separator}')
 
+
 def _validate_combine(args):
     commands = _get_required_arg(args, 'commands')
     _require_no_more(args)
@@ -174,6 +185,7 @@ def _validate_combine(args):
 # =============================================================================
 # Real validation functions
 # =============================================================================
+
 
 def validate_complete(complete):
     '''Validate a completion command.'''
@@ -225,6 +237,7 @@ def validate_complete(complete):
 
     validate_commands[command](args)
 
+
 def validate_commandline(cmdline):
     '''Validate completion commands of options/positionals in a commandline.'''
 
@@ -246,6 +259,7 @@ def validate_commandline(cmdline):
                 positional.number,
                 positional.metavar,
                 e)) from e
+
 
 def validate_commandlines(cmdline):
     '''Validate completion commands of options/positionals in all commandlines.'''

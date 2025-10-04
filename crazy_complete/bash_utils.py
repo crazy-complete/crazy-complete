@@ -2,6 +2,7 @@
 
 from . import shell
 
+
 def make_option_variable_name(option, prefix=''):
     '''Make a variable for an option.'''
     long_options = option.get_long_option_strings()

@@ -6,6 +6,7 @@ import importlib
 import tempfile
 import __main__
 
+
 def execute_file(file):
     '''Import file using compile + exec.'''
     with open(os.devnull, 'w', encoding='utf-8') as null_fh:
@@ -26,6 +27,7 @@ def execute_file(file):
             sys.stderr = sys.__stderr__
 
     return __main__
+
 
 def import_file(file):
     '''Import file using importlib.'''

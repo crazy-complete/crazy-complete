@@ -14,6 +14,7 @@ from .cli import CommandLine, MutuallyExclusiveGroup
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access
 
+
 def range_to_complete(r):
     '''Convert a Python range object to a range complete format.'''
 
@@ -25,6 +26,7 @@ def range_to_complete(r):
         return ('range', start, end)
 
     return ('range', start, end, step)
+
 
 def get_complete(action):
     '''
@@ -70,6 +72,7 @@ def get_complete(action):
 
     raise CrazyError(f'Unknown action type: {action}')
 
+
 def get_final(action):
     '''Return if an argparse action object is final.'''
 
@@ -77,6 +80,7 @@ def get_final(action):
         return True
 
     return action.get_final()
+
 
 def argumentparser_to_commandline(parser, prog=None, description=None):
     '''Converts an ArgumentParser object to a CommandLine object.
@@ -177,6 +181,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
 
     return commandline
 
+
 def find_objects_by_type(module, types):
     '''Search for objects in the specified module that match the given types.'''
 
@@ -188,6 +193,7 @@ def find_objects_by_type(module, types):
             r.append(obj)
 
     return r
+
 
 def find_root_argument_parsers(module):
     '''Return a list of all ArgumentParser objects that have no parent.'''
@@ -203,6 +209,7 @@ def find_root_argument_parsers(module):
                 pass
 
     return parsers
+
 
 def load_from_file(file, parser_variable=None, parser_blacklist=()):
     '''

@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 
+
 def flatten(iterable):
     '''Flatten a list of iterables into a single list.'''
 
@@ -9,6 +10,7 @@ def flatten(iterable):
     for item in iterable:
         result.extend(item)
     return result
+
 
 def uniq(iterable):
     '''Return list of unique items, preserving order.'''
@@ -20,6 +22,7 @@ def uniq(iterable):
             seen.add(item)
             result.append(item)
     return result
+
 
 def partition(iterable, predicate):
     '''Split an iterable into two lists based on a predicate.
@@ -42,7 +45,8 @@ def partition(iterable, predicate):
             a.append(item)
         else:
             b.append(item)
-    return (a,b)
+    return (a, b)
+
 
 def group_by(iterable, keyfunc):
     '''Group items from an iterable by a key function.

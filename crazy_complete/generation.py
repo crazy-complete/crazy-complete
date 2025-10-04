@@ -6,6 +6,7 @@ from . import cli
 from . import config as _config
 from . import when
 
+
 class GenerationContext:
     '''Holds global configuration and helpers used during code generation.'''
 
@@ -25,6 +26,7 @@ class GenerationContext:
             option
         )
 
+
 class OptionGenerationContext(GenerationContext):
     '''Extends GenerationContext; holds commandline and option objects.'''
 
@@ -34,6 +36,7 @@ class OptionGenerationContext(GenerationContext):
         super().__init__(config, helpers)
         self.commandline = commandline
         self.option = option
+
 
 def _apply_config(commandline, config):
     '''Applies configuration settings to a command line object.
@@ -90,6 +93,7 @@ def _apply_config(commandline, config):
         for positional in commandline.positionals:
             positional.when = None
 
+
 def _add_parsed_when(commandline):
     for option in commandline.options:
         if option.when:
@@ -116,6 +120,7 @@ def _add_parsed_when(commandline):
                     positional.when,
                     e)) from e
 
+
 def enhance_commandline(commandline, config):
     '''Enhance commandline.
 
@@ -129,6 +134,7 @@ def enhance_commandline(commandline, config):
     commandline.visit_commandlines(_add_parsed_when)
     completion_validator.validate_commandlines(commandline)
     return commandline
+
 
 def visit_commandlines(completion_class, ctxt, commandline):
     '''Visit commandlines with a completer class.'''

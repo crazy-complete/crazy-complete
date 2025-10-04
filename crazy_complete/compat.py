@@ -5,6 +5,7 @@ from . import utils
 # Wrong types in configuration structures are silently ignored, because
 # they are handled elsewhere
 
+
 def fix_option_dictionary(dictionary):
     '''Fix an option dictionary.'''
 
@@ -19,6 +20,7 @@ def fix_option_dictionary(dictionary):
             utils.warn('`group` is deprecated. Please use `groups` instead')
             dictionary['groups'] = [dictionary.pop('group')]
 
+
 def fix_commandline_dictionary(dictionary):
     '''Fix a commandline dictionary.'''
 
@@ -30,6 +32,7 @@ def fix_commandline_dictionary(dictionary):
     if isinstance(options, list):
         for option in options:
             fix_option_dictionary(option)
+
 
 def fix_commandline_dictionaries(dictionaries):
     '''Fix a list of commandline dictionaries.'''

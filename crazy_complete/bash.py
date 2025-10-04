@@ -20,6 +20,7 @@ from .str_utils import indent
 from .bash_utils import VariableManager
 from . import generation
 
+
 class BashCompletionGenerator:
     def __init__(self, ctxt, commandline):
         self.commandline = commandline
@@ -140,13 +141,13 @@ class BashCompletionGenerator:
             # This sets up END_OF_OPTIONS, POSITIONALS and the OPT_* variables.
             code['command_line_parsing'] = self._generate_commandline_parsing()
 
-
         r  = '%s() {\n' % shell.make_completion_funcname(self.commandline)
         r += '%s\n\n'   % indent('\n\n'.join(c for c in code.values() if c), 2)
         r += '  return 1\n'
         r += '}'
 
         self.result = r
+
 
 def generate_completion(commandline, config=None):
     '''Code for generating a Bash auto completion file.'''

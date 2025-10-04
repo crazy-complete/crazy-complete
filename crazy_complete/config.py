@@ -1,13 +1,15 @@
 '''This module contains the configuration class.'''
 
-# pylint: disable=too-many-instance-attributes
 
 def _assert_is_bool(obj, func, param):
     if not isinstance(obj, bool):
         raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")
 
+
 class Config:
     '''Class representing configuration settings for command line completion.'''
+
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self):
         self.abbreviate_commands    = False

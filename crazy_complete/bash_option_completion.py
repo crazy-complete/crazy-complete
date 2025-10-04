@@ -6,6 +6,7 @@ from . import bash_when
 from . import bash_utils
 from .str_utils import indent
 
+
 class MasterCompletionFunction:
     '''Class for generating a master completion function.'''
 
@@ -86,6 +87,7 @@ class MasterCompletionFunction:
 
         return None
 
+
 class _Info:
     def __init__(self, options, abbreviations, commandline, ctxt):
         self.commandline    = commandline
@@ -145,6 +147,7 @@ class _Info:
                 elif option.complete:
                     self.short_required = True
 
+
 def _get_prev_completion(info):
     r =  'case "$prev" in\n'
 
@@ -165,6 +168,7 @@ def _get_prev_completion(info):
 
     r += 'esac'
     return r
+
 
 def _get_cur_completion(info):
     r =  'case "$cur" in\n'
@@ -207,6 +211,7 @@ def _get_cur_completion(info):
     r += 'esac'
     return r
 
+
 def _get_dispatcher(info):
     r = []
 
@@ -218,6 +223,7 @@ def _get_dispatcher(info):
         r += [_get_cur_completion(info)]
 
     return '\n\n'.join(r)
+
 
 def generate_option_completion(self):
     options = self.commandline.get_options(only_with_arguments=True)

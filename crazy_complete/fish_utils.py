@@ -3,6 +3,7 @@
 from .errors import InternalError
 from . import shell
 
+
 class FishString:
     '''A utility class for handling command-line strings that may or may not require escaping.
 
@@ -66,6 +67,7 @@ class FishString:
     def __repr__(self):
         return repr(self.s)
 
+
 def make_fish_string(s, raw):
     '''Make a fish string.'''
 
@@ -73,6 +75,7 @@ def make_fish_string(s, raw):
         return FishString(s, raw)
 
     return None
+
 
 class FishCompleteCommand:
     '''Class for creating Fish's `complete` command.'''
@@ -179,6 +182,7 @@ class FishCompleteCommand:
             r.extend(['-a', self.arguments])
 
         return ' '.join(v if isinstance(v, str) else v.escape() for v in r)
+
 
 class VariableManager:
     '''
