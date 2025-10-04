@@ -130,7 +130,9 @@ def dictionaries_to_commandline(dictionaries):
         progs = [c.prog for c in root.get_subcommands().subcommands]
         raise CrazyError(f"Too many main programs defined: {progs}")
 
-    return root.get_subcommands().subcommands[0]
+    cmdline = root.get_subcommands().subcommands[0]
+    cmdline.parent = None
+    return cmdline
 
 def option_to_dictionary(self):
     '''Convert a cli.Option object to a dictionary.'''
