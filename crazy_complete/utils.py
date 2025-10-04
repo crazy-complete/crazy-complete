@@ -177,21 +177,61 @@ def get_all_command_variations(commandline):
 def get_defined_option_types(commandline):
     '''Return a tuple of defined option types.'''
 
-    old   = False
-    long  = False
-    short = False
+    short_required = False
+    short_optional = False
+    short_flag     = False
+    long_required  = False
+    long_optional  = False
+    long_flag      = False
+    old_required   = False
+    old_optional   = False
+    old_flag       = False
+    positionals    = False
 
     for cmdline in commandline.get_all_commandlines():
-        for option in cmdline.options:
-            for option_string in option.option_strings:
-                if option_string.startswith('--'):
-                    long = True
-                elif len(option_string) == 2:
-                    short = True
-                else:
-                    old = True
+        if len(cmdline.get_positionals()) > 0:
+            positionals = True
 
-    return namedtuple('Types', ('short', 'long', 'old'))(short, long, old)
+        if cmdline.get_subcommands() and len(cmdline.get_subcommands().subcommands) > 0:
+            positionals = True
+
+        for option in cmdline.options:
+            if option.get_long_option_strings():
+                if option.complete and option.optional_arg is True:
+                    long_optional = True
+                elif option.complete:
+                    long_required = True
+                else:
+                    long_flag = True
+
+            if option.get_old_option_strings():
+                if option.complete and option.optional_arg is True:
+                    old_optional = True
+                elif option.complete:
+                    old_required = True
+                else:
+                    old_flag = True
+
+            if option.get_short_option_strings():
+                if option.complete and option.optional_arg is True:
+                    short_optional = True
+                elif option.complete:
+                    short_required = True
+                else:
+                    short_flag = True
+
+    return namedtuple('Types', (
+        'positionals',
+        'short_required', 'short_optional', 'short_flag', 'short',
+        'long_required',  'long_optional',  'long_flag',  'long',
+        'old_required',   'old_optional',   'old_flag',   'old'))(
+        positionals,
+        short_required,    short_optional,   short_flag,
+        short_required or  short_optional or short_flag,
+        long_required,     long_optional,    long_flag,
+        long_required  or  long_optional  or long_flag,
+        old_required,      old_optional,     old_flag,
+        old_required   or  old_optional   or old_flag)
 
 def get_query_option_strings(commandline, with_parent_options=True):
     '''Return a string that can be used by {fish,zsh}_query functions.

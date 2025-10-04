@@ -9,7 +9,9 @@ from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcom
 from .preprocessor import preprocess
 
 _PARSER_CODE = '''\
+#ifdef positionals
 POSITIONALS=()
+#endif
 END_OF_OPTIONS=0
 
 local cmd="root" argi arg i char trailing_chars VAR ARGS
@@ -27,7 +29,9 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
   case "$arg" in
     --)
       END_OF_OPTIONS=1
+#ifdef positionals
       POSITIONALS+=("${words[@]:$((++argi))}")
+#endif
       return;;
 #ifdef long_options
     --*=*)
@@ -75,12 +79,14 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
             else __append_to_array "$VAR" "${words[++argi]}"
             fi
             break;
+#ifdef short_optionals
           elif [[ "$ARGS" == '?' ]]; then
             if [[ -n "$trailing_chars" ]]
             then __append_to_array "$VAR" "$trailing_chars"
             else __append_to_array "$VAR" _OPT_ISSET_
             fi
             break;
+#endif
           else
             __append_to_array "$VAR" "_OPT_ISSET_"
           fi
@@ -88,19 +94,23 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
       done
 #endif
       ;;
+#ifdef positionals
     *)
       POSITIONALS+=("$arg")
 %SUBCOMMAND_SWITCH_CODE%
       ;;
+#endif
   esac
 done
+#ifdef positionals
 
 for ((; argi < ${#words[@]}; ++argi)); do
   case "${words[argi]}" in
     -?*);;
     *) POSITIONALS+=("${words[argi]}");;
   esac
-done'''
+done
+#endif'''
 
 _OPT_ISSET = '_OPT_ISSET_'
 
@@ -163,6 +173,10 @@ def generate(commandline, variable_manager):
         defines.append('long_options')
     if types.old:
         defines.append('old_options')
+    if types.short_optional:
+        defines.append('short_optionals')
+    if types.positionals:
+        defines.append('positionals')
 
     s = preprocess(_PARSER_CODE, defines)
 
