@@ -97,7 +97,7 @@ done
 _NET_INTERFACES_LIST = helpers.ShellFunction('net_interfaces_list', r'''
 if [[ -d /sys/class/net ]]; then
   command ls /sys/class/net
-elif ifconfig -l &>/dev/null; then
+elif command ifconfig -l &>/dev/null; then
   command ifconfig -l # BSD / macOS
 else
   command ifconfig 2>/dev/null | command awk '/^[a-z0-9]/ {print $1}' | command sed 's/://'
