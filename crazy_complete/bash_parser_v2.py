@@ -6,6 +6,7 @@ from . import utils
 from . import shell
 from .str_utils import indent
 from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
+from .preprocessor import preprocess
 
 _PARSER_CODE = '''\
 POSITIONALS=()
@@ -28,6 +29,7 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
       END_OF_OPTIONS=1
       POSITIONALS+=("${words[@]:$((++argi))}")
       return;;
+#ifdef long_options
     --*=*)
       if __find_option "$cmd" "${arg%%=*}"
       then __append_to_array "$VAR" "${arg#*=}"
@@ -39,7 +41,11 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
         else __append_to_array "$VAR" "_OPT_ISSET_"
         fi
       fi;;
+#else
+    --*);;
+#endif
     -?*) # ignore '-'
+#ifdef old_options
       if [[ "$arg" == -*=* ]]; then
         if __find_option "$cmd" "${arg%%=*}"; then
           __append_to_array "$VAR" "${arg#*=}"
@@ -55,7 +61,9 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
 
         continue
       fi
+#endif
 
+#ifdef short_options
       for ((i=1; i < ${#arg}; ++i)); do
         char="${arg:$i:1}"
         trailing_chars="${arg:$((i + 1))}"
@@ -77,7 +85,9 @@ for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
             __append_to_array "$VAR" "_OPT_ISSET_"
           fi
         fi
-      done;;
+      done
+#endif
+      ;;
     *)
       POSITIONALS+=("$arg")
 %SUBCOMMAND_SWITCH_CODE%
@@ -145,7 +155,16 @@ def generate(commandline, variable_manager):
     find_option_code       = _make_find_option_code(commandline, variable_manager)
     subcommand_switch_code = make_subcommand_switch_code(commandline)
 
-    s = _PARSER_CODE
+    defines = []
+    types = utils.get_defined_option_types(commandline)
+    if types.short:
+        defines.append('short_options')
+    if types.long:
+        defines.append('long_options')
+    if types.old:
+        defines.append('old_options')
+
+    s = preprocess(_PARSER_CODE, defines)
 
     if subcommand_switch_code:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_switch_code, 6))
