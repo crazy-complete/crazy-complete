@@ -3,6 +3,7 @@
 from . import shell
 from . import helpers
 from .type_utils import is_dict_type
+from .str_utils import indent, join_with_wrap
 
 CHOICES_INLINE_THRESHOLD = 80
 # The `choices` command can in Fish be expressed inline in a complete command
@@ -71,8 +72,8 @@ class FishCompleteChoices(FishCompletionBase):
     @staticmethod
     def _get_code_for_list(choices):
         code = "printf '%s\\n' \\\n"
-        for item in choices:
-            code += '  %s \\\n' % shell.escape(str(item))
+        escaped = [shell.escape(str(item)) for item in choices]
+        code += indent(join_with_wrap(' ', ' \\\n', 80, escaped), 2)
         return code.rstrip(' \\\n')
 
     @staticmethod
