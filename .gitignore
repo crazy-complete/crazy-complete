@@ -8,8 +8,8 @@ build/
 dist/
 pkg/
 src/
-python-cracy-complete/
-python-cracy-complete-*.pkg.*
+python-crazy-complete-*.pkg.*
+python-crazy-complete/
 
 # directory 'test'
 test/tests/output/
