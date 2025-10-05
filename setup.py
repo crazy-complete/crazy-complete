@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='crazy-complete',
-    version='0.3.5',
+    version='0.3.6',
     author='Benjamin Abendroth',
     author_email='braph93@gmx.de',
     packages=['crazy_complete'],
@@ -16,8 +16,7 @@ setup(
         'Programming Language :: Unix Shell',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
-        'Development Status :: 4 - Beta',
-        # 'Development Status :: 5 - Production/Stable',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
