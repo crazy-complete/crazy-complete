@@ -17,6 +17,9 @@ type rpmbuild || {
 }
 
 dnf install -y python3-setuptools
+dnf install -y python3-wheel
+dnf install -y python3-pip
+dnf install -y python3-packaging
 
 export PATH="$HOME/.local/share/gem/ruby/bin/:$PATH"
 
