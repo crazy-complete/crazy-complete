@@ -14,6 +14,11 @@ type git || {
 
 type python3 || {
   apt install -y python3
+  apt install -y python3-pip
+  apt install -y python3-pkg-resources
+  apt install -y python3-setuptools
+  apt install -y python3-wheel
+  apt install -y python3-packaging
 }
 
 type python || {
@@ -23,8 +28,6 @@ type python || {
 type ar || {
   apt install -y binutils
 }
-
-apt install -y python3-pkg-resources python3-setuptools
 
 export PATH="$HOME/.local/share/gem/ruby/3.1.0/bin/:$PATH"
 
