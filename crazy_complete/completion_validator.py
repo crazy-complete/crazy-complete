@@ -182,6 +182,15 @@ def _validate_combine(args):
     if len(commands) == 1:
         raise CrazyError('commands: Must contain more than one command')
 
+
+def _validate_history(args):
+    pattern = _get_required_arg(args, 'pattern')
+    _require_no_more(args)
+
+    if not isinstance(pattern, str):
+        raise CrazyError(f"Pattern is not a string: {pattern}")
+
+
 # =============================================================================
 # Real validation functions
 # =============================================================================
@@ -221,6 +230,7 @@ def validate_complete(complete):
         'exec_internal': _validate_exec,
         'value_list':    _validate_value_list,
         'combine':       _validate_combine,
+        'history':       _validate_history,
         # Bonus
         'mountpoint':    _validate_void,
         'net_interface': _validate_void,

@@ -273,6 +273,10 @@ class FishCompleter(shell.ShellCompleter):
     def combine(self, ctxt, commands):
         return FishCompleteCombine(ctxt, self, commands)
 
+    def history(self, ctxt, pattern):
+        func = ctxt.helpers.use_function('history')
+        return FishCompletionCommand('%s %s' % (func, shell.escape(pattern)))
+
     # =========================================================================
     # Bonus
     # =========================================================================

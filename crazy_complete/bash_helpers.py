@@ -90,6 +90,18 @@ for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
 done
 ''')
 
+_HISTORY = helpers.ShellFunction('history', r'''
+[[ -f "$HISTFILE" ]] || return
+
+local match
+
+while read -r match; do
+  if [[ "$match" == "$cur"* ]]; then
+    COMPREPLY+=("$(printf '%q' "$match")")
+  fi
+done < <(command grep -E -o -- "$1" "$HISTFILE")
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -143,6 +155,7 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
         self.add_function(_PREFIX_COMPREPLY)
+        self.add_function(_HISTORY)
         self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)

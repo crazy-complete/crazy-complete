@@ -205,6 +205,10 @@ class BashCompleter(shell.ShellCompleter):
     def combine(self, ctxt, commands):
         return BashCompleteCombine(ctxt, self, commands)
 
+    def history(self, ctxt, pattern):
+        funcname = ctxt.helpers.use_function('history')
+        return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(pattern)))
+
     # =========================================================================
     # Bonus
     # =========================================================================

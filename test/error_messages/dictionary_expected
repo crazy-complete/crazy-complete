@@ -125,5 +125,8 @@
 3_22_07-combine-subcommand-is-none       | foo: -o: Command `none` not allowed inside combine
 3_22_08-combine-subcommand-is-combine    | foo: -o: Nested `combine` not allowed
 3_22_09-combine-too-many-args            | foo: -o: Too many arguments: ['wrong']
+3_23_00-history-missing-arg              | foo: -o: Missing argument: pattern
+3_23_01-history-too-many-arguments       | foo: -o: Too many arguments: ['wrong']
+3_23_02-history-pattern-wrong-type       | foo: -o: Pattern is not a string: False
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field

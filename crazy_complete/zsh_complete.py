@@ -181,6 +181,11 @@ class ZshCompleter(shell.ShellCompleter):
         funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
         return funcname
 
+    def history(self, ctxt, pattern):
+        func = ctxt.helpers.use_function('history')
+        cmd = '{%s %s}' % (func, shell.escape(pattern))
+        return shell.escape(cmd)
+
     # =========================================================================
     # Bonus
     # =========================================================================

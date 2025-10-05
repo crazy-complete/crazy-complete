@@ -41,6 +41,7 @@ cmdp.add_argument('--value-list',       help='Complete a list').complete('value_
 cmdp.add_argument('--value-list-2',     help='Complete a list').complete('value_list', {'values': {'foo': 'Some foo', 'bar': 'Some bar'}})
 cmdp.add_argument('--range-1',          help='Complete a range', type=int, choices=range(1,10))
 cmdp.add_argument('--range-2',          help='Complete a range', type=int, choices=range(1,10,2))
+cmdp.add_argument('--history',          help='Complete a history').complete('history', '[^"\' ]+@[^"\' ]+(/[^"\' ]+)?')
 cmdp.add_argument('--mountpoint',       help='Complete a mountpoint').complete('mountpoint')
 cmdp.add_argument('--net',              help='Complete a network interface').complete('net_interface')
 cmdp.add_argument('--shell',            help='Complete a login shell').complete('login_shell')

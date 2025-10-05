@@ -125,5 +125,8 @@
 3_22_07-combine-subcommand-is-none       | line 4, column 38: Command `none` not allowed inside combine
 3_22_08-combine-subcommand-is-combine    | line 4, column 38: Nested `combine` not allowed
 3_22_09-combine-too-many-args            | line 4, column 15: Too many arguments provided
+3_23_00-history-missing-arg              | line 4, column 15: Missing required arg `pattern`
+3_23_01-history-too-many-arguments       | line 4, column 15: Too many arguments provided
+3_23_02-history-pattern-wrong-type       | line 4, column 27: pattern: Invalid type. Expected types: string
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary

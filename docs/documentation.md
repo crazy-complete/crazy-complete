@@ -143,6 +143,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [service](#service)              | Complete a SystemD service                                                  |
 | [variable](#variable)            | Complete a shell variable                                                   |
 | [environment](#environment)      | Complete a environment variable                                             |
+| [history](#history)              | Complete based on a shell's history                                         |
 
 
 ### Bonus Commands
@@ -588,6 +589,24 @@ options:
  ~ > example --environment=X<TAB>
 XDG_RUNTIME_DIR  XDG_SEAT  XDG_SESSION_CLASS  XDG_SESSION_ID
 XDG_SESSION_TYPE XDG_VTNR
+```
+
+### history
+
+> Complete based on a shell's history.
+
+> The argument is an extended regular expression passed to `grep -E`.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--history"]
+    complete: ["history", '[a-zA-Z0-9]+@[a-zA-Z0-9]+']
+```
+
+```
+ ~ > example --history=
+foo@bar mymail@myprovider
 ```
 
 ## When Conditionals

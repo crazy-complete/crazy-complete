@@ -392,6 +392,10 @@ if set -q files[1]
 end
 ''')
 
+_HISTORY = helpers.FishFunction('history', r'''
+builtin history | command grep -E -o -- $argv[1]
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -444,6 +448,7 @@ class FishHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.FishFunction)
         self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
+        self.add_function(_HISTORY)
         self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)

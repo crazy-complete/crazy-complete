@@ -307,6 +307,18 @@ done < <(eval "$1")
 _describe '' describe
 ''')
 
+_HISTORY = helpers.ShellFunction('history', r'''
+[[ -f "$HISTFILE" ]] || return
+
+local match='' describe=()
+
+command grep -E -o -- "$1" "$HISTFILE" | while read -r match; do
+  describe+=("${match//:/\\:}")
+done
+
+_describe '' describe
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -347,5 +359,6 @@ class ZshHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_ZSH_QUERY_FUNC)
         self.add_function(_EXEC)
+        self.add_function(_HISTORY)
         self.add_function(_ALSA_COMPLETE_CARDS)
         self.add_function(_ALSA_COMPLETE_DEVICES)

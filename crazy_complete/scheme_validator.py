@@ -206,6 +206,12 @@ def _check_combine(args):
         raise _error('commands: Must contain more than one command', commands)
 
 
+def _check_history(args):
+    command = _get_required_arg(args, "pattern")
+    _check_type(command, (str,), "pattern")
+    _require_no_more(args)
+
+
 def _check_complete(args):
     cmd = _get_required_arg(args, 'command')
 
@@ -232,6 +238,7 @@ def _check_complete(args):
         'exec_internal':    _check_exec,
         'value_list':       _check_value_list,
         'combine':          _check_combine,
+        'history':          _check_history,
         # Bonus
         'mountpoint':       _check_void,
         'net_interface':    _check_void,
