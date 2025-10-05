@@ -413,7 +413,7 @@ _TIMEZONE_LIST = helpers.FishFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null
   command find /usr/share/zoneinfo -type f |\
   command sed 's|/usr/share/zoneinfo/||g'  |\
-  command egrep -v '^(posix|right)'
+  command grep -E -v '^(posix|right)'
 end''')
 
 _ALSA_LIST_CARDS = helpers.FishFunction('alsa_list_cards', r'''

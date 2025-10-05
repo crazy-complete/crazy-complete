@@ -119,7 +119,7 @@ _TIMEZONE_LIST = helpers.ShellFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null; then
   command find /usr/share/zoneinfo -type f |\
   command sed 's|/usr/share/zoneinfo/||g'  |\
-  command egrep -v '^(posix|right)'
+  command grep -E -v '^(posix|right)'
 fi''')
 
 _ALSA_LIST_CARDS = helpers.ShellFunction('alsa_list_cards', r'''

@@ -155,7 +155,7 @@ class ShellCompleter:
     # =========================================================================
 
     def login_shell(self, ctxt):
-        return self.exec(ctxt, "command egrep '^[^#]' /etc/shells")
+        return self.exec(ctxt, "command grep -E '^[^#]' /etc/shells")
 
     def locale(self, ctxt):
         return self.exec(ctxt, "command locale -a")
