@@ -441,7 +441,7 @@ class FishHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Fish.'''
 
     def __init__(self, function_prefix):
-        super().__init__(function_prefix)
+        super().__init__(function_prefix, helpers.FishFunction)
         self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
         self.add_function(_NET_INTERFACES_LIST)

@@ -344,7 +344,7 @@ class ZshHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Zsh.'''
 
     def __init__(self, function_prefix):
-        super().__init__(function_prefix)
+        super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_ZSH_QUERY_FUNC)
         self.add_function(_EXEC)
         self.add_function(_ALSA_COMPLETE_CARDS)

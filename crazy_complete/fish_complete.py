@@ -97,9 +97,8 @@ class FishCompleteChoices(FishCompletionBase):
             return ['-f', '-a', arg]
 
         code = self.get_code()
-        funcname = self.ctxt.helpers.get_unique_function_name(self.ctxt)
-        self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
-        funcname = self.ctxt.helpers.use_function(funcname)
+
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
         return ['-f', '-a', '(%s)' % funcname]
 
     def get_code(self):
@@ -154,7 +153,6 @@ class FishCompleteValueList(FishCompletionBase):
     def __init__(self, ctxt, opts):
         separator = opts.get('separator', ',')
         values = opts['values']
-        funcname = ctxt.helpers.get_unique_function_name(ctxt)
 
         if is_dict_type(values):
             code = "printf '%s\\t%s\\n' \\\n"
@@ -167,9 +165,7 @@ class FishCompleteValueList(FishCompletionBase):
                 code += '  %s \\\n' % shell.escape(value)
             code = code.rstrip(' \\\n')
 
-        ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
-        funcname = ctxt.helpers.use_function(funcname)
-
+        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
         self.cmd = '__fish_complete_list %s %s' % (shell.escape(separator), funcname)
 
     def get_args(self):
@@ -201,9 +197,8 @@ class FishCompleteCombine(FishCompletionBase):
             return ['-f', '-a', '(%s)' % '; '.join(self.code)]
 
         code = '\n'.join(self.code)
-        funcname = self.ctxt.helpers.get_unique_function_name(self.ctxt)
-        self.ctxt.helpers.add_function(helpers.FishFunction(funcname, code))
-        return ['-f', '-a', '(%s)' % self.ctxt.helpers.use_function(funcname)]
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
+        return ['-f', '-a', '(%s)' % funcname]
 
 
 class FishCompleter(shell.ShellCompleter):

@@ -74,11 +74,55 @@ def make_completion_funcname_for_context(ctxt):
 class GeneralHelpers:
     '''Class for including functions in the generation process.'''
 
-    def __init__(self, function_prefix):
+    def __init__(self, function_prefix, function_class):
         self.function_prefix = function_prefix
+        self.function_class = function_class
+
+        # Dynamic functions
+        self.dynamic_functions_code_to_funcname = {}
+
+        # Builtin functins
         self.functions = {}
         self.used_functions = {} # funcname:set(defines)
         self.global_defines = set()
+
+    # =========================================================================
+    # Dynamic functions
+    # =========================================================================
+
+    def add_dynamic_func(self, ctxt, code):
+        '''Add dynamically generated function.'''
+
+        try:
+            return self.dynamic_functions_code_to_funcname[code]
+        except KeyError:
+            funcname = self.get_dynamic_funcname(ctxt)
+            self.dynamic_functions_code_to_funcname[code] = funcname
+            return funcname
+
+    def get_dynamic_funcname(self, ctxt):
+        '''Return a unique function name for `ctxt`.'''
+
+        funcname = make_completion_funcname_for_context(ctxt)
+        funcname = '_%s__%s' % (self.function_prefix, funcname)
+        num = 0
+        funcname_plus_num = funcname
+        while funcname_plus_num in self.dynamic_functions_code_to_funcname.values():
+            funcname_plus_num = '%s%d' % (funcname, num)
+            num += 1
+        return funcname_plus_num
+
+    def get_all_dynamic_functions(self):
+        '''Return a list of code for all dynamically defined functions.'''
+
+        r = []
+        for code, funcname in self.dynamic_functions_code_to_funcname.items():
+            r.append(self.function_class(funcname, code).get_code())
+        return r
+
+    # =========================================================================
+    # Builtin functions
+    # =========================================================================
 
     def add_function(self, function):
         '''Add a function to the function repository.'''
@@ -99,33 +143,17 @@ class GeneralHelpers:
         if function_name not in self.functions:
             raise KeyError('No such function: %r' % function_name)
 
-        # Code deduplication:
-        # If we have a function with the same code, return its funcname.
-        for function in self.used_functions.keys():
-            if self.functions[function_name].code == self.functions[function].code:
-                self.used_functions[function].update(defines)
-                return self.get_real_function_name(function)
-
         if function_name not in self.used_functions:
             self.used_functions[function_name] = set(defines)
+        else:
+            self.used_functions[function_name].update(defines)
 
         return self.get_real_function_name(function_name)
-
-    def get_unique_function_name(self, ctxt):
-        '''Return a unique function name for `ctxt`.'''
-
-        funcname = make_completion_funcname_for_context(ctxt)
-        num = 0
-        funcname_plus_num = funcname
-        while funcname_plus_num in self.used_functions:
-            funcname_plus_num = '%s%d' % (funcname, num)
-            num += 1
-        return funcname_plus_num
 
     def get_real_function_name(self, function_name):
         '''Return the function name with its prefix.'''
 
-        return '_%s_%s' % (self.function_prefix, function_name)
+        return '_%s__%s' % (self.function_prefix, function_name)
 
     def is_used(self, function_name):
         '''Check if a function is used.'''
@@ -140,5 +168,7 @@ class GeneralHelpers:
         for funcname, defines in self.used_functions.items():
             r.append(self.functions[funcname].get_code(
                 self.get_real_function_name(funcname), self.global_defines | defines))
+
+        r.extend(self.get_all_dynamic_functions())
 
         return r

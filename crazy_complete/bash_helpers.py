@@ -137,7 +137,7 @@ class BashHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Bash.'''
 
     def __init__(self, function_prefix):
-        super().__init__(function_prefix)
+        super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_COMPGEN_W_REPLACEMENT)
         self.add_function(_EXEC)
         self.add_function(_EXEC_FAST)

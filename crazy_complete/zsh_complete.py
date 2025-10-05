@@ -47,7 +47,6 @@ class ZshCompleter(shell.ShellCompleter):
             return action
 
         # Make a function
-        funcname = ctxt.helpers.get_unique_function_name(ctxt)
         metavar  = shell.escape(ctxt.option.metavar or '')
         escaped  = [shell.escape(escape_colon(c)) for c in choices]
 
@@ -56,8 +55,7 @@ class ZshCompleter(shell.ShellCompleter):
         code += '\n)\n\n'
         code += f'_describe -- {metavar} items'
 
-        ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
-        funcname = ctxt.helpers.use_function(funcname)
+        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
         return funcname
 
     def _choices_dict(self, ctxt, choices):
@@ -74,7 +72,6 @@ class ZshCompleter(shell.ShellCompleter):
         #       return action
 
         # Make a function
-        funcname = ctxt.helpers.get_unique_function_name(ctxt)
         metavar  = shell.escape(ctxt.option.metavar or '')
 
         code  = 'local items=(\n'
@@ -85,8 +82,7 @@ class ZshCompleter(shell.ShellCompleter):
         code += ')\n\n'
         code += f'_describe -- {metavar} items'
 
-        ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
-        funcname = ctxt.helpers.use_function(funcname)
+        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
         return funcname
 
     def command(self, _ctxt):
@@ -175,7 +171,6 @@ class ZshCompleter(shell.ShellCompleter):
             c = getattr(self, command)(ctxt, *args)
             completions.append(c)
 
-        funcname = ctxt.helpers.get_unique_function_name(ctxt)
         #metavar = shell.escape(ctxt.option.metavar or '')
 
         code  = '_alternative \\\n'
@@ -183,8 +178,7 @@ class ZshCompleter(shell.ShellCompleter):
             code += '  %s \\\n' % completion
         code = code.rstrip(' \\\n')
 
-        ctxt.helpers.add_function(helpers.ShellFunction(funcname, code))
-        funcname = ctxt.helpers.use_function(funcname)
+        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
         return funcname
 
     # =========================================================================
