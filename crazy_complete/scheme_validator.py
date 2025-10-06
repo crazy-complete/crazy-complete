@@ -239,6 +239,7 @@ def _check_complete(args):
         'value_list':       _check_value_list,
         'combine':          _check_combine,
         'history':          _check_history,
+        'commandline_string': _check_void,
         # Bonus
         'mountpoint':       _check_void,
         'net_interface':    _check_void,

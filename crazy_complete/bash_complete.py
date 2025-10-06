@@ -209,6 +209,9 @@ class BashCompleter(shell.ShellCompleter):
         funcname = ctxt.helpers.use_function('history')
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(pattern)))
 
+    def commandline_string(self, ctxt):
+        return BashCompletionCommand(ctxt, '')
+
     # =========================================================================
     # Bonus
     # =========================================================================

@@ -231,6 +231,7 @@ def validate_complete(complete):
         'value_list':    _validate_value_list,
         'combine':       _validate_combine,
         'history':       _validate_history,
+        'commandline_string': _validate_void,
         # Bonus
         'mountpoint':    _validate_void,
         'net_interface': _validate_void,

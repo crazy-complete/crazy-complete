@@ -122,28 +122,29 @@ help: "<SUBCOMMAND DESCRIPTION>"
 
 ### Built-in Commands
 
-| Command                          | Description                                                                 |
-|----------------------------------|-----------------------------------------------------------------------------|
-| [none](#none)                    | No completion, but specifies that an argument is required                   |
-| [integer](#integer)              | Complete an integer                                                         |
-| [float](#float)                  | Complete a floating point number                                            |
-| [combine](#combine)              | Combine multiple completion commands                                        |
-| [file](#file)                    | Complete a file                                                             |
-| [directory](#directory)          | Complete a directory                                                        |
-| [choices](#choices)              | Complete from a set of values                                               |
-| [value\_list](#value_list)       | Complete a list                                                             |
-| [range](#range)                  | Complete a range of integers                                                |
-| [signal](#signal)                | Complete a signal                                                           |
-| [hostname](#hostname)            | Complete a hostname                                                         |
-| [process](#process)              | Complete a process                                                          |
-| [pid](#pid)                      | Complete a PID                                                              |
-| [command](#command)              | Complete a command                                                          |
-| [user](#user)                    | Complete a user                                                             |
-| [group](#group)                  | Complete a group                                                            |
-| [service](#service)              | Complete a SystemD service                                                  |
-| [variable](#variable)            | Complete a shell variable                                                   |
-| [environment](#environment)      | Complete a environment variable                                             |
-| [history](#history)              | Complete based on a shell's history                                         |
+| Command                                    | Description                                                                 |
+|--------------------------------------------|-----------------------------------------------------------------------------|
+| [none](#none)                              | No completion, but specifies that an argument is required                   |
+| [integer](#integer)                        | Complete an integer                                                         |
+| [float](#float)                            | Complete a floating point number                                            |
+| [combine](#combine)                        | Combine multiple completion commands                                        |
+| [file](#file)                              | Complete a file                                                             |
+| [directory](#directory)                    | Complete a directory                                                        |
+| [choices](#choices)                        | Complete from a set of values                                               |
+| [value\_list](#value_list)                 | Complete a list                                                             |
+| [range](#range)                            | Complete a range of integers                                                |
+| [signal](#signal)                          | Complete a signal                                                           |
+| [hostname](#hostname)                      | Complete a hostname                                                         |
+| [process](#process)                        | Complete a process                                                          |
+| [pid](#pid)                                | Complete a PID                                                              |
+| [command](#command)                        | Complete a command                                                          |
+| [commandline\_string](#commandline_string) | Complete a command line as a string                                         |
+| [user](#user)                              | Complete a user                                                             |
+| [group](#group)                            | Complete a group                                                            |
+| [service](#service)                        | Complete a SystemD service                                                  |
+| [variable](#variable)                      | Complete a shell variable                                                   |
+| [environment](#environment)                | Complete a environment variable                                             |
+| [history](#history)                        | Complete based on a shell's history                                         |
 
 
 ### Bonus Commands
@@ -496,6 +497,24 @@ options:
 
 ```
  ~ > example --command=bas<TAB>
+base32    base64    basename  basenc    bash      bashbug
+```
+
+### commandline\_string
+
+> Complete a command line as a string.
+
+> **NOTE:** This command is currently only available in **Fish** and **Zsh**.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--commandline"]
+    complete: ["commandline_string"]
+```
+
+```
+ ~ > example --commandline='sudo ba
 base32    base64    basename  basenc    bash      bashbug
 ```
 

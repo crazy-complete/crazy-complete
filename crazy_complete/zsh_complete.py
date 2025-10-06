@@ -186,6 +186,9 @@ class ZshCompleter(shell.ShellCompleter):
         cmd = '{%s %s}' % (func, shell.escape(pattern))
         return shell.escape(cmd)
 
+    def commandline_string(self, _ctxt):
+        return '_cmdstring'
+
     # =========================================================================
     # Bonus
     # =========================================================================

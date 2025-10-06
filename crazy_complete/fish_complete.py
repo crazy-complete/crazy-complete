@@ -277,6 +277,10 @@ class FishCompleter(shell.ShellCompleter):
         func = ctxt.helpers.use_function('history')
         return FishCompletionCommand('%s %s' % (func, shell.escape(pattern)))
 
+    def commandline_string(self, ctxt):
+        func = ctxt.helpers.use_function('commandline_string')
+        return FishCompletionCommand(func)
+
     # =========================================================================
     # Bonus
     # =========================================================================

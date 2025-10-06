@@ -396,6 +396,50 @@ _HISTORY = helpers.FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
 ''')
 
+_SUBSTRACT_PREFIX_SUFFIX = helpers.FishFunction('subtract_prefix_suffix', r'''
+set -l s1 $argv[1]
+set -l s2 $argv[2]
+
+set -l len1 (string length -- $s1)
+set -l len2 (string length -- $s2)
+
+set -l maxk $len1
+if test $len2 -lt $maxk
+  set maxk $len2
+end
+
+set -l k $maxk
+while test $k -gt 0
+  set -l start (math $len1 - $k + 1)
+  set -l suf (string sub -s $start -l $k -- $s1)
+  set -l pre (string sub -s 1 -l $k -- $s2)
+
+  if test "$suf" = "$pre"
+    if test $len1 -eq $k
+      echo ''
+    else
+      string sub -l (math $len1 - $k) -- $s1
+    end
+    return
+  end
+
+  set k (math $k - 1)
+end
+
+echo $s1
+''')
+
+_COMMANDLINE_STRING = helpers.FishFunction('commandline_string', r'''
+set -l line
+set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
+set comp (string unescape -- "$comp")
+
+complete -C "$comp" | while read line
+  set -l split (string split -m 1 -- \t $line)
+  set -l comp2 (subtract_prefix_suffix "$comp" "$split[1]")
+  printf '%s\t%s\n' "$comp2$split[1]" "$split[2]"
+end''', ['subtract_prefix_suffix'])
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -449,6 +493,8 @@ class FishHelpers(helpers.GeneralHelpers):
         self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
         self.add_function(_HISTORY)
+        self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
+        self.add_function(_COMMANDLINE_STRING)
         self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)
