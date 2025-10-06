@@ -4,7 +4,7 @@ from collections import namedtuple
 
 from . import utils
 from .str_utils import indent
-from .bash_utils import make_option_variable_name, CasePatterns
+from .bash_utils import CasePatterns
 from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
 
 _PARSER_CODE = '''\

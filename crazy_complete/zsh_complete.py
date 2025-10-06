@@ -1,7 +1,6 @@
 '''This module contains code for completing arguments in Zsh.'''
 
 from . import shell
-from . import helpers
 from .str_utils import join_with_wrap, indent
 from .zsh_utils import escape_colon, escape_square_brackets
 from .type_utils import is_dict_type

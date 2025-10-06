@@ -1,7 +1,6 @@
 '''This module contains code for completing arguments in Fish.'''
 
 from . import shell
-from . import helpers
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
 
