@@ -12,9 +12,10 @@ from .str_utils import indent
 class FunctionBase:
     '''Base class for functions.'''
 
-    def __init__(self, funcname, code):
+    def __init__(self, funcname, code, dependencies=None):
         self.funcname = funcname
         self.code = code.strip()
+        self.dependencies = dependencies if dependencies else []
 
     def get_code(self):
         '''Return the whole function.'''
@@ -148,6 +149,10 @@ class GeneralHelpers:
         else:
             self.used_functions[function_name].update(defines)
 
+        # Add dependencies
+        for function in self.functions[function_name].dependencies:
+            self.use_function(function)
+
         return self.get_real_function_name(function_name)
 
     def get_real_function_name(self, function_name):
@@ -166,8 +171,14 @@ class GeneralHelpers:
         r = []
 
         for funcname, defines in self.used_functions.items():
-            r.append(self.functions[funcname].get_code(
-                self.get_real_function_name(funcname), self.global_defines | defines))
+            function = self.functions[funcname]
+            realname = self.get_real_function_name(funcname)
+            code = function.get_code(realname, self.global_defines | defines)
+
+            for dep_func in function.dependencies:
+                code = code.replace(dep_func, self.get_real_function_name(dep_func))
+
+            r.append(code)
 
         r.extend(self.get_all_dynamic_functions())
 
