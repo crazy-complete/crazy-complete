@@ -15,6 +15,7 @@ from . import bash_parser
 from . import bash_parser_v2
 from . import bash_option_completion
 from . import bash_option_strings_completion
+from . import bash_positionals_completion
 from . import bash_when
 from .str_utils import indent
 from .bash_utils import VariableManager
@@ -52,28 +53,7 @@ class BashCompletionGenerator:
         return r
 
     def _generate_positionals_completion(self):
-        def make_block(code):
-            if code:
-                return '{\n%s\n  return 0;\n}' % indent(code, 2)
-            else:
-                return '{\n  return 0;\n}'
-
-        r = ''
-        for positional in self.positionals:
-            operator = '=='
-            if positional.repeatable:
-                operator = '>='
-            r += '(( ${#POSITIONALS[@]} %s %d )) && ' % (operator, positional.get_positional_num())
-            if positional.when:
-                r += '%s && ' % bash_when.generate_when_conditions(self.commandline, self.variable_manager, positional.when)
-            r += '%s\n\n' % make_block(self._complete_option(positional, False))
-
-        if self.subcommands:
-            cmds = self.subcommands.get_choices().keys()
-            complete = self.completer.choices(self.ctxt, cmds).get_code()
-            r += '(( ${#POSITIONALS[@]} == %d )) && ' % self.subcommands.get_positional_num()
-            r += '%s\n\n' % make_block(complete)
-        return r.strip()
+        return bash_positionals_completion.generate(self)
 
     def _generate_subcommand_call(self):
         # This code is used to call subcommand functions
