@@ -76,8 +76,11 @@ class ZshCompleter(shell.ShellCompleter):
         code  = 'local items=(\n'
         for item, desc in choices.items():
             item = shell.escape(escape_colon(str(item)))
-            desc = shell.escape(str(desc))
-            code += f'  {item}:{desc}\n'
+            if desc:
+                desc = shell.escape(str(desc))
+                code += f'  {item}:{desc}\n'
+            else:
+                code += f'  {item}\n'
         code += ')\n\n'
         code += f'_describe -- {metavar} items'
 
