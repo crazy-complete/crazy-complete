@@ -88,6 +88,82 @@ class MasterCompletionFunction:
         return None
 
 
+class MasterCompletionFunctionNoWhen:
+    '''Class for generating a master completion function.'''
+
+    def __init__(self, options, abbreviations, generator):
+        self.abbreviations = abbreviations
+        self.complete = generator._complete_option
+        self.generator = generator
+        self.optionals = False
+        self.code = []
+
+        optional_arg = list(filter(lambda o: o.complete and o.optional_arg is True, options))
+        required_arg = list(filter(lambda o: o.complete and o.optional_arg is False, options))
+
+        self._add_options(required_arg)
+
+        if optional_arg:
+            self.optionals = True
+            r =  '(( ! ret )) && return 0\n'
+            r += '[[ "$mode" == WITH_OPTIONAL ]] || return 1\n'
+            r += 'ret=0'
+            self.code.append(r)
+            self._add_options(optional_arg)
+
+    @staticmethod
+    def accept(options):
+        return not any(option.when for option in options)
+
+    def _get_all_option_strings(self, option):
+        opts = []
+        opts.extend(self.abbreviations.get_many_abbreviations(option.get_long_option_strings()))
+        opts.extend(self.abbreviations.get_many_abbreviations(option.get_old_option_strings()))
+        opts.extend(option.get_short_option_strings())
+        return opts
+
+    def _add_options(self, options):
+        options_group_by_complete = algo.group_by(options, lambda o: self.complete(o, False))
+
+        if options_group_by_complete:
+            r = 'case "$opt" in\n'
+            for complete, options in options_group_by_complete.items():
+                opts = algo.flatten([self._get_all_option_strings(o) for o in options])
+                if complete:
+                    r += '  %s)\n' % '|'.join(opts)
+                    r += '%s;;\n' % indent(complete, 4)
+                else:
+                    r += '  %s);;\n' % '|'.join(opts)
+            r += '  *) ret=1;;\n'
+            r += 'esac'
+            self.code.append(r)
+
+    def get(self, funcname):
+        '''Get the function code.'''
+
+        if self.code:
+            r  = '%s() {\n' % funcname
+            if self.optionals:
+                r += '  local opt="$1" cur="$2" mode="$3" ret=0\n\n'
+            else:
+                r += '  local opt="$1" cur="$2" ret=0\n\n'
+            r += '%s\n\n' % indent('\n\n'.join(self.code), 2)
+            r += '  return $ret\n'
+            r += '}'
+            return r
+
+        return None
+
+
+def _get_master_completion_obj(options, abbreviations, generator):
+    if MasterCompletionFunctionNoWhen.accept(options):
+        klass = MasterCompletionFunctionNoWhen
+    else:
+        klass = MasterCompletionFunction
+
+    return klass(options, abbreviations, generator)
+
+
 class _Info:
     def __init__(self, options, abbreviations, commandline, ctxt):
         self.commandline    = commandline
@@ -229,7 +305,7 @@ def generate_option_completion(self):
     options = self.commandline.get_options(only_with_arguments=True)
     abbreviations = utils.get_option_abbreviator(self.commandline)
 
-    complete_function = MasterCompletionFunction(options, abbreviations, self)
+    complete_function = _get_master_completion_obj(options, abbreviations, self)
     complete_function_code = complete_function.get('__complete_option')
 
     if not complete_function_code:
