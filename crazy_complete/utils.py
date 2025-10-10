@@ -268,15 +268,16 @@ def is_worth_a_function(commandline):
 
     This means that a commandline has on of:
         - Subcommands
-        - Positionals
-        - Options that aren't --help or --version
+        - Positionals (that have meaningful completion)
+        - Options (that aren't --help or --version)
     '''
-
-    if len(commandline.get_positionals()) > 0:
-        return True
 
     if commandline.get_subcommands():
         return True
+
+    for positional in commandline.get_positionals():
+        if positional.complete[0] not in ('none', 'integer', 'float'):
+            return True
 
     options = commandline.get_options()
     options = list(filter(lambda o: '--help' not in o.option_strings and
