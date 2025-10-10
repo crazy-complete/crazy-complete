@@ -63,10 +63,16 @@ class BashCompletionGenerator:
         for subcommand in self.subcommands.subcommands:
             cmds = utils.get_all_command_variations(subcommand)
             pattern = '|'.join(shell.escape(s) for s in cmds)
-            if self.commandline.inherit_options:
-                r += '    %s) %s && return 0;;\n' % (pattern, shell.make_completion_funcname(subcommand))
+            if utils.is_worth_a_function(subcommand):
+                if self.commandline.inherit_options:
+                    r += '    %s) %s && return 0;;\n' % (pattern, shell.make_completion_funcname(subcommand))
+                else:
+                    r += '    %s) %s && return 0 || return 1;;\n' % (pattern, shell.make_completion_funcname(subcommand))
             else:
-                r += '    %s) %s && return 0 || return 1;;\n' % (pattern, shell.make_completion_funcname(subcommand))
+                if self.commandline.inherit_options:
+                    r += '    %s);;\n' % pattern
+                else:
+                    r += '    %s) return 0;;\n' % pattern
         r += '  esac\n'
         r += 'fi'
         return r
@@ -76,10 +82,7 @@ class BashCompletionGenerator:
         # This return code is used for dealing with subcommands.
 
         if not utils.is_worth_a_function(self.commandline):
-            r  = '%s() {\n' % shell.make_completion_funcname(self.commandline)
-            r += '  return 0\n'
-            r += '}'
-            self.result = r
+            self.result = ''
             return
 
         code = OrderedDict()
@@ -144,7 +147,7 @@ def generate_completion(commandline, config=None):
     output += [generation_notice.GENERATION_NOTICE]
     output += config.get_included_files_content()
     output += helpers.get_used_functions_code()
-    output += [generator.result for generator in result]
+    output += [generator.result for generator in result if generator.result]
     output += ['complete -F %s %s' % (
         shell.make_completion_funcname(commandline),
         ' '.join([commandline.prog] + commandline.aliases)
