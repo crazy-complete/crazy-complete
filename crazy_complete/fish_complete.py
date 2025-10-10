@@ -68,7 +68,8 @@ class FishCompleteChoices(FishCompletionBase):
 
     @staticmethod
     def _get_inline_for_dict(choices):
-        stringified = {str(item): str(desc) for item, desc in choices.items()}
+        str0 = lambda o: str(o) if o is not None else ''
+        stringified = {str(item): str0(desc) for item, desc in choices.items()}
         r = ['%s\\t%s' % (shell.escape(item), shell.escape(desc)) for item, desc in stringified.items()]
         return ' '.join(r)
 
@@ -82,8 +83,10 @@ class FishCompleteChoices(FishCompletionBase):
     @staticmethod
     def _get_code_for_dict(choices):
         code = "printf '%s\\t%s\\n' \\\n"
-        for item, description in choices.items():
-            code += '  %s %s \\\n' % (shell.escape(str(item)), shell.escape(str(description)))
+        for item, desc in choices.items():
+            if desc is None:
+                desc = ''
+            code += '  %s %s \\\n' % (shell.escape(str(item)), shell.escape(str(desc)))
         return code.rstrip(' \\\n')
 
     def get_args(self):
