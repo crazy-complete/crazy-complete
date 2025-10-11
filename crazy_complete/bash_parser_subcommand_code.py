@@ -1,6 +1,9 @@
 '''Code for creating the subcommand switch code in Bash'''
 
+from collections import OrderedDict
+
 from . import utils
+from . import shell
 from .str_utils import indent
 
 
@@ -29,23 +32,34 @@ def make_subcommand_switch_code(commandline):
     assert commandline.parent is None, \
         "This function should only be used on top-level command lines"
 
-    code = []
+    cases = []
 
     for cmdline in commandline.get_all_commandlines():
-        if cmdline.get_subcommands():
-            positional_num = cmdline.get_subcommands().get_positional_num()
+        if not cmdline.get_subcommands():
+            continue
 
-            r = 'if [[ "$cmd" == "%s" ]] &&'               % get_subcommand_path(cmdline)
-            r += ' (( ${#POSITIONALS[@]} == %d )); then\n' % positional_num
-            r += '%s\n' % indent(_make_switch_case(cmdline), 2)
-            r += 'fi'
-            code.append(r)
+        positional_num = cmdline.get_subcommands().get_positional_num()
+        command_path   = get_subcommand_path(cmdline)
+        switch_code    = _make_switch_case(cmdline)
 
-    return '\n\n'.join(code)
+        cases.append(('%s|%d' % (command_path, positional_num), switch_code))
+
+    if not cases:
+        return None
+
+    r  = 'case "$cmd|${#POSITIONALS[@]}" in\n'
+    for case in cases:
+        if '\n' not in case[1]:
+            r += '  %s) %s;;\n' % (shell.escape(case[0]), case[1])
+        else:
+            r += '  %s)\n%s;;\n' % (shell.escape(case[0]), indent(case[1], 4))
+    r += 'esac'
+
+    return r
 
 
 def _make_switch_case(cmdline):
-    subcommand_aliases = {}
+    subcommand_aliases = OrderedDict()
 
     for subcommand in cmdline.get_subcommands().subcommands:
         aliases = utils.get_all_command_variations(subcommand)
