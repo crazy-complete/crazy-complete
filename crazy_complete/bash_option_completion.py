@@ -4,6 +4,7 @@ from . import algo
 from . import utils
 from . import bash_when
 from . import bash_utils
+from . import bash_patterns
 from .str_utils import indent
 
 
@@ -46,7 +47,7 @@ class MasterCompletionFunction:
             r = 'case "$opt" in\n'
             for complete, options in options_group_by_complete.items():
                 opts = algo.flatten([self._get_all_option_strings(o) for o in options])
-                r += '  %s)\n' % '|'.join(opts)
+                r += '  %s)\n' % bash_patterns.make_pattern(opts)
                 if complete:
                     r += '%s\n' % indent(complete, 4)
                 r += '    return 0;;\n'
@@ -62,7 +63,7 @@ class MasterCompletionFunction:
                 self.generator.variable_manager,
                 option.when)
 
-            r  = 'case "$opt" in %s)\n' % '|'.join(opts)
+            r  = 'case "$opt" in %s)\n' % bash_patterns.make_pattern(opts)
             r += '  if %s; then\n' % cond
             if completion_code:
                 r += '%s\n' % indent(completion_code, 4)
@@ -130,10 +131,10 @@ class MasterCompletionFunctionNoWhen:
             for complete, options in options_group_by_complete.items():
                 opts = algo.flatten([self._get_all_option_strings(o) for o in options])
                 if complete:
-                    r += '  %s)\n' % '|'.join(opts)
+                    r += '  %s)\n' % bash_patterns.make_pattern(opts)
                     r += '%s;;\n' % indent(complete, 4)
                 else:
-                    r += '  %s);;\n' % '|'.join(opts)
+                    r += '  %s);;\n' % bash_patterns.make_pattern(opts)
             r += '  *) ret=1;;\n'
             r += 'esac'
             self.code.append(r)

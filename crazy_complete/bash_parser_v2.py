@@ -4,6 +4,7 @@ from collections import namedtuple
 
 from . import utils
 from . import shell
+from . import bash_patterns
 from .str_utils import indent
 from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
 from .preprocessor import preprocess
@@ -156,7 +157,7 @@ def _make_option_switch_code(option_cases):
     c  = 'case "$2" in\n'
 
     for case in option_cases:
-        c += '  %s)'        % '|'.join(case.option_strings)
+        c += '  %s)'        % bash_patterns.make_pattern(case.option_strings)
         c += ' VAR=%s;'     % case.variable
         c += ' ARGS=%s;'    % case.args
         c += ' return;;\n'
