@@ -3,11 +3,11 @@
 001-empty-prog                           | line 1, column 7: prog is empty
 002-prog-is-space                        | line 1, column 7: prog is empty
 003-no-programs-defined                  | line 1, column 1: No programs defined
-004-too-many-programs-defined            | No error
-005-duplicate-programs                   | No error
-006-duplicate-subcommands                | No error
-007-missing-command                      | No error
-008-missing-command-2                    | No error
+004-too-many-programs-defined            | line 1, column 1: Too many main programs defined: ['test', 'test1']
+005-duplicate-programs                   | line 3, column 1: Multiple definition of program `test`
+006-duplicate-subcommands                | line 5, column 1: Multiple definition of program `test subcommand`
+007-missing-command                      | line 3, column 1: Command not found: test bar
+008-missing-command-2                    | line 5, column 1: Command not found: test bar
 010-aliases-wrong-type                   | line 2, column 10: aliases: Invalid type. Expected types: list|none
 011-aliases-not-str                      | line 2, column 11: alias: Invalid type. Expected types: string
 012-aliases-with-space                   | line 2, column 11: alias contains space

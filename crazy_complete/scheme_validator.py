@@ -397,6 +397,33 @@ def _check_definition(definition):
         _check_positionals_repeatable(definition.value['positionals'].value)
 
 
+def _check_definitions_program_hierarchy(definition_list):
+    root = {}
+
+    for definition in definition_list:
+        commands = definition.value['prog'].value.split(' ')
+        subcommand = commands.pop(-1)
+
+        node = root
+        for i, part in enumerate(commands):
+            try:
+                node = node[part]
+            except KeyError:
+                prog = ' '.join(commands[0:i+1])
+                raise _error(f'Command not found: {prog}', definition)
+
+        if subcommand in node:
+            prog = definition.value['prog'].value
+            raise _error(f'Multiple definition of program `{prog}`', definition)
+
+        node[subcommand] = {}
+
+    if len(root) > 1:
+        value = ValueWithTrace(None, '', 1, 1)
+        progs = list(root.keys())
+        raise _error('Too many main programs defined: %s' % progs, value)
+
+
 def validate(definition_list):
     '''Validate a list of definitions.'''
 
@@ -405,3 +432,5 @@ def validate(definition_list):
 
     if len(definition_list) == 0:
         raise _error('No programs defined', ValueWithTrace(None, '', 1, 1))
+
+    _check_definitions_program_hierarchy(definition_list)

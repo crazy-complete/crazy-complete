@@ -1,14 +1,3 @@
 05-misc/001-multiple-repeatable-positionals.yaml: also give errors in dictionary_expected
 05-misc/002-positional-after-repeatable.yaml: also give errors in dictionary_expected
 05-misc/003-positional-after-repeatable.yaml: also give errors in dictionary_expected
-
-expected_error: "Too many main programs defined: ['test', 'test1']"
-expected_error: "Multiple definition of program `test`"
-expected_error: "Multiple definition of program `subcommand`"
-
-check this:
-
-prog: "foo"
-options:
-  - option_strings: ["-o"]
-    complete: ["value_list", {"values", []}]
