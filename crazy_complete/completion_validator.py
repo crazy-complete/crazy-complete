@@ -2,6 +2,7 @@
 
 from .errors import CrazyError, CrazyTypeError
 from .type_utils import is_dict_type, is_list_type
+from .str_utils import is_valid_extended_regex
 
 # =============================================================================
 # Helper functions
@@ -189,6 +190,9 @@ def _validate_history(args):
 
     if not isinstance(pattern, str):
         raise CrazyError(f"Pattern is not a string: {pattern}")
+
+    if not is_valid_extended_regex(pattern):
+        raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
 
 
 # =============================================================================

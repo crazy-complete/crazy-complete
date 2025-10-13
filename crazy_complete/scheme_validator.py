@@ -5,8 +5,11 @@ from types import NoneType
 from .cli import ExtendedBool, is_extended_bool
 from .when import parse_when
 from .errors import CrazyError, CrazySchemaValidationError
-from .str_utils import contains_space, is_empty_or_whitespace, is_valid_option_string, is_valid_variable_name
 from .value_with_trace import ValueWithTrace
+from .str_utils import (
+    contains_space, is_empty_or_whitespace,
+    is_valid_option_string, is_valid_variable_name,
+    is_valid_extended_regex)
 
 _error = CrazySchemaValidationError
 
@@ -207,9 +210,12 @@ def _check_combine(args):
 
 
 def _check_history(args):
-    command = _get_required_arg(args, "pattern")
-    _check_type(command, (str,), "pattern")
+    pattern = _get_required_arg(args, "pattern")
+    _check_type(pattern, (str,), "pattern")
     _require_no_more(args)
+
+    if not is_valid_extended_regex(pattern.value):
+        raise _error('Pattern: Not a valid extended regex', pattern)
 
 
 def _check_complete(args):

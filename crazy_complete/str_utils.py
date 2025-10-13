@@ -1,6 +1,7 @@
 '''String utility functions.'''
 
 import re
+import subprocess
 
 
 _VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
@@ -17,6 +18,23 @@ def is_empty_or_whitespace(string):
     '''Check if string is empty or whitespace.'''
 
     return not string.strip()
+
+
+def is_valid_extended_regex(string):
+    '''Check if string is a valid extended regular expression.'''
+
+    try:
+        r = subprocess.run(
+            ['grep', '-q', '-E', '--', string],
+            input=b"",
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=1,
+            check=False)
+
+        return r.returncode != 2
+    except (FileNotFoundError, PermissionError, subprocess.TimeoutExpired):
+        return True
 
 
 def indent(string, num_spaces):

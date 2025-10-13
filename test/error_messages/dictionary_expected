@@ -128,6 +128,7 @@
 3_23_00-history-missing-arg              | foo: -o: Missing argument: pattern
 3_23_01-history-too-many-arguments       | foo: -o: Too many arguments: ['wrong']
 3_23_02-history-pattern-wrong-type       | foo: -o: Pattern is not a string: False
+3_23_03-history-pattern-wrong-regex      | foo: -o: Pattern is not a valid extended regex: [foo
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | No error
