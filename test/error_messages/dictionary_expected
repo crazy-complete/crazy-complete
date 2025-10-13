@@ -130,3 +130,6 @@
 3_23_02-history-pattern-wrong-type       | foo: -o: Pattern is not a string: False
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
+001-multiple-repeatable-positionals      | No error
+002-positional-after-repeatable          | No error
+003-positional-after-repeatable          | No error

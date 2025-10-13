@@ -257,6 +257,25 @@ def _check_complete(args):
     commands[cmd.value](args)
 
 
+def _check_positionals_repeatable(positionals):
+    repeatable_number = None
+
+    for positional in sorted(positionals, key=lambda p: p.value['number'].value):
+        repeatable = False
+        if _has_set(positional, 'repeatable'):
+            repeatable = positional.value['repeatable'].value
+
+        positional_number = positional.value['number'].value
+
+        if repeatable:
+            if repeatable_number is not None and repeatable_number != positional_number:
+                raise _error('Only one positional argument may be marked as repeatable', positional)
+            else:
+                repeatable_number = positional_number
+        elif repeatable_number is not None and positional_number > repeatable_number:
+            raise _error('A positional argument cannot follow a repeatable positional argument', positional)
+
+
 def _check_option(option):
     _check_dictionary(option, {
         'option_strings':       (True,  (list,)),
@@ -374,6 +393,8 @@ def _check_definition(definition):
     if _has_set(definition, 'positionals'):
         for positional in definition.value['positionals'].value:
             _check_positional(positional)
+
+        _check_positionals_repeatable(definition.value['positionals'].value)
 
 
 def validate(definition_list):
