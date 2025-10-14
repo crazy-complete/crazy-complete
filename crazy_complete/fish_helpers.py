@@ -447,7 +447,7 @@ end''', ['subtract_prefix_suffix'])
 _NET_INTERFACES_LIST = helpers.FishFunction('net_interfaces_list', r'''
 if test -d /sys/class/net
   command ls /sys/class/net
-else if ifconfig -l &>/dev/null
+else if command ifconfig -l &>/dev/null
   command ifconfig -l # BSD / macOS
 else
   command ifconfig 2>/dev/null | command awk '/^[a-z0-9]/ {print $1}' | command sed 's/://'
