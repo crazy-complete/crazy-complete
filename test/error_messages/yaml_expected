@@ -9,8 +9,8 @@
 007-too-many-programs-defined            | line 1, column 1: Too many main programs defined: ['test', 'test1']
 008-duplicate-programs                   | line 3, column 1: Multiple definition of program `test`
 009-duplicate-subcommands                | line 5, column 1: Multiple definition of program `test subcommand`
-010-missing-command                      | line 3, column 1: Command not found: test bar
-011-missing-command-2                    | line 5, column 1: Command not found: test bar
+010-missing-command                      | line 3, column 1: Missing definition of program `test bar`
+011-missing-command-2                    | line 5, column 1: Missing definition of program `test bar`
 020-aliases-wrong-type                   | line 2, column 10: aliases: Invalid type. Expected types: list|none
 021-aliases-not-str                      | line 2, column 11: alias: Invalid type. Expected types: string
 022-aliases-with-space                   | line 2, column 11: alias contains space

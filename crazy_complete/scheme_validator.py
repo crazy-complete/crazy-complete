@@ -419,7 +419,7 @@ def _check_definitions_program_hierarchy(definition_list):
                 node = node[part]
             except KeyError:
                 prog = ' '.join(commands[0:i+1])
-                raise _error(f'Command not found: {prog}', definition)
+                raise _error(f'Missing definition of program `{prog}`', definition)
 
         if subcommand in node:
             prog = definition.value['prog'].value

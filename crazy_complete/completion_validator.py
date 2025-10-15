@@ -299,6 +299,7 @@ def validate_commandline(cmdline):
     except CrazyError as e:
         raise CrazyError("%s: %s" % (cmdline.get_command_path(), e)) from e
 
+
 def validate_commandlines(cmdline):
     '''Validate completion commands of options/positionals in all commandlines.'''
 

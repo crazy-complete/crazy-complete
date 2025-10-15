@@ -95,11 +95,11 @@ def _get_commandline_by_path(root, path):
         path_str = ' '.join(path[0:i + 1])
 
         if not current.get_subcommands():
-            raise CrazyError(f"Command not found: {path_str}")
+            raise CrazyError(f"Missing defintion of program `{path_str}`")
 
         current = current.get_subcommands().get_subcommand_by_name(name)
         if not current:
-            raise CrazyError(f"Command not found: {path_str}")
+            raise CrazyError(f"Missing defintion of program `{path_str}`")
 
     return current
 
