@@ -9,23 +9,39 @@ from .str_utils import is_valid_extended_regex
 # =============================================================================
 
 
-def _get_required_arg(args, name):
-    try:
-        return args.pop(0)
-    except IndexError:
-        raise CrazyError(f'Missing argument: {name}') from None
+class Arguments:
+    '''Class for accessing arguments.'''
 
+    def __init__(self, args):
+        self.args = args
+        self.index = 0
 
-def _get_optional_arg(args, default=None):
-    try:
-        return args.pop(0)
-    except IndexError:
+    def get_required_arg(self, name):
+        '''Return a required argument, else raise an exception.'''
+
+        if self.index < len(self.args):
+            arg = self.args[self.index]
+            self.index += 1
+            return arg
+
+        raise CrazyError(f'Missing argument: {name}')
+
+    def get_optional_arg(self, default=None):
+        '''Return an optional arg, else return a default.'''
+
+        if self.index < len(self.args):
+            arg = self.args[self.index]
+            self.index += 1
+            return arg
+
         return default
 
+    def require_no_more(self):
+        '''Raise an exception if there are any arguments left.'''
 
-def _require_no_more(args):
-    if args:
-        raise CrazyError(f'Too many arguments: {args}')
+        if self.index < len(self.args):
+            raise CrazyError(f'Too many arguments: {self.args[self.index:]}')
+
 
 # =============================================================================
 # Command validation functions
@@ -37,12 +53,12 @@ def _validate_none(_args):
 
 
 def _validate_void(args):
-    _require_no_more(args)
+    args.require_no_more()
 
 
 def _validate_choices(args):
-    choices = _get_required_arg(args, 'values')
-    _require_no_more(args)
+    choices = args.get_required_arg('values')
+    args.require_no_more()
 
     if is_dict_type(choices):
         for item, desc in choices.items():
@@ -62,8 +78,8 @@ def _validate_choices(args):
 
 
 def _validate_file(args):
-    opts = _get_optional_arg(args, {})
-    _require_no_more(args)
+    opts = args.get_optional_arg({})
+    args.require_no_more()
 
     if not isinstance(opts, dict):
         raise CrazyTypeError('options', 'dict', opts)
@@ -80,10 +96,10 @@ def _validate_file(args):
 
 
 def _validate_range(args):
-    start = _get_required_arg(args, "start")
-    stop  = _get_required_arg(args, "stop")
-    step  = _get_optional_arg(args, 1)
-    _require_no_more(args)
+    start = args.get_required_arg("start")
+    stop  = args.get_required_arg("stop")
+    step  = args.get_optional_arg(1)
+    args.require_no_more()
 
     if not isinstance(start, int):
         raise CrazyError(f"start: not an int: {start}")
@@ -105,16 +121,16 @@ def _validate_range(args):
 
 
 def _validate_exec(args):
-    cmd = _get_required_arg(args, 'command')
-    _require_no_more(args)
+    cmd = args.get_required_arg('command')
+    args.require_no_more()
 
     if not isinstance(cmd, str):
         raise CrazyError(f"Command is not a string: {cmd}")
 
 
 def _validate_value_list(args):
-    opts = _get_required_arg(args, 'options')
-    _require_no_more(args)
+    opts = args.get_required_arg('options')
+    args.require_no_more()
 
     values = None
     separator = ','
@@ -156,8 +172,8 @@ def _validate_value_list(args):
 
 
 def _validate_combine(args):
-    commands = _get_required_arg(args, 'commands')
-    _require_no_more(args)
+    commands = args.get_required_arg('commands')
+    args.require_no_more()
 
     if not isinstance(commands, list):
         raise CrazyError(f'commands: Not a list: {commands}')
@@ -185,8 +201,8 @@ def _validate_combine(args):
 
 
 def _validate_history(args):
-    pattern = _get_required_arg(args, 'pattern')
-    _require_no_more(args)
+    pattern = args.get_required_arg('pattern')
+    args.require_no_more()
 
     if not isinstance(pattern, str):
         raise CrazyError(f"Pattern is not a string: {pattern}")
@@ -206,7 +222,8 @@ def validate_complete(complete):
     if not complete:
         return
 
-    command, *args = complete
+    args = Arguments(complete)
+    command = args.get_required_arg('command')
 
     if not isinstance(command, str):
         raise CrazyError(f"Command is not a string: {command}")
@@ -276,6 +293,27 @@ def validate_positionals_repeatable(cmdline):
         raise CrazyError('Repeatable positionals and subcommands cannot be used together')
 
 
+def validate_positionals_command_arg(cmdline):
+    '''Check for the right usage of `command_arg`.'''
+
+    positionals = cmdline.get_positionals()
+    command_position = None
+
+    for positional in sorted(positionals, key=lambda p: p.number):
+        complete = positional.complete or ['none']
+        positional_number = positional.get_positional_num()
+
+        if complete[0] == 'command':
+            command_position = positional_number
+
+        elif complete[0] == 'command_arg':
+            if not positional.repeatable:
+                raise CrazyError('The `command_arg` completer requires `repeatable=True`')
+
+            if command_position is None or command_position + 1 != positional_number:
+                raise CrazyError('The `command_arg` completer requires a previous `command` completer')
+
+
 def validate_commandline(cmdline):
     '''Validate completion commands of options/positionals in a commandline.'''
 
@@ -300,6 +338,7 @@ def validate_commandline(cmdline):
 
     try:
         validate_positionals_repeatable(cmdline)
+        validate_positionals_command_arg(cmdline)
     except CrazyError as e:
         raise CrazyError("%s: %s" % (cmdline.get_command_path(), e)) from e
 

@@ -18,27 +18,43 @@ _error = CrazySchemaValidationError
 # =============================================================================
 
 
-def _has_set(dictionary, key):
-    return (key in dictionary.value and dictionary.value[key].value is not None)
+class Arguments:
+    '''Class for accessing arguments.'''
 
+    def __init__(self, args):
+        self.args = args
+        self.index = 0
 
-def _get_required_arg(args, name):
-    try:
-        return args.value.pop(0)
-    except IndexError:
-        raise _error(f'Missing required arg `{name}`', args) from None
+    def get_required_arg(self, name):
+        '''Return a required argument, else raise an exception.'''
 
+        if self.index < len(self.args.value):
+            arg = self.args.value[self.index]
+            self.index += 1
+            return arg
 
-def _get_optional_arg(args, default=None):
-    try:
-        return args.value.pop(0)
-    except IndexError:
+        raise _error(f'Missing required arg `{name}`', self.args)
+
+    def get_optional_arg(self, default=None):
+        '''Return an optional arg, else return a default.'''
+
+        if self.index < len(self.args.value):
+            arg = self.args.value[self.index]
+            self.index += 1
+            return arg
+
         return ValueWithTrace(default, '<default value>', 1, 1)
 
 
-def _require_no_more(args):
-    if len(args.value) > 0:
-        raise _error('Too many arguments provided', args)
+    def require_no_more(self):
+        '''Raise an exception if there are any arguments left.'''
+
+        if self.index < len(self.args.value):
+            raise _error('Too many arguments provided', self.args)
+
+
+def _has_set(dictionary, key):
+    return (key in dictionary.value and dictionary.value[key].value is not None)
 
 
 def _check_type(value, types, parameter_name=None):
@@ -93,14 +109,14 @@ def _check_when(value):
         raise _error(f'when: {e}', value) from e
 
 
-def _check_void(args):
-    _require_no_more(args)
+def _check_void(arguments):
+    arguments.require_no_more()
 
 
-def _check_choices(args):
-    choices = _get_required_arg(args, 'choices')
+def _check_choices(arguments):
+    choices = arguments.get_required_arg('choices')
     _check_type(choices, (list, dict))
-    _require_no_more(args)
+    arguments.require_no_more()
 
     if isinstance(choices.value, dict):
         for value, desc in choices.value.items():
@@ -112,10 +128,10 @@ def _check_choices(args):
             _check_type(value, (str, int, float))
 
 
-def _check_file(args):
-    options = _get_optional_arg(args, {})
+def _check_file(arguments):
+    options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
-    _require_no_more(args)
+    arguments.require_no_more()
     _check_dictionary(options, {'directory': (False, (str,))})
 
     if _has_set(options, 'directory'):
@@ -123,17 +139,17 @@ def _check_file(args):
             raise _error('directory may not be empty', options.value['directory'])
 
 
-def _check_range(args):
-    start = _get_required_arg(args, "start")
+def _check_range(arguments):
+    start = arguments.get_required_arg("start")
     _check_type(start, (int,), "start")
 
-    stop  = _get_required_arg(args, "stop")
+    stop  = arguments.get_required_arg("stop")
     _check_type(stop,  (int,), "stop")
 
-    step  = _get_optional_arg(args, 1)
+    step  = arguments.get_optional_arg(1)
     _check_type(step,  (int,), "step")
 
-    _require_no_more(args)
+    arguments.require_no_more()
 
     if step.value > 0:
         if start.value > stop.value:
@@ -147,15 +163,15 @@ def _check_range(args):
         raise _error("step: cannot be 0", step)
 
 
-def _check_exec(args):
-    command = _get_required_arg(args, "command")
+def _check_exec(arguments):
+    command = arguments.get_required_arg("command")
     _check_type(command, (str,), "command")
-    _require_no_more(args)
+    arguments.require_no_more()
 
 
-def _check_value_list(args):
-    options = _get_required_arg(args, 'options')
-    _require_no_more(args)
+def _check_value_list(arguments):
+    options = arguments.get_required_arg('options')
+    arguments.require_no_more()
 
     _check_dictionary(options, {
         'values':    (True,  (list, dict)),
@@ -182,9 +198,9 @@ def _check_value_list(args):
             raise _error('Invalid length for separator', separator)
 
 
-def _check_combine(args):
-    commands = _get_required_arg(args, 'commands')
-    _require_no_more(args)
+def _check_combine(arguments):
+    commands = arguments.get_required_arg('commands')
+    arguments.require_no_more()
 
     _check_type(commands, (list,))
 
@@ -209,17 +225,18 @@ def _check_combine(args):
         raise _error('commands: Must contain more than one command', commands)
 
 
-def _check_history(args):
-    pattern = _get_required_arg(args, "pattern")
+def _check_history(arguments):
+    pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
-    _require_no_more(args)
+    arguments.require_no_more()
 
     if not is_valid_extended_regex(pattern.value):
         raise _error('Pattern: Not a valid extended regex', pattern)
 
 
 def _check_complete(args):
-    cmd = _get_required_arg(args, 'command')
+    arguments = Arguments(args)
+    cmd = arguments.get_required_arg('command')
 
     commands = {
         'none':             _check_void,
@@ -261,7 +278,7 @@ def _check_complete(args):
     if cmd.value not in commands:
         raise _error(f'Invalid command: {cmd.value}', cmd)
 
-    commands[cmd.value](args)
+    commands[cmd.value](arguments)
 
 
 def _check_positionals_repeatable(definition_tree, definition):
@@ -289,6 +306,37 @@ def _check_positionals_repeatable(definition_tree, definition):
     node = definition_tree.get_definition(definition.value['prog'].value)
     if repeatable_number is not None and len(node.subcommands) > 0:
         raise _error('Repeatable positionals and subcommands cannot be used together', definition)
+
+
+def _check_positionals_command_arg(definition):
+    '''Check for the right usage of `command_arg`.'''
+
+    if not _has_set(definition, 'positionals'):
+        return
+
+    positionals = definition.value['positionals'].value
+    command_position = None
+
+    for positional in sorted(positionals, key=lambda p: p.value['number'].value):
+        complete = ['none']
+        if _has_set(positional, 'complete'):
+            complete = positional.value['complete'].value
+
+        repeatable = False
+        if _has_set(positional, 'repeatable'):
+            repeatable = positional.value['repeatable'].value
+
+        positional_number = positional.value['number'].value
+
+        if complete[0] == 'command':
+            command_position = positional_number
+
+        elif complete[0] == 'command_arg':
+            if not repeatable:
+                raise _error('The `command_arg` completer requires `repeatable=True`', positional)
+
+            if command_position is None or command_position + 1 != positional_number:
+                raise _error('The `command_arg` completer requires a previous `command` completer', positional)
 
 
 def _check_option(option):
@@ -473,3 +521,4 @@ def validate(definition_list):
 
     for definition in definition_list:
         _check_positionals_repeatable(tree, definition)
+        _check_positionals_command_arg(definition)

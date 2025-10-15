@@ -1,0 +1,5 @@
+prog: "foo"
+positionals:
+  - number: 1
+    complete: ['command_arg']
+    repeatable: true

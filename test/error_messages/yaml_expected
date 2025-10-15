@@ -132,6 +132,8 @@
 3_23_01-history-too-many-arguments       | line 4, column 15: Too many arguments provided
 3_23_02-history-pattern-wrong-type       | line 4, column 27: pattern: Invalid type. Expected types: string
 3_23_03-history-pattern-wrong-regex      | line 4, column 27: Pattern: Not a valid extended regex
+3_24_00-command-arg-without-command      | line 3, column 5: The `command_arg` completer requires a previous `command` completer
+3_24_01-command-arg-non-repeatable       | line 6, column 5: The `command_arg` completer requires `repeatable=True`
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary
 001-multiple-repeatable-positionals      | line 6, column 5: Only one positional argument may be marked as repeatable
