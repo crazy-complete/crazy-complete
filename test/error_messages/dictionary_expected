@@ -131,6 +131,6 @@
 3_23_03-history-pattern-wrong-regex      | foo: -o: Pattern is not a valid extended regex: [foo
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
-001-multiple-repeatable-positionals      | No error
-002-positional-after-repeatable          | No error
-003-positional-after-repeatable          | No error
+001-multiple-repeatable-positionals      | foo: Only one positional argument may be marked as repeatable
+002-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
+003-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
