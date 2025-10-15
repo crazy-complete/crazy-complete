@@ -1,24 +1,27 @@
 ======= Directory "01-commandline" =======
 000-no-prog                              | line 1, column 1: Missing required key: prog
-001-empty-prog                           | line 1, column 7: prog is empty
-002-prog-is-space                        | line 1, column 7: prog is empty
-003-no-programs-defined                  | line 1, column 1: No programs defined
-004-too-many-programs-defined            | line 1, column 1: Too many main programs defined: ['test', 'test1']
-005-duplicate-programs                   | line 3, column 1: Multiple definition of program `test`
-006-duplicate-subcommands                | line 5, column 1: Multiple definition of program `test subcommand`
-007-missing-command                      | line 3, column 1: Command not found: test bar
-008-missing-command-2                    | line 5, column 1: Command not found: test bar
-010-aliases-wrong-type                   | line 2, column 10: aliases: Invalid type. Expected types: list|none
-011-aliases-not-str                      | line 2, column 11: alias: Invalid type. Expected types: string
-012-aliases-with-space                   | line 2, column 11: alias contains space
-020-abbreviate-commands-wrong-type       | line 2, column 22: abbreviate_commands: Invalid type. Expected types: boolean|string|none
-021-abbreviate-commands-wrong-value      | line 2, column 22: Invalid value. Expected true, false or "INHERIT"
-030-abbreviate-options-wrong-type        | line 2, column 21: abbreviate_options: Invalid type. Expected types: boolean|string|none
-031-abbreviate-options-wrong-value       | line 2, column 21: Invalid value. Expected true, false or "INHERIT"
-040-inherit-options-wrong-type           | line 2, column 18: inherit_options: Invalid type. Expected types: boolean|string|none
-041-inherit-options-wrong-value          | line 2, column 18: Invalid value. Expected true, false or "INHERIT"
-050-options-wrong-type                   | line 2, column 10: options: Invalid type. Expected types: list|none
-060-positionals-wrong-type               | line 2, column 14: positionals: Invalid type. Expected types: list|none
+001-empty-prog                           | line 1, column 7: prog: value is empty
+002-prog-is-space                        | line 1, column 7: prog: value is empty
+003-prog-contains-more-space             | line 3, column 7: prog: contains multiple spaces
+004-prog-begins-with-space               | line 1, column 7: prog: begins with space
+005-prog-ends-with-space                 | line 1, column 7: prog: ends with space
+006-no-programs-defined                  | line 1, column 1: No programs defined
+007-too-many-programs-defined            | line 1, column 1: Too many main programs defined: ['test', 'test1']
+008-duplicate-programs                   | line 3, column 1: Multiple definition of program `test`
+009-duplicate-subcommands                | line 5, column 1: Multiple definition of program `test subcommand`
+010-missing-command                      | line 3, column 1: Command not found: test bar
+011-missing-command-2                    | line 5, column 1: Command not found: test bar
+020-aliases-wrong-type                   | line 2, column 10: aliases: Invalid type. Expected types: list|none
+021-aliases-not-str                      | line 2, column 11: alias: Invalid type. Expected types: string
+022-aliases-with-space                   | line 2, column 11: alias contains space
+030-abbreviate-commands-wrong-type       | line 2, column 22: abbreviate_commands: Invalid type. Expected types: boolean|string|none
+031-abbreviate-commands-wrong-value      | line 2, column 22: Invalid value. Expected true, false or "INHERIT"
+040-abbreviate-options-wrong-type        | line 2, column 21: abbreviate_options: Invalid type. Expected types: boolean|string|none
+041-abbreviate-options-wrong-value       | line 2, column 21: Invalid value. Expected true, false or "INHERIT"
+050-inherit-options-wrong-type           | line 2, column 18: inherit_options: Invalid type. Expected types: boolean|string|none
+051-inherit-options-wrong-value          | line 2, column 18: Invalid value. Expected true, false or "INHERIT"
+060-options-wrong-type                   | line 2, column 10: options: Invalid type. Expected types: list|none
+070-positionals-wrong-type               | line 2, column 14: positionals: Invalid type. Expected types: list|none
 ======= Directory "02-option" =======
 100-no-option-strings                    | line 3, column 5: Missing required key: option_strings
 101-option-strings-wrong-type            | line 3, column 21: option_strings: Invalid type. Expected types: list

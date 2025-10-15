@@ -9,7 +9,7 @@ from .value_with_trace import ValueWithTrace
 from .str_utils import (
     contains_space, is_empty_or_whitespace,
     is_valid_option_string, is_valid_variable_name,
-    is_valid_extended_regex)
+    is_valid_extended_regex, validate_prog)
 
 _error = CrazySchemaValidationError
 
@@ -374,8 +374,10 @@ def _check_definition(definition):
         'positionals':          (False, (list, NoneType)),
     })
 
-    if is_empty_or_whitespace(definition.value['prog'].value):
-        raise _error('prog is empty', definition.value['prog'])
+    try:
+        validate_prog(definition.value['prog'].value)
+    except CrazyError as e:
+        raise _error(f'prog: {e}', definition.value['prog'])
 
     if _has_set(definition, 'aliases'):
         for alias in definition.value['aliases'].value:

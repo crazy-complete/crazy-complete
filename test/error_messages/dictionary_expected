@@ -1,24 +1,27 @@
 ======= Directory "01-commandline" =======
 000-no-prog                              | Missing `prog` field
-001-empty-prog                           | The `prog` field must not be empty
-002-prog-is-space                        | The `prog` field must not be empty
-003-no-programs-defined                  | No programs defined
-004-too-many-programs-defined            | Too many main programs defined: ['test', 'test1']
-005-duplicate-programs                   | Multiple definition of program `test`
-006-duplicate-subcommands                | Multiple definition of program `subcommand`
-007-missing-command                      | Command not found: test bar
-008-missing-command-2                    | Command not found: test bar
-010-aliases-wrong-type                   | Parameter `aliases` has an invalid type. Expected types: list. Received: True (bool)
-011-aliases-not-str                      | Parameter `aliases[0]` has an invalid type. Expected types: str. Received: True (bool)
-012-aliases-with-space                   | aliases[0]: cannot contain space
-020-abbreviate-commands-wrong-type       | Parameter `abbreviate_commands` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
-021-abbreviate-commands-wrong-value      | Parameter `abbreviate_commands` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
-030-abbreviate-options-wrong-type        | Parameter `abbreviate_options` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
-031-abbreviate-options-wrong-value       | Parameter `abbreviate_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
-040-inherit-options-wrong-type           | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
-041-inherit-options-wrong-value          | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
-050-options-wrong-type                   | Parameter `options` has an invalid type. Expected types: list. Received: False (bool)
-060-positionals-wrong-type               | Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)
+001-empty-prog                           | prog: value is empty
+002-prog-is-space                        | prog: value is empty
+003-prog-contains-more-space             | prog: contains multiple spaces
+004-prog-begins-with-space               | prog: begins with space
+005-prog-ends-with-space                 | prog: ends with space
+006-no-programs-defined                  | No programs defined
+007-too-many-programs-defined            | Too many main programs defined: ['test', 'test1']
+008-duplicate-programs                   | Multiple definition of program `test`
+009-duplicate-subcommands                | Multiple definition of program `subcommand`
+010-missing-command                      | Command not found: test bar
+011-missing-command-2                    | Command not found: test bar
+020-aliases-wrong-type                   | Parameter `aliases` has an invalid type. Expected types: list. Received: True (bool)
+021-aliases-not-str                      | Parameter `aliases[0]` has an invalid type. Expected types: str. Received: True (bool)
+022-aliases-with-space                   | aliases[0]: cannot contain space
+030-abbreviate-commands-wrong-type       | Parameter `abbreviate_commands` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+031-abbreviate-commands-wrong-value      | Parameter `abbreviate_commands` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+040-abbreviate-options-wrong-type        | Parameter `abbreviate_options` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+041-abbreviate-options-wrong-value       | Parameter `abbreviate_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+050-inherit-options-wrong-type           | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: [] (list)
+051-inherit-options-wrong-value          | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
+060-options-wrong-type                   | Parameter `options` has an invalid type. Expected types: list. Received: False (bool)
+070-positionals-wrong-type               | Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)
 ======= Directory "02-option" =======
 100-no-option-strings                    | Parameter `option_strings` has an invalid type. Expected types: list. Received: None (NoneType)
 101-option-strings-wrong-type            | Parameter `option_strings` has an invalid type. Expected types: list. Received: False (bool)

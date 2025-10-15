@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from .errors import CrazyError, CrazyTypeError
 from .cli import CommandLine, ExtendedBool
-from .str_utils import is_empty_or_whitespace
+from .str_utils import is_empty_or_whitespace, validate_prog
 from . import compat
 
 
@@ -82,8 +82,10 @@ def _check_prog_in_dictionary(dictionary):
     if not isinstance(dictionary['prog'], str):
         raise CrazyTypeError('prog', 'str', dictionary["prog"])
 
-    if is_empty_or_whitespace(dictionary['prog']):
-        raise CrazyError('The `prog` field must not be empty')
+    try:
+        validate_prog(dictionary['prog'])
+    except CrazyError as e:
+        raise CrazyError(f'prog: {e}')
 
 
 def _get_commandline_by_path(root, path):

@@ -3,6 +3,8 @@
 import re
 import subprocess
 
+from .errors import CrazyError
+
 
 _VALID_OPTION_STRING_RE = re.compile('-[^\\s,]+')
 _VALID_VARIABLE_RE = re.compile('[a-zA-Z_][a-zA-Z0-9_]*')
@@ -35,6 +37,28 @@ def is_valid_extended_regex(string):
         return r.returncode != 2
     except (FileNotFoundError, PermissionError, subprocess.TimeoutExpired):
         return True
+
+
+def validate_prog(string):
+    '''Validate a program string.'''
+
+    if is_empty_or_whitespace(string):
+        raise CrazyError('value is empty')
+
+    if string.startswith(' '):
+        raise CrazyError('begins with space')
+
+    if string.endswith(' '):
+        raise CrazyError('ends with space')
+
+    if '\t' in string:
+        raise CrazyError('contains a tabulator')
+
+    if '\n' in string:
+        raise CrazyError('contains a newline')
+
+    if '  ' in string:
+        raise CrazyError('contains multiple spaces')
 
 
 def indent(string, num_spaces):
