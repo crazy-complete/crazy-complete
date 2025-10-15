@@ -78,30 +78,28 @@ class ZshCompletionFunction:
 
         return Arg(option, option.when, option.hidden, option_spec)
 
-    def _complete_subcommands(self, option):
-        choices = option.get_choices()
+    def _complete_subcommands(self, positional):
+        choices = positional.get_choices()
         self.command_counter += 1
 
-        option_spec = "%d:command%d:%s" % (
-            option.get_positional_num(),
-            self.command_counter,
-            self._complete(option, 'choices', choices)
+        spec = zsh_utils.make_positional_spec(
+            positional.get_positional_num(),
+            False,
+            f'command{self.command_counter}',
+            self._complete(positional, 'choices', choices)
         )
 
-        return Arg(option, None, False, option_spec)
+        return Arg(positional, None, False, spec)
 
-    def _complete_positional(self, option):
-        positional_num = option.get_positional_num()
-        if option.repeatable:
-            positional_num = "'*'"
-
-        option_spec = "%s:%s:%s" % (
-            positional_num,
-            shell.escape(zsh_utils.escape_colon(option.help or option.metavar or ' ')),
-            self._complete(option, *option.complete)
+    def _complete_positional(self, positional):
+        spec = zsh_utils.make_positional_spec(
+            positional.get_positional_num(),
+            positional.repeatable,
+            positional.help or positional.metavar or ' ',
+            self._complete(positional, *positional.complete)
         )
 
-        return Arg(option, option.when, False, option_spec)
+        return Arg(positional, positional.when, False, spec)
 
     def _generate_completion_code(self):
         self.code = OrderedDict()

@@ -6,6 +6,7 @@ inherit-on: {"args": ["--input-type=yaml", "--inherit-options=True"], "definitio
 inherit-off: {"args": ["--input-type=yaml", "--inherit-options=False"], "definition_file": "inherit-options.yaml"}
 capture: {"args": ["--input-type=yaml", "--include-file=include.capture.$shell"], "definition_file": "capture.yaml"}
 choices: {"args": ["--input-type=yaml"], "definition_file": "choices.yaml"}
+command_arg: {"args": ["--input-type=yaml"], "definition_file": "command_arg.yaml"}
 ---
 number: 1
 definition_file: "main"

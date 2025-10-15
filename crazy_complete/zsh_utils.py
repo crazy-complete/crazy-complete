@@ -89,3 +89,30 @@ def make_option_spec(
         result.append(':%s:%s' % (shell.escape(escape_colon(metavar)), action))
 
     return ''.join(result)
+
+
+def make_positional_spec(
+        number,
+        repeatable,
+        description,
+        action
+    ):
+
+    '''
+    Make a Zsh positional spec.
+
+    Returns something like this:
+        Number:Description:Action
+    '''
+
+    if repeatable is True:
+        num_spec = "'*'"
+    else:
+        num_spec = str(number)
+
+    desc_spec = shell.escape(escape_colon(description))
+
+    if action == '_normal':
+        return f'{num_spec}::{desc_spec}:{action}'
+
+    return f'{num_spec}:{desc_spec}:{action}'

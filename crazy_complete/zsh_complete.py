@@ -191,6 +191,9 @@ class ZshCompleter(shell.ShellCompleter):
     def commandline_string(self, _ctxt):
         return '_cmdstring'
 
+    def command_arg(self, _ctxt):
+        return '_normal'
+
     # =========================================================================
     # Bonus
     # =========================================================================

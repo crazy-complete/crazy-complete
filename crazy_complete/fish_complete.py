@@ -283,6 +283,9 @@ class FishCompleter(shell.ShellCompleter):
         func = ctxt.helpers.use_function('commandline_string')
         return FishCompletionCommand(func)
 
+    def command_arg(self, _ctxt):
+        return FishCompleteNone()
+
     # =========================================================================
     # Bonus
     # =========================================================================

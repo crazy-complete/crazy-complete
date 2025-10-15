@@ -138,6 +138,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [process](#process)                        | Complete a process                                                          |
 | [pid](#pid)                                | Complete a PID                                                              |
 | [command](#command)                        | Complete a command                                                          |
+| [command\_arg](#command_arg)               | Complete arguments of a command                                             |
 | [commandline\_string](#commandline_string) | Complete a command line as a string                                         |
 | [user](#user)                              | Complete a user                                                             |
 | [group](#group)                            | Complete a group                                                            |
@@ -488,6 +489,8 @@ options:
 
 > Complete a command.
 
+> **NOTE:**: Use `command_arg` to complete arguments of a command.
+
 ```yaml
 prog: "example"
 options:
@@ -497,6 +500,32 @@ options:
 
 ```
  ~ > example --command=bas<TAB>
+base32    base64    basename  basenc    bash      bashbug
+```
+
+### command\_arg
+
+> Complete arguments of a command.
+
+> **NOTE:** This completion type can only be used in combination with a previously defined `command` completion.
+
+> **NOTE:** This completion requires `repeatable: true`.
+
+> **NOTE:** This command is currently only available in **Zsh**.
+
+```yaml
+prog: "example"
+positionals:
+  - number: 1
+    complete: ["command"]
+
+  - number: 2
+    complete: ["command_arg"]
+    repeatable: true
+```
+
+```
+ ~ > example sudo bas<TAB>
 base32    base64    basename  basenc    bash      bashbug
 ```
 

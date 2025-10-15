@@ -212,6 +212,9 @@ class BashCompleter(shell.ShellCompleter):
     def commandline_string(self, ctxt):
         return BashCompletionCommand(ctxt, '')
 
+    def command_arg(self, ctxt):
+        return BashCompletionCommand(ctxt, '')
+
     # =========================================================================
     # Bonus
     # =========================================================================
