@@ -137,3 +137,4 @@
 001-multiple-repeatable-positionals      | foo: Only one positional argument may be marked as repeatable
 002-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
 003-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
+004-repeatable-and-subcommands           | foo: Repeatable positionals and subcommands cannot be used together

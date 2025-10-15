@@ -1,0 +1,6 @@
+prog: "foo"
+positionals:
+  - number: 1
+    repeatable: true
+---
+prog: "foo bar"

@@ -264,7 +264,11 @@ def _check_complete(args):
     commands[cmd.value](args)
 
 
-def _check_positionals_repeatable(positionals):
+def _check_positionals_repeatable(definition_tree, definition):
+    if not _has_set(definition, 'positionals'):
+        return
+
+    positionals = definition.value['positionals'].value
     repeatable_number = None
 
     for positional in sorted(positionals, key=lambda p: p.value['number'].value):
@@ -281,6 +285,10 @@ def _check_positionals_repeatable(positionals):
                 repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:
             raise _error('A positional argument cannot follow a repeatable positional argument', positional)
+
+    node = definition_tree.get_definition(definition.value['prog'].value)
+    if repeatable_number is not None and len(node.subcommands) > 0:
+        raise _error('Repeatable positionals and subcommands cannot be used together', definition)
 
 
 def _check_option(option):
@@ -403,34 +411,48 @@ def _check_definition(definition):
         for positional in definition.value['positionals'].value:
             _check_positional(positional)
 
-        _check_positionals_repeatable(definition.value['positionals'].value)
 
+class DefinitionTree:
+    def __init__(self, prog):
+        self.prog = prog
+        self.subcommands = {}
 
-def _check_definitions_program_hierarchy(definition_list):
-    root = {}
-
-    for definition in definition_list:
+    def add_definition(self, definition):
         commands = definition.value['prog'].value.split(' ')
         subcommand = commands.pop(-1)
 
-        node = root
+        node = self
+
         for i, part in enumerate(commands):
             try:
-                node = node[part]
+                node = node.subcommands[part]
             except KeyError:
                 prog = ' '.join(commands[0:i+1])
                 raise _error(f'Missing definition of program `{prog}`', definition)
 
-        if subcommand in node:
+        if subcommand in node.subcommands:
             prog = definition.value['prog'].value
             raise _error(f'Multiple definition of program `{prog}`', definition)
 
-        node[subcommand] = {}
+        node.subcommands[subcommand] = DefinitionTree(subcommand)
 
-    if len(root) > 1:
-        value = ValueWithTrace(None, '', 1, 1)
-        progs = list(root.keys())
-        raise _error('Too many main programs defined: %s' % progs, value)
+    def get_definition(self, prog):
+        commands = prog.split(' ')
+        node = self
+
+        for part in commands:
+            node = node.subcommands[part]
+
+        return node
+
+    @staticmethod
+    def make_tree(definition_list):
+        root = DefinitionTree('<root>')
+
+        for definition in definition_list:
+            root.add_definition(definition)
+
+        return root
 
 
 def validate(definition_list):
@@ -439,7 +461,15 @@ def validate(definition_list):
     for definition in definition_list:
         _check_definition(definition)
 
-    if len(definition_list) == 0:
+    tree = DefinitionTree.make_tree(definition_list)
+
+    if len(tree.subcommands) == 0:
         raise _error('No programs defined', ValueWithTrace(None, '', 1, 1))
 
-    _check_definitions_program_hierarchy(definition_list)
+    if len(tree.subcommands) > 1:
+        value = ValueWithTrace(None, '', 1, 1)
+        progs = list(tree.subcommands.keys())
+        raise _error('Too many main programs defined: %s' % progs, value)
+
+    for definition in definition_list:
+        _check_positionals_repeatable(tree, definition)

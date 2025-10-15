@@ -254,10 +254,11 @@ def validate_complete(complete):
     validate_commands[command](args)
 
 
-def validate_positionals_repeatable(positionals):
+def validate_positionals_repeatable(cmdline):
     '''Validate positional argument definitions.'''
 
     repeatable_number = None
+    positionals = cmdline.get_positionals()
 
     for positional in sorted(positionals, key=lambda p: p.number):
         repeatable = positional.repeatable
@@ -270,6 +271,9 @@ def validate_positionals_repeatable(positionals):
                 repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:
             raise CrazyError('A positional argument cannot follow a repeatable positional argument')
+
+    if cmdline.get_subcommands() and repeatable_number is not None:
+        raise CrazyError('Repeatable positionals and subcommands cannot be used together')
 
 
 def validate_commandline(cmdline):
@@ -295,7 +299,7 @@ def validate_commandline(cmdline):
                 e)) from e
 
     try:
-        validate_positionals_repeatable(cmdline.get_positionals())
+        validate_positionals_repeatable(cmdline)
     except CrazyError as e:
         raise CrazyError("%s: %s" % (cmdline.get_command_path(), e)) from e
 
