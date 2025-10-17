@@ -252,10 +252,10 @@ def _check_combine(arguments):
         _check_complete(subcommand_args)
 
     if len(commands.value) == 0:
-        raise _error('commands: Cannot be empty', commands)
+        raise _error('combine: Cannot be empty', commands)
 
     if len(commands.value) == 1:
-        raise _error('commands: Must contain more than one command', commands)
+        raise _error('combine: Must contain more than one command', commands)
 
 
 def _check_history(arguments):

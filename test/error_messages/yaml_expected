@@ -126,8 +126,8 @@
 3_21_09-value-list-too-many-args         | line 4, column 15: Too many arguments provided
 3_22_00-combine-missing-arg              | line 4, column 15: Missing required arg `commands`
 3_22_01-combine-wrong-type               | line 4, column 27: Invalid type. Expected types: list
-3_22_02-combine-empty-subcommands        | line 4, column 27: commands: Cannot be empty
-3_22_03-combine-single-subcommand        | line 4, column 27: commands: Must contain more than one command
+3_22_02-combine-empty-subcommands        | line 4, column 27: combine: Cannot be empty
+3_22_03-combine-single-subcommand        | line 4, column 27: combine: Must contain more than one command
 3_22_04-combine-subcommand-no-command    | line 4, column 38: Missing command
 3_22_05-combine-subcommand-invalid-type  | line 4, column 38: Invalid type. Expected types: list
 3_22_06-combine-subcommand-invalid-command | line 4, column 39: Invalid command: invalid

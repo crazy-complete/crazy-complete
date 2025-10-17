@@ -204,7 +204,7 @@ def _validate_combine(args):
     args.require_no_more()
 
     if not isinstance(commands, list):
-        raise CrazyError(f'commands: Not a list: {commands}')
+        raise CrazyError(f'combine: Not a list: {commands}')
 
     for subcommand_args in commands:
         if not isinstance(subcommand_args, list):
@@ -222,10 +222,10 @@ def _validate_combine(args):
         validate_complete(subcommand_args)
 
     if len(commands) == 0:
-        raise CrazyError('commands: Cannot be empty')
+        raise CrazyError('combine: Cannot be empty')
 
     if len(commands) == 1:
-        raise CrazyError('commands: Must contain more than one command')
+        raise CrazyError('combine: Must contain more than one command')
 
 
 def _validate_history(args):

@@ -125,9 +125,9 @@
 3_21_08-value-list-dict-desc-wrong-type  | foo: -o: values: Not a string: None
 3_21_09-value-list-too-many-args         | foo: -o: Too many arguments: ['wrong']
 3_22_00-combine-missing-arg              | foo: -o: Missing argument: commands
-3_22_01-combine-wrong-type               | foo: -o: commands: Not a list: True
-3_22_02-combine-empty-subcommands        | foo: -o: commands: Cannot be empty
-3_22_03-combine-single-subcommand        | foo: -o: commands: Must contain more than one command
+3_22_01-combine-wrong-type               | foo: -o: combine: Not a list: True
+3_22_02-combine-empty-subcommands        | foo: -o: combine: Cannot be empty
+3_22_03-combine-single-subcommand        | foo: -o: combine: Must contain more than one command
 3_22_04-combine-subcommand-no-command    | foo: -o: combine: Missing command
 3_22_05-combine-subcommand-invalid-type  | foo: -o: combine: Not a list: True
 3_22_06-combine-subcommand-invalid-command | foo: -o: Unknown command for `complete`: invalid
