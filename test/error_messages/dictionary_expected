@@ -87,16 +87,18 @@
 3_15_01-file-unknown-key                 | foo: -o: Unknown option: wrong
 3_15_02-file-directory-wrong-type        | foo: -o: directory: Not a string: False
 3_15_03-file-directory-empty             | foo: -o: directory: Cannot be empty
-3_15_04-file-extensions-wrong-type       | foo: -o: extensions: Not a list: False
-3_15_05-file-extensions-empty            | foo: -o: extensions: Cannot be empty
-3_15_06-file-extension-empty             | foo: -o: extensions[0]: May not be empty
-3_15_07-file-extension-with-space        | foo: -o: extensions[0]: Contains space: foo 
-3_15_08-file-too-many-args               | foo: -o: Too many arguments: ['wrong']
+3_15_04-file-directory-not-absolute      | foo: -o: directory: Must be an absolute path
+3_15_05-file-extensions-wrong-type       | foo: -o: extensions: Not a list: False
+3_15_06-file-extensions-empty            | foo: -o: extensions: Cannot be empty
+3_15_07-file-extension-empty             | foo: -o: extensions[0]: May not be empty
+3_15_08-file-extension-with-space        | foo: -o: extensions[0]: Contains space: foo 
+3_15_09-file-too-many-args               | foo: -o: Too many arguments: ['wrong']
 3_16_00-directory-options-wrong-type     | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
 3_16_01-directory-unknown-key            | foo: -o: Unknown option: wrong
 3_16_02-directory-directory-wrong-type   | foo: -o: directory: Not a string: False
 3_16_03-directory-directory-empty        | foo: -o: directory: Cannot be empty
-3_16_04-directory-too-many-args          | foo: -o: Too many arguments: ['wrong']
+3_16_04-directory-directory-not-absolute | foo: -o: directory: Must be an absolute path
+3_16_05-directory-too-many-args          | foo: -o: Too many arguments: ['wrong']
 3_17_00-range-missing-arg-1              | foo: -o: Missing argument: start
 3_17_01-range-missing-arg-2              | foo: -o: Missing argument: stop
 3_17_02-range-too-many-args              | foo: -o: Too many arguments: [4]

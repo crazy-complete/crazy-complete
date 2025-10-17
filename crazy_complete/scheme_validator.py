@@ -128,18 +128,27 @@ def _check_choices(arguments):
             _check_type(value, (str, int, float))
 
 
-def _check_file(arguments):
+def _check_filedir(arguments, mode):
     options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
     arguments.require_no_more()
-    _check_dictionary(options, {
-        'directory':  (False, (str,)),
-        'extensions': (False, (list,)),
-    })
+
+    if mode == 'file':
+        _check_dictionary(options, {
+            'directory':  (False, (str,)),
+            'extensions': (False, (list,)),
+        })
+    else:
+        _check_dictionary(options, {
+            'directory':  (False, (str,)),
+        })
 
     if _has_set(options, 'directory'):
         if options.value['directory'].value == '':
             raise _error('directory may not be empty', options.value['directory'])
+
+        if not options.value['directory'].value.startswith('/'):
+            raise _error('directory must be an absolute path', options.value['directory'])
 
     if _has_set(options, 'extensions'):
         if len(options.value['extensions'].value) == 0:
@@ -153,6 +162,14 @@ def _check_file(arguments):
 
             if contains_space(extension.value):
                 raise _error('extension contains space', extension)
+
+
+def _check_file(arguments):
+    _check_filedir(arguments, 'file')
+
+
+def _check_directory(arguments):
+    _check_filedir(arguments, 'directory')
 
 
 def _check_range(arguments):
@@ -270,7 +287,7 @@ def _check_complete(args):
         'variable':         _check_void,
         'choices':          _check_choices,
         'file':             _check_file,
-        'directory':        _check_file,
+        'directory':        _check_directory,
         'range':            _check_range,
         'exec':             _check_exec,
         'exec_fast':        _check_exec,

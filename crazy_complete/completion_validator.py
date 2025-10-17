@@ -77,7 +77,7 @@ def _validate_choices(args):
         raise CrazyError('values: Not a list or dictionary')
 
 
-def _validate_file(args):
+def _validate_filedir(args, mode):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
@@ -91,7 +91,11 @@ def _validate_file(args):
 
             if value == '':
                 raise CrazyError('directory: Cannot be empty')
-        elif key == 'extensions':
+
+            if not value.startswith('/'):
+                raise CrazyError('directory: Must be an absolute path')
+
+        elif mode == 'file' and key == 'extensions':
             if not is_list_type(value):
                 raise CrazyError(f"extensions: Not a list: {value}")
 
@@ -109,6 +113,14 @@ def _validate_file(args):
                     raise CrazyError(f"extensions[{i}]: Contains space: {subval}")
         else:
             raise CrazyError(f'Unknown option: {key}')
+
+
+def _validate_file(args):
+    _validate_filedir(args, 'file')
+
+
+def _validate_directory(args):
+    _validate_filedir(args, 'directory')
 
 
 def _validate_range(args):
@@ -260,7 +272,7 @@ def validate_complete(complete):
         'environment':   _validate_void,
         'choices':       _validate_choices,
         'file':          _validate_file,
-        'directory':     _validate_file,
+        'directory':     _validate_directory,
         'range':         _validate_range,
         'exec':          _validate_exec,
         'exec_fast':     _validate_exec,
