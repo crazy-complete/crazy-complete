@@ -109,23 +109,76 @@ class FishCompleteChoices(FishCompletionBase):
         return self._get_code_for_list(self.choices)
 
 
-class FishCompleteFileDir(FishCompletionBase):
-    '''Class for completing file/dir completion.'''
+class FishCompleteFile(FishCompletionBase):
+    '''Class for completing files.'''
 
-    def __init__(self, ctxt, mode, opts):
+    def __init__(self, ctxt, opts):
         self.ctxt = ctxt
-        self.mode = mode
+        self.directory = None
+        self.extensions = None
+
+        if opts:
+            self.directory = opts.get('directory', None)
+            self.extensions = opts.get('extensions', None)
+
+    def _get_extension_regex(self):
+        patterns = []
+
+        for extension in self.extensions:
+            pattern = ''
+            for c in extension:
+                if c.isalpha():
+                    pattern += '[%s%s]' % (c.lower(), c.upper())
+                elif c in ('.', '+'):
+                    pattern += f'\\{c}'
+                else:
+                    pattern += c
+            patterns.append(pattern)
+
+        return '|'.join(f'(.*\\.{pattern})' for pattern in patterns)
+
+    def get_args(self):
+        args = []
+
+        if self.directory:
+            args.extend(['-C', shell.escape(self.directory)])
+
+        if self.extensions:
+            self.ctxt.helpers.use_function('fish_complete_filedir', 'regex')
+            args.extend(['-r', shell.escape(self._get_extension_regex())])
+
+        if not args:
+            return ['-F']
+
+        funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
+        return ['-f', '-a', '(%s %s)' % (funcname, ' '.join(args))]
+
+    def get_code(self):
+        args = []
+
+        if self.directory:
+            args.extend(['-C', shell.escape(self.directory)])
+
+        if self.extensions:
+            self.ctxt.helpers.use_function('fish_complete_filedir', 'regex')
+            args.extend(['-r', shell.escape(self._get_extension_regex())])
+
+        funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
+
+        if not args:
+            return funcname
+
+        return '%s %s' % (funcname, ' '.join(args))
+
+
+class FishCompleteDir(FishCompletionBase):
+    '''Class for completing directories.'''
+
+    def __init__(self, ctxt, opts):
+        self.ctxt = ctxt
         self.directory = None if opts is None else opts.get('directory', None)
 
     def get_args(self):
-        if self.mode == 'file':
-            if self.directory is not None:
-                funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-                return ['-f', '-a', '(%s -C %s)' % (funcname, shell.escape(self.directory))]
-
-            return ['-F']
-
-        # self.mode == 'directory'
         if self.directory is not None:
             funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
             return ['-f', '-a', '(%s -D -C %s)' % (funcname, shell.escape(self.directory))]
@@ -133,15 +186,6 @@ class FishCompleteFileDir(FishCompletionBase):
         return ['-f', '-a', '(__fish_complete_directories)']
 
     def get_code(self):
-        if self.mode == 'file':
-            funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-
-            if self.directory is not None:
-                return '%s -C %s' % (funcname, shell.escape(self.directory))
-
-            return '%s' % funcname
-
-        # self.mode == 'directory'
         if self.directory is not None:
             funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
             return '%s -D -C %s' % (funcname, shell.escape(self.directory))
@@ -225,10 +269,10 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompletionCommand("__fish_complete_command")
 
     def directory(self, ctxt, opts=None):
-        return FishCompleteFileDir(ctxt, 'directory', opts)
+        return FishCompleteDir(ctxt, opts)
 
     def file(self, ctxt, opts=None):
-        return FishCompleteFileDir(ctxt, 'file', opts)
+        return FishCompleteFile(ctxt, opts)
 
     def group(self, _ctxt):
         return FishCompletionCommand("__fish_complete_groups")

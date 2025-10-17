@@ -2,7 +2,7 @@
 
 from . import shell
 from .str_utils import join_with_wrap, indent
-from .zsh_utils import escape_colon, escape_square_brackets
+from .zsh_utils import escape_colon, escape_square_brackets, make_file_extension_pattern
 from .type_utils import is_dict_type
 
 
@@ -94,17 +94,32 @@ class ZshCompleter(shell.ShellCompleter):
         directory = None if opts is None else opts.get('directory', None)
 
         if directory:
-            return shell.escape('_directories %s' % shell.escape(directory))
+            return shell.escape('_directories -W %s' % shell.escape(directory))
 
         return '_directories'
 
     def file(self, _ctxt, opts=None):
-        directory = None if opts is None else opts.get('directory', None)
+        directory = None
+        extensions = None
+
+        if opts:
+            directory = opts.get('directory', None)
+            extensions = opts.get('extensions', None)
+
+        args = []
 
         if directory:
-            return shell.escape('_files -W %s' % shell.escape(directory))
+            args.extend(['-W', shell.escape(directory)])
 
-        return '_files'
+        if extensions:
+            args.extend(['-g', shell.escape(make_file_extension_pattern(extensions))])
+
+        if args:
+            cmd = '_files %s' % ' '.join(args)
+        else:
+            cmd = '_files'
+
+        return shell.escape(cmd)
 
     def group(self, _ctxt):
         return '_groups'

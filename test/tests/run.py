@@ -23,12 +23,14 @@ TESTS_INFILE        = 'tests.yaml'
 TESTS_OUTFILE       = 'tests.new.yaml'
 CRAZY_COMPLETE      = '../../crazy-complete'
 COMPLETIONS_OUTDIR  = 'output'
+TEMP_DIR            = 'tmp'
 
 # =============================================================================
 # Switch to the script's directory
 # =============================================================================
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+CURRENT_DIRECTORY = os.path.abspath(os.getcwd())
 
 # =============================================================================
 # Commandline parser
@@ -173,14 +175,31 @@ class Tests:
             if not os.path.isdir(COMPLETIONS_OUTDIR):
                 raise NotADirectoryError(COMPLETIONS_OUTDIR) from None
 
+        try:
+            os.mkdir(TEMP_DIR)
+        except FileExistsError:
+            if not os.path.isdir(TEMP_DIR):
+                raise NotADirectoryError(TEMP_DIR) from None
+
         print_err('Generating completion files ...')
         for file, args in self.definition_files.items():
+
+            definition_file = args['definition_file']
+            temp_definition_file = f'{TEMP_DIR}/{definition_file}'
+
+            with open(definition_file, 'r', encoding='UTF-8') as fh:
+                content = fh.read()
+                content = content.replace('%TEST_DIR%', CURRENT_DIRECTORY)
+
+            with open(temp_definition_file, 'w', encoding='UTF-8') as fh:
+                fh.write(content)
+
             for shell in SHELLS:
                 cmd =  [CRAZY_COMPLETE, '--debug', '--zsh-compdef=False']
                 for arg in args['args']:
                     cmd += [arg.replace('$shell', shell)]
                 cmd += ['-o', f'{COMPLETIONS_OUTDIR}/{file}.{shell}']
-                cmd += [shell, args['definition_file']]
+                cmd += [shell, temp_definition_file]
                 print_err('Running', ' '.join(cmd))
                 run(cmd)
 

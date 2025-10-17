@@ -132,11 +132,27 @@ def _check_file(arguments):
     options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
     arguments.require_no_more()
-    _check_dictionary(options, {'directory': (False, (str,))})
+    _check_dictionary(options, {
+        'directory':  (False, (str,)),
+        'extensions': (False, (list,)),
+    })
 
     if _has_set(options, 'directory'):
         if options.value['directory'].value == '':
             raise _error('directory may not be empty', options.value['directory'])
+
+    if _has_set(options, 'extensions'):
+        if len(options.value['extensions'].value) == 0:
+            raise _error('extensions may not be empty', options.value['extensions'])
+
+        for extension in options.value['extensions'].value:
+            _check_type(extension, (str,), 'extension')
+
+            if extension.value == '':
+                raise _error('extension may not be empty', extension)
+
+            if contains_space(extension.value):
+                raise _error('extension contains space', extension)
 
 
 def _check_range(arguments):

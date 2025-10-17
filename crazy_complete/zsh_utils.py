@@ -116,3 +116,19 @@ def make_positional_spec(
         return f'{num_spec}::{desc_spec}:{action}'
 
     return f'{num_spec}:{desc_spec}:{action}'
+
+
+def make_file_extension_pattern(extensions):
+    '''Make a case-insensitive glob pattern matching `extensions`.
+
+    Takes a list of extensions (e.g. ['txt', 'jpg']) and returns a Zsh-style
+    pattern that matches all of them, ignoring case.
+
+    Example output:
+        '*.(#i)(txt|jpg)'
+    '''
+
+    if len(extensions) == 1:
+        return '*.(#i)%s' % extensions[0]
+
+    return '*.(#i)(%s)' % '|'.join(extensions)

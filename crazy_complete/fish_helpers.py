@@ -353,10 +353,17 @@ _FISH_COMPLETE_FILEDIR = helpers.FishFunction('fish_complete_filedir', r'''
 #   -c|--comp=STR           Complete STR instead of current command line argument
 #   -D|--directories        Only complete directories
 #   -C|--cd=DIR             List contents in DIR
+#ifdef regex
+#   -r|--regex=PATTERN      Only list files matching pattern
+#endif
 #
 # This function is made out of /usr/share/fish/functions/__fish_complete_directories.fish
 
+#ifdef regex
+argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
+#else
 argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' -- $argv || return 1
+#endif
 
 set -l comp
 set -l desc
@@ -387,6 +394,12 @@ if set -q files[1]
   if set -q _flag_directories[1]
     set files (printf '%s\n' $files | string match -r '.*/$')
   end
+#ifdef regex
+
+  if set -q _flag_regex[1]
+    set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1]\$)")
+  end
+#endif
 
   printf '%s\n' $files\t"$desc"
 end

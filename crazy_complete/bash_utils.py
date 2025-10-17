@@ -74,3 +74,27 @@ class CasePatterns:
             return '|'.join(option_strings)
 
         return '-@(%s)' % '|'.join(o.lstrip('-') for o in option_strings)
+
+
+def make_file_extension_pattern(extensions):
+    '''Make a case-insensitive glob pattern matching `extensions`.
+
+    Takes a list of extensions (e.g. ['txt', 'jpg']) and returns a Bash-style
+    pattern that matches all of them, ignoring case.
+
+    Example output:
+        '@([tT][xX][tT]|[jJ][pP][gG])'
+    '''
+
+    patterns = []
+
+    for extension in extensions:
+        pattern = ''
+        for c in extension:
+            if c.isalpha():
+                pattern += '[%s%s]' % (c.lower(), c.upper())
+            else:
+                pattern += c
+        patterns.append(pattern)
+
+    return '@(%s)' % '|'.join(patterns)

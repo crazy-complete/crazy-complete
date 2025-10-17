@@ -228,6 +228,11 @@ options:
 > Complete a file.
 >
 > You can restrict completion to a specific directory by adding `{"directory": ...}`.
+>
+> You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
+>
+> **NOTE:** Restricting completion to specific file extensions only makes sense if the program being completed actually expects files of those types.
+> On Unix-like systems, file extensions generally have no inherent meaning -- they are purely conventional and not required for determining file types.
 
 ```yaml
 prog: "example"
@@ -236,11 +241,15 @@ options:
     complete: ["file"]
   - option_strings: ["--file-tmp"]
     complete: ["file", {"directory": "/tmp"}]
+  - option_strings: ["--file-ext"]
+    complete: ["file", {"extensions": ["c", "cpp"]}]
 ```
 
 ```
  ~ > example --file=<TAB>
  dir1/  dir2/  file1  file2
+ ~ > example --file-ext=<TAB>
+ dir1/  dir2/  file.c  file.cpp
 ```
 
 ### directory

@@ -1,7 +1,9 @@
 '''This module contains code for completing arguments in Bash.'''
 
 from . import shell
+from .str_utils import indent
 from .type_utils import is_dict_type
+from .bash_utils import make_file_extension_pattern
 
 
 # pylint: disable=too-few-public-methods
@@ -137,16 +139,26 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, '_filedir -d')
 
     def file(self, ctxt, opts=None):
-        directory = None if opts is None else opts.get('directory', None)
+        directory = None
+        extensions = None
+
+        if opts:
+            directory = opts.get('directory', None)
+            extensions = opts.get('extensions', None)
+
+        if extensions:
+            filedir_cmd = '_filedir %s' % make_file_extension_pattern(extensions)
+        else:
+            filedir_cmd = '_filedir'
 
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
-            cmd += '  _filedir\n'
+            cmd += '  %s\n' % filedir_cmd
             cmd += '  builtin popd &>/dev/null\n'
             cmd += '}'
             return BashCompletionCommand(ctxt, cmd)
 
-        return BashCompletionCommand(ctxt, '_filedir')
+        return BashCompletionCommand(ctxt, filedir_cmd)
 
     def group(self, ctxt):
         return BashCompletionCompgen(ctxt, '-A group')

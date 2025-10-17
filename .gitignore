@@ -13,6 +13,7 @@ python-crazy-complete/
 
 # directory 'test'
 test/tests/output/
+test/tests/tmp/
 out.json
 out.yaml
 help.txt

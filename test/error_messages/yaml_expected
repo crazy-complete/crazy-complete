@@ -87,7 +87,11 @@
 3_15_01-file-unknown-key                 | line 4, column 25: Unknown key: wrong
 3_15_02-file-directory-wrong-type        | line 4, column 38: directory: Invalid type. Expected types: string
 3_15_03-file-directory-empty             | line 4, column 38: directory may not be empty
-3_15_04-file-too-many-args               | line 4, column 15: Too many arguments provided
+3_15_04-file-extensions-wrong-type       | line 4, column 39: extensions: Invalid type. Expected types: list
+3_15_05-file-extensions-empty            | line 4, column 39: extensions may not be empty
+3_15_06-file-extension-empty             | line 4, column 40: extension may not be empty
+3_15_07-file-extension-with-space        | line 4, column 40: extension contains space
+3_15_08-file-too-many-args               | line 4, column 15: Too many arguments provided
 3_16_00-directory-options-wrong-type     | line 4, column 29: Invalid type. Expected types: dictionary
 3_16_01-directory-unknown-key            | line 4, column 30: Unknown key: wrong
 3_16_02-directory-directory-wrong-type   | line 4, column 43: directory: Invalid type. Expected types: string

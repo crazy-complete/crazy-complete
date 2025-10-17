@@ -2,7 +2,7 @@
 
 from .errors import CrazyError, CrazyTypeError
 from .type_utils import is_dict_type, is_list_type
-from .str_utils import is_valid_extended_regex
+from .str_utils import is_valid_extended_regex, contains_space
 
 # =============================================================================
 # Helper functions
@@ -91,6 +91,22 @@ def _validate_file(args):
 
             if value == '':
                 raise CrazyError('directory: Cannot be empty')
+        elif key == 'extensions':
+            if not is_list_type(value):
+                raise CrazyError(f"extensions: Not a list: {value}")
+
+            if len(value) == 0:
+                raise CrazyError("extensions: Cannot be empty")
+
+            for i, subval in enumerate(value):
+                if not isinstance(subval, str):
+                    raise CrazyError(f"extensions[{i}]: Not a string: {subval}")
+
+                if subval == '':
+                    raise CrazyError(f"extensions[{i}]: May not be empty")
+
+                if contains_space(subval):
+                    raise CrazyError(f"extensions[{i}]: Contains space: {subval}")
         else:
             raise CrazyError(f'Unknown option: {key}')
 

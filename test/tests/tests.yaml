@@ -7,6 +7,7 @@ inherit-off: {"args": ["--input-type=yaml", "--inherit-options=False"], "definit
 capture: {"args": ["--input-type=yaml", "--include-file=include.capture.$shell"], "definition_file": "capture.yaml"}
 choices: {"args": ["--input-type=yaml"], "definition_file": "choices.yaml"}
 command_arg: {"args": ["--input-type=yaml"], "definition_file": "command_arg.yaml"}
+filedir: {"args": ["--input-type=yaml"], "definition_file": "filedir.yaml"}
 ---
 number: 1
 definition_file: "main"
@@ -1357,3 +1358,82 @@ fish_expected: |
   first2  (First positional)
 zsh_expected: |
   > crazy-complete-test -- test first
+---
+number: 87
+definition_file: "filedir"
+description: "Check --directory"
+send: "crazy-complete-test --directory "
+bash_expected: |
+  > crazy-complete-test --directory directory
+fish_expected: |
+  > crazy-complete-test --directory directory/
+zsh_expected: |
+  > crazy-complete-test --directory directory/
+---
+number: 88
+definition_file: "filedir"
+description: "Check --file"
+send: "crazy-complete-test --file "
+bash_expected: |
+  > crazy-complete-test --file
+  README.md         file with spaces  file3.tXt         image2.jPg
+  archive.tar.gz    file0.txt         image0.jpg        source.c++
+  directory         file1.TXT         image1.JPG
+  > crazy-complete-test --file
+fish_expected: |
+  > crazy-complete-test --file
+  archive.tar.gz  file with spaces  file1.TXT  image0.jpg  image2.jPg  source.c++
+  directory/      file0.txt         file3.tXt  image1.JPG  README.md
+zsh_expected: |
+  > crazy-complete-test --file
+  README.md           file\ with\ spaces  file3.tXt           image2.jPg
+  archive.tar.gz      file0.txt           image0.jpg          source.c++
+  directory/          file1.TXT           image1.JPG
+---
+number: 89
+definition_file: "filedir"
+description: "Check --file-txt-jpg"
+send: "crazy-complete-test --file-txt-jpg "
+bash_expected: |
+  > crazy-complete-test --file-txt-jpg
+  directory   file1.TXT   image0.jpg  image2.jPg
+  file0.txt   file3.tXt   image1.JPG
+  > crazy-complete-test --file-txt-jpg
+fish_expected: |
+  > crazy-complete-test --file-txt-jpg
+  directory/  file1.TXT  image0.jpg  image2.jPg
+  file0.txt   file3.tXt  image1.JPG
+zsh_expected: |
+  > crazy-complete-test --file-txt-jpg
+  directory/  file1.TXT   image0.jpg  image2.jPg
+  file0.txt   file3.tXt   image1.JPG
+---
+number: 90
+definition_file: "filedir"
+description: "Check --file-tar-gz"
+send: "crazy-complete-test --file-tar-gz "
+bash_expected: |
+  > crazy-complete-test --file-tar-gz
+  archive.tar.gz  directory
+  > crazy-complete-test --file-tar-gz
+fish_expected: |
+  > crazy-complete-test --file-tar-gz
+  archive.tar.gz  directory/
+zsh_expected: |
+  > crazy-complete-test --file-tar-gz
+  archive.tar.gz  directory/
+---
+number: 91
+definition_file: "filedir"
+description: "Check --file-cpp"
+send: "crazy-complete-test --file-cpp "
+bash_expected: |
+  > crazy-complete-test --file-cpp
+  directory   source.c++
+  > crazy-complete-test --file-cpp
+fish_expected: |
+  > crazy-complete-test --file-cpp
+  directory/  source.c++
+zsh_expected: |
+  > crazy-complete-test --file-cpp
+  directory/  source.c++

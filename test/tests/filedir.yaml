@@ -1,0 +1,16 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ["--directory"]
+    complete: ["directory", {"directory": "%TEST_DIR%/test_data"}]
+
+  - option_strings: ["--file"]
+    complete: ["file", {"directory": "%TEST_DIR%/test_data"}]
+
+  - option_strings: ["--file-txt-jpg"]
+    complete: ["file", {"directory": "%TEST_DIR%/test_data", "extensions": ["txt", "jpg"]}]
+
+  - option_strings: ["--file-tar-gz"]
+    complete: ["file", {"directory": "%TEST_DIR%/test_data", "extensions": ["tar.gz"]}]
+
+  - option_strings: ["--file-cpp"]
+    complete: ["file", {"directory": "%TEST_DIR%/test_data", "extensions": ["c++"]}]
