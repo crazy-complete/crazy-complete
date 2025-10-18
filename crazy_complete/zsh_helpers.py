@@ -318,18 +318,21 @@ done
 ''')
 
 _MIME_FILE = helpers.ShellFunction('mime_file', r'''
-local line='' file='' mime='' i_opt=''
+local line='' file='' mime='' i_opt='' cur=''
+
+cur="${words[$CURRENT]}"
+[[ "$cur" == --*= ]] && cur="${cur#--*=}"
 
 if command file -i /dev/null &>/dev/null; then
   i_opt="-i"
 elif command file -I /dev/null &>/dev/null; then
   i_opt="-I"
 else
-  compadd -- "${words[$CURRENT]}"*
+  compadd -- "$cur"*
   return
 fi
 
-command file -L $i_opt -- "${words[$CURRENT]}"* 2>/dev/null | while read -r line; do
+command file -L $i_opt -- "$cur"* 2>/dev/null | while read -r line; do
   mime="${line##*:}"
 
   if [[ "$mime" == *inode/directory* ]] || command grep -q -E -- "$1" <<< "$mime"; then
