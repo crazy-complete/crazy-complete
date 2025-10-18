@@ -4,7 +4,10 @@ from collections import OrderedDict
 from types import NoneType
 
 from .errors import CrazyError, CrazyTypeError
-from .str_utils import contains_space, is_valid_option_string, is_valid_variable_name
+from .str_utils import (
+    contains_space, is_valid_option_string,
+    is_valid_variable_name, is_empty_or_whitespace
+)
 
 # pylint: disable=redefined-builtin
 # pylint: disable=too-few-public-methods
@@ -67,6 +70,13 @@ class CommandLine:
 
         if not isinstance(wraps, (str, NoneType)):
             raise CrazyTypeError('wraps', 'str', wraps)
+
+        if wraps is not None:
+            if is_empty_or_whitespace(wraps):
+                raise CrazyError('wraps is empty')
+
+            if contains_space(wraps):
+                raise CrazyError('wraps: cannot contain space')
 
         for index, alias in enumerate(aliases):
             if not isinstance(alias, str):

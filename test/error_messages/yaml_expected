@@ -22,6 +22,9 @@
 051-inherit-options-wrong-value          | line 2, column 18: Invalid value. Expected true, false or "INHERIT"
 060-options-wrong-type                   | line 2, column 10: options: Invalid type. Expected types: list|none
 070-positionals-wrong-type               | line 2, column 14: positionals: Invalid type. Expected types: list|none
+080-wraps-wrong-type                     | line 2, column 8: wraps: Invalid type. Expected types: string|none
+081-wraps-empty                          | line 2, column 8: wraps is empty
+082-wraps-in-subcommand                  | line 4, column 8: wraps not allowed in subcommands
 ======= Directory "02-option" =======
 100-no-option-strings                    | line 3, column 5: Missing required key: option_strings
 101-option-strings-wrong-type            | line 3, column 21: option_strings: Invalid type. Expected types: list

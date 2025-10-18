@@ -2,7 +2,9 @@
 
 from .errors import CrazyError, CrazyTypeError
 from .type_utils import is_dict_type, is_list_type
-from .str_utils import is_valid_extended_regex, contains_space
+from .str_utils import (
+    is_valid_extended_regex, contains_space, is_empty_or_whitespace
+)
 
 # =============================================================================
 # Helper functions
@@ -354,6 +356,17 @@ def validate_positionals_command_arg(cmdline):
                 raise CrazyError('The `command_arg` completer requires a previous `command` completer')
 
 
+def validate_wraps(cmdline):
+    '''Check for the right usage of `wraps`.'''
+
+    if cmdline.wraps is not None:
+        if is_empty_or_whitespace(cmdline.wraps):
+            raise CrazyError('wraps is empty')
+
+        if contains_space(cmdline.get_command_path()):
+            raise CrazyError('wraps not allowed in subcommands')
+
+
 def validate_commandline(cmdline):
     '''Validate completion commands of options/positionals in a commandline.'''
 
@@ -379,6 +392,7 @@ def validate_commandline(cmdline):
     try:
         validate_positionals_repeatable(cmdline)
         validate_positionals_command_arg(cmdline)
+        validate_wraps(cmdline)
     except CrazyError as e:
         raise CrazyError("%s: %s" % (cmdline.get_command_path(), e)) from e
 

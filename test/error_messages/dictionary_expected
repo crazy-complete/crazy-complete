@@ -22,6 +22,9 @@
 051-inherit-options-wrong-value          | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
 060-options-wrong-type                   | Parameter `options` has an invalid type. Expected types: list. Received: False (bool)
 070-positionals-wrong-type               | Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)
+080-wraps-wrong-type                     | Parameter `wraps` has an invalid type. Expected types: str. Received: False (bool)
+081-wraps-empty                          | wraps is empty
+082-wraps-in-subcommand                  | foo bar: wraps not allowed in subcommands
 ======= Directory "02-option" =======
 100-no-option-strings                    | Parameter `option_strings` has an invalid type. Expected types: list. Received: None (NoneType)
 101-option-strings-wrong-type            | Parameter `option_strings` has an invalid type. Expected types: list. Received: False (bool)

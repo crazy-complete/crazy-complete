@@ -1,0 +1,4 @@
+prog: "foo"
+---
+prog: "foo bar"
+wraps: 'sudo'

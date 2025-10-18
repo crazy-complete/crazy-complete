@@ -35,6 +35,7 @@ To define a completion for a command, use the following structure:
 prog: "<PROGRAM NAME>"
 aliases: ["<ALIAS>", ...]
 help: "<PROGRAM DESCRIPTION>"
+wraps: "<PROGRAM>"
 options:
   <OPTION ...>
 positionals:
@@ -44,6 +45,7 @@ positionals:
 - *prog*: The name of the program for which you want to create completion
 - *aliases* (optional): Specify alternative program names for which this completion should also apply
 - *help* (optional): A short description of the program
+- *wraps* (optional): Inherit completion behaviour of another command
 - *options* (optional): A list of [options](#defining-an-option) the program accepts
 - *positionals* (optional): A list of [positional arguments](#defining-a-positional-argument) the program uses
 

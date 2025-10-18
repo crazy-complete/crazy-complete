@@ -493,6 +493,9 @@ def _check_definition(definition):
         if contains_space(definition.value['wraps'].value):
             raise _error('wraps contains space', definition.value['wraps'])
 
+        if contains_space(definition.value['prog'].value):
+            raise _error('wraps not allowed in subcommands', definition.value['wraps'])
+
     if _has_set(definition, 'abbreviate_commands'):
         _check_extended_bool(definition.value['abbreviate_commands'])
 
