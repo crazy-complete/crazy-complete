@@ -172,6 +172,15 @@ def _check_directory(arguments):
     _check_filedir(arguments, 'directory')
 
 
+def _check_mime_file(arguments):
+    pattern = arguments.get_required_arg("pattern")
+    _check_type(pattern, (str,), "pattern")
+    arguments.require_no_more()
+
+    if not is_valid_extended_regex(pattern.value):
+        raise _error('Pattern: Not a valid extended regex', pattern)
+
+
 def _check_range(arguments):
     start = arguments.get_required_arg("start")
     _check_type(start, (int,), "start")
@@ -288,6 +297,7 @@ def _check_complete(args):
         'choices':          _check_choices,
         'file':             _check_file,
         'directory':        _check_directory,
+        'mime_file':        _check_mime_file,
         'range':            _check_range,
         'exec':             _check_exec,
         'exec_fast':        _check_exec,

@@ -409,6 +409,31 @@ _HISTORY = helpers.FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
 ''')
 
+_MIME_FILE = helpers.FishFunction('mime_file', r'''
+set -l i_opt
+
+if command file -i /dev/null &>/dev/null
+  set i_opt '-i'
+else if command file -I /dev/null &>/dev/null
+  set i_opt '-I'
+else
+  set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
+  complete -C"'' $comp"
+  return
+end
+
+set -l line
+command file -L $i_opt -- * 2>/dev/null | while read line
+  set -l split (string split -m 1 -r ':' $line)
+
+  if string match -q -- '*inode/directory*' $split[1]
+    printf '%s/\n' "$split[1]"
+  else if begin; echo "$split[2]" | command grep -q -E -- $argv[1]; end
+    printf '%s\n' "$split[1]"
+  end
+end
+''')
+
 _SUBSTRACT_PREFIX_SUFFIX = helpers.FishFunction('subtract_prefix_suffix', r'''
 set -l s1 $argv[1]
 set -l s2 $argv[2]
@@ -506,6 +531,7 @@ class FishHelpers(helpers.GeneralHelpers):
         self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
         self.add_function(_HISTORY)
+        self.add_function(_MIME_FILE)
         self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
         self.add_function(_COMMANDLINE_STRING)
         self.add_function(_NET_INTERFACES_LIST)

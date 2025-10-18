@@ -319,6 +319,37 @@ done
 _describe '' describe
 ''')
 
+_MIME_FILE = helpers.ShellFunction('mime_file', r'''
+local line='' file='' mime='' i_opt=''
+
+if command file -i /dev/null &>/dev/null; then
+  i_opt="-i"
+elif command file -I /dev/null &>/dev/null; then
+  i_opt="-I"
+else
+  compadd -- *
+  return
+fi
+
+command file -L $i_opt -- * 2>/dev/null | while read -r line; do
+  mime="${line##*:}"
+
+  if [[ "$mime" == *inode/directory* ]] || command grep -q -E -- "$1" <<< "$mime"; then
+    file="${line%:*}"
+
+    if [[ "$file" == *\\* ]]; then
+      file="$(command perl -pe 's/\\([0-7]{3})/chr(oct($1))/ge' <<< "$file")"
+    fi
+
+    if [[ "$mime" == *inode/directory* ]]; then
+      compadd -- "$file/"
+    else
+      compadd -- "$file"
+    fi
+  fi
+done
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -360,5 +391,6 @@ class ZshHelpers(helpers.GeneralHelpers):
         self.add_function(_ZSH_QUERY_FUNC)
         self.add_function(_EXEC)
         self.add_function(_HISTORY)
+        self.add_function(_MIME_FILE)
         self.add_function(_ALSA_COMPLETE_CARDS)
         self.add_function(_ALSA_COMPLETE_DEVICES)

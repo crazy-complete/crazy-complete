@@ -121,6 +121,11 @@ class ZshCompleter(shell.ShellCompleter):
 
         return shell.escape(cmd)
 
+    def mime_file(self, ctxt, pattern):
+        func = ctxt.helpers.use_function('mime_file')
+        cmd = '{%s %s}' % (func, shell.escape(pattern))
+        return shell.escape(cmd)
+
     def group(self, _ctxt):
         return '_groups'
 

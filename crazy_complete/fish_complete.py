@@ -274,6 +274,10 @@ class FishCompleter(shell.ShellCompleter):
     def file(self, ctxt, opts=None):
         return FishCompleteFile(ctxt, opts)
 
+    def mime_file(self, ctxt, pattern):
+        func = ctxt.helpers.use_function('mime_file')
+        return FishCompletionCommand('%s %s' % (func, shell.escape(pattern)))
+
     def group(self, _ctxt):
         return FishCompletionCommand("__fish_complete_groups")
 

@@ -102,6 +102,39 @@ while read -r match; do
 done < <(command grep -E -o -- "$1" "$HISTFILE")
 ''')
 
+_MIME_FILE = helpers.ShellFunction('mime_file', r'''
+local line file mime i_opt
+
+if command file -i /dev/null &>/dev/null; then
+  i_opt="-i"
+elif command file -I /dev/null &>/dev/null; then
+  i_opt="-I"
+else
+  _filedir
+  return
+fi
+
+while read -r line; do
+  mime="${line##*:}"
+
+  if [[ "$mime" == *inode/directory* ]] || command grep -q -E -- "$1" <<< "$mime"; then
+    file="${line%:*}"
+
+    if [[ "$file" == *\\* ]]; then
+      file="$(command perl -pe 's/\\([0-7]{3})/chr(oct($1))/ge' <<< "$file")"
+    fi
+
+    if [[ "$mime" == *inode/directory* ]]; then
+      file="$file/"
+    fi
+
+    if [[ "$file" == "$cur"* ]]; then
+      COMPREPLY+=("$(printf '%q' "$file")")
+    fi
+  fi
+done < <(command file -L $i_opt -- * 2>/dev/null)
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -156,6 +189,7 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_VALUE_LIST)
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
+        self.add_function(_MIME_FILE)
         self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)

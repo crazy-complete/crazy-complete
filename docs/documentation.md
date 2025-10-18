@@ -130,6 +130,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [combine](#combine)                        | Combine multiple completion commands                                        |
 | [file](#file)                              | Complete a file                                                             |
 | [directory](#directory)                    | Complete a directory                                                        |
+| [mime\_file](#mime_file)                   | Complete a file based on it's MIME-type                                     |
 | [choices](#choices)                        | Complete from a set of values                                               |
 | [value\_list](#value_list)                 | Complete a list                                                             |
 | [range](#range)                            | Complete a range of integers                                                |
@@ -270,6 +271,24 @@ options:
 ```
  ~ > example --directory=<TAB>
  dir1/  dir2/
+```
+
+### mime\_file
+
+> Complete a file based on it's MIME-type.
+>
+> This command takes an extended regex passed to `grep -E` to filter the results.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--image"]
+    complete: ["mime_file", 'image/']
+```
+
+```
+ ~ > example --image=<TAB>
+ dir1/  dir2/  img.png  img.jpg
 ```
 
 ### choices

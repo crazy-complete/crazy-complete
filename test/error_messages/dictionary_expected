@@ -140,6 +140,10 @@
 3_23_03-history-pattern-wrong-regex      | foo: -o: Pattern is not a valid extended regex: [foo
 3_24_00-command-arg-without-command      | foo: The `command_arg` completer requires a previous `command` completer
 3_24_01-command-arg-non-repeatable       | foo: The `command_arg` completer requires `repeatable=True`
+3_25_00-mime-file-missing-arg            | foo: -o: Missing argument: pattern
+3_25_01-mime-file-too-many-arguments     | foo: -o: Too many arguments: ['wrong']
+3_25_02-mime-file-pattern-wrong-type     | foo: -o: Pattern is not a string: False
+3_25_03-mime-file-pattern-wrong-regex    | foo: -o: Pattern is not a valid extended regex: [foo
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Only one positional argument may be marked as repeatable

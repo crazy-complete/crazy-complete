@@ -160,6 +160,10 @@ class BashCompleter(shell.ShellCompleter):
 
         return BashCompletionCommand(ctxt, filedir_cmd)
 
+    def mime_file(self, ctxt, pattern):
+        funcname = ctxt.helpers.use_function('mime_file')
+        return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(pattern)))
+
     def group(self, ctxt):
         return BashCompletionCompgen(ctxt, '-A group')
 

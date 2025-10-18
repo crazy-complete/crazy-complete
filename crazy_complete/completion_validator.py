@@ -123,6 +123,17 @@ def _validate_directory(args):
     _validate_filedir(args, 'directory')
 
 
+def _validate_mime_file(args):
+    pattern = args.get_required_arg('pattern')
+    args.require_no_more()
+
+    if not isinstance(pattern, str):
+        raise CrazyError(f"Pattern is not a string: {pattern}")
+
+    if not is_valid_extended_regex(pattern):
+        raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
+
+
 def _validate_range(args):
     start = args.get_required_arg("start")
     stop  = args.get_required_arg("stop")
@@ -273,6 +284,7 @@ def validate_complete(complete):
         'choices':       _validate_choices,
         'file':          _validate_file,
         'directory':     _validate_directory,
+        'mime_file':     _validate_mime_file,
         'range':         _validate_range,
         'exec':          _validate_exec,
         'exec_fast':     _validate_exec,
