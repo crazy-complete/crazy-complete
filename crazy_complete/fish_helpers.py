@@ -101,7 +101,7 @@ else
         true
 #ifdef long_options
       else if string match -qr -- '^--.+=$' $option
-        set -a long_opts_with_arg (string replace -- '='  '' $option)
+        set -a long_opts_with_arg (string replace -- '=' '' $option)
       else if string match -qr -- '^--.+=\?$' $option
         set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
       else if string match -qr -- '^--.+$' $option
@@ -109,7 +109,7 @@ else
 #endif
 #ifdef short_options
       else if string match -qr -- '^-.=$' $option
-        set -a short_opts_with_arg (string replace -- '='  '' $option)
+        set -a short_opts_with_arg (string replace -- '=' '' $option)
       else if string match -qr -- '^-.=\?$' $option
         set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
       else if string match -qr -- '^-.$' $option
@@ -117,9 +117,9 @@ else
 #endif
 #ifdef old_options
       else if string match -qr -- '^-..+=$' $option
-        set -a old_opts_with_arg (string replace -- '='  '' $option)
+        set -a old_opts_with_arg (string replace -- '=' '' $option)
       else if string match -qr -- '^-..+=\?$' $option
-        set -a old_opts_with_optional_arg  (string replace -- '=?' '' $option)
+        set -a old_opts_with_optional_arg (string replace -- '=?' '' $option)
       else if string match -qr -- '^-..+$' $option
         set -a old_opts_without_arg $option
 #endif
