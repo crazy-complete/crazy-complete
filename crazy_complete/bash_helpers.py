@@ -18,6 +18,37 @@ for word; do
 done
 ''')
 
+_MY_DEQUOTE = helpers.ShellFunction('my_dequote', r'''
+local input="$1" result=''
+local i=0 len=${#input}
+
+for ((; i < len; ++i)); do
+  case "${input:i:1}" in
+    "'")
+      for ((++i; i < len; ++i)); do
+        [[ "${input:i:1}" == "'" ]] && break
+        result+="${input:i:1}"
+      done;;
+    '"')
+      for ((++i; i < len; ++i)); do
+        [[ "${input:i:1}" == '"' ]] && break
+
+        if [[ "${input:i:1}" == '\' ]]; then
+          result+="${input:$((++i)):1}"
+        else
+          result+="${input:i:1}"
+        fi
+      done;;
+    '\')
+      result+="${input:$((++i)):1}";;
+    *)
+      result+="${input:i:1}";;
+  esac
+done
+
+printf '%s\n' "$result"
+''')
+
 _EXEC = helpers.ShellFunction('exec', r'''
 local item desc
 
@@ -103,7 +134,7 @@ done < <(command grep -E -o -- "$1" "$HISTFILE")
 ''')
 
 _MIME_FILE = helpers.ShellFunction('mime_file', r'''
-local line file mime i_opt
+local line file mime i_opt cur_dequoted
 
 if command file -i /dev/null &>/dev/null; then
   i_opt="-i"
@@ -113,6 +144,8 @@ else
   _filedir
   return
 fi
+
+cur_dequoted="$(my_dequote "$cur")"
 
 while read -r line; do
   mime="${line##*:}"
@@ -128,12 +161,12 @@ while read -r line; do
       file="$file/"
     fi
 
-    if [[ "$file" == "$cur"* ]]; then
+    if [[ "$file" == "$cur_dequoted"* ]]; then
       COMPREPLY+=("$(printf '%q' "$file")")
     fi
   fi
-done < <(command file -L $i_opt -- * 2>/dev/null)
-''')
+done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
+''', ['my_dequote'])
 
 # =============================================================================
 # Bonus
@@ -184,6 +217,7 @@ class BashHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_COMPGEN_W_REPLACEMENT)
+        self.add_function(_MY_DEQUOTE)
         self.add_function(_EXEC)
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)

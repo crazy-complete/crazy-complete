@@ -325,11 +325,11 @@ if command file -i /dev/null &>/dev/null; then
 elif command file -I /dev/null &>/dev/null; then
   i_opt="-I"
 else
-  compadd -- *
+  compadd -- "${words[$CURRENT]}"*
   return
 fi
 
-command file -L $i_opt -- * 2>/dev/null | while read -r line; do
+command file -L $i_opt -- "${words[$CURRENT]}"* 2>/dev/null | while read -r line; do
   mime="${line##*:}"
 
   if [[ "$mime" == *inode/directory* ]] || command grep -q -E -- "$1" <<< "$mime"; then
