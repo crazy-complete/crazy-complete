@@ -310,13 +310,11 @@ _describe '' describe
 _HISTORY = helpers.ShellFunction('history', r'''
 [[ -f "$HISTFILE" ]] || return
 
-local match='' describe=()
+local match=''
 
 command grep -E -o -- "$1" "$HISTFILE" | while read -r match; do
-  describe+=("${match//:/\\:}")
+  compadd -- "$match"
 done
-
-_describe '' describe
 ''')
 
 _MIME_FILE = helpers.ShellFunction('mime_file', r'''
