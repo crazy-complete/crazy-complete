@@ -49,6 +49,18 @@ done
 printf '%s\n' "$result"
 ''')
 
+_INVOKE_COMPLETE = helpers.ShellFunction('invoke_complete', r'''
+local prog="$1"; shift
+local i=0 args=($(complete -p -- "$prog"))
+
+for ((; i < ${#args[@]}; ++i)); do
+  if [[ "${args[i]}" == '-F' ]]; then
+    "${args[i+1]}" "$@"
+    return
+  fi
+done
+''')
+
 _EXEC = helpers.ShellFunction('exec', r'''
 local item desc
 
@@ -218,6 +230,7 @@ class BashHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_COMPGEN_W_REPLACEMENT)
         self.add_function(_MY_DEQUOTE)
+        self.add_function(_INVOKE_COMPLETE)
         self.add_function(_EXEC)
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)

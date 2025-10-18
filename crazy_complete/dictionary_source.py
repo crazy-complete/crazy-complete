@@ -21,7 +21,8 @@ def dictionary_to_commandline(dictionary, prog=None):
     '''Convert a single dictionary to a cli.CommandLine object.'''
 
     _validate_keys(dictionary,
-        ['prog', 'help', 'aliases', 'abbreviate_commands', 'abbreviate_options',
+        ['prog', 'help', 'aliases', 'wraps',
+         'abbreviate_commands', 'abbreviate_options',
          'inherit_options', 'options', 'positionals'])
 
     options = dictionary.get('options', [])
@@ -37,6 +38,7 @@ def dictionary_to_commandline(dictionary, prog=None):
         parent              = None,
         help                = dictionary.get('help', None),
         aliases             = dictionary.get('aliases', []),
+        wraps               = dictionary.get('wraps', None),
         abbreviate_commands = dictionary.get('abbreviate_commands', ExtendedBool.INHERIT),
         abbreviate_options  = dictionary.get('abbreviate_options', ExtendedBool.INHERIT),
         inherit_options     = dictionary.get('inherit_options', ExtendedBool.INHERIT))
@@ -222,6 +224,9 @@ def commandline_to_dictionary(commandline):
 
     if commandline.help is not None:
         r['help'] = commandline.help
+
+    if commandline.wraps is not None:
+        r['wraps'] = commandline.wraps
 
     if commandline.abbreviate_commands != ExtendedBool.INHERIT:
         r['abbreviate_commands'] = commandline.abbreviate_commands

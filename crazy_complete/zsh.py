@@ -227,6 +227,25 @@ class ZshCompletionFunction:
             indent('\n\n'.join(c for c in self.code.values() if c), 2))
 
 
+def generate_wrapper(generators):
+    first_generator = generators[0]
+    commandline = first_generator.commandline
+
+    if not commandline.wraps:
+        return (shell.make_completion_funcname(commandline), None)
+
+    completion_funcname = shell.make_completion_funcname(commandline)
+    wrapper_funcname = '%s__wrapper' % completion_funcname
+
+    r =  '%s() {\n' % wrapper_funcname
+    r += '  %s\n' % completion_funcname
+    r += '  words=(%s "${words[@]}")\n' % commandline.wraps
+    r += '  (( $+_comps[%s] )) && $_comps[%s]\n' % (commandline.wraps, commandline.wraps)
+    r += '}'
+
+    return (wrapper_funcname, r)
+
+
 def generate_completion(commandline, config=None):
     '''Code for generating a Zsh auto completion file.'''
 
@@ -257,15 +276,20 @@ def generate_completion(commandline, config=None):
 
     output.extend(config.get_included_files_content())
 
+    completion_func, wrapper_code = generate_wrapper(functions)
+
     for code in helpers.get_used_functions_code():
         output.append(code)
 
     output += [function.get_code() for function in functions]
 
+    if wrapper_code:
+        output.append(wrapper_code)
+
     if config.zsh_compdef:
-        output += ['%s "$@"' % functions[0].funcname]
+        output += ['%s "$@"' % completion_func]
     else:
-        output += ['compdef %s %s' % (functions[0].funcname, all_progs)]
+        output += ['compdef %s %s' % (completion_func, all_progs)]
 
     if config.vim_modeline:
         output += [modeline.get_vim_modeline('zsh')]

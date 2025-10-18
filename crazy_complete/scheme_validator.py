@@ -466,6 +466,7 @@ def _check_definition(definition):
         'prog':                 (True,  (str,)),
         'help':                 (False, (str,  NoneType)),
         'aliases':              (False, (list, NoneType)),
+        'wraps':                (False, (str,  NoneType)),
         'abbreviate_commands':  (False, (bool, str, NoneType)),
         'abbreviate_options':   (False, (bool, str, NoneType)),
         'inherit_options':      (False, (bool, str, NoneType)),
@@ -484,6 +485,13 @@ def _check_definition(definition):
 
             if contains_space(alias.value):
                 raise _error('alias contains space', alias)
+
+    if _has_set(definition, 'wraps'):
+        if is_empty_or_whitespace(definition.value['wraps'].value):
+            raise _error('wraps is empty', definition.value['wraps'])
+
+        if contains_space(definition.value['wraps'].value):
+            raise _error('wraps contains space', definition.value['wraps'])
 
     if _has_set(definition, 'abbreviate_commands'):
         _check_extended_bool(definition.value['abbreviate_commands'])

@@ -340,6 +340,11 @@ def generate_completion(commandline, config=None):
     output.append('# Generally disable file completion')
     output.append('complete -c $prog -x')
 
+    if result[0].commandline.wraps:
+        output.append('')
+        output.append('# Wrap command')
+        output.append('complete -c $prog -w %s' % result[0].commandline.wraps)
+
     for generator in result:
         output.append('')
         output.append(generator.command_comment)

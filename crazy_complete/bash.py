@@ -132,6 +132,45 @@ class BashCompletionGenerator:
         self.result = r
 
 
+def generate_wrapper(generators):
+    first_generator = generators[0]
+    commandline = first_generator.commandline
+    ctxt = first_generator.ctxt
+
+    if not commandline.wraps:
+        return (shell.make_completion_funcname(commandline), None)
+
+    completion_funcname = shell.make_completion_funcname(commandline)
+    wrapper_funcname = '%s__wrapper' % completion_funcname
+    complete_invoker_func = ctxt.helpers.use_function('invoke_complete')
+
+    r  = 'source /usr/share/bash-completion/completions/%s 2>/dev/null\n' % commandline.wraps
+    r += 'source /usr/share/bash-completion/completions/_%s 2>/dev/null\n' % commandline.wraps
+    r += '\n'
+    r += '%s() {\n' % wrapper_funcname
+    r += '  local WRAPS=\'%s\'\n' % commandline.wraps
+    r += '  local COMP_LINE_OLD="$COMP_LINE"\n'
+    r += '  local COMP_POINT_OLD="$COMP_POINT"\n'
+    r += '  local COMP_WORDS_OLD=("${COMP_WORDS[@]}")\n'
+    r += '\n'
+    r += '  COMP_LINE="${COMP_LINE/$1/$WRAPS}"\n'
+    r += '  COMP_WORDS[0]=\'%s\'\n' % commandline.wraps
+    r += '  COMP_POINT=$(( COMP_POINT + ${#WRAPS} - ${#1} ))\n'
+    r += '\n'
+    r += '  %s %s %s "${@:1}"\n' % (complete_invoker_func, commandline.wraps, commandline.wraps)
+    r += '\n'
+    r += '  COMP_LINE="$COMP_LINE_OLD"\n'
+    r += '  COMP_POINT="$COMP_POINT_OLD"\n'
+    r += '  COMP_WORDS=("${COMP_WORDS_OLD[@]}")\n'
+    r += '  local COMPREPLY_OLD=("${COMPREPLY[@]}")\n'
+    r += '  %s "$@"\n' % completion_funcname
+    r += '\n'
+    r += '  COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}")\n'
+    r += '}'
+
+    return (wrapper_funcname, r)
+
+
 def generate_completion(commandline, config=None):
     '''Code for generating a Bash auto completion file.'''
 
@@ -143,14 +182,19 @@ def generate_completion(commandline, config=None):
     ctxt = generation.GenerationContext(config, helpers)
     result = generation.visit_commandlines(BashCompletionGenerator, ctxt, commandline)
 
+    completion_func, wrapper_code = generate_wrapper(result)
+
     output = []
     output += [generation_notice.GENERATION_NOTICE]
     output += config.get_included_files_content()
     output += helpers.get_used_functions_code()
     output += [generator.result for generator in result if generator.result]
+
+    if wrapper_code:
+        output += [wrapper_code]
+
     output += ['complete -F %s %s' % (
-        shell.make_completion_funcname(commandline),
-        ' '.join([commandline.prog] + commandline.aliases)
+        completion_func, ' '.join([commandline.prog] + commandline.aliases)
     )]
 
     if config.vim_modeline:

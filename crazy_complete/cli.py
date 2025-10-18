@@ -35,6 +35,7 @@ class CommandLine:
                  parent=None,
                  help=None,
                  aliases=None,
+                 wraps=None,
                  abbreviate_commands=ExtendedBool.INHERIT,
                  abbreviate_options=ExtendedBool.INHERIT,
                  inherit_options=ExtendedBool.INHERIT):
@@ -64,6 +65,9 @@ class CommandLine:
         if not isinstance(aliases, list):
             raise CrazyTypeError('aliases', 'list', aliases)
 
+        if not isinstance(wraps, (str, NoneType)):
+            raise CrazyTypeError('wraps', 'str', wraps)
+
         for index, alias in enumerate(aliases):
             if not isinstance(alias, str):
                 raise CrazyTypeError(f'aliases[{index}]', 'str', alias)
@@ -84,6 +88,7 @@ class CommandLine:
         self.parent = parent
         self.help = help
         self.aliases = aliases
+        self.wraps = wraps
         self.abbreviate_commands = abbreviate_commands
         self.abbreviate_options = abbreviate_options
         self.inherit_options = inherit_options
@@ -355,6 +360,7 @@ class CommandLine:
             parent              = None,
             help                = self.help,
             aliases             = self.aliases,
+            wraps               = self.wraps,
             abbreviate_commands = self.abbreviate_commands,
             abbreviate_options  = self.abbreviate_options,
             inherit_options     = self.inherit_options)
@@ -398,6 +404,7 @@ class CommandLine:
             self.prog                == other.prog                and
             self.aliases             == other.aliases             and
             self.help                == other.help                and
+            self.wraps               == other.wraps               and
             self.abbreviate_commands == other.abbreviate_commands and
             self.abbreviate_options  == other.abbreviate_options  and
             self.inherit_options     == other.inherit_options     and

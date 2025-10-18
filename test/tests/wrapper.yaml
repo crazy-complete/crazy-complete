@@ -1,0 +1,5 @@
+prog: crazy-complete-test
+wraps: sudo
+options:
+  - option_strings: ["--my-option"]
+    complete: ["choices", ["argument 1", "argument 2"]]

@@ -8,6 +8,7 @@ capture: {"args": ["--input-type=yaml", "--include-file=include.capture.$shell"]
 choices: {"args": ["--input-type=yaml"], "definition_file": "choices.yaml"}
 command_arg: {"args": ["--input-type=yaml"], "definition_file": "command_arg.yaml"}
 filedir: {"args": ["--input-type=yaml"], "definition_file": "filedir.yaml"}
+wrapper: {"args": ["--input-type=yaml"], "definition_file": "wrapper.yaml"}
 ---
 number: 1
 definition_file: "main"

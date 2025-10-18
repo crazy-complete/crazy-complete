@@ -106,6 +106,7 @@ def to_yaml(dictionary):
     prog                = dictionary['prog']
     aliases             = dictionary.get('aliases',             None)
     help                = dictionary.get('help',                None)
+    wraps               = dictionary.get('wraps',               None)
     abbreviate_commands = dictionary.get('abbreviate_commands', ExtendedBool.INHERIT)
     abbreviate_options  = dictionary.get('abbreviate_options',  ExtendedBool.INHERIT)
     inherit_options     = dictionary.get('inherit_options',     ExtendedBool.INHERIT)
@@ -119,6 +120,9 @@ def to_yaml(dictionary):
 
     if help is not None:
         r += 'help: %s\n' % json.dumps(help)
+
+    if wraps is not None:
+        r += 'wraps: %s\n' % json.dumps(wraps)
 
     if abbreviate_commands != ExtendedBool.INHERIT:
         r += 'abbreviate_commands: %s\n' % json.dumps(abbreviate_commands)
