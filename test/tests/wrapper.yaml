@@ -1,5 +1,11 @@
 prog: crazy-complete-test
 wraps: sudo
 options:
-  - option_strings: ["--my-option"]
-    complete: ["choices", ["argument 1", "argument 2"]]
+  - option_strings: ["--arg", '-a', '-arg']
+    complete: ["choices", ["argument1"]]
+
+  - option_strings: ["--optional", '-o', '-optional']
+    complete: ["choices", ["argument1"]]
+    optional_arg: true
+
+  - option_strings: ["--flag", '-f', '-flag']

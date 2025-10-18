@@ -11,6 +11,7 @@ from . import utils
 from . import zsh_complete
 from . import zsh_helpers
 from . import zsh_utils
+from . import zsh_wrapper
 from .str_utils import indent
 
 
@@ -227,25 +228,6 @@ class ZshCompletionFunction:
             indent('\n\n'.join(c for c in self.code.values() if c), 2))
 
 
-def generate_wrapper(generators):
-    first_generator = generators[0]
-    commandline = first_generator.commandline
-
-    if not commandline.wraps:
-        return (shell.make_completion_funcname(commandline), None)
-
-    completion_funcname = shell.make_completion_funcname(commandline)
-    wrapper_funcname = '%s__wrapper' % completion_funcname
-
-    r =  '%s() {\n' % wrapper_funcname
-    r += '  %s\n' % completion_funcname
-    r += '  words=(%s "${words[@]}")\n' % commandline.wraps
-    r += '  (( $+_comps[%s] )) && $_comps[%s]\n' % (commandline.wraps, commandline.wraps)
-    r += '}'
-
-    return (wrapper_funcname, r)
-
-
 def generate_completion(commandline, config=None):
     '''Code for generating a Zsh auto completion file.'''
 
@@ -276,7 +258,7 @@ def generate_completion(commandline, config=None):
 
     output.extend(config.get_included_files_content())
 
-    completion_func, wrapper_code = generate_wrapper(functions)
+    completion_func, wrapper_code = zsh_wrapper.generate_wrapper(functions)
 
     for code in helpers.get_used_functions_code():
         output.append(code)
