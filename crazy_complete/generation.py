@@ -119,6 +119,8 @@ def _add_parsed_when(commandline):
                     positional.metavar,
                     positional.when,
                     e)) from e
+        else:
+            positional.when_parsed = None
 
 
 def enhance_commandline(commandline, config):

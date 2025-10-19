@@ -11,114 +11,12 @@ from . import algo
 from . import fish_complete
 from . import fish_helpers
 from .fish_utils import FishCompleteCommand, VariableManager
+from .fish_conditions import (
+    Conditions, Not,
+    HasHiddenOption, HasOption, OptionIs, PositionalNum, PositionalContains
+)
 from . import when
 from . import generation
-
-
-class FishQuery:
-    '''Class for querying the command line.'''
-
-    def __init__(self, ctxt):
-        self.ctxt = ctxt
-
-    def positional_contains(self, num, words):
-        '''Check if a positional contains words.'''
-
-        self.ctxt.helpers.use_function('fish_query', 'positional_contains')
-        r = "$query '$opts' positional_contains %d %s" % (num, ' '.join(words))
-        return r
-
-    def has_option(self, options):
-        '''Check if certain option is present on command line.'''
-
-        self.ctxt.helpers.use_function('fish_query', 'has_option')
-        r = "$query '$opts' has_option %s" % ' '.join(options)
-        return r
-
-    def option_is(self, options, values):
-        '''Check if certain options have certain values.'''
-
-        self.ctxt.helpers.use_function('fish_query', 'option_is')
-        r = "$query '$opts' option_is %s -- %s" % (
-            ' '.join(options), ' '.join(values))
-        return r
-
-    def num_of_positionals(self, operator, num):
-        '''Check the current count of positional arguments .'''
-
-        self.ctxt.helpers.use_function('fish_query', 'num_of_positionals')
-        r = "$query '$opts' num_of_positionals %s %d" % (operator, num)
-        return r
-
-    def by_object(self, obj):
-        if isinstance(obj, when.OptionIs):
-            return self.option_is(obj.options, obj.values)
-        if isinstance(obj, when.HasOption):
-            return self.has_option(obj.options)
-        raise AssertionError("Should not be reached")
-
-
-class Conditions:
-    NumOfPositionals = namedtuple('NumOfPositionals', ['operator', 'value'])
-
-    def __init__(self, ctxt):
-        self.ctxt = ctxt
-        self.fish_query = FishQuery(ctxt)
-        self.positional_contains = {}
-        self.not_has_option = []
-        self.num_of_positionals = None
-        self.has_hidden_option = []
-        self.when = None
-
-    def get(self, unsafe=False):
-        conditions = []
-
-        for num, words in self.positional_contains.items():
-            if unsafe:
-                guard = "__fish_seen_subcommand_from %s" % (' '.join(words))
-            else:
-                guard = self.fish_query.positional_contains(num, words)
-            conditions += [guard]
-
-        if self.not_has_option:
-            if unsafe:
-                guard = "not __fish_seen_argument"
-                for opt in self.not_has_option:
-                    if opt.startswith('--'):
-                        guard += ' -l %s' % opt.lstrip('-')
-                    elif len(opt) == 2:
-                        guard += ' -s %s' % opt[1]
-                    else:
-                        guard += ' -o %s' % opt.lstrip('-')
-            else:
-                guard = "not %s" % self.fish_query.has_option(self.not_has_option)
-            conditions += [guard]
-
-        if self.num_of_positionals is not None:
-            if unsafe:
-                guard = "test (__fish_number_of_cmd_args_wo_opts) %s %d" % (
-                    self.num_of_positionals.operator, self.num_of_positionals.value) # TODO - 1)
-            else:
-                guard = self.fish_query.num_of_positionals(
-                    self.num_of_positionals.operator, self.num_of_positionals.value - 1)
-            conditions += [guard]
-
-        if self.has_hidden_option:
-            self.ctxt.helpers.use_function('fish_query', 'with_incomplete')
-            self.ctxt.helpers.use_function('fish_query', 'has_option')
-            guard = "$query '$opts' has_option WITH_INCOMPLETE %s" % (
-                ' '.join(shell.escape(o) for o in self.has_hidden_option))
-            conditions += [guard]
-
-        if self.when is not None:
-            parsed = when.parse_when(self.when)
-            guard = self.fish_query.by_object(parsed)
-            conditions += [guard]
-
-        if not conditions:
-            return None
-
-        return '"%s"' % ' && '.join(conditions)
 
 
 class FishCompletionDefinition:
@@ -145,9 +43,9 @@ class FishCompletionDefinition:
         self.description = description
         self.requires_argument = requires_argument
         self.completion_args = completion_args
-        self.conditions = Conditions(ctxt)
+        self.conditions = Conditions()
 
-    def get_complete_cmd(self, unsafe=False):
+    def get_complete_cmd(self, ctxt, unsafe=False):
         cmd = FishCompleteCommand()
         cmd.set_command('$prog', raw=True)
         cmd.add_short_options(self.short_options)
@@ -161,7 +59,11 @@ class FishCompletionDefinition:
             cmd.flags.add('r')
 
         cmd.parse_args(self.completion_args)
-        cmd.set_condition(self.conditions.get(unsafe=unsafe), raw=True)
+
+        if unsafe:
+            cmd.set_condition(self.conditions.unsafe_code(ctxt), raw=True)
+        else:
+            cmd.set_condition(self.conditions.query_code(ctxt), raw=True)
 
         return cmd
 
@@ -170,13 +72,14 @@ def _get_positional_contains(option):
     cmdlines = option.parent.get_parents(include_self=True)
     del cmdlines[0]
 
-    r = OrderedDict()
+    conditions = []
 
     for cmdline in cmdlines:
         cmds = utils.get_all_command_variations(cmdline)
-        r[cmdline.parent.get_subcommands().get_positional_num()] = cmds
+        num = cmdline.parent.get_subcommands().get_positional_num()
+        conditions.append(PositionalContains(num, cmds))
 
-    return r
+    return conditions
 
 
 class FishCompletionGenerator:
@@ -200,7 +103,7 @@ class FishCompletionGenerator:
             complete_definitions.append(self._complete_subcommands(self.commandline.get_subcommands()))
 
         for definition in complete_definitions:
-            cmd = definition.get_complete_cmd(self.ctxt.config.fish_fast)
+            cmd = definition.get_complete_cmd(self.ctxt, self.ctxt.config.fish_fast)
 
             if cmd.condition is not None and '$query' in cmd.condition.s:
                 self.ctxt.helpers.use_function('fish_query')
@@ -228,28 +131,32 @@ class FishCompletionGenerator:
             description         = option.help,
             completion_args     = completion_args)
 
+        not_has_options = []
+
         final_options = self.commandline.get_final_option_strings()
-        definition.conditions.not_has_option.extend(final_options)
+        not_has_options.extend(final_options)
 
         conflicting_options = option.get_conflicting_option_strings()
-        definition.conditions.not_has_option.extend(conflicting_options)
+        not_has_options.extend(conflicting_options)
 
         if not option.repeatable:
-            definition.conditions.not_has_option.extend(option.option_strings)
+            not_has_options.extend(option.option_strings)
+
+        if not_has_options:
+            not_has_options = algo.uniq(not_has_options)
+            definition.conditions.add(Not(HasOption(not_has_options)))
 
         if option.hidden:
-            definition.conditions.has_hidden_option = option.option_strings
-
-        definition.conditions.not_has_option = algo.uniq(definition.conditions.not_has_option)
+            definition.conditions.add(HasHiddenOption(option.option_strings))
 
         # If we don't inherit options, add a condition to the option that
         # ensures that we're in the right (sub)command.
         if not self.commandline.inherit_options and self.commandline.get_subcommands():
             positional = self.commandline.get_subcommands().get_positional_num()
-            definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
+            definition.conditions.add(PositionalNum('==', positional))
 
-        definition.conditions.positional_contains = _get_positional_contains(option)
-        definition.conditions.when = option.when
+        definition.conditions.extend(_get_positional_contains(option))
+        definition.conditions.add_when(option.when_parsed)
 
         return definition
 
@@ -268,14 +175,12 @@ class FishCompletionGenerator:
             completion_args     = completion_args
         )
 
-        definition.conditions.when = option.when
-        definition.conditions.positional_contains = _get_positional_contains(option)
+        definition.conditions.add_when(option.when_parsed)
+        definition.conditions.extend(_get_positional_contains(option))
 
         positional = option.get_positional_num()
-        if option.repeatable:
-            definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-ge', positional)
-        else:
-            definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
+        operator = '>=' if option.repeatable else '=='
+        definition.conditions.add(PositionalNum(operator, positional))
 
         return definition
 
@@ -291,8 +196,8 @@ class FishCompletionGenerator:
         )
 
         positional = option.get_positional_num()
-        definition.conditions.num_of_positionals = Conditions.NumOfPositionals('-eq', positional)
-        definition.conditions.positional_contains = _get_positional_contains(option)
+        definition.conditions.add(PositionalNum('==', positional))
+        definition.conditions.extend(_get_positional_contains(option))
         return definition
 
 
