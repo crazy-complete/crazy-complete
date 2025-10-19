@@ -1,5 +1,6 @@
 '''Code for generating wrapper.'''
 
+from . import algo
 from . import shell
 from . import preprocessor
 
@@ -7,92 +8,42 @@ _CODE = r'''
 %WRAPPER_FUNC%() {
   %ORIGINAL_COMPLETION_FUNC%
 
-  local i=0 del=0 adjust=0 delete=() new_words=() opt=''
-#ifdef long_opts_arg
-  local long_opts_arg=(%LONG_OPTS_WITH_ARG%)
-#endif
-#ifdef long_opts_flag
-  local long_opts_flag=(%LONG_OPTS_FLAG%)
-#endif
-#ifdef long_opts_optional
-  local long_opts_optional=(%LONG_OPTS_OPTIONAL%)
-#endif
-#ifdef short_opts_arg
-  local short_opts_arg=(%SHORT_OPTS_WITH_ARG%)
-#endif
-#ifdef short_opts_flag
-  local short_opts_flag=(%SHORT_OPTS_FLAG%)
-#endif
-#ifdef short_opts_optional
-  local short_opts_optional=(%SHORT_OPTS_OPTIONAL%)
-#endif
+  local i=0 del=0 adjust=0 delete=() new_words=()
 
   for ((i=1; i <= ${#words[@]}; ++i)); do
-    local word="${words[$i]}"
-#ifdef long_opts_arg
+    local w="${words[$i]}"
 
-    for opt in "${long_opts_arg[@]}"; do
-      if [[ "$word" == "$opt"* ]]; then
-        delete+=($i);
-        continue 2;
-      elif [[ "$word" == "$opt" ]]; then
-        delete+=($i $((++i)));
-        continue 2;
-      fi
-    done
+    if false; then
+      true
+#ifdef long_opts_arg
+    elif [[ "$w" == %LONG_OPTS_ARG_PATTERN1% ]]; then
+      delete+=($i);
+    elif [[ "$w" == %LONG_OPTS_ARG_PATTERN2% ]]; then
+      delete+=($i $((++i)));
 #endif
 #ifdef long_opts_optional
-
-    for opt in "${long_opts_optional[@]}"; do
-      if [[ "$word" == "$opt"* ]]; then
-        delete+=($i);
-        continue 2;
-      fi
-    done
+    elif [[ "$w" == %LONG_OPTS_OPTIONAL_PATTERN% ]]; then
+      delete+=($i);
 #endif
 #ifdef long_opts_flag
-
-    for opt in "${long_opts_flag[@]}"; do
-      if [[ "$word" == "$opt" ]]; then
-        delete+=($i);
-        continue 2;
-      fi
-    done
-#endif
-#ifdef short_opts_any
-
-    [[ "$word" == --* ]] && continue
+    elif [[ "$w" == %LONG_OPTS_FLAG_PATTERN% ]]; then
+      delete+=($i);
 #endif
 #ifdef short_opts_arg
-
-    for opt in "${short_opts_arg[@]}"; do
-      if [[ "$word" == '-'*"$opt" ]]; then
-        delete+=($i $((++i)));
-        continue 2;
-      elif [[ "$word" == '-'*"$opt"* ]]; then
-        delete+=($i);
-        continue 2;
-      fi
-    done
+    elif [[ "$w" =~ '%SHORT_OPTS_ARG_REGEX1%' ]]; then
+      delete+=($i $((++i)));
+    elif [[ "$w" =~ '%SHORT_OPTS_ARG_REGEX2%' ]]; then
+      delete+=($i);
 #endif
 #ifdef short_opts_optional
-
-    for opt in "${short_opts_optional[@]}"; do
-      if [[ "$word" == '-'*"$opt"* ]]; then
-        delete+=($i);
-        continue 2;
-      fi
-    done
+    elif [[ "$w" =~ '%SHORT_OPTS_OPTIONAL_REGEX%' ]]; then
+      delete+=($i);
 #endif
 #ifdef short_opts_flag
-
-    for opt in "${short_opts_flag[@]}"; do
-      if [[ "$word" == '-'*"$opt"* ]]; then
-        delete+=($i);
-        continue 2;
-      fi
-    done
+    elif [[ "$w" =~ '%SHORT_OPTS_FLAG_REGEX%' ]]; then
+      delete+=($i);
 #endif
+    fi
   done
 
   for del in "${delete[@]}"; do
@@ -109,11 +60,59 @@ _CODE = r'''
 
   words=("${new_words[@]}")
   words[1]='%WRAPS%'
-
   service=%WRAPS%
   (( $+_comps[%WRAPS%] )) && $_comps[%WRAPS%]
 }
 '''
+
+
+def _make_long_opts_pattern(opts, arg_type):
+    if not opts:
+        return ''
+
+    long, old = algo.partition(opts, lambda o: o.startswith('--'))
+
+    old = [o.lstrip('-') for o in old]
+    long = [o.lstrip('-') for o in long]
+
+    if long and old:
+        r = '-(%s|-(%s))' % ('|'.join(old), '|'.join(long))
+    elif long:
+        r = '--(%s)' % '|'.join(long)
+    elif old:
+        r = '-(%s)' % '|'.join(old)
+
+    if arg_type is 'arg':
+        r += '=*'
+    elif arg_type is 'optional':
+        r += '(|=*)'
+
+    return r
+
+
+def _make_short_opts_flag_regex(flag_opts):
+    if not flag_opts:
+        return ''
+
+    return '^-[%s]+$' % ''.join(flag_opts)
+
+
+def _make_short_opts_arg_regex(flag_opts, arg_opts, arg_type):
+    if not arg_opts:
+        return ''
+
+    if flag_opts:
+        r = '-[%s]*[%s]' % (''.join(flag_opts), ''.join(arg_opts))
+    else:
+        r = '-[%s]' % ''.join(arg_opts)
+
+    if arg_type == 'arg':
+        r += '.+'
+    elif arg_type == 'optional':
+        r += '.*'
+
+    return f'^{r}$'
+
 
 def generate_wrapper(generators):
     first_generator = generators[0]
@@ -147,16 +146,28 @@ def generate_wrapper(generators):
             long_opts_flag.extend(option.get_old_option_strings())
             short_opts_flag.extend(o.lstrip('-') for o in option.get_short_option_strings())
 
-    s = _CODE
+    long_opts_flag_pattern = _make_long_opts_pattern(long_opts_flag, None)
+    long_opts_arg_pattern1 = _make_long_opts_pattern(long_opts_arg, 'arg')
+    long_opts_arg_pattern2 = _make_long_opts_pattern(long_opts_arg, None)
+    long_opts_optional_pattern = _make_long_opts_pattern(long_opts_optional, 'optional')
+
+    short_opts_flag_regex = _make_short_opts_flag_regex(short_opts_flag)
+    short_opts_arg_regex1 = _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, None)
+    short_opts_arg_regex2 = _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, 'arg')
+    short_opts_optional_regex = _make_short_opts_arg_regex(short_opts_flag, short_opts_optional, 'optional')
+
+    s = _CODE.strip()
     s = s.replace('%ORIGINAL_COMPLETION_FUNC%', completion_funcname)
     s = s.replace('%WRAPPER_FUNC%', wrapper_funcname)
     s = s.replace('%WRAPS%', commandline.wraps)
-    s = s.replace('%LONG_OPTS_FLAG%', ' '.join(long_opts_flag))
-    s = s.replace('%LONG_OPTS_WITH_ARG%', ' '.join(long_opts_arg))
-    s = s.replace('%LONG_OPTS_OPTIONAL%', ' '.join(long_opts_optional))
-    s = s.replace('%SHORT_OPTS_FLAG%', ' '.join(short_opts_flag))
-    s = s.replace('%SHORT_OPTS_WITH_ARG%', ' '.join(short_opts_arg))
-    s = s.replace('%SHORT_OPTS_OPTIONAL%', ' '.join(short_opts_optional))
+    s = s.replace('%LONG_OPTS_FLAG_PATTERN%', long_opts_flag_pattern)
+    s = s.replace('%LONG_OPTS_ARG_PATTERN1%', long_opts_arg_pattern1)
+    s = s.replace('%LONG_OPTS_ARG_PATTERN2%', long_opts_arg_pattern2)
+    s = s.replace('%LONG_OPTS_OPTIONAL_PATTERN%', long_opts_optional_pattern)
+    s = s.replace('%SHORT_OPTS_ARG_REGEX1%', short_opts_arg_regex1)
+    s = s.replace('%SHORT_OPTS_ARG_REGEX2%', short_opts_arg_regex2)
+    s = s.replace('%SHORT_OPTS_FLAG_REGEX%', short_opts_flag_regex)
+    s = s.replace('%SHORT_OPTS_OPTIONAL_REGEX%', short_opts_optional_regex)
 
     defines = []
     if long_opts_flag:
@@ -171,8 +182,6 @@ def generate_wrapper(generators):
         defines.append('short_opts_arg')
     if short_opts_optional:
         defines.append('short_opts_optional')
-    if short_opts_flag or short_opts_arg or short_opts_optional:
-        defines.append('short_opts_any')
 
     s = preprocessor.preprocess(s, defines)
 
