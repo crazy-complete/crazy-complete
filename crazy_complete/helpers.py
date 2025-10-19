@@ -67,7 +67,12 @@ def make_completion_funcname_for_context(ctxt):
     if isinstance(ctxt.option, cli.Option):
         return '%s_%s' % (funcname, ctxt.option.option_strings[0])
     if isinstance(ctxt.option, cli.Positional):
-        return '%s_%s' % (funcname, shell.make_identifier(ctxt.option.metavar))
+        if ctxt.option.metavar:
+            identifier = shell.make_identifier(ctxt.option.metavar)
+        else:
+            identifier = 'arg%d' % ctxt.option.get_positional_num()
+
+        return '%s_%s' % (funcname, identifier)
 
     raise AssertionError('make_completion_funcname_for_context: Should not be reached')
 
