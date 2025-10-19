@@ -304,6 +304,14 @@ class CommandLine:
 
         return parents
 
+    def get_root_commandline(self):
+        '''Return the root commandline.'''
+
+        if not self.parent:
+            return self
+
+        return self.parent.get_root_commandline()
+
     def get_options_by_option_strings(self, option_strings):
         '''Return all options containing one option_strings.'''
 

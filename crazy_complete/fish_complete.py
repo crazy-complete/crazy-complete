@@ -3,6 +3,7 @@
 from . import shell
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
+from .utils import get_query_option_strings, get_defined_option_types
 
 CHOICES_INLINE_THRESHOLD = 80
 # The `choices` command can in Fish be expressed inline in a complete command
@@ -247,6 +248,39 @@ class FishCompleteCombine(FishCompletionBase):
         return ['-f', '-a', '(%s)' % funcname]
 
 
+class FishCompleteCommandArg(FishCompletionBase):
+    '''Complete an argument of a command'''
+
+    def __init__(self, ctxt):
+        self.ctxt = ctxt
+
+        query = ctxt.helpers.use_function('fish_query', 'positionals_positions')
+        types = get_defined_option_types(ctxt.option.parent.get_root_commandline())
+        if types.short:
+            ctxt.helpers.use_function('fish_query', 'short_options')
+        if types.long:
+            ctxt.helpers.use_function('fish_query', 'long_options')
+        if types.old:
+            ctxt.helpers.use_function('fish_query', 'old_options')
+
+        opts = get_query_option_strings(ctxt.option.parent, with_parent_options=True)
+        opts = shell.escape(opts)
+        command_pos = ctxt.option.get_positional_num() - 1
+
+        r = 'set -l pos (%s %s positional_pos %d)\n' % (query, opts, command_pos)
+        r += 'set -l cmdline (commandline -poc | string escape) (commandline -ct)\n'
+        r += 'complete -C -- "$cmdline[$pos..]"'
+
+        self.code = r
+
+    def get_code(self):
+        return self.code
+
+    def get_args(self):
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.code)
+        return ['-f', '-a', '(%s)' % funcname]
+
+
 class FishCompleter(shell.ShellCompleter):
     '''Code generator for completing arguments in Fish.'''
 
@@ -331,8 +365,8 @@ class FishCompleter(shell.ShellCompleter):
         func = ctxt.helpers.use_function('commandline_string')
         return FishCompletionCommand(func)
 
-    def command_arg(self, _ctxt):
-        return FishCompleteNone()
+    def command_arg(self, ctxt):
+        return FishCompleteCommandArg(ctxt)
 
     # =========================================================================
     # Bonus

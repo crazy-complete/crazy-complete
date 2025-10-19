@@ -46,6 +46,9 @@ _FISH_QUERY = helpers.FishFunction('fish_query', r'''
 # ===========================================================================
 
 set -l positionals
+#ifdef positionals_positions
+set -l positionals_positions
+#endif
 set -l having_options
 set -l option_values
 
@@ -70,6 +73,9 @@ set -l my_cache_key "$(commandline -b) $options"
 
 if test "$__QUERY_CACHE_KEY" = "$my_cache_key"
   set positionals    $__QUERY_CACHE_POSITIONALS
+#ifdef positionals_positions
+  set positionals_positions $__QUERY_CACHE_POSITIONALS_POSITIONS
+#endif
   set having_options $__QUERY_CACHE_HAVING_OPTIONS
   set option_values  $__QUERY_CACHE_OPTION_VALUES
 else
@@ -142,9 +148,15 @@ else
     switch $arg
       case '-'
         set -a positionals -
+#ifdef positionals_positions
+        set -s positionals_positions $argi
+#endif
       case '--'
         for argi in (seq (math $argi + 1) $cmdline_count)
           set -a positionals $cmdline[$argi]
+#ifdef positionals_positions
+          set -a positionals_positions $argi
+#endif
         end
         break
       case '--*=*'
@@ -221,12 +233,18 @@ else
 #endif
       case '*'
         set -a positionals $arg
+#ifdef positionals_positions
+        set -a positionals_positions $argi
+#endif
     end
 
     set argi (math $argi + 1)
   end
 
   set -g __QUERY_CACHE_POSITIONALS    $positionals
+#ifdef positionals_positions
+  set -g __QUERY_CACHE_POSITIONALS_POSITIONS $positionals_positions
+#endif
   set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
   set -g __QUERY_CACHE_OPTION_VALUES  $option_values
   set -g __QUERY_CACHE_KEY            $my_cache_key
@@ -336,6 +354,10 @@ switch $cmd
     end
 
     return 1
+#endif
+#ifdef positionals_positions
+  case 'positional_pos'
+    echo $positionals_positions[$argv[1]]
 #endif
 #ifdef DEBUG
   case '*'
