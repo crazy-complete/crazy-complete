@@ -79,11 +79,42 @@ def _validate_choices(args):
         raise CrazyError('values: Not a list or dictionary')
 
 
+def _validate_command(args):
+    opts = args.get_optional_arg({})
+    args.require_no_more()
+
+    path = None
+    append = None
+    prepend = None
+
+    if not is_dict_type(opts):
+        raise CrazyTypeError('options', 'dict', opts)
+
+    for key, value in opts.items():
+        if key == 'path':
+            path = value
+        elif key == 'path_append':
+            append = value
+        elif key == 'path_prepend':
+            prepend = value
+        else:
+            raise CrazyError(f'Unknown option: {key}')
+
+        if not isinstance(value, str):
+            raise CrazyError(f'{key}: Not a string: {value}')
+
+        if is_empty_or_whitespace(value):
+            raise CrazyError(f'{key}: Cannot be empty')
+
+    if path and (append or prepend):
+        raise CrazyError('command: path_append/path_prepend cannot be used with path')
+
+
 def _validate_filedir(args, mode):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
-    if not isinstance(opts, dict):
+    if not is_dict_type(opts):
         raise CrazyTypeError('options', 'dict', opts)
 
     for key, value in opts.items():
@@ -273,7 +304,7 @@ def validate_complete(complete):
         'none':          _validate_none,
         'integer':       _validate_void,
         'float':         _validate_void,
-        'command':       _validate_void,
+        'command':       _validate_command,
         'group':         _validate_void,
         'hostname':      _validate_void,
         'pid':           _validate_void,

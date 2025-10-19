@@ -222,6 +222,47 @@ class FishCompleteValueList(FishCompletionBase):
         return self.cmd
 
 
+class FishCompleteCommand(FishCompletionBase):
+    def __init__(self, ctxt, opts):
+        self.ctxt = ctxt
+
+        code = None
+        path = None
+        append = None
+        prepend = None
+
+        if opts:
+            path = opts.get('path', None)
+            append = opts.get('path_append', None)
+            prepend = opts.get('path_prepend', None)
+
+        mkpath = lambda path: ' '.join(shell.escape(p) for p in path.split(':'))
+
+        if path:
+            code = 'set -lx PATH %s' % mkpath(path)
+        elif append and prepend:
+            code = 'set -lx PATH %s $PATH %s' % (mkpath(prepend), mkpath(append))
+        elif append:
+            code = 'set -lx -a PATH %s' % mkpath(append)
+        elif prepend:
+            code = 'set -lx PATH %s $PATH' % mkpath(prepend)
+
+        if not code:
+            self.code = "__fish_complete_command"
+        else:
+            self.code = f'{code}\n__fish_complete_command'
+
+    def get_args(self):
+        if '\n' in self.code:
+            func = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.code)
+            return ['-f', '-a', '(%s)' % func]
+
+        return ['-f', '-a', '(%s)' % self.code]
+
+    def get_code(self):
+        return self.code
+
+
 class FishCompleteCombine(FishCompletionBase):
     '''Used for combining multiple complete commands.'''
 
@@ -299,8 +340,8 @@ class FishCompleter(shell.ShellCompleter):
     def choices(self, ctxt, choices):
         return FishCompleteChoices(ctxt, choices)
 
-    def command(self, __ctxt):
-        return FishCompletionCommand("__fish_complete_command")
+    def command(self, ctxt, opts=None):
+        return FishCompleteCommand(ctxt, opts)
 
     def directory(self, ctxt, opts=None):
         return FishCompleteDir(ctxt, opts)

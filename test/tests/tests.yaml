@@ -1365,11 +1365,15 @@ definition_file: "filedir"
 description: "Check --directory"
 send: "crazy-complete-test --directory "
 bash_expected: |
-  > crazy-complete-test --directory directory
+  > crazy-complete-test --directory
+  bin        directory
+  > crazy-complete-test --directory
 fish_expected: |
-  > crazy-complete-test --directory directory/
+  > crazy-complete-test --directory
+  bin/  directory/
 zsh_expected: |
-  > crazy-complete-test --directory directory/
+  > crazy-complete-test --directory
+  bin/        directory/
 ---
 number: 88
 definition_file: "filedir"
@@ -1377,19 +1381,19 @@ description: "Check --file"
 send: "crazy-complete-test --file "
 bash_expected: |
   > crazy-complete-test --file
-  README.md         file with spaces  file3.tXt         image2.jPg
-  archive.tar.gz    file0.txt         image0.jpg        source.c++
-  directory         file1.TXT         image1.JPG
+  README.md         directory         file1.TXT         image1.JPG
+  archive.tar.gz    file with spaces  file3.tXt         image2.jPg
+  bin               file0.txt         image0.jpg        source.c++
   > crazy-complete-test --file
 fish_expected: |
   > crazy-complete-test --file
-  archive.tar.gz  file with spaces  file1.TXT  image0.jpg  image2.jPg  source.c++
-  directory/      file0.txt         file3.tXt  image1.JPG  README.md
+  archive.tar.gz  directory/        file0.txt  file3.tXt   image1.JPG  README.md
+  bin/            file with spaces  file1.TXT  image0.jpg  image2.jPg  source.c++
 zsh_expected: |
   > crazy-complete-test --file
-  README.md           file\ with\ spaces  file3.tXt           image2.jPg
-  archive.tar.gz      file0.txt           image0.jpg          source.c++
-  directory/          file1.TXT           image1.JPG
+  README.md           directory/          file1.TXT           image1.JPG
+  archive.tar.gz      file\ with\ spaces  file3.tXt           image2.jPg
+  bin/                file0.txt           image0.jpg          source.c++
 ---
 number: 89
 definition_file: "filedir"
@@ -1397,17 +1401,17 @@ description: "Check --file-txt-jpg"
 send: "crazy-complete-test --file-txt-jpg "
 bash_expected: |
   > crazy-complete-test --file-txt-jpg
+  bin         file0.txt   file3.tXt   image1.JPG
   directory   file1.TXT   image0.jpg  image2.jPg
-  file0.txt   file3.tXt   image1.JPG
   > crazy-complete-test --file-txt-jpg
 fish_expected: |
   > crazy-complete-test --file-txt-jpg
+  bin/        file0.txt  file3.tXt   image1.JPG
   directory/  file1.TXT  image0.jpg  image2.jPg
-  file0.txt   file3.tXt  image1.JPG
 zsh_expected: |
   > crazy-complete-test --file-txt-jpg
+  bin/        file0.txt   file3.tXt   image1.JPG
   directory/  file1.TXT   image0.jpg  image2.jPg
-  file0.txt   file3.tXt   image1.JPG
 ---
 number: 90
 definition_file: "filedir"
@@ -1415,14 +1419,14 @@ description: "Check --file-tar-gz"
 send: "crazy-complete-test --file-tar-gz "
 bash_expected: |
   > crazy-complete-test --file-tar-gz
-  archive.tar.gz  directory
+  archive.tar.gz  bin             directory
   > crazy-complete-test --file-tar-gz
 fish_expected: |
   > crazy-complete-test --file-tar-gz
-  archive.tar.gz  directory/
+  archive.tar.gz  bin/  directory/
 zsh_expected: |
   > crazy-complete-test --file-tar-gz
-  archive.tar.gz  directory/
+  archive.tar.gz  bin/            directory/
 ---
 number: 91
 definition_file: "filedir"
@@ -1430,11 +1434,55 @@ description: "Check --file-cpp"
 send: "crazy-complete-test --file-cpp "
 bash_expected: |
   > crazy-complete-test --file-cpp
-  directory   source.c++
+  bin         directory   source.c++
   > crazy-complete-test --file-cpp
 fish_expected: |
   > crazy-complete-test --file-cpp
-  directory/  source.c++
+  bin/  directory/  source.c++
 zsh_expected: |
   > crazy-complete-test --file-cpp
-  directory/  source.c++
+  bin/        directory/  source.c++
+---
+number: 92
+definition_file: "command_arg"
+description: "Check --command-path"
+send: "crazy-complete-test --command-path my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path my_test_binary
+---
+number: 93
+definition_file: "command_arg"
+description: "Check --command-path-append"
+send: "crazy-complete-test --command-path-append my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path-append my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path-append my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path-append my_test_binary
+---
+number: 94
+definition_file: "command_arg"
+description: "Check --command-path-prepend"
+send: "crazy-complete-test --command-path-prepend my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path-prepend my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path-prepend my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path-prepend my_test_binary
+---
+number: 95
+definition_file: "command_arg"
+description: "Check --command-path-append-prepend"
+send: "crazy-complete-test --command-path-append-prepend my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path-append-prepend my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path-append-prepend my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path-append-prepend my_test_binary

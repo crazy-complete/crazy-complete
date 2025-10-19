@@ -517,7 +517,17 @@ options:
 
 ### command
 
-> Complete a command.
+> This completer provides completion suggestions for executable commands available in the system's `$PATH`.
+
+> `$PATH` can be modified using these options:
+
+> `{"path": "<directory>:..."}`: Overrides the default `$PATH` entirely.
+
+> `{"path_append": "<directory>:..."}`: Appends to the default `$PATH`.
+
+> `{"path_prepend": "<directory>:..."}`: Prepends to the default `$PATH`.
+
+> **NOTE:** `path_append` and `path_prepend` can be used together, but both are mutually exclusive with `path`.
 
 > **NOTE:**: Use `command_arg` to complete arguments of a command.
 
@@ -526,6 +536,8 @@ prog: "example"
 options:
   - option_strings: ["--command"]
     complete: ["command"]
+  - option_strings: ["--command-sbin"]
+    complete: ["command", {"path_append": "/sbin:/usr/sbin"}]
 ```
 
 ```
@@ -541,7 +553,7 @@ base32    base64    basename  basenc    bash      bashbug
 
 > **NOTE:** This completion requires `repeatable: true`.
 
-> **NOTE:** This command is currently only available in **Zsh**.
+> **NOTE:** This command is currently only available in **Fish** and **Zsh**.
 
 ```yaml
 prog: "example"

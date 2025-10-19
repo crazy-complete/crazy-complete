@@ -1,6 +1,16 @@
 prog: crazy-complete-test
 options:
-  - option_strings: ['-o', '--option']
+  - option_strings: ['--command-path']
+    complete: ['command', {'path': '%TEST_DIR%/test_data/bin'}]
+
+  - option_strings: ['--command-path-append']
+    complete: ['command', {'path_append': '%TEST_DIR%/test_data/bin'}]
+
+  - option_strings: ['--command-path-prepend']
+    complete: ['command', {'path_prepend': '%TEST_DIR%/test_data/bin'}]
+
+  - option_strings: ['--command-path-append-prepend']
+    complete: ['command', {'path_append': '/tmp', 'path_prepend': '%TEST_DIR%/test_data/bin'}]
 
 positionals:
   - number: 1

@@ -128,6 +128,40 @@ def _check_choices(arguments):
             _check_type(value, (str, int, float))
 
 
+def _check_command(arguments):
+    opts = arguments.get_optional_arg({})
+    _check_type(opts, (dict, ))
+    arguments.require_no_more()
+
+    _check_dictionary(opts, {
+        'path':         (False, (str,)),
+        'path_append':  (False, (str,)),
+        'path_prepend': (False, (str,)),
+    })
+
+    path = None
+    append = None
+    prepend = None
+
+    if _has_set(opts, 'path'):
+        path = opts.value['path']
+        if is_empty_or_whitespace(path.value):
+            raise _error('path cannot be empty', path)
+
+    if _has_set(opts, 'path_append'):
+        path_append = opts.value['path_append']
+        if is_empty_or_whitespace(path_append.value):
+            raise _error('path_append cannot be empty', path_append)
+
+    if _has_set(opts, 'path_prepend'):
+        path_prepend = opts.value['path_prepend']
+        if is_empty_or_whitespace(path_prepend.value):
+            raise _error('path_prepend cannot be empty', path_prepend)
+
+    if path and (append or prepend):
+        raise _error('path_append/path_prepend cannot be used with path')
+
+
 def _check_filedir(arguments, mode):
     options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
@@ -284,7 +318,7 @@ def _check_complete(args):
         'none':             _check_void,
         'integer':          _check_void,
         'float':            _check_void,
-        'command':          _check_void,
+        'command':          _check_command,
         'environment':      _check_void,
         'group':            _check_void,
         'hostname':         _check_void,

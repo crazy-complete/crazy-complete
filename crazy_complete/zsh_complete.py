@@ -87,8 +87,34 @@ class ZshCompleter(shell.ShellCompleter):
         funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
         return funcname
 
-    def command(self, _ctxt):
-        return '_command_names'
+    def command(self, ctxt, opts=None):
+        code = None
+        path = None
+        append = None
+        prepend = None
+
+        if opts:
+            path = opts.get('path', None)
+            append = opts.get('path_append', None)
+            prepend = opts.get('path_prepend', None)
+
+        if path:
+            code = 'local -x PATH=%s' % shell.escape(path)
+        elif append and prepend:
+            append = shell.escape(append)
+            prepend = shell.escape(prepend)
+            code = 'local -x PATH=%s:"$PATH":%s' % (prepend, append)
+        elif append:
+            code = 'local -x PATH="$PATH":%s' % shell.escape(append)
+        elif prepend:
+            code = 'local -x PATH=%s:"$PATH"' % shell.escape(prepend)
+
+        if not code:
+            return '_command_names'
+
+        code = f'{code}\n_command_names'
+        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
+        return funcname
 
     def directory(self, _ctxt, opts=None):
         directory = None if opts is None else opts.get('directory', None)

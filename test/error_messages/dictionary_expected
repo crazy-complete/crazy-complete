@@ -67,7 +67,15 @@
 262-capture-wrong-value                  | Invalid variable name: ''
 ======= Directory "04-complete" =======
 3_00_00-invalid-command                  | foo: -o: Unknown command for `complete`: wrong
-3_01_00-command-too-many-args            | foo: -o: Too many arguments: ['wrong']
+3_01_00-command-options-wrong-type       | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: 'wrong' (str)
+3_01_01-command-path-wrong-type          | foo: -o: path: Not a string: False
+3_01_02-command-path-empty               | foo: -o: path: Cannot be empty
+3_01_03-command-path-append-wrong-type   | foo: -o: path_append: Not a string: False
+3_01_04-command-path-append-empty        | foo: -o: path_append: Cannot be empty
+3_01_05-command-path-prepend-wrong-type  | foo: -o: path_prepend: Not a string: False
+3_01_06-command-path-prepend-empty       | foo: -o: path_prepend: Cannot be empty
+3_01_07-command-invalid-option           | foo: -o: Unknown option: wrong
+3_01_10-command-too-many-args            | foo: -o: Too many arguments: ['wrong']
 3_02_00-environment-too-many-args        | foo: -o: Too many arguments: ['wrong']
 3_03_00-float-too-many-args              | foo: -o: Too many arguments: ['wrong']
 3_04_00-group-too-many-args              | foo: -o: Too many arguments: ['wrong']

@@ -76,15 +76,18 @@ class CompgenW(BashCompletionBase):
 class BashCompletionCompgen(BashCompletionBase):
     '''Used for completion that uses Bash's `compgen` command.'''
 
-    def __init__(self, _ctxt, compgen_args, word='"$cur"'):
+    def __init__(self, _ctxt, compgen_args, code=None):
         self.compgen_args = compgen_args
-        self.word = word
+        self.code = code
 
     def get_code(self, append=False):
-        return 'COMPREPLY%s=($(compgen %s -- %s))' % (
-            ('+' if append else ''),
-            self.compgen_args,
-            self.word)
+        compgen_cmd = 'COMPREPLY%s=($(compgen %s -- "$cur"))' % (
+            ('+' if append else ''), self.compgen_args)
+
+        if not self.code:
+            return compgen_cmd
+
+        return '%s\n%s' % (self.code, compgen_cmd)
 
 
 class BashCompleteCombine(BashCompletionBase):
@@ -123,8 +126,29 @@ class BashCompleter(shell.ShellCompleter):
     def choices(self, ctxt, choices):
         return CompgenW(ctxt, choices)
 
-    def command(self, ctxt):
-        return BashCompletionCompgen(ctxt, '-A command')
+    def command(self, ctxt, opts=None):
+        code = None
+        path = None
+        append = None
+        prepend = None
+
+        if opts:
+            path = opts.get('path', None)
+            append = opts.get('path_append', None)
+            prepend = opts.get('path_prepend', None)
+
+        if path:
+            code = 'local -x PATH=%s' % shell.escape(path)
+        elif append and prepend:
+            append = shell.escape(append)
+            prepend = shell.escape(prepend)
+            code = 'local -x PATH=%s:"$PATH":%s' % (prepend, append)
+        elif append:
+            code = 'local -x PATH="$PATH":%s' % shell.escape(append)
+        elif prepend:
+            code = 'local -x PATH=%s:"$PATH"' % shell.escape(prepend)
+
+        return BashCompletionCompgen(ctxt, '-A command', code=code)
 
     def directory(self, ctxt, opts=None):
         directory = None if opts is None else opts.get('directory', None)
