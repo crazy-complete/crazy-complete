@@ -26,9 +26,10 @@ class FishCompletionDefinition:
           short_options=None,      # List of short options
           long_options=None,       # List of long options
           old_options=None,        # List of old-style options
+          positional=None,         # Positional number
           description=None,        # Description
           requires_argument=False, # Option requires an argument
-          completion_args=None
+          completion_obj=None
         ):
         if short_options is None:
             short_options = []
@@ -40,9 +41,10 @@ class FishCompletionDefinition:
         self.short_options = short_options
         self.long_options = long_options
         self.old_options = old_options
+        self.positional = positional
         self.description = description
         self.requires_argument = requires_argument
-        self.completion_args = completion_args
+        self.completion_obj = completion_obj
         self.conditions = Conditions()
 
     def get_complete_cmd(self, ctxt, unsafe=False):
@@ -58,7 +60,7 @@ class FishCompletionDefinition:
         if self.requires_argument:
             cmd.flags.add('r')
 
-        cmd.parse_args(self.completion_args)
+        cmd.parse_args(self.completion_obj.get_args())
 
         if unsafe:
             cmd.set_condition(self.conditions.unsafe_code(ctxt), raw=True)
@@ -83,7 +85,10 @@ def _get_positional_contains(option):
 
 
 class FishCompletionGenerator:
-    def __init__(self, ctxt, commandline):
+    def __init__(self, ctxt, commandline, parent=None):
+        self.parent = parent
+        self.children = []
+
         self.commandline = commandline
         self.ctxt = ctxt
         self.completer = fish_complete.FishCompleter()
@@ -91,22 +96,30 @@ class FishCompletionGenerator:
         self.conditions = VariableManager('C')
         self.command_comment = '# command %s' % self.commandline.get_command_path()
         self.options_for_query = 'set -l opts "%s"' % utils.get_query_option_strings(self.commandline)
+        self.complete_definitions = []
 
-        complete_definitions = []
         for option in self.commandline.get_options():
-            complete_definitions.append(self._complete_option(option))
+            self.complete_definitions.append(self._complete_option(option))
 
         for positional in self.commandline.get_positionals():
-            complete_definitions.append(self._complete_positional(positional))
+            self.complete_definitions.append(self._complete_positional(positional))
 
         if self.commandline.get_subcommands():
-            complete_definitions.append(self._complete_subcommands(self.commandline.get_subcommands()))
+            self.complete_definitions.append(self._complete_subcommands(self.commandline.get_subcommands()))
 
-        for definition in complete_definitions:
+        if self.commandline.get_subcommands():
+            for subcmd in self.commandline.get_subcommands().subcommands:
+                self.children.append(FishCompletionGenerator(ctxt, subcmd, self))
+
+        for definition in self.complete_definitions:
+            if isinstance(definition.completion_obj, fish_complete.FishCompleteCommandArg):
+                cmdline = self
+                while cmdline:
+                    cmdline.fix_command_arg(definition.positional)
+                    cmdline = cmdline.parent
+
+        for definition in self.complete_definitions:
             cmd = definition.get_complete_cmd(self.ctxt, self.ctxt.config.fish_fast)
-
-            if cmd.condition is not None and '$query' in cmd.condition.s:
-                self.ctxt.helpers.use_function('fish_query')
 
             if not self.ctxt.config.fish_inline_conditions:
                 if cmd.condition is not None:
@@ -114,13 +127,30 @@ class FishCompletionGenerator:
 
             self.lines.append(cmd.get())
 
+    def fix_command_arg(self, positional):
+        for definition in self.complete_definitions:
+            if not (definition.short_options or definition.long_options or definition.old_options):
+                continue
+
+            definition.conditions.add(Not(PositionalNum('>=', positional)))
+
+    def visit(self, callback):
+        callback(self)
+        for child in self.children:
+            callback(child)
+
+    def get_all(self):
+        r = []
+        self.visit(r.append)
+        return r
+
     def _complete_option(self, option):
         context = self.ctxt.get_option_context(self.commandline, option)
 
         if option.complete:
-            completion_args = self.completer.complete(context, *option.complete).get_args()
+            completion_obj = self.completer.complete(context, *option.complete)
         else:
-            completion_args = self.completer.complete(context, 'none').get_args()
+            completion_obj = self.completer.complete(context, 'none')
 
         definition = FishCompletionDefinition(
             self.ctxt,
@@ -129,7 +159,7 @@ class FishCompletionGenerator:
             old_options         = option.get_old_option_strings(),
             requires_argument   = (option.complete and not option.optional_arg),
             description         = option.help,
-            completion_args     = completion_args)
+            completion_obj      = completion_obj)
 
         not_has_options = []
 
@@ -164,15 +194,16 @@ class FishCompletionGenerator:
         context = self.ctxt.get_option_context(self.commandline, option)
 
         if option.complete:
-            completion_args = self.completer.complete(context, *option.complete).get_args()
+            completion_obj = self.completer.complete(context, *option.complete)
         else:
-            completion_args = self.completer.complete(context, 'none').get_args()
+            completion_obj = self.completer.complete(context, 'none')
 
         definition = FishCompletionDefinition(
             self.ctxt,
+            positional          = option.get_positional_num(),
             requires_argument   = True,
             description         = option.help,
-            completion_args     = completion_args
+            completion_obj      = completion_obj
         )
 
         definition.conditions.add_when(option.when_parsed)
@@ -187,12 +218,12 @@ class FishCompletionGenerator:
     def _complete_subcommands(self, option):
         items = option.get_choices()
         context = self.ctxt.get_option_context(self.commandline, option)
-        completion_args = self.completer.complete(context, 'choices', items).get_args()
+        completion_obj = self.completer.complete(context, 'choices', items)
 
         definition = FishCompletionDefinition(
             self.ctxt,
             description    = 'Commands',
-            completion_args = completion_args
+            completion_obj = completion_obj
         )
 
         positional = option.get_positional_num()
@@ -210,7 +241,7 @@ def generate_completion(commandline, config=None):
     commandline = generation.enhance_commandline(commandline, config)
     helpers = fish_helpers.FishHelpers(commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
-    result = generation.visit_commandlines(FishCompletionGenerator, ctxt, commandline)
+    result = FishCompletionGenerator(ctxt, commandline)
 
     if helpers.is_used('fish_query'):
         types = utils.get_defined_option_types(commandline)
@@ -245,12 +276,12 @@ def generate_completion(commandline, config=None):
     output.append('# Generally disable file completion')
     output.append('complete -c $prog -x')
 
-    if result[0].commandline.wraps:
+    if result.commandline.wraps:
         output.append('')
         output.append('# Wrap command')
-        output.append('complete -c $prog -w %s' % result[0].commandline.wraps)
+        output.append('complete -c $prog -w %s' % result.commandline.wraps)
 
-    for generator in result:
+    for generator in result.get_all():
         if generator.lines:
             output.append('')
             output.append(generator.command_comment)
