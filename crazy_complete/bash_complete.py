@@ -250,7 +250,8 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(pattern)))
 
     def commandline_string(self, ctxt):
-        return BashCompletionCommand(ctxt, '')
+        funcname = ctxt.helpers.use_function('commandline_string')
+        return BashCompletionCommand(ctxt, '%s' % funcname)
 
     def command_arg(self, ctxt):
         return BashCompletionCommand(ctxt, '')

@@ -49,6 +49,117 @@ done
 printf '%s\n' "$result"
 ''')
 
+_PARSE_LINE = helpers.ShellFunction('parse_line', r'''
+local -n out="$1"
+local in="$2" len=${#2} i=0 word='' active=0
+
+for ((i=0; i < len; ++i)); do
+  case "${in:i:1}" in
+    ' ')
+      if (( active )); then
+        out+=("$word")
+        word=''
+        active=0;
+      fi;;
+    '"')
+      for ((i; i < len; ++i)); do
+        if [[ "${in:i:1}" == '\' ]]; then
+          word+="${in:$((++i)):1}"
+        else
+          word+="${in:i:1}"
+          [[ "${in:i:1}" == '"' ]] && break;
+        fi
+      done
+      active=1;;
+    "'")
+      for ((i; i < len; ++i)); do
+        word+="${in:i:1}"
+        [[ "${in:i:1}" == "'" ]] && break;
+      done
+      active=1;;
+    '\')
+      word+='\'
+      word+="${in:$((++i)):1}"
+      active=1;;
+    *)
+      word+="${in:i:1}"
+      active=1;;
+  esac
+done
+
+if (( active )); then
+  out+=("$word")
+elif [[ "${in:$((len - 1)):1}" == ' ' ]]; then
+  out+=('')
+fi
+''')
+
+_SUBSTRACT_PREFIX_SUFFIX = helpers.ShellFunction('subtract_prefix_suffix', r'''
+local s1="$1"
+local s2="$2"
+
+local len1=${#s1}
+local len2=${#s2}
+
+local maxk=$len1
+if (( len2 < maxk )); then
+  maxk=$len2
+fi
+
+local k=$maxk
+while (( k > 0 )); do
+  local start=$((len1 - k))
+  local suf="${s1:start:k}"
+  local pre="${s2:0:k}"
+
+  if [[ "$suf" == "$pre" ]]; then
+    if (( len1 == k )); then
+      echo ""
+    else
+      echo "${s1:0:len1-k}"
+    fi
+
+    return
+  fi
+
+  ((k--))
+done
+
+echo "$s1"
+''')
+
+_COMMANDLINE_STRING = helpers.ShellFunction('commandline_string', r'''
+local l line="$(my_dequote "$cur")"
+
+local COMP_LINE_OLD="$COMP_LINE"
+local COMP_POINT_OLD=$COMP_POINT
+local COMP_WORDS_OLD=("${COMP_WORDS[@]}")
+local COMP_CWORD_OLD=$COMP_CWORD
+
+COMP_LINE="$line"
+COMP_POINT=${#line}
+COMP_WORDS=()
+parse_line COMP_WORDS "$line"
+COMP_CWORD=$(( ${#COMP_WORDS[@]} - 1 ))
+COMPREPLY=()
+
+invoke_complete "${COMP_WORDS[0]}" "${COMP_WORDS[0]}"
+
+local REPLY COMPREPLY_NEW=()
+
+for REPLY in "${COMPREPLY[@]}"; do
+  l=("$(subtract_prefix_suffix "$line" "$REPLY")")
+  COMPREPLY_NEW+=("$l$REPLY")
+done
+
+COMPREPLY=("${COMPREPLY_NEW[@]}")
+
+COMP_LINE="$COMP_LINE_OLD"
+COMP_POINT=$COMP_POINT_OLD
+COMP_WORDS=("${COMP_WORDS_OLD[@]}")
+COMP_CWORD=$COMP_CWORD_OLD
+''', ['my_dequote', 'parse_line', 'invoke_complete', 'subtract_prefix_suffix'])
+
 _INVOKE_COMPLETE = helpers.ShellFunction('invoke_complete', r'''
 local prog="$1"; shift
 local i=0 args=($(complete -p -- "$prog"))
@@ -230,6 +341,9 @@ class BashHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_COMPGEN_W_REPLACEMENT)
         self.add_function(_MY_DEQUOTE)
+        self.add_function(_PARSE_LINE)
+        self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
+        self.add_function(_COMMANDLINE_STRING)
         self.add_function(_INVOKE_COMPLETE)
         self.add_function(_EXEC)
         self.add_function(_EXEC_FAST)

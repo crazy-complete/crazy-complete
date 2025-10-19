@@ -575,8 +575,6 @@ base32    base64    basename  basenc    bash      bashbug
 
 > Complete a command line as a string.
 
-> **NOTE:** This command is currently only available in **Fish** and **Zsh**.
-
 ```yaml
 prog: "example"
 options:
