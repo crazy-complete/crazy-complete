@@ -346,11 +346,12 @@ def generate_completion(commandline, config=None):
         output.append('complete -c $prog -w %s' % result[0].commandline.wraps)
 
     for generator in result:
-        output.append('')
-        output.append(generator.command_comment)
-        output.append(generator.options_for_query)
-        output.extend(generator.conditions.get_lines())
-        output.extend(generator.lines)
+        if generator.lines:
+            output.append('')
+            output.append(generator.command_comment)
+            output.append(generator.options_for_query)
+            output.extend(generator.conditions.get_lines())
+            output.extend(generator.lines)
 
     if commandline.aliases:
         output.append('')
