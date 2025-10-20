@@ -306,6 +306,9 @@ def _check_combine(arguments):
         if subcommand_args.value[0] == 'none':
             raise _error('Command `none` not allowed inside combine', subcommand_args)
 
+        if subcommand_args.value[0] == 'command_arg':
+            raise _error('Command `command_arg` not allowed inside combine', subcommand_args)
+
         _check_complete(subcommand_args)
 
     if len(commands.value) == 0:

@@ -279,6 +279,9 @@ def _validate_combine(args):
         if subcommand_args[0] == 'none':
             raise CrazyError('Command `none` not allowed inside combine')
 
+        if subcommand_args[0] == 'command_arg':
+            raise CrazyError('Command `command_arg` not allowed inside combine')
+
         validate_complete(subcommand_args)
 
     if len(commands) == 0:
