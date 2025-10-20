@@ -32,3 +32,10 @@ options:
 
   - option_strings: ["--file-list-txt-jpg"]
     complete: ["file_list", {"directory": "%TEST_DIR%/test_data", "extensions": ["txt", "jpg"]}]
+
+  # ===========================================================================
+  # directory_list
+  # ===========================================================================
+
+  - option_strings: ["--directory-list"]
+    complete: ["directory_list", {"directory": "%TEST_DIR%/test_data"}]

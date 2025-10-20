@@ -133,6 +133,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [file](#file)                              | Complete a file                                                             |
 | [directory](#directory)                    | Complete a directory                                                        |
 | [file\_list](#file_list)                   | Complete a list of files                                                    |
+| [directory\_list](#directory_list)         | Complete a list of directories                                              |
 | [mime\_file](#mime_file)                   | Complete a file based on it's MIME-type                                     |
 | [choices](#choices)                        | Complete from a set of values                                               |
 | [value\_list](#value_list)                 | Complete a list                                                             |
@@ -297,6 +298,26 @@ options:
 ```
  ~ > example --file-list=file1,file2,<TAB>
  file3  file4
+```
+
+### directory\_list
+
+> Complete a comma separated list of directories.
+>
+> You can restrict completion to a specific directory by adding `{"directory": ...}`.
+>
+> The separator can be changed by adding `{"separator": ...}`
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--directory-list"]
+    complete: ["directory_list"]
+```
+
+```
+ ~ > example --directory-list=directory1,directory2,<TAB>
+ directory3  directory4
 ```
 
 ### mime\_file
@@ -750,7 +771,7 @@ options:
 ```
 
 ```
- ~ > example --date-fromat '%
+ ~ > example --date-format '%
 a     -- abbreviated day name
 A     -- full day name
 B     -- full month name

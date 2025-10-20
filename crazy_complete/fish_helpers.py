@@ -434,22 +434,24 @@ argparse --max-args 0 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
 argparse --max-args 0 'D/directories' 'C/cd=' -- $argv || return 1
 #endif
 
+set -l files
+
 if set -q _flag_cd[1]
   pushd $_flag_cd 2>/dev/null || return 1
 end
 
-set -l files *
+if set -q _flag_directories[1]
+  set files */
+else
+  set files *
+end
 
 if set -q _flag_cd[1]
   popd
 end
 
 if set -q files[1]
-  if set -q _flag_directories[1]
-    set files (printf '%s\n' $files | string match -r '.*/$')
-  end
 #ifdef regex
-
   if set -q _flag_regex[1]
     set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1]\$)")
   end

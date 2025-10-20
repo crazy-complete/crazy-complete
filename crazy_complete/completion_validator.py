@@ -168,6 +168,10 @@ def _validate_file_list(args):
     _validate_filedir(args, with_extensions=True, with_separator=True)
 
 
+def _validate_directory_list(args):
+    _validate_filedir(args, with_separator=True)
+
+
 def _validate_mime_file(args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
@@ -353,6 +357,7 @@ def validate_complete(complete):
         'date':          _validate_date,
         'date_format':   _validate_void,
         'file_list':     _validate_file_list,
+        'directory_list': _validate_directory_list,
         # Bonus
         'mountpoint':    _validate_void,
         'net_interface': _validate_void,

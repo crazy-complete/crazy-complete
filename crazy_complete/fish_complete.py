@@ -447,6 +447,26 @@ class FishCompleter(shell.ShellCompleter):
         cmd = '__fish_complete_list %s %s' % (shell.escape(separator), list_func)
         return FishCompletionCommand(cmd)
 
+    def directory_list(self, ctxt, opts=None):
+        separator = ','
+        directory = None
+        funcname = ctxt.helpers.use_function('list_files')
+
+        if opts:
+            separator = opts.get('separator', ',')
+            directory = opts.get('directory', None)
+
+        args = ['-D']
+
+        if directory:
+            args.extend(['-C', shell.escape(directory)])
+
+        list_cmd = '%s %s' % (funcname, ' '.join(args))
+        list_func = ctxt.helpers.add_dynamic_func(ctxt, list_cmd)
+
+        cmd = '__fish_complete_list %s %s' % (shell.escape(separator), list_func)
+        return FishCompletionCommand(cmd)
+
     # =========================================================================
     # Bonus
     # =========================================================================

@@ -216,6 +216,10 @@ def _check_file_list(arguments):
     _check_filedir(arguments, with_extensions=True, with_separator=True)
 
 
+def _check_directory_list(arguments):
+    _check_filedir(arguments, with_separator=True)
+
+
 def _check_mime_file(arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
@@ -363,6 +367,7 @@ def _check_complete(args):
         'date':             _check_date,
         'date_format':      _check_void,
         'file_list':        _check_file_list,
+        'directory_list':   _check_directory_list,
         # Bonus
         'mountpoint':       _check_void,
         'net_interface':    _check_void,

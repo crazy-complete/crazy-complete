@@ -249,8 +249,28 @@ class ZshCompleter(shell.ShellCompleter):
 
     def file_list(self, ctxt, opts=None):
         separator = opts.pop('separator', ',') if opts else ','
-        file_code = shell.unescape(self.file(ctxt, opts))
-        funcname = ctxt.helpers.add_dynamic_func(ctxt, file_code)
+        file_code = self.file(ctxt, opts)
+
+        if ' ' not in file_code:
+            funcname = file_code
+        else:
+            funcname = ctxt.helpers.add_dynamic_func(ctxt, shell.unescape(file_code))
+
+        if separator == ',':
+            cmd = '_sequence %s' % funcname
+        else:
+            cmd = '_sequence -s %s %s' % (shell.escape(separator), funcname)
+
+        return shell.escape(cmd)
+
+    def directory_list(self, ctxt, opts=None):
+        separator = opts.pop('separator', ',') if opts else ','
+        file_code = self.directory(ctxt, opts)
+
+        if ' ' not in file_code:
+            funcname = file_code
+        else:
+            funcname = ctxt.helpers.add_dynamic_func(ctxt, shell.unescape(file_code))
 
         if separator == ',':
             cmd = '_sequence %s' % funcname
