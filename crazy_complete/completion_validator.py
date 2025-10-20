@@ -339,6 +339,7 @@ def validate_complete(complete):
         'commandline_string': _validate_void,
         'command_arg':   _validate_void,
         'date':          _validate_date,
+        'date_format':   _validate_void,
         # Bonus
         'mountpoint':    _validate_void,
         'net_interface': _validate_void,

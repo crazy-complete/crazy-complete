@@ -54,6 +54,7 @@ cmdp.add_argument('--alsa-device',      help='Complete an ALSA device').complete
 cmdp.add_argument('--mime-image',       help='Complete an image').complete('mime_file', 'image/')
 cmdp.add_argument('--mime-video',       help='Complete a video').complete('mime_file', 'video/')
 cmdp.add_argument('--date',             help='Complete a date').complete('date', '%Y-%m-%d')
+cmdp.add_argument('--date-format',      help='Complete a date format').complete('date_format')
 
 # =============================================================================
 # Command 'when'

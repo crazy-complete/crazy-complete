@@ -159,6 +159,7 @@
 3_26_01-date-too-many-arguments          | line 4, column 15: Too many arguments provided
 3_26_02-date-format-wrong-type           | line 4, column 24: format: Invalid type. Expected types: string
 3_26_03-date-format-empty                | line 4, column 24: format cannot be empty
+3_27_00-date-format-too-many-arguments   | line 4, column 15: Too many arguments provided
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary
 001-multiple-repeatable-positionals      | line 6, column 5: Only one positional argument may be marked as repeatable

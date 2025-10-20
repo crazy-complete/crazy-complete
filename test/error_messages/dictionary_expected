@@ -159,6 +159,7 @@
 3_26_01-date-too-many-arguments          | foo: -o: Too many arguments: ['wrong']
 3_26_02-date-format-wrong-type           | foo: -o: Format is not a string: False
 3_26_03-date-format-empty                | foo: -o: Format: Cannot be empty
+3_27_00-date-format-too-many-arguments   | foo: -o: Too many arguments: ['wrong']
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Only one positional argument may be marked as repeatable

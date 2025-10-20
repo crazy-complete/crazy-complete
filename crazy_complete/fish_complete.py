@@ -412,6 +412,10 @@ class FishCompleter(shell.ShellCompleter):
     def date(self, _ctxt, _format):
         return FishCompleteNone()
 
+    def date_format(self, ctxt):
+        func = ctxt.helpers.use_function('date_format')
+        return FishCompletionCommand(func)
+
     # =========================================================================
     # Bonus
     # =========================================================================

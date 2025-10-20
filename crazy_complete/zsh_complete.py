@@ -244,6 +244,9 @@ class ZshCompleter(shell.ShellCompleter):
         cmd = '_dates -f %s' % shell.escape(format_)
         return shell.escape(cmd)
 
+    def date_format(self, _ctxt):
+        return '_date_formats'
+
     # =========================================================================
     # Bonus
     # =========================================================================

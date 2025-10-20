@@ -150,6 +150,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [environment](#environment)                | Complete a environment variable                                             |
 | [history](#history)                        | Complete based on a shell's history                                         |
 | [date](#date)                              | Complete a date string                                                      |
+| [date\_format](#date_format)               | Complete a date format string                                               |
 
 ### Bonus Commands
 
@@ -710,6 +711,32 @@ prog: "example"
 options:
   - option_strings: ["--date"]
     complete: ["date", '%Y-%m-%d']
+```
+
+### date\_format
+
+> Complete a date format string.
+
+> **NOTE:** This command is currently only available in **Fish** and **Zsh**.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--date-format"]
+    complete: ["date_format"]
+```
+
+```
+ ~ > example --date-fromat '%
+a     -- abbreviated day name
+A     -- full day name
+B     -- full month name
+c     -- preferred locale date and time
+C     -- 2-digit century
+d     -- day of month (01-31)
+D     -- American format month/day/year (%m/%d/%y)
+e     -- day of month ( 1-31)
+[...]
 ```
 
 ## When Conditionals

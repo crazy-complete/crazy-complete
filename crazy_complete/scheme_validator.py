@@ -351,6 +351,7 @@ def _check_complete(args):
         'commandline_string': _check_void,
         'command_arg':      _check_void,
         'date':             _check_date,
+        'date_format':      _check_void,
         # Bonus
         'mountpoint':       _check_void,
         'net_interface':    _check_void,

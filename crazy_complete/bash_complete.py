@@ -259,6 +259,9 @@ class BashCompleter(shell.ShellCompleter):
     def date(self, ctxt, _format):
         return BashCompletionCommand(ctxt, '')
 
+    def date_format(self, ctxt):
+        return BashCompletionCommand(ctxt, '')
+
     # =========================================================================
     # Bonus
     # =========================================================================
