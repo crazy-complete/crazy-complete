@@ -144,8 +144,7 @@ def generate_wrapper(generators):
     wrapper_funcname = '%s__wrapper' % completion_funcname
     complete_invoker_func = ctxt.helpers.use_function('invoke_complete')
 
-    r  = 'source /usr/share/bash-completion/completions/%s 2>/dev/null\n' % commandline.wraps
-    r += 'source /usr/share/bash-completion/completions/_%s 2>/dev/null\n' % commandline.wraps
+    r  = '_completion_loader %s\n' % commandline.wraps
     r += '\n'
     r += '%s() {\n' % wrapper_funcname
     r += '  local WRAPS=\'%s\'\n' % commandline.wraps
