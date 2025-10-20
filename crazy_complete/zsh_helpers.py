@@ -95,8 +95,10 @@ case "$cmd" in
 #ifdef with_incomplete
     local option='' with_incomplete=0
     [[ "$1" == 'WITH_INCOMPLETE' ]] && { with_incomplete=1; shift; }
-
+#else
+    local option=''
 #endif
+
     if (( $# == 0 )); then
       echo "%FUNCNAME%: has_option: arguments required" >&2
       return 1
@@ -204,12 +206,8 @@ for ((; argi <= $#; ++argi)); do
   local have_trailing_arg=$(test $argi -lt $# && echo true || echo false)
 
   case "$arg" in
-    -)
-      POSITIONALS+=(-);;
     --)
-      for argi in $(command seq $((argi + 1)) $#); do
-        POSITIONALS+=("${@[$argi]}")
-      done
+      POSITIONALS+=("${@:$((argi + 1))}")
       break;;
     --*=*)
       HAVING_OPTIONS+=("${arg%%=*}")
@@ -231,19 +229,16 @@ for ((; argi <= $#; ++argi)); do
       fi
 #endif
       ;;
-    -*)
-      local end_of_parsing=0
-
+    -?*) # ignore '-'
 #ifdef old_options
       if [[ "$arg" == *=* ]]; then
         local option="${arg%%=*}" value="${arg#*=}"
         if __zsh_query_contains "$option" "${old_opts_with_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("$value")
-          end_of_parsing=1
+          continue
         fi
       elif __zsh_query_contains "$arg" "${old_opts_with_arg[@]}"; then
-        end_of_parsing=1
         if $have_trailing_arg; then
           HAVING_OPTIONS+=("$arg")
           OPTION_VALUES+=("${@[$((++argi))]}")
@@ -252,16 +247,17 @@ for ((; argi <= $#; ++argi)); do
           INCOMPLETE_OPTION="$arg"
 #endif
         fi
+        continue
       elif __zsh_query_contains "$arg" "${old_opts_without_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
         HAVING_OPTIONS+=("$arg")
         OPTION_VALUES+=("")
-        end_of_parsing=1
+        continue
       fi
 #endif
 
 #ifdef short_options
       local i=1 arg_length=${#arg}
-      for ((; ! end_of_parsing && i < arg_length; ++i)); do
+      for ((; i < arg_length; ++i)); do
         local option="-${arg:$i:1}"
         local trailing_chars="${arg:$((i+1))}"
 
@@ -269,8 +265,6 @@ for ((; argi <= $#; ++argi)); do
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("")
         elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
-          end_of_parsing=1
-
           if [[ -n "$trailing_chars" ]]; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("$trailing_chars")
@@ -282,10 +276,12 @@ for ((; argi <= $#; ++argi)); do
             INCOMPLETE_OPTION="$option"
 #endif
           fi
+
+          continue 2
         elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
-          end_of_parsing=1
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("$trailing_chars") # may be empty
+          continue 2
         fi
       done
 #endif
