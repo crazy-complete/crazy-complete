@@ -53,6 +53,11 @@ _PARSE_LINE = helpers.ShellFunction('parse_line', r'''
 local -n out="$1"
 local in="$2" len=${#2} i=0 word='' active=0
 
+if (( len == 0 )); then
+  out+=('')
+  return
+fi
+
 for ((i=0; i < len; ++i)); do
   case "${in:i:1}" in
     ' ')
@@ -62,7 +67,7 @@ for ((i=0; i < len; ++i)); do
         active=0;
       fi;;
     '"')
-      for ((i; i < len; ++i)); do
+      for ((; i < len; ++i)); do
         if [[ "${in:i:1}" == '\' ]]; then
           word+="${in:$((++i)):1}"
         else
@@ -72,7 +77,7 @@ for ((i=0; i < len; ++i)); do
       done
       active=1;;
     "'")
-      for ((i; i < len; ++i)); do
+      for ((; i < len; ++i)); do
         word+="${in:i:1}"
         [[ "${in:i:1}" == "'" ]] && break;
       done
@@ -143,16 +148,25 @@ parse_line COMP_WORDS "$line"
 COMP_CWORD=$(( ${#COMP_WORDS[@]} - 1 ))
 COMPREPLY=()
 
-invoke_complete "${COMP_WORDS[0]}" "${COMP_WORDS[0]}"
+if (( COMP_CWORD == 0 )); then
+  local cur="${COMP_WORDS[0]}"
+  if [[ "${cur:0:1}" == [./] ]]; then
+    _filedir
+  else
+    COMPREPLY=($(compgen -A command -- "$cur"))
+  fi
+else
+  invoke_complete "${COMP_WORDS[0]}" "${COMP_WORDS[0]}"
 
-local REPLY COMPREPLY_NEW=()
+  local REPLY COMPREPLY_NEW=()
 
-for REPLY in "${COMPREPLY[@]}"; do
-  l=("$(subtract_prefix_suffix "$line" "$REPLY")")
-  COMPREPLY_NEW+=("$l$REPLY")
-done
+  for REPLY in "${COMPREPLY[@]}"; do
+    l=("$(subtract_prefix_suffix "$line" "$REPLY")")
+    COMPREPLY_NEW+=("$l$REPLY")
+  done
 
-COMPREPLY=("${COMPREPLY_NEW[@]}")
+  COMPREPLY=("${COMPREPLY_NEW[@]}")
+fi
 
 COMP_LINE="$COMP_LINE_OLD"
 COMP_POINT=$COMP_POINT_OLD
