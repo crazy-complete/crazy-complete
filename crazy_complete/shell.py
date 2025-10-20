@@ -1,6 +1,7 @@
 '''Shell utility functions.'''
 
 import re
+import shlex
 import collections
 
 from . import cli
@@ -60,6 +61,12 @@ def escape(string, escape_empty_string=True):
         return '"%s"' % string.replace('\\', '\\\\').replace('$', '\\$').replace('`', '\\`')
 
     return "'%s'" % string.replace("'", '\'"\'"\'')
+
+
+def unescape(string):
+    '''Unescapes a string.'''
+
+    return ''.join(shlex.split(string, posix=True))
 
 
 def make_completion_funcname(cmdline, prefix='_', suffix=''):

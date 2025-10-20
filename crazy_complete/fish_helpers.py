@@ -403,10 +403,42 @@ else
 end
 
 if set -q _flag_cd[1]
-  pushd $_flag_cd || return 1
+  pushd $_flag_cd 2>/dev/null || return 1
 end
 
 set -l files (complete -C"'' $comp")
+
+if set -q _flag_cd[1]
+  popd
+end
+
+if set -q files[1]
+  if set -q _flag_directories[1]
+    set files (printf '%s\n' $files | string match -r '.*/$')
+  end
+#ifdef regex
+
+  if set -q _flag_regex[1]
+    set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1]\$)")
+  end
+#endif
+
+  printf '%s\n' $files\t"$desc"
+end
+''')
+
+_LIST_FILES = helpers.FishFunction('list_files', r'''
+#ifdef regex
+argparse --max-args 0 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
+#else
+argparse --max-args 0 'D/directories' 'C/cd=' -- $argv || return 1
+#endif
+
+if set -q _flag_cd[1]
+  pushd $_flag_cd 2>/dev/null || return 1
+end
+
+set -l files *
 
 if set -q _flag_cd[1]
   popd
@@ -601,6 +633,7 @@ class FishHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.FishFunction)
         self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
+        self.add_function(_LIST_FILES)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)
         self.add_function(_MIME_FILE)

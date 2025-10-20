@@ -262,6 +262,17 @@ class BashCompleter(shell.ShellCompleter):
     def date_format(self, ctxt):
         return BashCompletionCommand(ctxt, '')
 
+    def file_list(self, ctxt, opts=None):
+        separator = opts.pop('separator', ',') if opts else ','
+        code = self.file(ctxt, opts).get_code()
+        funcname = ctxt.helpers.use_function('value_list')
+        r =  'local cur_old="$cur"\n'
+        r += 'cur="${cur##*%s}"\n' % shell.escape(separator)
+        r += '%s\n' % code
+        r += 'cur="$cur_old"\n'
+        r += '%s %s "${COMPREPLY[@]}"' % (funcname, shell.escape(separator))
+        return BashCompletionCommand(ctxt, r)
+
     # =========================================================================
     # Bonus
     # =========================================================================

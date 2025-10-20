@@ -110,6 +110,23 @@ class FishCompleteChoices(FishCompletionBase):
         return self._get_code_for_list(self.choices)
 
 
+def _get_extension_regex(extensions):
+    patterns = []
+
+    for extension in extensions:
+        pattern = ''
+        for c in extension:
+            if c.isalpha():
+                pattern += '[%s%s]' % (c.lower(), c.upper())
+            elif c in ('.', '+'):
+                pattern += f'\\{c}'
+            else:
+                pattern += c
+        patterns.append(pattern)
+
+    return '|'.join(f'(.*\\.{pattern})' for pattern in patterns)
+
+
 class FishCompleteFile(FishCompletionBase):
     '''Class for completing files.'''
 
@@ -122,22 +139,6 @@ class FishCompleteFile(FishCompletionBase):
             self.directory = opts.get('directory', None)
             self.extensions = opts.get('extensions', None)
 
-    def _get_extension_regex(self):
-        patterns = []
-
-        for extension in self.extensions:
-            pattern = ''
-            for c in extension:
-                if c.isalpha():
-                    pattern += '[%s%s]' % (c.lower(), c.upper())
-                elif c in ('.', '+'):
-                    pattern += f'\\{c}'
-                else:
-                    pattern += c
-            patterns.append(pattern)
-
-        return '|'.join(f'(.*\\.{pattern})' for pattern in patterns)
-
     def get_args(self):
         args = []
 
@@ -146,7 +147,7 @@ class FishCompleteFile(FishCompletionBase):
 
         if self.extensions:
             self.ctxt.helpers.use_function('fish_complete_filedir', 'regex')
-            args.extend(['-r', shell.escape(self._get_extension_regex())])
+            args.extend(['-r', shell.escape(_get_extension_regex(self.extensions))])
 
         if not args:
             return ['-F']
@@ -415,6 +416,36 @@ class FishCompleter(shell.ShellCompleter):
     def date_format(self, ctxt):
         func = ctxt.helpers.use_function('date_format')
         return FishCompletionCommand(func)
+
+    def file_list(self, ctxt, opts=None):
+        separator = ','
+        directory = None
+        extensions = None
+        funcname = ctxt.helpers.use_function('list_files')
+
+        if opts:
+            separator = opts.get('separator', ',')
+            directory = opts.get('directory', None)
+            extensions = opts.get('extensions', None)
+
+        args = []
+
+        if directory:
+            args.extend(['-C', shell.escape(directory)])
+
+        if extensions:
+            ctxt.helpers.use_function('list_files', 'regex')
+            args.extend(['-r', shell.escape(_get_extension_regex(extensions))])
+
+        if args:
+            list_cmd = '%s %s' % (funcname, ' '.join(args))
+        else:
+            list_cmd = funcname
+
+        list_func = ctxt.helpers.add_dynamic_func(ctxt, list_cmd)
+
+        cmd = '__fish_complete_list %s %s' % (shell.escape(separator), list_func)
+        return FishCompletionCommand(cmd)
 
     # =========================================================================
     # Bonus

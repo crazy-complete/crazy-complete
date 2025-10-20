@@ -247,6 +247,18 @@ class ZshCompleter(shell.ShellCompleter):
     def date_format(self, _ctxt):
         return '_date_formats'
 
+    def file_list(self, ctxt, opts=None):
+        separator = opts.pop('separator', ',') if opts else ','
+        file_code = shell.unescape(self.file(ctxt, opts))
+        funcname = ctxt.helpers.add_dynamic_func(ctxt, file_code)
+
+        if separator == ',':
+            cmd = '_sequence %s' % funcname
+        else:
+            cmd = '_sequence -s %s %s' % (shell.escape(separator), funcname)
+
+        return shell.escape(cmd)
+
     # =========================================================================
     # Bonus
     # =========================================================================

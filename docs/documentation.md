@@ -132,6 +132,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [combine](#combine)                        | Combine multiple completion commands                                        |
 | [file](#file)                              | Complete a file                                                             |
 | [directory](#directory)                    | Complete a directory                                                        |
+| [file\_list](#file_list)                   | Complete a list of files                                                    |
 | [mime\_file](#mime_file)                   | Complete a file based on it's MIME-type                                     |
 | [choices](#choices)                        | Complete from a set of values                                               |
 | [value\_list](#value_list)                 | Complete a list                                                             |
@@ -274,6 +275,28 @@ options:
 ```
  ~ > example --directory=<TAB>
  dir1/  dir2/
+```
+
+### file\_list
+
+> Complete a comma separated list of files.
+>
+> You can restrict completion to a specific directory by adding `{"directory": ...}`.
+>
+> You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
+>
+> The separator can be changed by adding `{"separator": ...}`
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--file-list"]
+    complete: ["file_list"]
+```
+
+```
+ ~ > example --file-list=file1,file2,<TAB>
+ file3  file4
 ```
 
 ### mime\_file

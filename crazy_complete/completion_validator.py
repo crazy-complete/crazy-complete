@@ -110,7 +110,7 @@ def _validate_command(args):
         raise CrazyError('command: path_append/path_prepend cannot be used with path')
 
 
-def _validate_filedir(args, mode):
+def _validate_filedir(args, with_extensions=False, with_separator=False):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
@@ -128,7 +128,7 @@ def _validate_filedir(args, mode):
             if not value.startswith('/'):
                 raise CrazyError('directory: Must be an absolute path')
 
-        elif mode == 'file' and key == 'extensions':
+        elif with_extensions and key == 'extensions':
             if not is_list_type(value):
                 raise CrazyError(f"extensions: Not a list: {value}")
 
@@ -144,16 +144,28 @@ def _validate_filedir(args, mode):
 
                 if contains_space(subval):
                     raise CrazyError(f"extensions[{i}]: Contains space: {subval}")
+
+        elif with_separator and key == 'separator':
+            if not isinstance(value, str):
+                raise CrazyError(f'separator: Not a string: {value}')
+
+            if len(value) != 1:
+                raise CrazyError(f'Invalid length for separator: {value}')
+
         else:
             raise CrazyError(f'Unknown option: {key}')
 
 
 def _validate_file(args):
-    _validate_filedir(args, 'file')
+    _validate_filedir(args, with_extensions=True)
 
 
 def _validate_directory(args):
-    _validate_filedir(args, 'directory')
+    _validate_filedir(args)
+
+
+def _validate_file_list(args):
+    _validate_filedir(args, with_extensions=True, with_separator=True)
 
 
 def _validate_mime_file(args):
@@ -340,6 +352,7 @@ def validate_complete(complete):
         'command_arg':   _validate_void,
         'date':          _validate_date,
         'date_format':   _validate_void,
+        'file_list':     _validate_file_list,
         # Bonus
         'mountpoint':    _validate_void,
         'net_interface': _validate_void,

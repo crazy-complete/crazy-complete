@@ -162,20 +162,20 @@ def _check_command(arguments):
         raise _error('path_append/path_prepend cannot be used with path')
 
 
-def _check_filedir(arguments, mode):
+def _check_filedir(arguments, with_extensions=False, with_separator=False):
     options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
     arguments.require_no_more()
 
-    if mode == 'file':
-        _check_dictionary(options, {
-            'directory':  (False, (str,)),
-            'extensions': (False, (list,)),
-        })
-    else:
-        _check_dictionary(options, {
-            'directory':  (False, (str,)),
-        })
+    spec = {'directory': (False, (str,))}
+
+    if with_extensions:
+        spec['extensions'] = (False, (list,))
+
+    if with_separator:
+        spec['separator'] = (False, (str,))
+
+    _check_dictionary(options, spec)
 
     if _has_set(options, 'directory'):
         if options.value['directory'].value == '':
@@ -197,13 +197,23 @@ def _check_filedir(arguments, mode):
             if contains_space(extension.value):
                 raise _error('extension contains space', extension)
 
+    if _has_set(options, 'separator'):
+        separator = options.value['separator']
+
+        if len(separator.value) != 1:
+            raise _error('Invalid length for separator', separator)
+
 
 def _check_file(arguments):
-    _check_filedir(arguments, 'file')
+    _check_filedir(arguments, with_extensions=True)
 
 
 def _check_directory(arguments):
-    _check_filedir(arguments, 'directory')
+    _check_filedir(arguments)
+
+
+def _check_file_list(arguments):
+    _check_filedir(arguments, with_extensions=True, with_separator=True)
 
 
 def _check_mime_file(arguments):
@@ -352,6 +362,7 @@ def _check_complete(args):
         'command_arg':      _check_void,
         'date':             _check_date,
         'date_format':      _check_void,
+        'file_list':        _check_file_list,
         # Bonus
         'mountpoint':       _check_void,
         'net_interface':    _check_void,

@@ -195,6 +195,8 @@ done < <(eval "$1")
 _VALUE_LIST = helpers.ShellFunction('value_list', r'''
 local separator="$1"; shift
 
+cur="$(my_dequote "$cur")"
+
 if [[ -z "$cur" ]]; then
   COMPREPLY=("$@")
   return
@@ -235,7 +237,7 @@ elif (( ${#having_values[@]} )); then
     fi
   done
 fi
-''')
+''', ['my_dequote'])
 
 _PREFIX_COMPREPLY = helpers.ShellFunction('prefix_compreply', r'''
 local i prefix="$1"
