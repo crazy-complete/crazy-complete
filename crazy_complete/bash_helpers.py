@@ -175,7 +175,10 @@ COMP_CWORD=$COMP_CWORD_OLD
 ''', ['my_dequote', 'parse_line', 'invoke_complete', 'subtract_prefix_suffix'])
 
 _INVOKE_COMPLETE = helpers.ShellFunction('invoke_complete', r'''
-local prog="$1"; shift
+local prog="${1##*/}"; shift
+
+_completion_loader "$prog"
+
 local i=0 args=($(complete -p -- "$prog"))
 
 for ((; i < ${#args[@]}; ++i)); do
