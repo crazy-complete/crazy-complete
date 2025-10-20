@@ -140,7 +140,7 @@ def _validate_filedir(args, with_extensions=False, with_separator=False):
                     raise CrazyError(f"extensions[{i}]: Not a string: {subval}")
 
                 if subval == '':
-                    raise CrazyError(f"extensions[{i}]: May not be empty")
+                    raise CrazyError(f"extensions[{i}]: Cannot be empty")
 
                 if contains_space(subval):
                     raise CrazyError(f"extensions[{i}]: Contains space: {subval}")
@@ -390,7 +390,7 @@ def validate_positionals_repeatable(cmdline):
 
         if repeatable:
             if repeatable_number is not None and repeatable_number != positional_number:
-                raise CrazyError('Only one positional argument may be marked as repeatable')
+                raise CrazyError('Only one positional argument can be marked as repeatable')
             else:
                 repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:

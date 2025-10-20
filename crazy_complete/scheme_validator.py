@@ -159,7 +159,7 @@ def _check_command(arguments):
             raise _error('path_prepend cannot be empty', path_prepend)
 
     if path and (append or prepend):
-        raise _error('path_append/path_prepend cannot be used with path')
+        raise _error('path_append/path_prepend cannot be used with path', opts)
 
 
 def _check_filedir(arguments, with_extensions=False, with_separator=False):
@@ -179,20 +179,20 @@ def _check_filedir(arguments, with_extensions=False, with_separator=False):
 
     if _has_set(options, 'directory'):
         if options.value['directory'].value == '':
-            raise _error('directory may not be empty', options.value['directory'])
+            raise _error('directory cannot not be empty', options.value['directory'])
 
         if not options.value['directory'].value.startswith('/'):
             raise _error('directory must be an absolute path', options.value['directory'])
 
     if _has_set(options, 'extensions'):
         if len(options.value['extensions'].value) == 0:
-            raise _error('extensions may not be empty', options.value['extensions'])
+            raise _error('extensions cannot not be empty', options.value['extensions'])
 
         for extension in options.value['extensions'].value:
             _check_type(extension, (str,), 'extension')
 
             if extension.value == '':
-                raise _error('extension may not be empty', extension)
+                raise _error('extension canonot not be empty', extension)
 
             if contains_space(extension.value):
                 raise _error('extension contains space', extension)
@@ -404,7 +404,7 @@ def _check_positionals_repeatable(definition_tree, definition):
 
         if repeatable:
             if repeatable_number is not None and repeatable_number != positional_number:
-                raise _error('Only one positional argument may be marked as repeatable', positional)
+                raise _error('Only one positional argument can be marked as repeatable', positional)
             else:
                 repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:
@@ -541,7 +541,7 @@ def _check_definition(definition):
     try:
         validate_prog(definition.value['prog'].value)
     except CrazyError as e:
-        raise _error(f'prog: {e}', definition.value['prog'])
+        raise _error(f'prog: {e}', definition.value['prog']) from None
 
     if _has_set(definition, 'aliases'):
         for alias in definition.value['aliases'].value:
@@ -594,7 +594,7 @@ class DefinitionTree:
                 node = node.subcommands[part]
             except KeyError:
                 prog = ' '.join(commands[0:i+1])
-                raise _error(f'Missing definition of program `{prog}`', definition)
+                raise _error(f'Missing definition of program `{prog}`', definition) from None
 
         if subcommand in node.subcommands:
             prog = definition.value['prog'].value
