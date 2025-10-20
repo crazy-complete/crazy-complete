@@ -155,6 +155,10 @@
 3_25_01-mime-file-too-many-arguments     | line 4, column 15: Too many arguments provided
 3_25_02-mime-file-pattern-wrong-type     | line 4, column 29: pattern: Invalid type. Expected types: string
 3_25_03-mime-file-pattern-wrong-regex    | line 4, column 29: Pattern: Not a valid extended regex
+3_26_00-date-missing-arg                 | line 4, column 15: Missing required arg `format`
+3_26_01-date-too-many-arguments          | line 4, column 15: Too many arguments provided
+3_26_02-date-format-wrong-type           | line 4, column 24: format: Invalid type. Expected types: string
+3_26_03-date-format-empty                | line 4, column 24: format cannot be empty
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary
 001-multiple-repeatable-positionals      | line 6, column 5: Only one positional argument may be marked as repeatable

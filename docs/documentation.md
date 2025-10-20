@@ -149,7 +149,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [variable](#variable)                      | Complete a shell variable                                                   |
 | [environment](#environment)                | Complete a environment variable                                             |
 | [history](#history)                        | Complete based on a shell's history                                         |
-
+| [date](#date)                              | Complete a date string                                                      |
 
 ### Bonus Commands
 
@@ -529,7 +529,7 @@ options:
 
 > **NOTE:** `path_append` and `path_prepend` can be used together, but both are mutually exclusive with `path`.
 
-> **NOTE:**: Use `command_arg` to complete arguments of a command.
+> **NOTE:** Use `command_arg` to complete arguments of a command.
 
 ```yaml
 prog: "example"
@@ -695,6 +695,21 @@ options:
 ```
  ~ > example --history=
 foo@bar mymail@myprovider
+```
+
+### date
+
+> Complete a date string.
+
+> The argument is the date format as described in `strftime(3)`.
+
+> **NOTE:** This command is currently only available in **Zsh**.
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--date"]
+    complete: ["date", '%Y-%m-%d']
 ```
 
 ## When Conditionals

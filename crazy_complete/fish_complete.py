@@ -409,6 +409,9 @@ class FishCompleter(shell.ShellCompleter):
     def command_arg(self, ctxt):
         return FishCompleteCommandArg(ctxt)
 
+    def date(self, _ctxt, _format):
+        return FishCompleteNone()
+
     # =========================================================================
     # Bonus
     # =========================================================================

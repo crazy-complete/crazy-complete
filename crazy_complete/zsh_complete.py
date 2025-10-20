@@ -240,6 +240,10 @@ class ZshCompleter(shell.ShellCompleter):
     def command_arg(self, _ctxt):
         return '_normal'
 
+    def date(self, _ctxt, format_):
+        cmd = '_dates -f %s' % shell.escape(format_)
+        return shell.escape(cmd)
+
     # =========================================================================
     # Bonus
     # =========================================================================

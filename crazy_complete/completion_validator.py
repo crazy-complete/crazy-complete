@@ -283,6 +283,17 @@ def _validate_history(args):
         raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
 
 
+def _validate_date(args):
+    format_ = args.get_required_arg('format')
+    args.require_no_more()
+
+    if not isinstance(format_, str):
+        raise CrazyError(f"Format is not a string: {format_}")
+
+    if is_empty_or_whitespace(format_):
+        raise CrazyError('Format: Cannot be empty')
+
+
 # =============================================================================
 # Real validation functions
 # =============================================================================
@@ -327,6 +338,7 @@ def validate_complete(complete):
         'history':       _validate_history,
         'commandline_string': _validate_void,
         'command_arg':   _validate_void,
+        'date':          _validate_date,
         # Bonus
         'mountpoint':    _validate_void,
         'net_interface': _validate_void,

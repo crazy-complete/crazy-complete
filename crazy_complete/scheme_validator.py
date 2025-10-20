@@ -310,6 +310,15 @@ def _check_history(arguments):
         raise _error('Pattern: Not a valid extended regex', pattern)
 
 
+def _check_date(arguments):
+    format_ = arguments.get_required_arg("format")
+    _check_type(format_, (str,), "format")
+    arguments.require_no_more()
+
+    if is_empty_or_whitespace(format_.value):
+        raise _error('format cannot be empty', format_)
+
+
 def _check_complete(args):
     arguments = Arguments(args)
     cmd = arguments.get_required_arg('command')
@@ -341,6 +350,7 @@ def _check_complete(args):
         'history':          _check_history,
         'commandline_string': _check_void,
         'command_arg':      _check_void,
+        'date':             _check_date,
         # Bonus
         'mountpoint':       _check_void,
         'net_interface':    _check_void,
