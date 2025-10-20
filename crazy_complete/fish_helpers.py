@@ -152,12 +152,10 @@ else
         set -s positionals_positions $argi
 #endif
       case '--'
-        for argi in (seq (math $argi + 1) $cmdline_count)
-          set -a positionals $cmdline[$argi]
+        set -a positionals $cmdline[$(math $argi + 1)..]
 #ifdef positionals_positions
-          set -a positionals_positions $argi
+        set -a positionals_positions (command seq (math $argi + 1) $cmdline_count)
 #endif
-        end
         break
       case '--*=*'
         set -l split (string split -m 1 -- '=' $arg)
@@ -178,8 +176,8 @@ else
 #endif
       case '-*'
         set -l end_of_parsing false
-
 #ifdef old_options
+
         if string match -q -- '*=*' $arg
           set -l split (string split -m 1 -- '=' $arg)
           if contains -- $split[1] $old_opts_with_arg $old_opts_with_optional_arg
@@ -200,8 +198,8 @@ else
           set end_of_parsing true
         end
 #endif
-
 #ifdef short_options
+
         set -l arg_length (string length -- $arg)
         set -l i 2
         while not $end_of_parsing; and test $i -le $arg_length
