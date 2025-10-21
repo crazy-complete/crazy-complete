@@ -816,9 +816,7 @@ send: "crazy-complete-test complete --value-list foo,baz,"
 bash_expected: |
   > crazy-complete-test complete --value-list foo,baz,bar
 fish_expected: |
-  > crazy-complete-test complete --value-list foo,baz,
-  foo,baz,bar  (Complete a list)  foo,baz,foo  (Complete a list)
-  foo,baz,baz  (Complete a list)
+  > crazy-complete-test complete --value-list foo,baz,bar
 zsh_expected: |
   > crazy-complete-test complete --value-list foo,baz,bar,
 ---
@@ -1530,8 +1528,8 @@ bash_expected: |
   one,three  one,two
   > crazy-complete-test --list one,t
 fish_expected: |
-  > crazy-complete-test --list one,
-  one,one  one,three  one,two
+  > crazy-complete-test --list one,t
+  one,three  one,two
 zsh_expected: |
   > crazy-complete-test --list one,
   one    three  two
@@ -1559,8 +1557,8 @@ send: "crazy-complete-test --colon-list one:"
 bash_expected: |
   > crazy-complete-test --colon-list one:
 fish_expected: |
-  > crazy-complete-test --colon-list one:
-  one:one  one:three  one:two
+  > crazy-complete-test --colon-list one:t
+  one:three  one:two
 zsh_expected: |
   > crazy-complete-test --colon-list one:
   one    three  two
@@ -1579,3 +1577,33 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --combined-list
   1      2      3      one    three  two
+---
+number: 102
+definition_file: "list"
+description: "Check --duplicate-list (1)"
+send: "crazy-complete-test --duplicate-list "
+bash_expected: |
+  > crazy-complete-test --duplicate-list
+  one    three  two
+  > crazy-complete-test --duplicate-list
+fish_expected: |
+  > crazy-complete-test --duplicate-list
+  one  three  two
+zsh_expected: |
+  > crazy-complete-test --duplicate-list
+  one    three  two
+---
+number: 103
+definition_file: "list"
+description: "Check --duplicate-list (2)"
+send: "crazy-complete-test --duplicate-list one,"
+bash_expected: |
+  > crazy-complete-test --duplicate-list one,
+  one,one    one,three  one,two
+  > crazy-complete-test --duplicate-list one,
+fish_expected: |
+  > crazy-complete-test --duplicate-list one,
+  one,one  one,three  one,two
+zsh_expected: |
+  > crazy-complete-test --duplicate-list one,
+  one    three  two

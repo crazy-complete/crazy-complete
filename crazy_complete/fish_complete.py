@@ -209,6 +209,7 @@ class FishCompleteValueList(FishCompletionCommand):
 
     def __init__(self, ctxt, opts):
         separator = opts.get('separator', ',')
+        duplicates = opts.get('duplicates', False)
         values = opts['values']
 
         if is_dict_type(values):
@@ -223,7 +224,14 @@ class FishCompleteValueList(FishCompletionCommand):
             code = code.rstrip(' \\\n')
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
-        super().__init__(ctxt, ['__fish_complete_list', separator, func])
+
+        if duplicates:
+            complete_list_func = '__fish_complete_list'
+        else:
+            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
+
+        super().__init__(ctxt, [complete_list_func, separator, func])
+
 
 
 class FishCompleteCommand(FishCompletionBase):
@@ -410,12 +418,18 @@ class FishCompleter(shell.ShellCompleter):
 
     def list(self, ctxt, command, opts=None):
         separator = opts.get('separator', ',') if opts else ','
+        duplicates = opts.get('duplicates', False) if opts else False
 
         cmd, *args = command
         obj = getattr(self, cmd)(ctxt, *args)
         func = obj.get_function()
 
-        return FishCompletionCommand(ctxt, ['__fish_complete_list', separator, func])
+        if duplicates:
+            complete_list_func = '__fish_complete_list'
+        else:
+            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
+
+        return FishCompletionCommand(ctxt, [complete_list_func, separator, func])
 
     def history(self, ctxt, pattern):
         func = ctxt.helpers.use_function('history')
@@ -437,12 +451,14 @@ class FishCompleter(shell.ShellCompleter):
 
     def file_list(self, ctxt, opts=None):
         separator = ','
+        duplicates = False
         fuzzy = False
         directory = None
         extensions = None
 
         if opts:
             separator = opts.get('separator', ',')
+            duplicates = opts.get('duplicates', False)
             fuzzy = opts.get('fuzzy', False)
             directory = opts.get('directory', None)
             extensions = opts.get('extensions', None)
@@ -456,28 +472,40 @@ class FishCompleter(shell.ShellCompleter):
             ctxt.helpers.use_function('list_files', 'regex')
             args.extend(['-r', shell.escape(_get_extension_regex(extensions, fuzzy))])
 
-        list_func = ctxt.helpers.use_function('list_files')
-        func = FishCompletionCommand(ctxt, [list_func] + args).get_function()
+        file_list_func = ctxt.helpers.use_function('list_files')
+        func = FishCompletionCommand(ctxt, [file_list_func] + args).get_function()
 
-        return FishCompletionCommand(ctxt, ['__fish_complete_list', separator, func])
+        if duplicates:
+            complete_list_func = '__fish_complete_list'
+        else:
+            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
+
+        return FishCompletionCommand(ctxt, [complete_list_func, separator, func])
 
     def directory_list(self, ctxt, opts=None):
         separator = ','
+        duplicates = False
         directory = None
 
         if opts:
             separator = opts.get('separator', ',')
             directory = opts.get('directory', None)
+            duplicates = opts.get('duplicates', False)
 
         args = ['-D']
 
         if directory:
             args.extend(['-C', shell.escape(directory)])
 
-        list_func = ctxt.helpers.use_function('list_files')
-        func = FishCompletionCommand(ctxt, [list_func] + args).get_function()
+        file_list_func = ctxt.helpers.use_function('list_files')
+        func = FishCompletionCommand(ctxt, [file_list_func] + args).get_function()
 
-        return FishCompletionCommand(ctxt, ['__fish_complete_list', separator, func])
+        if duplicates:
+            complete_list_func = '__fish_complete_list'
+        else:
+            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
+
+        return FishCompletionCommand(ctxt, [complete_list_func, separator, func])
 
     # =========================================================================
     # Bonus

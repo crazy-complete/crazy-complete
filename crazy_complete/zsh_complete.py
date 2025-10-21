@@ -312,15 +312,21 @@ class ZshCompleter(shell.ShellCompleter):
 
     def list(self, ctxt, command, opts=None):
         separator = opts.get('separator', ',') if opts else ','
+        duplicates = opts.get('duplicates', False) if opts else False
 
         cmd, *args = command
         obj = getattr(self, cmd)(ctxt, *args)
         func = obj.get_function()
 
-        if separator == ',':
-            return ZshComplFunc(ctxt, ['_sequence', func])
+        args = []
 
-        return ZshComplFunc(ctxt, ['_sequence', '-s', separator, func])
+        if separator != ',':
+            args.extend(['-s', separator])
+
+        if duplicates:
+            args.append('-d')
+
+        return ZshComplFunc(ctxt, ['_sequence', *args, func])
 
     def history(self, ctxt, pattern):
         func = ctxt.helpers.use_function('history')
@@ -339,22 +345,20 @@ class ZshCompleter(shell.ShellCompleter):
         return ZshComplFunc(ctxt, ['_date_formats'])
 
     def file_list(self, ctxt, opts=None):
-        separator = opts.pop('separator', ',') if opts else ','
-        func = self.file(ctxt, opts).get_function()
+        list_opts = {
+            'separator': opts.pop('separator', ',') if opts else ',',
+            'duplicates': opts.pop('duplicates', False) if opts else False
+        }
 
-        if separator == ',':
-            return ZshComplFunc(ctxt, ['_sequence', func])
-
-        return ZshComplFunc(ctxt, ['_sequence', '-s', separator, func])
+        return self.list(ctxt, ['file', opts], list_opts)
 
     def directory_list(self, ctxt, opts=None):
-        separator = opts.pop('separator', ',') if opts else ','
-        func = self.directory(ctxt, opts).get_function()
+        list_opts = {
+            'separator': opts.pop('separator', ',') if opts else ',',
+            'duplicates': opts.pop('duplicates', False) if opts else False
+        }
 
-        if separator == ',':
-            return ZshComplFunc(ctxt, ['_sequence', func])
-
-        return ZshComplFunc(ctxt, ['_sequence', '-s', separator, func])
+        return self.list(ctxt, ['directory', opts], list_opts)
 
     # =========================================================================
     # Bonus

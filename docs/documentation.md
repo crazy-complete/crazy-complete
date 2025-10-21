@@ -236,6 +236,8 @@ options:
 
 > The separator can be changed by adding `{"separator": ...}`
 
+> By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+
 > **NOTE:** `file` and `directory` are not supported. Use `file_list` and `directory_list` instead.
 
 > **NOTE:** Using a colon as separator does currently not work in **Bash**
@@ -316,6 +318,8 @@ options:
 >
 > You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
 >
+> By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+>
 > You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
 > Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
 >
@@ -340,6 +344,8 @@ options:
 > You can restrict completion to a specific directory by adding `{"directory": ...}`.
 >
 > The separator can be changed by adding `{"separator": ...}`
+>
+> By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 
 ```yaml
 prog: "example"
@@ -403,6 +409,8 @@ Item 1  (Description 1)  Item 2  (Description 2)
 > Arguments are supplied by adding `{"values": ...}`.
 >
 > A separator can be supplied by adding `{"separator": ...}` (the default is `","`).
+>
+> By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 
 ```yaml
 prog: "example"

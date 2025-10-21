@@ -459,6 +459,15 @@ if set -q files[1]
 end
 ''')
 
+_COMPLETE_LIST_UNIQ = helpers.FishFunction('complete_list_uniq', r'''
+for comp in (__fish_complete_list $argv)
+  set -l vals (string split -- $argv[1] (string split -m 1 -- \t $comp)[1])
+  set -l last $vals[-1]
+  set -e vals[-1]
+  not contains $last $vals && printf "%s\n" $comp
+end
+''')
+
 _HISTORY = helpers.FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
 ''')
@@ -634,6 +643,7 @@ class FishHelpers(helpers.GeneralHelpers):
         self.add_function(_FISH_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
         self.add_function(_LIST_FILES)
+        self.add_function(_COMPLETE_LIST_UNIQ)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)
         self.add_function(_MIME_FILE)

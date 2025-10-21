@@ -156,6 +156,10 @@ def _validate_filedir(args, with_extensions=False, with_separator=False):
             if len(value) != 1:
                 raise CrazyError(f'Invalid length for separator: {value}')
 
+        elif with_separator and key == 'duplicates':
+            if not isinstance(value, bool):
+                raise CrazyError(f"duplicates: Not a bool: {value}")
+
         else:
             raise CrazyError(f'Unknown option: {key}')
 
@@ -235,6 +239,9 @@ def _validate_value_list(args):
             values = value
         elif key == 'separator':
             separator = value
+        elif key == 'duplicates':
+            if not isinstance(value, bool):
+                raise CrazyError(f"duplicates: Not a bool: {value}")
         else:
             raise CrazyError(f'Unknown option: {key}')
 
@@ -337,6 +344,9 @@ def _validate_list(args):
 
             if len(value) != 1:
                 raise CrazyError(f'Invalid length for separator: {value}')
+        elif key == 'duplicates':
+            if not isinstance(value, bool):
+                raise CrazyError(f"duplicates: Not a bool: {value}")
         else:
             raise CrazyError(f'Unknown option: {key}')
 

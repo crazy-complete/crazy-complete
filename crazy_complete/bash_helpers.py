@@ -210,6 +210,9 @@ done < <(eval "$1")
 ''')
 
 _VALUE_LIST = helpers.ShellFunction('value_list', r'''
+local duplicates=0
+[[ "$1" == '-d' ]] && { duplicates=1; shift; }
+
 local separator="$1"; shift
 
 cur="$(my_dequote "$cur")"
@@ -224,20 +227,24 @@ local -a having_values remaining_values
 
 IFS="$separator" read -r -a having_values <<< "$cur"
 
-for value; do
-  found_value=0
+if (( duplicates )); then
+  remaining_values=("$@")
+else
+  for value; do
+    found_value=0
 
-  for having_value in "${having_values[@]}"; do
-    if [[ "$value" == "$having_value" ]]; then
-      found_value=1
-      break
+    for having_value in "${having_values[@]}"; do
+      if [[ "$value" == "$having_value" ]]; then
+        found_value=1
+        break
+      fi
+    done
+
+    if (( ! found_value )); then
+      remaining_values+=("$value")
     fi
   done
-
-  if (( ! found_value )); then
-    remaining_values+=("$value")
-  fi
-done
+fi
 
 COMPREPLY=()
 

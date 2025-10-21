@@ -234,13 +234,15 @@ class BashCompleter(shell.ShellCompleter):
     def value_list(self, ctxt, opts):
         funcname = ctxt.helpers.use_function('value_list')
         separator = opts.get('separator', ',')
+        duplicates = opts.get('duplicates', False)
         values = opts['values']
 
         if is_dict_type(values):
             values = list(values.keys())
 
-        return BashCompletionCommand(ctxt, '%s %s %s' % (
+        return BashCompletionCommand(ctxt, '%s%s %s %s' % (
             funcname,
+            ' -d' if duplicates else '',
             shell.escape(separator),
             ' '.join(shell.escape(v) for v in values)))
 
@@ -249,17 +251,20 @@ class BashCompleter(shell.ShellCompleter):
 
     def list(self, ctxt, command, opts=None):
         separator = opts.get('separator', ',') if opts else ','
+        duplicates = opts.get('duplicates', False) if opts else False
 
         cmd, *args = command
         obj = getattr(self, cmd)(ctxt, *args)
         code = obj.get_code()
 
         funcname = ctxt.helpers.use_function('value_list')
+        dup_arg = ' -d' if duplicates else ''
+
         r =  'local cur_old="$cur"\n'
         r += 'cur="${cur##*%s}"\n' % shell.escape(separator)
         r += '%s\n' % code
         r += 'cur="$cur_old"\n'
-        r += '%s %s "${COMPREPLY[@]}"' % (funcname, shell.escape(separator))
+        r += '%s%s %s "${COMPREPLY[@]}"' % (funcname, dup_arg, shell.escape(separator))
         return BashCompletionCommand(ctxt, r)
 
     def history(self, ctxt, pattern):
@@ -280,11 +285,17 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, '')
 
     def file_list(self, ctxt, opts=None):
-        list_opts = {'separator': opts.pop('separator', ',') if opts else ','}
+        list_opts = {
+            'separator': opts.pop('separator', ',') if opts else ',',
+            'duplicates': opts.pop('duplicates', False) if opts else False
+        }
         return self.list(ctxt, ['file', opts], list_opts)
 
     def directory_list(self, ctxt, opts=None):
-        list_opts = {'separator': opts.pop('separator', ',') if opts else ','}
+        list_opts = {
+            'separator': opts.pop('separator', ',') if opts else ',',
+            'duplicates': opts.pop('duplicates', False) if opts else False
+        }
         return self.list(ctxt, ['directory', opts], list_opts)
 
     # =========================================================================

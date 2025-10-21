@@ -175,6 +175,7 @@ def _check_filedir(arguments, with_extensions=False, with_separator=False):
 
     if with_separator:
         spec['separator'] = (False, (str,))
+        spec['duplicates'] = (False, (bool,))
 
     _check_dictionary(options, spec)
 
@@ -268,6 +269,7 @@ def _check_value_list(arguments):
     _check_dictionary(options, {
         'values':    (True,  (list, dict)),
         'separator': (False, (str,)),
+        'duplicates': (False, (bool,)),
     })
 
     values = options.value['values']
@@ -331,7 +333,10 @@ def _check_list(arguments):
     _check_type(command, (list,))
     _check_type(options, (dict,), 'options')
 
-    _check_dictionary(options, {'separator': (False, (str,))})
+    _check_dictionary(options, {
+        'separator': (False, (str,)),
+        'duplicates': (False, (bool,)),
+    })
 
     if len(command.value) == 0:
         raise _error('Missing command', command)
