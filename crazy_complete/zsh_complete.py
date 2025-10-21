@@ -16,65 +16,87 @@ CHOICES_INLINE_THRESHOLD = 80
 # is used instead.
 
 
-class ZshCompleter(shell.ShellCompleter):
-    '''Code generator for completing arguments in Zsh.'''
+class ZshCompletionBase:
+    '''Base class for Zsh completions.'''
 
-    # pylint: disable=too-many-public-methods
-    # pylint: disable=missing-function-docstring
+    def get_action_string(self):
+        '''Return an action string that can be used in an option spec.'''
+        raise NotImplementedError
 
-    def none(self, *_):
-        return "' '"
+    def get_function(self):
+        '''Return a function that can be used in e.g. `_sequence`.'''
 
-    def integer(self, _ctxt):
-        return '_numbers'
 
-    def float(self, _ctxt):
-        return "'_numbers -f'"
+class ZshComplFunc(ZshCompletionBase):
+    def __init__(self, ctxt, args, needs_braces=False):
+        self.ctxt = ctxt
+        self.args = args
+        self.needs_braces = needs_braces
 
-    def choices(self, ctxt, choices):
-        if is_dict_type(choices):
-            return self._choices_dict(ctxt, choices)
+    def get_action_string(self):
+        if len(self.args) == 1:
+            cmd = self.args[0]
+        else:
+            cmd = ' '.join(shell.escape(arg) for arg in self.args)
 
-        return self._choices_list(ctxt, choices)
+        if self.needs_braces:
+            return shell.escape('{%s}' % cmd)
 
-    def _choices_list(self, ctxt, choices):
-        # Inline choices
-        items   = [str(item) for item in choices]
+        return shell.escape(cmd)
+
+    def get_function(self):
+        if len(self.args) == 1:
+            return self.args[0]
+
+        code = ' '.join(shell.escape(arg) for arg in self.args)
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
+        return funcname
+
+
+class ZshCompleteChoices(ZshCompletionBase):
+    def __init__(self, ctxt, choices):
+        self.ctxt = ctxt
+        self.choices = choices
+
+    def _list_action_string(self):
+        items   = [str(item) for item in self.choices]
         escaped = [shell.escape(escape_colon(item)) for item in items]
         action  = shell.escape('(%s)' % ' '.join(escaped))
         if len(action) <= CHOICES_INLINE_THRESHOLD:
             return action
 
-        # Make a function
-        metavar  = shell.escape(ctxt.option.metavar or '')
-        escaped  = [shell.escape(escape_colon(c)) for c in choices]
+        return self._list_function()
+
+    def _list_function(self):
+        metavar  = shell.escape(self.ctxt.option.metavar or '')
+        escaped  = [shell.escape(escape_colon(c)) for c in self.choices]
 
         code  = 'local items=(\n'
         code += indent(join_with_wrap(' ', '\n', 78, escaped), 2)
         code += '\n)\n\n'
         code += f'_describe -- {metavar} items'
 
-        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
         return funcname
 
-    def _choices_dict(self, ctxt, choices):
-        # Inline choices
-        #   This does not work with `combine`; maybe we have to introduce
-        #   a `combined` parameter to fix this
+    def _dict_action_string(self):
+        #  This does not work with `combine`; maybe we have to introduce
+        #  a `combined` parameter to fix this
         #
-        #   items   = [str(item) for item in choices.keys()]
-        #   values  = [str(value) for value in choices.values()]
-        #   colon   = any(':' in s for s in items + values)
-        #   escaped = ['%s\\:%s' % (shell.escape(item), shell.escape(value)) for item, value in zip(items, values)]
-        #   action  = shell.escape('((%s))' % ' '.join(escaped))
-        #   if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
-        #       return action
+        #  items   = [str(item) for item in choices.keys()]
+        #  values  = [str(value) for value in choices.values()]
+        #  colon   = any(':' in s for s in items + values)
+        #  escaped = ['%s\\:%s' % (shell.escape(item), shell.escape(value)) for item, value in zip(items, values)]
+        #  action  = shell.escape('((%s))' % ' '.join(escaped))
+        #  if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
+        #      return action
+        return self._dict_function()
 
-        # Make a function
-        metavar  = shell.escape(ctxt.option.metavar or '')
+    def _dict_function(self):
+        metavar  = shell.escape(self.ctxt.option.metavar or '')
 
         code  = 'local items=(\n'
-        for item, desc in choices.items():
+        for item, desc in self.choices.items():
             item = shell.escape(escape_colon(str(item)))
             if desc:
                 desc = shell.escape(str(desc))
@@ -84,11 +106,26 @@ class ZshCompleter(shell.ShellCompleter):
         code += ')\n\n'
         code += f'_describe -- {metavar} items'
 
-        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
         return funcname
 
-    def command(self, ctxt, opts=None):
-        code = None
+    def get_action_string(self):
+        if is_dict_type(self.choices):
+            return self._dict_action_string()
+
+        return self._list_action_string()
+
+    def get_function(self):
+        if is_dict_type(self.choices):
+            return self._dict_function()
+
+        return self._list_function()
+
+
+class ZshCompleteCommand(ZshCompletionBase):
+    def __init__(self, ctxt, opts):
+        self.ctxt = ctxt
+        self.code = None
         path = None
         append = None
         prepend = None
@@ -99,32 +136,104 @@ class ZshCompleter(shell.ShellCompleter):
             prepend = opts.get('path_prepend', None)
 
         if path:
-            code = 'local -x PATH=%s' % shell.escape(path)
+            self.code = 'local -x PATH=%s' % shell.escape(path)
         elif append and prepend:
             append = shell.escape(append)
             prepend = shell.escape(prepend)
-            code = 'local -x PATH=%s:"$PATH":%s' % (prepend, append)
+            self.code = 'local -x PATH=%s:"$PATH":%s' % (prepend, append)
         elif append:
-            code = 'local -x PATH="$PATH":%s' % shell.escape(append)
+            self.code = 'local -x PATH="$PATH":%s' % shell.escape(append)
         elif prepend:
-            code = 'local -x PATH=%s:"$PATH"' % shell.escape(prepend)
+            self.code = 'local -x PATH=%s:"$PATH"' % shell.escape(prepend)
 
-        if not code:
+    def get_action_string(self):
+        if not self.code:
             return '_command_names'
 
-        code = f'{code}\n_command_names'
-        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
+        code = f'{self.code}\n_command_names'
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
         return funcname
 
-    def directory(self, _ctxt, opts=None):
+    def get_function(self):
+        if not self.code:
+            return '_command_names'
+
+        code = f'{self.code}\n_command_names'
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
+        return funcname
+
+
+class ZshCompleteRange(ZshCompletionBase):
+    def __init__(self, ctxt, start, stop, step):
+        self.ctxt = ctxt
+        self.start = start
+        self.stop = stop
+        self.step = step
+
+    def get_action_string(self):
+        if self.step == 1:
+            return f"'({{{self.start}..{self.stop}}})'"
+
+        return f"'({{{self.start}..{self.stop}..{self.step}}})'"
+
+    def get_function(self):
+        raise NotImplementedError
+
+
+class ZshCompleteCombine(ZshCompletionBase):
+    def __init__(self, ctxt, completer, commands):
+        # metavar = shell.escape(ctxt.option.metavar or '')
+
+        completions = []
+        for command_args in commands:
+            command, *args = command_args
+            compl_obj = getattr(completer, command)(ctxt, *args)
+            completions.append(compl_obj.get_action_string())
+
+        code  = '_alternative \\\n'
+        for completion in completions:
+            code += '  %s \\\n' % completion
+        code = code.rstrip(' \\\n')
+
+        self.func = ctxt.helpers.add_dynamic_func(ctxt, code)
+
+    def get_function(self):
+        return self.func
+
+    def get_action_string(self):
+        return shell.escape('{%s}' % self.func)
+
+
+class ZshCompleter(shell.ShellCompleter):
+    '''Code generator for completing arguments in Zsh.'''
+
+    # pylint: disable=too-many-public-methods
+    # pylint: disable=missing-function-docstring
+
+    def none(self, ctxt, *_):
+        return ZshComplFunc(ctxt, [' '])
+
+    def integer(self, ctxt):
+        return ZshComplFunc(ctxt, ['_numbers'])
+
+    def float(self, ctxt):
+        return ZshComplFunc(ctxt, ['_numbers', '-f'])
+
+    def choices(self, ctxt, choices):
+        return ZshCompleteChoices(ctxt, choices)
+
+    def command(self, ctxt, opts=None):
+        return ZshCompleteCommand(ctxt, opts)
+
+    def directory(self, ctxt, opts=None):
         directory = None if opts is None else opts.get('directory', None)
 
-        if directory:
-            return shell.escape('_directories -W %s' % shell.escape(directory))
+        if not directory:
+            return ZshComplFunc(ctxt, ['_directories'])
 
-        return '_directories'
+        return ZshComplFunc(ctxt, ['_directories', '-W', directory])
 
-    def file(self, _ctxt, opts=None):
+    def file(self, ctxt, opts=None):
         directory = None
         extensions = None
 
@@ -135,173 +244,125 @@ class ZshCompleter(shell.ShellCompleter):
         args = []
 
         if directory:
-            args.extend(['-W', shell.escape(directory)])
+            args.extend(['-W', directory])
 
         if extensions:
-            args.extend(['-g', shell.escape(make_file_extension_pattern(extensions))])
+            args.extend(['-g', make_file_extension_pattern(extensions)])
 
-        if args:
-            cmd = '_files %s' % ' '.join(args)
-        else:
-            cmd = '_files'
-
-        return shell.escape(cmd)
+        return ZshComplFunc(ctxt, ['_files'] + args)
 
     def mime_file(self, ctxt, pattern):
         func = ctxt.helpers.use_function('mime_file')
-        cmd = '{%s %s}' % (func, shell.escape(pattern))
-        return shell.escape(cmd)
+        return ZshComplFunc(ctxt, [func, pattern], needs_braces=True)
 
-    def group(self, _ctxt):
-        return '_groups'
+    def group(self, ctxt):
+        return ZshComplFunc(ctxt, ['_groups'])
 
-    def hostname(self, _ctxt):
-        return '_hosts'
+    def hostname(self, ctxt):
+        return ZshComplFunc(ctxt, ['_hosts'])
 
-    def pid(self, _ctxt):
-        return '_pids'
+    def pid(self, ctxt):
+        return ZshComplFunc(ctxt, ['_pids'])
 
-    def process(self, _ctxt):
-        return "'_process_names -a'"
+    def process(self, ctxt):
+        return ZshComplFunc(ctxt, ['_process_names', '-a'])
 
-    def range(self, _ctxt, start, stop, step=1):
-        if step == 1:
-            return f"'({{{start}..{stop}}})'"
+    def range(self, ctxt, start, stop, step=1):
+        return ZshCompleteRange(ctxt, start, stop, step)
 
-        return f"'({{{start}..{stop}..{step}}})'"
+    def user(self, ctxt):
+        return ZshComplFunc(ctxt, ['_users'])
 
-    def user(self, _ctxt):
-        return '_users'
+    def variable(self, ctxt):
+        return ZshComplFunc(ctxt, ['_vars'])
 
-    def variable(self, _ctxt):
-        return '_vars'
-
-    def environment(self, _ctxt):
-        return '"_parameters -g \'*export*\'"'
+    def environment(self, ctxt):
+        return ZshComplFunc(ctxt, ['_parameters', '-g', '*export*'])
 
     def exec(self, ctxt, command):
         funcname = ctxt.helpers.use_function('exec')
-        return shell.escape('{%s %s}' % (funcname, shell.escape(command)))
+        return ZshComplFunc(ctxt, [funcname, command], needs_braces=True)
 
     def exec_fast(self, ctxt, command):
         funcname = ctxt.helpers.use_function('exec')
-        return shell.escape('{%s %s}' % (funcname, shell.escape(command)))
+        return ZshComplFunc(ctxt, [funcname, command], needs_braces=True)
 
-    def exec_internal(self, _ctxt, command):
-        return shell.escape(command)
+    def exec_internal(self, ctxt, command):
+        return ZshComplFunc(ctxt, [command], needs_braces=True)
 
     def value_list(self, ctxt, opts):
         desc   = ctxt.option.metavar or ''
         values = opts['values']
+        separator = opts.get('separator', ',')
 
         if is_dict_type(values):
-            values_arg = ' '.join(
-                shell.escape('%s[%s]' % (
-                    escape_square_brackets(item),
-                    escape_square_brackets(desc))
-                ) for item, desc in values.items()
-            )
+            esc = escape_square_brackets
+            values = ['%s[%s]' % (esc(item), esc(desc)) for item, desc in values.items()]
         else:
-            values_arg = ' '.join(shell.escape(escape_square_brackets(i)) for i in values)
+            values = [escape_square_brackets(i) for i in values]
 
-        cmd = '_values -s %s %s %s' % (
-            shell.escape(opts.get('separator', ',')),
-            shell.escape(desc),
-            values_arg
-        )
-
-        return shell.escape(cmd)
+        return ZshComplFunc(ctxt, ['_values', '-s', separator, desc] + values)
 
     def combine(self, ctxt, commands):
-        completions = []
-        for command_args in commands:
-            command, *args = command_args
-            c = getattr(self, command)(ctxt, *args)
-            completions.append(c)
-
-        #metavar = shell.escape(ctxt.option.metavar or '')
-
-        code  = '_alternative \\\n'
-        for completion in completions:
-            code += '  %s \\\n' % completion
-        code = code.rstrip(' \\\n')
-
-        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
-        return funcname
+        return ZshCompleteCombine(ctxt, self, commands)
 
     def history(self, ctxt, pattern):
         func = ctxt.helpers.use_function('history')
-        cmd = '{%s %s}' % (func, shell.escape(pattern))
-        return shell.escape(cmd)
+        return ZshComplFunc(ctxt, [func, pattern], needs_braces=True)
 
-    def commandline_string(self, _ctxt):
-        return '_cmdstring'
+    def commandline_string(self, ctxt):
+        return ZshComplFunc(ctxt, ['_cmdstring'])
 
-    def command_arg(self, _ctxt):
-        return '_normal'
+    def command_arg(self, ctxt):
+        return ZshComplFunc(ctxt, ['_normal'])
 
-    def date(self, _ctxt, format_):
-        cmd = '_dates -f %s' % shell.escape(format_)
-        return shell.escape(cmd)
+    def date(self, ctxt, format_):
+        return ZshComplFunc(ctxt, ['_dates', '-f', format_])
 
-    def date_format(self, _ctxt):
-        return '_date_formats'
+    def date_format(self, ctxt):
+        return ZshComplFunc(ctxt, ['_date_formats'])
 
     def file_list(self, ctxt, opts=None):
         separator = opts.pop('separator', ',') if opts else ','
-        file_code = self.file(ctxt, opts)
-
-        if ' ' not in file_code:
-            funcname = file_code
-        else:
-            funcname = ctxt.helpers.add_dynamic_func(ctxt, shell.unescape(file_code))
+        func = self.file(ctxt, opts).get_function()
 
         if separator == ',':
-            cmd = '_sequence %s' % funcname
-        else:
-            cmd = '_sequence -s %s %s' % (shell.escape(separator), funcname)
+            return ZshComplFunc(ctxt, ['_sequence', func])
 
-        return shell.escape(cmd)
+        return ZshComplFunc(ctxt, ['_sequence', '-s', separator, func])
 
     def directory_list(self, ctxt, opts=None):
         separator = opts.pop('separator', ',') if opts else ','
-        file_code = self.directory(ctxt, opts)
-
-        if ' ' not in file_code:
-            funcname = file_code
-        else:
-            funcname = ctxt.helpers.add_dynamic_func(ctxt, shell.unescape(file_code))
+        func = self.directory(ctxt, opts).get_function()
 
         if separator == ',':
-            cmd = '_sequence %s' % funcname
-        else:
-            cmd = '_sequence -s %s %s' % (shell.escape(separator), funcname)
+            return ZshComplFunc(ctxt, ['_sequence', func])
 
-        return shell.escape(cmd)
+        return ZshComplFunc(ctxt, ['_sequence', '-s', separator, func])
 
     # =========================================================================
     # Bonus
     # =========================================================================
 
-    def net_interface(self, _ctxt):
-        return '_net_interfaces'
+    def net_interface(self, ctxt):
+        return ZshComplFunc(ctxt, ['_net_interfaces'])
 
-    def timezone(self, _ctxt):
-        return '_time_zone'
+    def timezone(self, ctxt):
+        return ZshComplFunc(ctxt, ['_time_zone'])
 
-    def locale(self, _ctxt):
-        return '_locales'
+    def locale(self, ctxt):
+        return ZshComplFunc(ctxt, ['_locales'])
 
-    def charset(self, _ctxt):
-        return '_charset'
+    def charset(self, ctxt):
+        return ZshComplFunc(ctxt, ['_charset'])
 
-    def login_shell(self, _ctxt):
-        return '_shells'
+    def login_shell(self, ctxt):
+        return ZshComplFunc(ctxt, ['_shells'])
 
     def alsa_card(self, ctxt):
         func = ctxt.helpers.use_function('alsa_complete_cards')
-        return func
+        return ZshComplFunc(ctxt, [func], needs_braces=True)
 
     def alsa_device(self, ctxt):
         func = ctxt.helpers.use_function('alsa_complete_devices')
-        return func
+        return ZshComplFunc(ctxt, [func], needs_braces=True)

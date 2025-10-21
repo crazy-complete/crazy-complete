@@ -453,9 +453,9 @@ if set -q files[1]
   if set -q _flag_regex[1]
     set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1]\$)")
   end
-#endif
 
-  printf '%s\n' $files\t"$desc"
+#endif
+  printf '%s\n' $files
 end
 ''')
 

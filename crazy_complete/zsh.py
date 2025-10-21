@@ -61,7 +61,7 @@ class ZshCompletionFunction:
 
     def _complete_option(self, option):
         if option.complete:
-            action = self._complete(option, *option.complete)
+            action = self._complete(option, *option.complete).get_action_string()
         else:
             action = None
 
@@ -87,7 +87,7 @@ class ZshCompletionFunction:
             positional.get_positional_num(),
             False,
             f'command{self.command_counter}',
-            self._complete(positional, 'choices', choices)
+            self._complete(positional, 'choices', choices).get_action_string()
         )
 
         return Arg(positional, None, False, spec)
@@ -97,7 +97,7 @@ class ZshCompletionFunction:
             positional.get_positional_num(),
             positional.repeatable,
             positional.help or positional.metavar or ' ',
-            self._complete(positional, *positional.complete)
+            self._complete(positional, *positional.complete).get_action_string()
         )
 
         return Arg(positional, positional.when, False, spec)
