@@ -24,7 +24,7 @@ __append_to_array() {
   arr+=("$2")
 }
 
-for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
+for ((argi=1; argi < cword; ++argi)); do
   arg="${words[argi]}"
 
   case "$arg" in

@@ -13,7 +13,7 @@ END_OF_OPTIONS=0
 
 local cmd="root" argi arg i char trailing_chars
 
-for ((argi=1; argi < ${#words[@]} - 1; ++argi)); do
+for ((argi=1; argi < cword; ++argi)); do
   arg="${words[argi]}"
 
   case "$arg" in
