@@ -1,0 +1,16 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ["--list"]
+    complete: ["list", ["choices", ["one", "two", "three"]]]
+    
+  - option_strings: ["--colon-list"]
+    complete: ["list", ["choices", ["one", "two", "three"]], {'separator': ':'}]
+
+  - option_strings: ["--combined-list"]
+    complete: ["list", ["combine", [
+      ["choices", ["one", "two", "three"]],
+      ["exec", "seq 3"]]]]
+
+  - option_strings: ["--user-list"]
+    complete: ["list", ["user"]]
+

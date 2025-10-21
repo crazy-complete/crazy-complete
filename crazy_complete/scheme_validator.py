@@ -262,6 +262,7 @@ def _check_exec(arguments):
 
 def _check_value_list(arguments):
     options = arguments.get_required_arg('options')
+    _check_type(options, (dict,), 'options')
     arguments.require_no_more()
 
     _check_dictionary(options, {
@@ -310,6 +311,9 @@ def _check_combine(arguments):
         if subcommand_args.value[0] == 'command_arg':
             raise _error('Command `command_arg` not allowed inside combine', subcommand_args)
 
+        if subcommand_args.value[0] == 'list':
+            raise _error('Command `list` not allowed inside combine', subcommand_args)
+
         _check_complete(subcommand_args)
 
     if len(commands.value) == 0:
@@ -317,6 +321,43 @@ def _check_combine(arguments):
 
     if len(commands.value) == 1:
         raise _error('combine: Must contain more than one command', commands)
+
+
+def _check_list(arguments):
+    command = arguments.get_required_arg('command')
+    options = arguments.get_optional_arg({})
+    arguments.require_no_more()
+
+    _check_type(command, (list,))
+    _check_type(options, (dict,), 'options')
+
+    _check_dictionary(options, {'separator': (False, (str,))})
+
+    if len(command.value) == 0:
+        raise _error('Missing command', command)
+
+    if command.value[0] == 'list':
+        raise _error('Nested `list` not allowed', command)
+
+    if command.value[0] == 'none':
+        raise _error('Command `none` not allowed inside list', command)
+
+    if command.value[0] == 'command_arg':
+        raise _error('Command `command_arg` not allowed inside list', command)
+
+    if command.value[0] == 'file':
+        raise _error('Command `file` not allowed inside list. Use `file_list` instead', command)
+
+    if command.value[0] == 'directory':
+        raise _error('Command `directory` not allowed inside list. Use `directory_list` instead', command)
+
+    if _has_set(options, 'separator'):
+        separator = options.value['separator']
+
+        if len(separator.value) != 1:
+            raise _error('Invalid length for separator', separator)
+
+    _check_complete(command)
 
 
 def _check_history(arguments):
@@ -365,6 +406,7 @@ def _check_complete(args):
         'exec_internal':    _check_exec,
         'value_list':       _check_value_list,
         'combine':          _check_combine,
+        'list':             _check_list,
         'history':          _check_history,
         'commandline_string': _check_void,
         'command_arg':      _check_void,

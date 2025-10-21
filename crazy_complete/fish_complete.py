@@ -408,6 +408,15 @@ class FishCompleter(shell.ShellCompleter):
     def combine(self, ctxt, commands):
         return FishCompleteCombine(ctxt, self, commands)
 
+    def list(self, ctxt, command, opts=None):
+        separator = opts.get('separator', ',') if opts else ','
+
+        cmd, *args = command
+        obj = getattr(self, cmd)(ctxt, *args)
+        func = obj.get_function()
+
+        return FishCompletionCommand(ctxt, ['__fish_complete_list', separator, func])
+
     def history(self, ctxt, pattern):
         func = ctxt.helpers.use_function('history')
         return FishCompletionCommand(ctxt, [func, pattern])

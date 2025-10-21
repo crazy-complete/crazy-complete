@@ -224,6 +224,9 @@ def _validate_value_list(args):
     opts = args.get_required_arg('options')
     args.require_no_more()
 
+    if not is_dict_type(opts):
+        raise CrazyTypeError('options', 'dict', opts)
+
     values = None
     separator = ','
 
@@ -286,6 +289,9 @@ def _validate_combine(args):
         if subcommand_args[0] == 'command_arg':
             raise CrazyError('Command `command_arg` not allowed inside combine')
 
+        if subcommand_args[0] == 'list':
+            raise CrazyError('Command `list` not allowed inside combine')
+
         validate_complete(subcommand_args)
 
     if len(commands) == 0:
@@ -293,6 +299,48 @@ def _validate_combine(args):
 
     if len(commands) == 1:
         raise CrazyError('combine: Must contain more than one command')
+
+
+def _validate_list(args):
+    command = args.get_required_arg('command')
+    opts = args.get_optional_arg({})
+    args.require_no_more()
+
+    if not isinstance(command, list):
+        raise CrazyError(f'list: Not a list: {command}')
+
+    if len(command) == 0:
+        raise CrazyError('list: Missing command')
+
+    if command[0] == 'list':
+        raise CrazyError('Nested `list` not allowed')
+
+    if command[0] == 'none':
+        raise CrazyError('Command `none` not allowed inside list')
+
+    if command[0] == 'command_arg':
+        raise CrazyError('Command `command_arg` not allowed inside list')
+
+    if command[0] == 'file':
+        raise CrazyError('Command `file` not allowed inside list. Use `file_list` instead')
+
+    if command[0] == 'directory':
+        raise CrazyError('Command `directory` not allowed inside list. Use `directory_list` instead')
+
+    if not is_dict_type(opts):
+        raise CrazyTypeError('options', 'dict', opts)
+
+    for key, value in opts.items():
+        if key == 'separator':
+            if not isinstance(value, str):
+                raise CrazyError(f'separator: Not a string: {value}')
+
+            if len(value) != 1:
+                raise CrazyError(f'Invalid length for separator: {value}')
+        else:
+            raise CrazyError(f'Unknown option: {key}')
+
+    validate_complete(command)
 
 
 def _validate_history(args):
@@ -358,6 +406,7 @@ def validate_complete(complete):
         'exec_internal': _validate_exec,
         'value_list':    _validate_value_list,
         'combine':       _validate_combine,
+        'list':          _validate_list,
         'history':       _validate_history,
         'commandline_string': _validate_void,
         'command_arg':   _validate_void,

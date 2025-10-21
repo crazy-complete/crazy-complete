@@ -40,9 +40,11 @@ class ZshComplFunc(ZshCompletionBase):
             cmd = ' '.join(shell.escape(arg) for arg in self.args)
 
         if self.needs_braces:
-            return shell.escape('{%s}' % cmd)
+            cmd = shell.escape('{%s}' % cmd)
+        else:
+            cmd = shell.escape(cmd)
 
-        return shell.escape(cmd)
+        return escape_colon(cmd)
 
     def get_function(self):
         if len(self.args) == 1:
@@ -307,6 +309,18 @@ class ZshCompleter(shell.ShellCompleter):
 
     def combine(self, ctxt, commands):
         return ZshCompleteCombine(ctxt, self, commands)
+
+    def list(self, ctxt, command, opts=None):
+        separator = opts.get('separator', ',') if opts else ','
+
+        cmd, *args = command
+        obj = getattr(self, cmd)(ctxt, *args)
+        func = obj.get_function()
+
+        if separator == ',':
+            return ZshComplFunc(ctxt, ['_sequence', func])
+
+        return ZshComplFunc(ctxt, ['_sequence', '-s', separator, func])
 
     def history(self, ctxt, pattern):
         func = ctxt.helpers.use_function('history')

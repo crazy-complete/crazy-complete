@@ -247,6 +247,21 @@ class BashCompleter(shell.ShellCompleter):
     def combine(self, ctxt, commands):
         return BashCompleteCombine(ctxt, self, commands)
 
+    def list(self, ctxt, command, opts=None):
+        separator = opts.get('separator', ',') if opts else ','
+
+        cmd, *args = command
+        obj = getattr(self, cmd)(ctxt, *args)
+        code = obj.get_code()
+
+        funcname = ctxt.helpers.use_function('value_list')
+        r =  'local cur_old="$cur"\n'
+        r += 'cur="${cur##*%s}"\n' % shell.escape(separator)
+        r += '%s\n' % code
+        r += 'cur="$cur_old"\n'
+        r += '%s %s "${COMPREPLY[@]}"' % (funcname, shell.escape(separator))
+        return BashCompletionCommand(ctxt, r)
+
     def history(self, ctxt, pattern):
         funcname = ctxt.helpers.use_function('history')
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(pattern)))
@@ -265,26 +280,12 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, '')
 
     def file_list(self, ctxt, opts=None):
-        separator = opts.pop('separator', ',') if opts else ','
-        code = self.file(ctxt, opts).get_code()
-        funcname = ctxt.helpers.use_function('value_list')
-        r =  'local cur_old="$cur"\n'
-        r += 'cur="${cur##*%s}"\n' % shell.escape(separator)
-        r += '%s\n' % code
-        r += 'cur="$cur_old"\n'
-        r += '%s %s "${COMPREPLY[@]}"' % (funcname, shell.escape(separator))
-        return BashCompletionCommand(ctxt, r)
+        list_opts = {'separator': opts.pop('separator', ',') if opts else ','}
+        return self.list(ctxt, ['file', opts], list_opts)
 
     def directory_list(self, ctxt, opts=None):
-        separator = opts.pop('separator', ',') if opts else ','
-        code = self.directory(ctxt, opts).get_code()
-        funcname = ctxt.helpers.use_function('value_list')
-        r =  'local cur_old="$cur"\n'
-        r += 'cur="${cur##*%s}"\n' % shell.escape(separator)
-        r += '%s\n' % code
-        r += 'cur="$cur_old"\n'
-        r += '%s %s "${COMPREPLY[@]}"' % (funcname, shell.escape(separator))
-        return BashCompletionCommand(ctxt, r)
+        list_opts = {'separator': opts.pop('separator', ',') if opts else ','}
+        return self.list(ctxt, ['directory', opts], list_opts)
 
     # =========================================================================
     # Bonus

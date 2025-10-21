@@ -101,7 +101,7 @@
 3_15_04-file-directory-not-absolute      | foo: -o: directory: Must be an absolute path
 3_15_05-file-extensions-wrong-type       | foo: -o: extensions: Not a list: False
 3_15_06-file-extensions-empty            | foo: -o: extensions: Cannot be empty
-3_15_07-file-extension-empty             | foo: -o: extensions[0]: May not be empty
+3_15_07-file-extension-empty             | foo: -o: extensions[0]: Cannot be empty
 3_15_08-file-extension-with-space        | foo: -o: extensions[0]: Contains space: foo 
 3_15_09-file-too-many-args               | foo: -o: Too many arguments: ['wrong']
 3_16_00-directory-options-wrong-type     | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
@@ -160,9 +160,22 @@
 3_26_02-date-format-wrong-type           | foo: -o: Format is not a string: False
 3_26_03-date-format-empty                | foo: -o: Format: Cannot be empty
 3_27_00-date-format-too-many-arguments   | foo: -o: Too many arguments: ['wrong']
+3_28_00-list-missing-arg                 | foo: -o: Missing argument: command
+3_28_01-list-wrong-type                  | foo: -o: list: Not a list: False
+3_28_02-list-options-wrong-type          | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
+3_28_03-list-too-many-args               | foo: -o: Too many arguments: [False]
+3_28_04-list-no-command                  | foo: -o: list: Missing command
+3_28_05-list-command-is-none             | foo: -o: Command `none` not allowed inside list
+3_28_06-list-command-is-list             | foo: -o: Nested `list` not allowed
+3_28_07-list-command-is-file             | foo: -o: Command `file` not allowed inside list. Use `file_list` instead
+3_28_08-list-command-is-directory        | foo: -o: Command `directory` not allowed inside list. Use `directory_list` instead
+3_28_09-list-command-is-command-arg      | foo: -o: Command `command_arg` not allowed inside list
+3_28_10-list-separator-wrong-type        | foo: -o: separator: Not a string: False
+3_28_11-list-separator-wrong-value       | foo: -o: Invalid length for separator: foo
+3_28_12-list-unkown-option               | foo: -o: Unknown option: wrong
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
-001-multiple-repeatable-positionals      | foo: Only one positional argument may be marked as repeatable
+001-multiple-repeatable-positionals      | foo: Only one positional argument can be marked as repeatable
 002-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
 003-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
 004-repeatable-and-subcommands           | foo: Repeatable positionals and subcommands cannot be used together

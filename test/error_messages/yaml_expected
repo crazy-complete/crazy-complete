@@ -97,17 +97,17 @@
 3_15_00-file-options-wrong-type          | line 4, column 24: Invalid type. Expected types: dictionary
 3_15_01-file-unknown-key                 | line 4, column 25: Unknown key: wrong
 3_15_02-file-directory-wrong-type        | line 4, column 38: directory: Invalid type. Expected types: string
-3_15_03-file-directory-empty             | line 4, column 38: directory may not be empty
+3_15_03-file-directory-empty             | line 4, column 38: directory cannot not be empty
 3_15_04-file-directory-not-absolute      | line 4, column 38: directory must be an absolute path
 3_15_05-file-extensions-wrong-type       | line 4, column 39: extensions: Invalid type. Expected types: list
-3_15_06-file-extensions-empty            | line 4, column 39: extensions may not be empty
-3_15_07-file-extension-empty             | line 4, column 40: extension may not be empty
+3_15_06-file-extensions-empty            | line 4, column 39: extensions cannot not be empty
+3_15_07-file-extension-empty             | line 4, column 40: extension canonot not be empty
 3_15_08-file-extension-with-space        | line 4, column 40: extension contains space
 3_15_09-file-too-many-args               | line 4, column 15: Too many arguments provided
 3_16_00-directory-options-wrong-type     | line 4, column 29: Invalid type. Expected types: dictionary
 3_16_01-directory-unknown-key            | line 4, column 30: Unknown key: wrong
 3_16_02-directory-directory-wrong-type   | line 4, column 43: directory: Invalid type. Expected types: string
-3_16_03-directory-directory-empty        | line 4, column 43: directory may not be empty
+3_16_03-directory-directory-empty        | line 4, column 43: directory cannot not be empty
 3_16_04-directory-directory-not-absolute | line 4, column 43: directory must be an absolute path
 3_16_05-directory-too-many-args          | line 4, column 15: Too many arguments provided
 3_17_00-range-missing-arg-1              | line 4, column 15: Missing required arg `start`
@@ -160,9 +160,22 @@
 3_26_02-date-format-wrong-type           | line 4, column 24: format: Invalid type. Expected types: string
 3_26_03-date-format-empty                | line 4, column 24: format cannot be empty
 3_27_00-date-format-too-many-arguments   | line 4, column 15: Too many arguments provided
+3_28_00-list-missing-arg                 | line 4, column 15: Missing required arg `command`
+3_28_01-list-wrong-type                  | line 4, column 24: Invalid type. Expected types: list
+3_28_02-list-options-wrong-type          | line 4, column 34: options: Invalid type. Expected types: dictionary
+3_28_03-list-too-many-args               | line 4, column 15: Too many arguments provided
+3_28_04-list-no-command                  | line 4, column 24: Missing command
+3_28_05-list-command-is-none             | line 4, column 24: Command `none` not allowed inside list
+3_28_06-list-command-is-list             | line 4, column 24: Nested `list` not allowed
+3_28_07-list-command-is-file             | line 4, column 24: Command `file` not allowed inside list. Use `file_list` instead
+3_28_08-list-command-is-directory        | line 4, column 24: Command `directory` not allowed inside list. Use `directory_list` instead
+3_28_09-list-command-is-command-arg      | line 4, column 24: Command `command_arg` not allowed inside list
+3_28_10-list-separator-wrong-type        | line 4, column 48: separator: Invalid type. Expected types: string
+3_28_11-list-separator-wrong-value       | line 4, column 48: Invalid length for separator
+3_28_12-list-unkown-option               | line 4, column 35: Unknown key: wrong
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary
-001-multiple-repeatable-positionals      | line 6, column 5: Only one positional argument may be marked as repeatable
+001-multiple-repeatable-positionals      | line 6, column 5: Only one positional argument can be marked as repeatable
 002-positional-after-repeatable          | line 6, column 5: A positional argument cannot follow a repeatable positional argument
 003-positional-after-repeatable          | line 3, column 5: A positional argument cannot follow a repeatable positional argument
 004-repeatable-and-subcommands           | line 1, column 1: Repeatable positionals and subcommands cannot be used together

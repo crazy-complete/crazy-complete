@@ -130,6 +130,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [integer](#integer)                        | Complete an integer                                                         |
 | [float](#float)                            | Complete a floating point number                                            |
 | [combine](#combine)                        | Combine multiple completion commands                                        |
+| [list](#list)                              | Complete a list of any available completer                                  |
 | [file](#file)                              | Complete a file                                                             |
 | [directory](#directory)                    | Complete a directory                                                        |
 | [file\_list](#file_list)                   | Complete a list of files                                                    |
@@ -227,6 +228,32 @@ prog: "example"
 options:
   - option_strings: ["--combine"]
     complete: ["combine", [["user"], ["pid"]]]
+```
+
+### list
+
+> Complete a comma-separted list of any completion command.
+
+> The separator can be changed by adding `{"separator": ...}`
+
+> **NOTE:** `file` and `directory` are not supported. Use `file_list` and `directory_list` instead.
+
+> **NOTE:** Using a colon as separator does currently not work in **Bash**
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--user-list"]
+    complete: ["list", ["user"]]
+  - option_strings: ["--option-list"]
+    complete: ["list", ["choices", ["setuid", "async", "block"]], {"separator": ":"}]
+```
+
+```
+ ~ > example --user-list=avahi,daemon,<TAB>
+bin                     braph
+colord                  dbus
+dhcpcd                  git
 ```
 
 ### file

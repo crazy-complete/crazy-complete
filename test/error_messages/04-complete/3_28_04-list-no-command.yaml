@@ -1,0 +1,4 @@
+prog: "foo"
+options:
+  - option_strings: ["-o"]
+    complete: ["list", []]
