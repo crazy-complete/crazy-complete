@@ -76,7 +76,7 @@ class CasePatterns:
         return '-@(%s)' % '|'.join(o.lstrip('-') for o in option_strings)
 
 
-def make_file_extension_pattern(extensions):
+def make_file_extension_pattern(extensions, fuzzy):
     '''Make a case-insensitive glob pattern matching `extensions`.
 
     Takes a list of extensions (e.g. ['txt', 'jpg']) and returns a Bash-style
@@ -95,6 +95,10 @@ def make_file_extension_pattern(extensions):
                 pattern += '[%s%s]' % (c.lower(), c.upper())
             else:
                 pattern += c
+
         patterns.append(pattern)
 
-    return '@(%s)' % '|'.join(patterns)
+    if not fuzzy:
+        return '@(%s)' % '|'.join(patterns)
+    
+    return '@(%s)*' % '|'.join(patterns)

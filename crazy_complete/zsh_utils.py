@@ -118,7 +118,7 @@ def make_positional_spec(
     return f'{num_spec}:{desc_spec}:{action}'
 
 
-def make_file_extension_pattern(extensions):
+def make_file_extension_pattern(extensions, fuzzy):
     '''Make a case-insensitive glob pattern matching `extensions`.
 
     Takes a list of extensions (e.g. ['txt', 'jpg']) and returns a Zsh-style
@@ -129,6 +129,11 @@ def make_file_extension_pattern(extensions):
     '''
 
     if len(extensions) == 1:
-        return '*.(#i)%s' % extensions[0]
+        pattern = '*.(#i)%s' % extensions[0]
+    else:
+        pattern = '*.(#i)(%s)' % '|'.join(extensions)
 
-    return '*.(#i)(%s)' % '|'.join(extensions)
+    if fuzzy:
+        pattern += '*'
+
+    return pattern

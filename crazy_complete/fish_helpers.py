@@ -417,7 +417,7 @@ if set -q files[1]
 #ifdef regex
 
   if set -q _flag_regex[1]
-    set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1]\$)")
+    set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1])\$")
   end
 #endif
 
@@ -451,7 +451,7 @@ end
 if set -q files[1]
 #ifdef regex
   if set -q _flag_regex[1]
-    set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1]\$)")
+    set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1])\$")
   end
 
 #endif

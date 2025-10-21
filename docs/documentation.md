@@ -237,6 +237,9 @@ options:
 >
 > You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
 >
+> You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
+> Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
+>
 > **NOTE:** Restricting completion to specific file extensions only makes sense if the program being completed actually expects files of those types.
 > On Unix-like systems, file extensions generally have no inherent meaning -- they are purely conventional and not required for determining file types.
 
@@ -285,6 +288,9 @@ options:
 > You can restrict completion to a specific directory by adding `{"directory": ...}`.
 >
 > You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
+>
+> You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
+> Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
 >
 > The separator can be changed by adding `{"separator": ...}`
 

@@ -110,7 +110,7 @@ class FishCompleteChoices(FishCompletionBase):
         return self._get_code_for_list(self.choices)
 
 
-def _get_extension_regex(extensions):
+def _get_extension_regex(extensions, fuzzy):
     patterns = []
 
     for extension in extensions:
@@ -122,6 +122,10 @@ def _get_extension_regex(extensions):
                 pattern += f'\\{c}'
             else:
                 pattern += c
+
+        if fuzzy:
+            pattern += '.*'
+
         patterns.append(pattern)
 
     return '|'.join(f'(.*\\.{pattern})' for pattern in patterns)
@@ -132,10 +136,12 @@ class FishCompleteFile(FishCompletionBase):
 
     def __init__(self, ctxt, opts):
         self.ctxt = ctxt
+        self.fuzzy = False
         self.directory = None
         self.extensions = None
 
         if opts:
+            self.fuzzy = opts.get('fuzzy', False)
             self.directory = opts.get('directory', None)
             self.extensions = opts.get('extensions', None)
 
@@ -147,7 +153,7 @@ class FishCompleteFile(FishCompletionBase):
 
         if self.extensions:
             self.ctxt.helpers.use_function('fish_complete_filedir', 'regex')
-            args.extend(['-r', shell.escape(_get_extension_regex(self.extensions))])
+            args.extend(['-r', shell.escape(_get_extension_regex(self.extensions, self.fuzzy))])
 
         if not args:
             return ['-F']
@@ -163,7 +169,7 @@ class FishCompleteFile(FishCompletionBase):
 
         if self.extensions:
             self.ctxt.helpers.use_function('fish_complete_filedir', 'regex')
-            args.extend(['-r', shell.escape(self._get_extension_regex())])
+            args.extend(['-r', shell.escape(_get_extension_regex(self.extensions, self.fuzzy))])
 
         funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
 
@@ -419,12 +425,14 @@ class FishCompleter(shell.ShellCompleter):
 
     def file_list(self, ctxt, opts=None):
         separator = ','
+        fuzzy = False
         directory = None
         extensions = None
         funcname = ctxt.helpers.use_function('list_files')
 
         if opts:
             separator = opts.get('separator', ',')
+            fuzzy = opts.get('fuzzy', False)
             directory = opts.get('directory', None)
             extensions = opts.get('extensions', None)
 
@@ -435,7 +443,7 @@ class FishCompleter(shell.ShellCompleter):
 
         if extensions:
             ctxt.helpers.use_function('list_files', 'regex')
-            args.extend(['-r', shell.escape(_get_extension_regex(extensions))])
+            args.extend(['-r', shell.escape(_get_extension_regex(extensions, fuzzy))])
 
         if args:
             list_cmd = '%s %s' % (funcname, ' '.join(args))

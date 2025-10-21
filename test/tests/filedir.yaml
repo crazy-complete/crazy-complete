@@ -23,6 +23,9 @@ options:
   - option_strings: ["--file-cpp"]
     complete: ["file", {"directory": "%TEST_DIR%/test_data", "extensions": ["c++"]}]
 
+  - option_strings: ["--file-txt-fuzzy"]
+    complete: ["file", {"directory": "%TEST_DIR%/test_data", "extensions": ["txt"], "fuzzy": true}]
+
   # ===========================================================================
   # file_list
   # ===========================================================================

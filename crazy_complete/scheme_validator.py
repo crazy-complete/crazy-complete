@@ -171,6 +171,7 @@ def _check_filedir(arguments, with_extensions=False, with_separator=False):
 
     if with_extensions:
         spec['extensions'] = (False, (list,))
+        spec['fuzzy'] = (False, (bool,))
 
     if with_separator:
         spec['separator'] = (False, (str,))

@@ -163,15 +163,17 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, '_filedir -d')
 
     def file(self, ctxt, opts=None):
+        fuzzy = False
         directory = None
         extensions = None
 
         if opts:
+            fuzzy = opts.get('fuzzy', False)
             directory = opts.get('directory', None)
             extensions = opts.get('extensions', None)
 
         if extensions:
-            filedir_cmd = '_filedir %s' % make_file_extension_pattern(extensions)
+            filedir_cmd = '_filedir %s' % make_file_extension_pattern(extensions, fuzzy)
         else:
             filedir_cmd = '_filedir'
 

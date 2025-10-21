@@ -1381,19 +1381,22 @@ description: "Check --file"
 send: "crazy-complete-test --file "
 bash_expected: |
   > crazy-complete-test --file
-  README.md         directory         file1.TXT         image1.JPG
-  archive.tar.gz    file with spaces  file3.tXt         image2.jPg
-  bin               file0.txt         image0.jpg        source.c++
+  README.md         file with spaces  file4.txt.1       source.c++
+  archive.tar.gz    file0.txt         image0.jpg
+  bin               file1.TXT         image1.JPG
+  directory         file3.tXt         image2.jPg
   > crazy-complete-test --file
 fish_expected: |
   > crazy-complete-test --file
-  archive.tar.gz  directory/        file0.txt  file3.tXt   image1.JPG  README.md
-  bin/            file with spaces  file1.TXT  image0.jpg  image2.jPg  source.c++
+  archive.tar.gz  file with spaces  file3.tXt    image1.JPG  source.c++
+  bin/            file0.txt         file4.txt.1  image2.jPg
+  directory/      file1.TXT         image0.jpg   README.md
 zsh_expected: |
   > crazy-complete-test --file
-  README.md           directory/          file1.TXT           image1.JPG
-  archive.tar.gz      file\ with\ spaces  file3.tXt           image2.jPg
-  bin/                file0.txt           image0.jpg          source.c++
+  README.md           file\ with\ spaces  file4.txt.1         source.c++
+  archive.tar.gz      file0.txt           image0.jpg
+  bin/                file1.TXT           image1.JPG
+  directory/          file3.tXt           image2.jPg
 ---
 number: 89
 definition_file: "filedir"
@@ -1486,3 +1489,18 @@ fish_expected: |
   > crazy-complete-test --command-path-append-prepend my_test_binary
 zsh_expected: |
   > crazy-complete-test --command-path-append-prepend my_test_binary
+---
+number: 96
+definition_file: "filedir"
+description: "Check --file-txt-fuzzy"
+send: "crazy-complete-test --file-txt-fuzzy "
+bash_expected: |
+  > crazy-complete-test --file-txt-fuzzy
+  bin          directory    file0.txt    file1.TXT    file3.tXt    file4.txt.1
+  > crazy-complete-test --file-txt-fuzzy
+fish_expected: |
+  > crazy-complete-test --file-txt-fuzzy
+  bin/  directory/  file0.txt  file1.TXT  file3.tXt  file4.txt.1
+zsh_expected: |
+  > crazy-complete-test --file-txt-fuzzy
+  bin/         directory/   file0.txt    file1.TXT    file3.tXt    file4.txt.1

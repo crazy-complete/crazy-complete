@@ -145,6 +145,10 @@ def _validate_filedir(args, with_extensions=False, with_separator=False):
                 if contains_space(subval):
                     raise CrazyError(f"extensions[{i}]: Contains space: {subval}")
 
+        elif with_extensions and key == 'fuzzy':
+            if not isinstance(value, bool):
+                raise CrazyError(f"fuzzy: Not a bool: {value}")
+
         elif with_separator and key == 'separator':
             if not isinstance(value, str):
                 raise CrazyError(f'separator: Not a string: {value}')

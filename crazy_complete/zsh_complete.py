@@ -234,10 +234,12 @@ class ZshCompleter(shell.ShellCompleter):
         return ZshComplFunc(ctxt, ['_directories', '-W', directory])
 
     def file(self, ctxt, opts=None):
+        fuzzy = False
         directory = None
         extensions = None
 
         if opts:
+            fuzzy = opts.get('fuzzy', False)
             directory = opts.get('directory', None)
             extensions = opts.get('extensions', None)
 
@@ -247,7 +249,7 @@ class ZshCompleter(shell.ShellCompleter):
             args.extend(['-W', directory])
 
         if extensions:
-            args.extend(['-g', make_file_extension_pattern(extensions)])
+            args.extend(['-g', make_file_extension_pattern(extensions, fuzzy)])
 
         return ZshComplFunc(ctxt, ['_files'] + args)
 
