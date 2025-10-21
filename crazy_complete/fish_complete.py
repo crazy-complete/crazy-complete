@@ -1,9 +1,12 @@
 '''This module contains code for completing arguments in Fish.'''
 
+import shlex
+
 from . import shell
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
 from .utils import get_query_option_strings, get_defined_option_types
+
 
 CHOICES_INLINE_THRESHOLD = 80
 # The `choices` command can in Fish be expressed inline in a complete command
@@ -19,6 +22,9 @@ CHOICES_INLINE_THRESHOLD = 80
 class FishCompletionBase:
     '''Base class for Fish completions.'''
 
+    def __init__(self, ctxt):
+        self.ctxt = ctxt
+
     def get_args(self):
         '''Return a list of arguments to be appended to the `complete`
         command in Fish.
@@ -32,6 +38,11 @@ class FishCompletionBase:
         '''Return the code that can be used for completing an argument.'''
         raise NotImplementedError
 
+    def get_function(self):
+        '''Return a function that runs the code.'''
+        func = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
+        return func
+
 
 class FishCompleteNone(FishCompletionBase):
     '''Class for completing an argument without a completer.'''
@@ -42,25 +53,37 @@ class FishCompleteNone(FishCompletionBase):
     def get_code(self):
         return ''
 
+    def get_function(self):
+        return 'true'
+
 
 class FishCompletionCommand(FishCompletionBase):
-    '''Class for executing a command and parsing its output.'''
+    '''Class for executing a command.'''
 
-    def __init__(self, command):
-        self.command = command
+    def __init__(self, ctxt, args):
+        super().__init__(ctxt)
+        self.args = args
 
     def get_code(self):
-        return self.command
+        return ' '.join(shell.escape(arg) for arg in self.args)
 
     def get_args(self):
-        return ['-f', '-a', '(%s)' % self.command]
+        command = ' '.join(shell.escape(arg) for arg in self.args)
+        return ['-f', '-a', '(%s)' % command]
+
+    def get_function(self):
+        if len(self.args) == 1:
+            return self.args[0]
+
+        func = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
+        return func
 
 
 class FishCompleteChoices(FishCompletionBase):
     '''Class for completing choices.'''
 
     def __init__(self, ctxt, choices):
-        self.ctxt = ctxt
+        super().__init__(ctxt)
         self.choices = choices
 
     @staticmethod
@@ -99,10 +122,8 @@ class FishCompleteChoices(FishCompletionBase):
         if len(arg) <= CHOICES_INLINE_THRESHOLD:
             return ['-f', '-a', arg]
 
-        code = self.get_code()
-
-        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
-        return ['-f', '-a', '(%s)' % funcname]
+        func = self.get_function()
+        return ['-f', '-a', '(%s)' % func]
 
     def get_code(self):
         if is_dict_type(self.choices):
@@ -135,73 +156,55 @@ class FishCompleteFile(FishCompletionBase):
     '''Class for completing files.'''
 
     def __init__(self, ctxt, opts):
-        self.ctxt = ctxt
-        self.fuzzy = False
-        self.directory = None
-        self.extensions = None
+        super().__init__(ctxt)
+
+        fuzzy = False
+        directory = None
+        extensions = None
+        self.args = []
 
         if opts:
-            self.fuzzy = opts.get('fuzzy', False)
-            self.directory = opts.get('directory', None)
-            self.extensions = opts.get('extensions', None)
+            fuzzy = opts.get('fuzzy', False)
+            directory = opts.get('directory', None)
+            extensions = opts.get('extensions', None)
+
+        if directory:
+            self.args.extend(['-C', directory])
+
+        if extensions:
+            ctxt.helpers.use_function('fish_complete_filedir', 'regex')
+            self.args.extend(['-r', _get_extension_regex(extensions, fuzzy)])
 
     def get_args(self):
-        args = []
-
-        if self.directory:
-            args.extend(['-C', shell.escape(self.directory)])
-
-        if self.extensions:
-            self.ctxt.helpers.use_function('fish_complete_filedir', 'regex')
-            args.extend(['-r', shell.escape(_get_extension_regex(self.extensions, self.fuzzy))])
-
-        if not args:
+        if len(self.args) == 0:
             return ['-F']
 
-        funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-        return ['-f', '-a', '(%s %s)' % (funcname, ' '.join(args))]
+        func = self.ctxt.helpers.use_function('fish_complete_filedir')
+        return FishCompletionCommand(self.ctxt, [func] + self.args).get_args()
 
     def get_code(self):
-        args = []
+        func = self.ctxt.helpers.use_function('fish_complete_filedir')
+        return FishCompletionCommand(self.ctxt, [func] + self.args).get_code()
 
-        if self.directory:
-            args.extend(['-C', shell.escape(self.directory)])
-
-        if self.extensions:
-            self.ctxt.helpers.use_function('fish_complete_filedir', 'regex')
-            args.extend(['-r', shell.escape(_get_extension_regex(self.extensions, self.fuzzy))])
-
-        funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-
-        if not args:
-            return funcname
-
-        return '%s %s' % (funcname, ' '.join(args))
+    def get_function(self):
+        func = self.ctxt.helpers.use_function('fish_complete_filedir')
+        return FishCompletionCommand(self.ctxt, [func] + self.args).get_function()
 
 
-class FishCompleteDir(FishCompletionBase):
+class FishCompleteDir(FishCompletionCommand):
     '''Class for completing directories.'''
 
     def __init__(self, ctxt, opts):
-        self.ctxt = ctxt
-        self.directory = None if opts is None else opts.get('directory', None)
+        directory = None if opts is None else opts.get('directory', None)
 
-    def get_args(self):
-        if self.directory is not None:
-            funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-            return ['-f', '-a', '(%s -D -C %s)' % (funcname, shell.escape(self.directory))]
-
-        return ['-f', '-a', '(__fish_complete_directories)']
-
-    def get_code(self):
-        if self.directory is not None:
-            funcname = self.ctxt.helpers.use_function('fish_complete_filedir')
-            return '%s -D -C %s' % (funcname, shell.escape(self.directory))
-
-        return '__fish_complete_directories'
+        if directory is not None:
+            func = ctxt.helpers.use_function('fish_complete_filedir')
+            super().__init__(ctxt, [func, '-D', '-C', directory])
+        else:
+            super().__init__(ctxt, ['__fish_complete_directories'])
 
 
-class FishCompleteValueList(FishCompletionBase):
+class FishCompleteValueList(FishCompletionCommand):
     '''Class for completing a list of values.'''
 
     def __init__(self, ctxt, opts):
@@ -219,19 +222,13 @@ class FishCompleteValueList(FishCompletionBase):
                 code += '  %s \\\n' % shell.escape(value)
             code = code.rstrip(' \\\n')
 
-        funcname = ctxt.helpers.add_dynamic_func(ctxt, code)
-        self.cmd = '__fish_complete_list %s %s' % (shell.escape(separator), funcname)
-
-    def get_args(self):
-        return ['-f', '-a', '(%s)' % self.cmd]
-
-    def get_code(self):
-        return self.cmd
+        func = ctxt.helpers.add_dynamic_func(ctxt, code)
+        super().__init__(ctxt, ['__fish_complete_list', separator, func])
 
 
 class FishCompleteCommand(FishCompletionBase):
     def __init__(self, ctxt, opts):
-        self.ctxt = ctxt
+        super().__init__(ctxt)
 
         code = None
         path = None
@@ -274,7 +271,8 @@ class FishCompleteCombine(FishCompletionBase):
     '''Used for combining multiple complete commands.'''
 
     def __init__(self, ctxt, completer, commands):
-        self.ctxt = ctxt
+        super().__init__(ctxt)
+
         self.code = []
 
         for command_args in commands:
@@ -292,15 +290,15 @@ class FishCompleteCombine(FishCompletionBase):
             return ['-f', '-a', '(%s)' % '; '.join(self.code)]
 
         code = '\n'.join(self.code)
-        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
-        return ['-f', '-a', '(%s)' % funcname]
+        func = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
+        return ['-f', '-a', '(%s)' % func]
 
 
 class FishCompleteCommandArg(FishCompletionBase):
     '''Complete an argument of a command'''
 
     def __init__(self, ctxt):
-        self.ctxt = ctxt
+        super().__init__(ctxt)
 
         query = ctxt.helpers.use_function('fish_query', 'positionals_positions')
         types = get_defined_option_types(ctxt.option.parent.get_root_commandline())
@@ -315,7 +313,8 @@ class FishCompleteCommandArg(FishCompletionBase):
         opts = shell.escape(opts)
         command_pos = ctxt.option.get_positional_num() - 1
 
-        r = 'set -l pos (%s %s positional_pos %d)\n' % (query, opts, command_pos)
+        r =  'set -l opts %s\n' % shell.escape(opts)
+        r += 'set -l pos (%s "$opts" positional_pos %d)\n' % (query, command_pos)
         r += 'set -l cmdline (commandline -poc | string escape) (commandline -ct)\n'
         r += 'complete -C -- "$cmdline[$pos..]"'
 
@@ -325,8 +324,12 @@ class FishCompleteCommandArg(FishCompletionBase):
         return self.code
 
     def get_args(self):
-        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.code)
-        return ['-f', '-a', '(%s)' % funcname]
+        func = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.code)
+        return ['-f', '-a', '(%s)' % func]
+
+    def get_function(self):
+        func = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.code)
+        return func
 
 
 class FishCompleter(shell.ShellCompleter):
@@ -335,14 +338,14 @@ class FishCompleter(shell.ShellCompleter):
     # pylint: disable=missing-function-docstring
     # pylint: disable=too-many-public-methods
 
-    def none(self, _ctxt, *_):
-        return FishCompleteNone()
+    def none(self, ctxt, *_):
+        return FishCompleteNone(ctxt)
 
-    def integer(self, _ctxt, *_):
-        return FishCompleteNone()
+    def integer(self, ctxt, *_):
+        return FishCompleteNone(ctxt)
 
-    def float(self, _ctxt, *_):
-        return FishCompleteNone()
+    def float(self, ctxt, *_):
+        return FishCompleteNone(ctxt)
 
     def choices(self, ctxt, choices):
         return FishCompleteChoices(ctxt, choices)
@@ -358,46 +361,46 @@ class FishCompleter(shell.ShellCompleter):
 
     def mime_file(self, ctxt, pattern):
         func = ctxt.helpers.use_function('mime_file')
-        return FishCompletionCommand('%s %s' % (func, shell.escape(pattern)))
+        return FishCompletionCommand(ctxt, [func, pattern])
 
-    def group(self, _ctxt):
-        return FishCompletionCommand("__fish_complete_groups")
+    def group(self, ctxt):
+        return FishCompletionCommand(ctxt, ["__fish_complete_groups"])
 
-    def hostname(self, _ctxt):
-        return FishCompletionCommand("__fish_print_hostnames")
+    def hostname(self, ctxt):
+        return FishCompletionCommand(ctxt, ["__fish_print_hostnames"])
 
-    def pid(self, _ctxt):
-        return FishCompletionCommand("__fish_complete_pids")
+    def pid(self, ctxt):
+        return FishCompletionCommand(ctxt, ["__fish_complete_pids"])
 
-    def process(self, _ctxt):
-        return FishCompletionCommand("__fish_complete_proc")
+    def process(self, ctxt):
+        return FishCompletionCommand(ctxt, ["__fish_complete_proc"])
 
-    def range(self, _ctxt, start, stop, step=1):
+    def range(self, ctxt, start, stop, step=1):
         if step == 1:
-            return FishCompletionCommand(f"command seq {start} {stop}")
+            return FishCompletionCommand(ctxt, ['command', 'seq', str(start), str(stop)])
 
-        return FishCompletionCommand(f"command seq {start} {step} {stop}")
+        return FishCompletionCommand(ctxt, ['command', 'seq', str(start), str(step), str(stop)])
 
-    def service(self, _ctxt):
-        return FishCompletionCommand("__fish_systemctl_services")
+    def service(self, ctxt):
+        return FishCompletionCommand(ctxt, ["__fish_systemctl_services"])
 
-    def user(self, _ctxt):
-        return FishCompletionCommand("__fish_complete_users")
+    def user(self, ctxt):
+        return FishCompletionCommand(ctxt, ["__fish_complete_users"])
 
-    def variable(self, _ctxt):
-        return FishCompletionCommand("set -n")
+    def variable(self, ctxt):
+        return FishCompletionCommand(ctxt, ["set", "-n"])
 
-    def environment(self, _ctxt):
-        return FishCompletionCommand("set -n -x")
+    def environment(self, ctxt):
+        return FishCompletionCommand(ctxt, ["set", "-n", "-x"])
 
-    def exec(self, _ctxt, command):
-        return FishCompletionCommand(command)
+    def exec(self, ctxt, command):
+        return FishCompletionCommand(ctxt, shlex.split(command, posix=True))
 
-    def exec_fast(self, _ctxt, command):
-        return FishCompletionCommand(command)
+    def exec_fast(self, ctxt, command):
+        return FishCompletionCommand(ctxt, shlex.split(command, posix=True))
 
-    def exec_internal(self, _ctxt, command):
-        return FishCompletionCommand(command)
+    def exec_internal(self, ctxt, command):
+        return FishCompletionCommand(ctxt, shlex.split(command, posix=True))
 
     def value_list(self, ctxt, opts):
         return FishCompleteValueList(ctxt, opts)
@@ -407,28 +410,27 @@ class FishCompleter(shell.ShellCompleter):
 
     def history(self, ctxt, pattern):
         func = ctxt.helpers.use_function('history')
-        return FishCompletionCommand('%s %s' % (func, shell.escape(pattern)))
+        return FishCompletionCommand(ctxt, [func, pattern])
 
     def commandline_string(self, ctxt):
         func = ctxt.helpers.use_function('commandline_string')
-        return FishCompletionCommand(func)
+        return FishCompletionCommand(ctxt, [func])
 
     def command_arg(self, ctxt):
         return FishCompleteCommandArg(ctxt)
 
-    def date(self, _ctxt, _format):
-        return FishCompleteNone()
+    def date(self, ctxt, _format):
+        return FishCompleteNone(ctxt)
 
     def date_format(self, ctxt):
         func = ctxt.helpers.use_function('date_format')
-        return FishCompletionCommand(func)
+        return FishCompletionCommand(ctxt, [func])
 
     def file_list(self, ctxt, opts=None):
         separator = ','
         fuzzy = False
         directory = None
         extensions = None
-        funcname = ctxt.helpers.use_function('list_files')
 
         if opts:
             separator = opts.get('separator', ',')
@@ -445,20 +447,14 @@ class FishCompleter(shell.ShellCompleter):
             ctxt.helpers.use_function('list_files', 'regex')
             args.extend(['-r', shell.escape(_get_extension_regex(extensions, fuzzy))])
 
-        if args:
-            list_cmd = '%s %s' % (funcname, ' '.join(args))
-        else:
-            list_cmd = funcname
+        list_func = ctxt.helpers.use_function('list_files')
+        func = FishCompletionCommand(ctxt, [list_func] + args).get_function()
 
-        list_func = ctxt.helpers.add_dynamic_func(ctxt, list_cmd)
-
-        cmd = '__fish_complete_list %s %s' % (shell.escape(separator), list_func)
-        return FishCompletionCommand(cmd)
+        return FishCompletionCommand(ctxt, ['__fish_complete_list', separator, func])
 
     def directory_list(self, ctxt, opts=None):
         separator = ','
         directory = None
-        funcname = ctxt.helpers.use_function('list_files')
 
         if opts:
             separator = opts.get('separator', ',')
@@ -469,11 +465,10 @@ class FishCompleter(shell.ShellCompleter):
         if directory:
             args.extend(['-C', shell.escape(directory)])
 
-        list_cmd = '%s %s' % (funcname, ' '.join(args))
-        list_func = ctxt.helpers.add_dynamic_func(ctxt, list_cmd)
+        list_func = ctxt.helpers.use_function('list_files')
+        func = FishCompletionCommand(ctxt, [list_func] + args).get_function()
 
-        cmd = '__fish_complete_list %s %s' % (shell.escape(separator), list_func)
-        return FishCompletionCommand(cmd)
+        return FishCompletionCommand(ctxt, ['__fish_complete_list', separator, func])
 
     # =========================================================================
     # Bonus
@@ -481,16 +476,16 @@ class FishCompleter(shell.ShellCompleter):
 
     def net_interface(self, ctxt):
         func = ctxt.helpers.use_function('net_interfaces_list')
-        return FishCompletionCommand(func)
+        return FishCompletionCommand(ctxt, [func])
 
     def timezone(self, ctxt):
         func = ctxt.helpers.use_function('timezone_list')
-        return FishCompletionCommand(func)
+        return FishCompletionCommand(ctxt, [func])
 
     def alsa_card(self, ctxt):
         func = ctxt.helpers.use_function('alsa_list_cards')
-        return FishCompletionCommand(func)
+        return FishCompletionCommand(ctxt, [func])
 
     def alsa_device(self, ctxt):
         func = ctxt.helpers.use_function('alsa_list_devices')
-        return FishCompletionCommand(func)
+        return FishCompletionCommand(ctxt, [func])
