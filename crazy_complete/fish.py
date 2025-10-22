@@ -243,14 +243,14 @@ def generate_completion(commandline, config=None):
     ctxt = generation.GenerationContext(config, helpers)
     result = FishCompletionGenerator(ctxt, commandline)
 
-    if helpers.is_used('fish_query'):
+    if helpers.is_used('query'):
         types = utils.get_defined_option_types(commandline)
         if types.short:
-            ctxt.helpers.use_function('fish_query', 'short_options')
+            ctxt.helpers.use_function('query', 'short_options')
         if types.long:
-            ctxt.helpers.use_function('fish_query', 'long_options')
+            ctxt.helpers.use_function('query', 'long_options')
         if types.old:
-            ctxt.helpers.use_function('fish_query', 'old_options')
+            ctxt.helpers.use_function('query', 'old_options')
 
     output = []
 
@@ -266,8 +266,8 @@ def generate_completion(commandline, config=None):
         output.append('')
 
     output.append("set -l prog '%s'" % commandline.prog)
-    if helpers.is_used('fish_query'):
-        output.append("set -l query '%s'" % helpers.use_function('fish_query'))
+    if helpers.is_used('query'):
+        output.append("set -l query '%s'" % helpers.use_function('query'))
 
     output.append('')
     output.append('# Delete existing completions')

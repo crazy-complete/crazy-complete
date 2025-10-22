@@ -2,12 +2,12 @@
 
 from . import helpers
 
-_FISH_QUERY = helpers.FishFunction('fish_query', r'''
+_QUERY = helpers.FishFunction('query', r'''
 # ===========================================================================
 #
 # This function implements the parsing of options and positionals in the Fish shell.
 #
-# Usage: __fish_query <OPTIONS> <COMMAND> [ARGS...]
+# Usage: query <OPTIONS> <COMMAND> [ARGS...]
 #
 # The first argument is a comma-separated list of options that the parser should know about.
 # Short options (-o), long options (--option), and old-style options (-option) are supported.
@@ -16,7 +16,7 @@ _FISH_QUERY = helpers.FishFunction('fish_query', r'''
 # If an option takes an optional argument, it is suffixed by '=?'.
 #
 # For example:
-#   __fish_query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
+#   query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
 #
 #   Here, -f, --flag and -old-style don't take options, --with-arg requires an
 #   argument and --with-optional takes an optional argument.
@@ -640,7 +640,7 @@ class FishHelpers(helpers.GeneralHelpers):
 
     def __init__(self, function_prefix):
         super().__init__(function_prefix, helpers.FishFunction)
-        self.add_function(_FISH_QUERY)
+        self.add_function(_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
         self.add_function(_LIST_FILES)
         self.add_function(_COMPLETE_LIST_UNIQ)

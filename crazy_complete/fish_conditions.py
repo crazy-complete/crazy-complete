@@ -13,7 +13,7 @@ class HasOption:
         self.option_strings = option_strings
 
     def query_code(self, ctxt):
-        ctxt.helpers.use_function('fish_query', 'has_option')
+        ctxt.helpers.use_function('query', 'has_option')
         options = ' '.join(self.option_strings)
         r = "$query '$opts' has_option %s" % options
         return r
@@ -40,8 +40,8 @@ class HasHiddenOption:
         self.option_strings = option_strings
 
     def query_code(self, ctxt):
-        ctxt.helpers.use_function('fish_query', 'has_option')
-        ctxt.helpers.use_function('fish_query', 'with_incomplete')
+        ctxt.helpers.use_function('query', 'has_option')
+        ctxt.helpers.use_function('query', 'with_incomplete')
         options  = ' '.join(self.option_strings)
         r = "$query '$opts' has_option WITH_INCOMPLETE %s" % options
         return r
@@ -62,7 +62,7 @@ class OptionIs:
         self.values = values
 
     def query_code(self, ctxt):
-        ctxt.helpers.use_function('fish_query', 'option_is')
+        ctxt.helpers.use_function('query', 'option_is')
         options = ' '.join(self.option_strings)
         values = ' '.join(self.values)
         r = "$query '$opts' option_is %s -- %s" % (options, values)
@@ -90,7 +90,7 @@ class PositionalNum:
         self.number = number
 
     def query_code(self, ctxt):
-        ctxt.helpers.use_function('fish_query', 'num_of_positionals')
+        ctxt.helpers.use_function('query', 'num_of_positionals')
         op = self.TEST_OPERATORS[self.operator]
         r = "$query '$opts' num_of_positionals %s %d" % (op, self.number - 1)
         return r
@@ -112,7 +112,7 @@ class PositionalContains:
         self.values = values
 
     def query_code(self, ctxt):
-        ctxt.helpers.use_function('fish_query', 'positional_contains')
+        ctxt.helpers.use_function('query', 'positional_contains')
         values = ' '.join(self.values)
         r = "$query '$opts' positional_contains %d %s" % (self.number, values)
         return r

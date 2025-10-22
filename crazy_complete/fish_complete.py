@@ -308,14 +308,14 @@ class FishCompleteCommandArg(FishCompletionBase):
     def __init__(self, ctxt):
         super().__init__(ctxt)
 
-        query = ctxt.helpers.use_function('fish_query', 'positionals_positions')
+        query = ctxt.helpers.use_function('query', 'positionals_positions')
         types = get_defined_option_types(ctxt.option.parent.get_root_commandline())
         if types.short:
-            ctxt.helpers.use_function('fish_query', 'short_options')
+            ctxt.helpers.use_function('query', 'short_options')
         if types.long:
-            ctxt.helpers.use_function('fish_query', 'long_options')
+            ctxt.helpers.use_function('query', 'long_options')
         if types.old:
-            ctxt.helpers.use_function('fish_query', 'old_options')
+            ctxt.helpers.use_function('query', 'old_options')
 
         opts = get_query_option_strings(ctxt.option.parent, with_parent_options=True)
         opts = shell.escape(opts)
