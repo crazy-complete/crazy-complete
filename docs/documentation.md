@@ -240,8 +240,6 @@ options:
 
 > **NOTE:** `file` and `directory` are not supported. Use `file_list` and `directory_list` instead.
 
-> **NOTE:** Using a colon as separator does currently not work in **Bash**
-
 ```yaml
 prog: "example"
 options:

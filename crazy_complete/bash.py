@@ -129,7 +129,7 @@ class BashCompletionGenerator:
         if self.commandline.parent is None:
             # The root parser makes those variables local and sets up the completion.
             r  = 'local cur prev words cword split\n'
-            r += '_init_completion -n = || return'
+            r += '_init_completion -n =: || return'
             code['init_completion'] = r
 
             v1 = bash_parser.generate(self.commandline, self.variable_manager)

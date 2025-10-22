@@ -1556,6 +1556,8 @@ comment: "Does not work for Bash yet (thanks to $COMP_WORDBREAKS)"
 send: "crazy-complete-test --colon-list one:"
 bash_expected: |
   > crazy-complete-test --colon-list one:
+  one:three  one:two
+  > crazy-complete-test --colon-list one:one:t
 fish_expected: |
   > crazy-complete-test --colon-list one:t
   one:three  one:two
