@@ -262,7 +262,7 @@ dhcpcd                  git
 
 > Complete a file.
 >
-> You can restrict completion to a specific directory by adding `{"directory": ...}`.
+> You can restrict completion to a specific directory by adding `{"directory": ...}`. Directory has to be an absolute path.
 >
 > You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
 >
@@ -341,7 +341,7 @@ options:
 
 > Complete a comma separated list of directories.
 >
-> You can restrict completion to a specific directory by adding `{"directory": ...}`.
+> You can restrict completion to a specific directory by adding `{"directory": ...}`. Directory has to be an absolute path.
 >
 > The separator can be changed by adding `{"separator": ...}`
 >
