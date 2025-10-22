@@ -10,6 +10,7 @@ command_arg: {"args": ["--input-type=yaml"], "definition_file": "command_arg.yam
 filedir: {"args": ["--input-type=yaml"], "definition_file": "filedir.yaml"}
 wrapper: {"args": ["--input-type=yaml"], "definition_file": "wrapper.yaml"}
 list: {"args": ["--input-type=yaml"], "definition_file": "list.yaml"}
+key_value_list: {"args": ["--input-type=yaml"], "definition_file": "key_value_list.yaml"}
 ---
 number: 1
 definition_file: "main"
@@ -1626,3 +1627,137 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test complete --value-list-dup foo,
   bar  baz  foo
+---
+number: 105
+definition_file: "key_value_list"
+description: "key_value_list: Check -o"
+send: "crazy-complete-test -o "
+bash_expected: |
+  > crazy-complete-test -o
+  animal  async   atime   number  pid     user
+  > crazy-complete-test -o
+fish_expected: |
+  > crazy-complete-test -o
+  animal  async  atime  number  pid  user
+zsh_expected: |
+  > crazy-complete-test -o
+  animal  async   atime   number  pid     user
+---
+number: 106
+definition_file: "key_value_list"
+description: "key_value_list: Check -o a"
+send: "crazy-complete-test -o a"
+bash_expected: |
+  > crazy-complete-test -o a
+  animal  async   atime
+  > crazy-complete-test -o a
+fish_expected: |
+  > crazy-complete-test -o a
+  animal  async  atime
+zsh_expected: |
+  > crazy-complete-test -o a
+  animal  async   atime
+---
+number: 107
+definition_file: "key_value_list"
+description: "key_value_list: Check -o an"
+send: "crazy-complete-test -o an"
+bash_expected: |
+  > crazy-complete-test -o animal
+fish_expected: |
+  > crazy-complete-test -o animal
+zsh_expected: |
+  > crazy-complete-test -o animal=
+---
+number: 108
+definition_file: "key_value_list"
+description: "key_value_list: Check -o animal="
+send: "crazy-complete-test -o animal="
+bash_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+  animal=cat  animal=dog  animal=horse
+zsh_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+---
+number: 109
+definition_file: "key_value_list"
+description: "key_value_list: Check -o animal,"
+send: "crazy-complete-test -o animal,"
+bash_expected: |
+  > crazy-complete-test -o animal,
+  animal,async   animal,atime   animal,number  animal,pid     animal,user
+  > crazy-complete-test -o animal,
+fish_expected: |
+  > crazy-complete-test -o animal,
+  animal,animal  animal,atime   animal,pid
+  animal,async   animal,number  animal,user
+zsh_expected: |
+  > crazy-complete-test -o animal,
+  async   atime   number  pid     user
+---
+number: 110
+definition_file: "key_value_list"
+description: "key_value_list: Check -o animal,n"
+send: "crazy-complete-test -o animal,n"
+bash_expected: |
+  > crazy-complete-test -o animal,number
+fish_expected: |
+  > crazy-complete-test -o animal,number
+zsh_expected: |
+  > crazy-complete-test -o animal,number=
+---
+number: 111
+definition_file: "key_value_list"
+description: "key_value_list: Check -o number="
+send: "crazy-complete-test -o number="
+bash_expected: |
+  > crazy-complete-test -o number=
+  0  1  2
+  > crazy-complete-test -o number=
+fish_expected: |
+  > crazy-complete-test -o number=
+  number=0  (zero)  number=1  (one)  number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 112
+definition_file: "key_value_list"
+description: "key_value_list: Check -o 'number="
+send: "crazy-complete-test -o 'number="
+bash_expected: |
+  > crazy-complete-test -o 'number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o 'number=
+fish_expected: |
+  > crazy-complete-test -o 'number=
+  'number=0  (zero)  'number=1  (one)  'number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o 'number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 113
+definition_file: "key_value_list"
+description: "key_value_list: Check -o \"number="
+send: "crazy-complete-test -o \"number="
+bash_expected: |
+  > crazy-complete-test -o "number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o "number=
+fish_expected: |
+  > crazy-complete-test -o "number=
+  "number=0  (zero)  "number=1  (one)  "number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o "number=
+  0  -- zero
+  1  -- one
+  2  -- two

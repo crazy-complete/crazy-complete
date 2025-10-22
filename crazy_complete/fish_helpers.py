@@ -468,6 +468,72 @@ for comp in (__fish_complete_list $argv)
 end
 ''')
 
+_KEY_VALUE_LIST = helpers.FishFunction('key_value_list', r'''
+set -l sep1 $argv[1]
+set -e argv[1]
+
+set -l sep2 $argv[1]
+set -e argv[1]
+
+set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unescape)
+
+set -l key
+set -l value
+set -l keys
+set -l funcs
+set -l i
+
+for i in (command seq 1 2 (count $argv))
+  set -a keys $argv[$i]
+  set -a funcs $argv[(math $i + 1)]
+end
+
+if test -z "$comp"
+  printf '%s\n' $keys
+  return
+end
+
+if test (string sub -s -1 -l 1 -- $comp) = $sep1
+  for key in $keys
+    printf '%s%s\n' $comp $key
+  end
+  return
+end
+
+function __call_func_for_key -S
+  set -l i
+  for i in (command seq 1 (count $keys))
+    if test $keys[$i] = $argv[1]
+      $funcs[$i]
+      return
+    end
+  end
+end
+
+set -l pair (string split -- $sep1 $comp)[-1]
+set -l split (string split -- $sep2 $pair)
+
+switch $pair
+  case "*$sep2*"
+    set -l value_len (string length -- $split[2])
+
+    if test $value_len -gt 0
+      set comp (string sub -e -$value_len -- $comp)
+    end
+
+    for value in (__call_func_for_key $split[1])
+      printf '%s%s\n' $comp $value
+    end
+  case '*'
+    set -l key_len (string length -- $split[1])
+    set comp (string sub -e -$key_len -- $comp)
+
+    for key in $keys
+      printf '%s%s\n' $comp $key
+    end
+end
+''')
+
 _HISTORY = helpers.FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
 ''')
@@ -643,6 +709,7 @@ class FishHelpers(helpers.GeneralHelpers):
         self.add_function(_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
         self.add_function(_LIST_FILES)
+        self.add_function(_KEY_VALUE_LIST)
         self.add_function(_COMPLETE_LIST_UNIQ)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)

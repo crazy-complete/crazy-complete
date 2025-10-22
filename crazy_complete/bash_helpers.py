@@ -263,6 +263,88 @@ elif (( ${#having_values[@]} )); then
 fi
 ''', ['my_dequote'])
 
+_KEY_VALUE_LIST = helpers.ShellFunction('key_value_list', r'''
+local sep1="$1"; shift
+local sep2="$1"; shift
+local -A keys=()
+local i
+
+for ((i=1; i <= $#; i += 2)); do
+  keys["${@:i:1}"]="${@:i + 1:1}"
+done
+
+local needs_strip=1
+[[ "${cur:0:1}" == '"' ]] && needs_strip=0
+[[ "${cur:0:1}" == "'" ]] && needs_strip=0
+cur="$(my_dequote "$cur")"
+
+if [[ -z "$cur" ]]; then
+  COMPREPLY=("${!keys[@]}")
+  return
+fi
+
+local pair key value found_key cur_stripped="$cur"
+local -a having_pairs having_keys remaining_keys
+
+IFS="$sep1" read -r -a having_pairs <<< "$cur"
+
+for pair in "${having_pairs[@]}"; do
+  having_keys+=("${pair%%"$sep2"*}")
+done
+
+for key in "${!keys[@]}"; do
+  found_key=0
+
+  for having_key in "${having_keys[@]}"; do
+    if [[ "$key" == "$having_key" ]]; then
+      found_key=1
+      break
+    fi
+  done
+
+  if (( ! found_key )); then
+    remaining_keys+=("$key")
+  fi
+done
+
+COMPREPLY=()
+
+if [[ "${cur: -1}" == "$sep1" ]]; then
+  (( needs_strip )) && cur_stripped="${cur_stripped##*=}"
+
+  for key in "${remaining_keys[@]}"; do
+    COMPREPLY+=("$cur_stripped$key")
+  done
+else
+  pair="${cur##*"$sep1"}"
+  if [[ "$pair" == *"$sep2"* ]]; then
+    key="${pair%%"$sep2"*}"
+    value="${pair##*"$sep2"}"
+    cur="$value"
+    ${keys[$key]}
+
+    if (( needs_strip )); then
+        cur_stripped="${cur_stripped##"$sep"*}"
+    else
+        cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
+    fi
+
+    for i in "${!COMPREPLY[@]}"; do
+      COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
+    done
+  else
+    (( needs_strip )) && cur_stripped="${cur_stripped##*=}"
+    cur_stripped="${cur_stripped%"$pair"}"
+
+    for key in "${remaining_keys[@]}"; do
+      if [[ "$key" == "$pair"* ]]; then
+        COMPREPLY+=("$cur_stripped$key")
+      fi
+    done
+  fi
+fi
+''', ['my_dequote'])
+
 _PREFIX_COMPREPLY = helpers.ShellFunction('prefix_compreply', r'''
 local i prefix="$1"
 for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
@@ -374,6 +456,7 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_EXEC)
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
+        self.add_function(_KEY_VALUE_LIST)
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)

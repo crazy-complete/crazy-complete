@@ -108,6 +108,34 @@ class BashCompleteCombine(BashCompletionBase):
         return '\n'.join(code)
 
 
+class BashCompleteKeyValueList(BashCompletionCommand):
+    '''Used for completing a list of key-value pairs.'''
+
+    def __init__(self, ctxt, completer, pair_separator, value_separator, values):
+        funcs = {}
+
+        for key, complete in values.items():
+            if complete is None or complete[0] == 'none':
+                funcs[key] = 'true'
+            else:
+                command, *args = complete
+                obj = getattr(completer, command)(ctxt, *args)
+                code = obj.get_code()
+                funcs[key] = ctxt.helpers.add_dynamic_func(ctxt, code)
+
+        e = shell.escape
+        args = ' \\\n'.join('%s %s' % (e(k), e(f)) for k, f in funcs.items())
+
+        code = '%s %s %s \\\n%s' % (
+            ctxt.helpers.use_function('key_value_list'),
+            shell.escape(pair_separator),
+            shell.escape(value_separator),
+            indent(args, 2)
+        )
+
+        super().__init__(ctxt, code)
+
+
 class BashCompleter(shell.ShellCompleter):
     '''Code generator for completing arguments in Bash.'''
 
@@ -245,6 +273,9 @@ class BashCompleter(shell.ShellCompleter):
             ' -d' if duplicates else '',
             shell.escape(separator),
             ' '.join(shell.escape(v) for v in values)))
+
+    def key_value_list(self, ctxt, pair_separator, value_separator, values):
+        return BashCompleteKeyValueList(ctxt, self, pair_separator, value_separator, values)
 
     def combine(self, ctxt, commands):
         return BashCompleteCombine(ctxt, self, commands)

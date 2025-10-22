@@ -244,6 +244,33 @@ class FishCompleteValueList(FishCompletionCommand):
         super().__init__(ctxt, [complete_list_func, separator, func])
 
 
+class FishCompletKeyValueList(FishCompletionCommand):
+    '''Used for completing a list of key-value pairs.'''
+
+    def __init__(self, ctxt, completer, pair_separator, value_separator, values):
+        funcs = {}
+
+        for key, complete in values.items():
+            if complete is None or complete[0] == 'none':
+                funcs[key] = 'true'
+            else:
+                command, *args = complete
+                obj = getattr(completer, command)(ctxt, *args)
+                funcs[key] = obj.get_function()
+
+        e = shell.escape
+        args = ' \\\n'.join('%s %s' % (e(k), e(f)) for k, f in funcs.items())
+        code = '%s %s %s \\\n%s' % (
+            ctxt.helpers.use_function('key_value_list'),
+            shell.escape(pair_separator),
+            shell.escape(value_separator),
+            indent(args, 2)
+        )
+
+        func = ctxt.helpers.add_dynamic_func(ctxt, code)
+
+        super().__init__(ctxt, [func])
+
 
 class FishCompleteCommand(FishCompletionBase):
     def __init__(self, ctxt, opts):
@@ -423,6 +450,9 @@ class FishCompleter(shell.ShellCompleter):
 
     def value_list(self, ctxt, opts):
         return FishCompleteValueList(ctxt, opts)
+
+    def key_value_list(self, ctxt, pair_separator, value_separator, values):
+        return FishCompletKeyValueList(ctxt, self, pair_separator, value_separator, values)
 
     def combine(self, ctxt, commands):
         return FishCompleteCombine(ctxt, self, commands)

@@ -182,6 +182,34 @@ class ZshCompleteRange(ZshCompletionBase):
         raise NotImplementedError
 
 
+class ZshKeyValueList(ZshComplFunc):
+    '''Used for completing a list of key-value pairs.'''
+
+    def __init__(self, ctxt, completer, pair_separator, value_separator, values):
+        spec = []
+
+        for key, complete in values.items():
+            if not complete or complete[0] == 'none':
+                action = ''
+            else:
+                command, *args = complete
+                compl_obj = getattr(completer, command)(ctxt, *args)
+                action = compl_obj.get_action_string()
+
+            spec.append('%s:::%s' % (escape_colon(key), action))
+
+        code = '_values -s %s -S %s %s \\\n' % (
+            shell.escape(pair_separator),
+            shell.escape(value_separator),
+            shell.escape(ctxt.option.metavar or ''))
+
+        code += indent(' \\\n'.join(spec), 2)
+
+        func = ctxt.helpers.add_dynamic_func(ctxt, code)
+
+        super().__init__(ctxt, [func], needs_braces=True)
+
+
 class ZshCompleteCombine(ZshCompletionBase):
     def __init__(self, ctxt, completer, commands):
         # metavar = shell.escape(ctxt.option.metavar or '')
@@ -315,6 +343,9 @@ class ZshCompleter(shell.ShellCompleter):
             return ZshComplFunc(ctxt, ['_sequence', '-d', values_func])
 
         return ZshComplFunc(ctxt, ['_sequence', '-s', separator, '-d', values_func])
+
+    def key_value_list(self, ctxt, pair_separator, value_separator, values):
+        return ZshKeyValueList(ctxt, self, pair_separator, value_separator, values)
 
     def combine(self, ctxt, commands):
         return ZshCompleteCombine(ctxt, self, commands)

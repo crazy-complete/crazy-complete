@@ -91,8 +91,8 @@
 3_14_00-choices-missing-arg              | foo: -o: Missing argument: values
 3_14_01-choices-arg-wrong-type           | foo: -o: values: Not a list or dictionary
 3_14_02-choices-dict-key-wrong-type      | No error
-3_14_03-choices-dict-desc-wrong-type     | foo: -o: Description not a string/int/float: []
-3_14_04-choices-list-value-wrong-type    | foo: -o: Item not a string/int/float: []
+3_14_03-choices-dict-desc-wrong-type     | foo: -o: Description not a string/int: []
+3_14_04-choices-list-value-wrong-type    | foo: -o: Item not a string/int: []
 3_14_05-choices-too-many-args            | foo: -o: Too many arguments: ['wrong']
 3_15_00-file-options-wrong-type          | foo: -o: Parameter `options` has an invalid type. Expected types: dict. Received: False (bool)
 3_15_01-file-unknown-key                 | foo: -o: Unknown option: wrong

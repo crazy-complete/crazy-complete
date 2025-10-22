@@ -304,6 +304,53 @@ def _check_value_list(ctxt, arguments):
             raise _error('Invalid length for separator', separator)
 
 
+def _check_key_value_list(ctxt, arguments):
+    pair_separator = arguments.get_required_arg('pair_separator')
+    value_separator = arguments.get_required_arg('value_separator')
+    values = arguments.get_required_arg('values')
+    arguments.require_no_more()
+
+    _check_type(pair_separator, (str,), 'pair_separator')
+    _check_type(value_separator, (str,), 'value_separator')
+    _check_type(values, (dict,), 'values')
+
+    if len(pair_separator.value) != 1:
+        raise _error('Invalid length for pair_separator', pair_separator)
+
+    if len(value_separator.value) != 1:
+        raise _error('Invalid length for value_separator', value_separator)
+
+    if len(values.value) == 0:
+        raise _error('values: cannot be empty', values)
+
+    for key, complete in values.value.items():
+        _check_type(key, (str,))
+        _check_type(complete, (list, NoneType))
+
+        if is_empty_or_whitespace(key.value):
+            raise _error('Key cannot be empty', key)
+
+        if contains_space(key.value):
+            raise _error('Key cannot contain space', key)
+
+        if complete.value == None:
+            continue
+
+        if len(complete.value) == 0:
+            raise _error('Missing command', complete)
+
+        if complete.value[0] == 'key_value_list':
+            raise _error('Nested `key_value_list` not allowed', complete)
+
+        if complete.value[0] == 'command_arg':
+            raise _error('Command `command_arg` not allowed inside key_value_list', complete)
+
+        if complete.value[0] == 'list':
+            raise _error('Command `list` not allowed inside key_value_list', complete)
+
+        _check_complete(ctxt, complete)
+
+
 def _check_combine(ctxt, arguments):
     commands = arguments.get_required_arg('commands')
     arguments.require_no_more()
@@ -425,6 +472,7 @@ def _check_complete(ctxt, args):
         'exec_fast':        _check_exec,
         'exec_internal':    _check_exec,
         'value_list':       _check_value_list,
+        'key_value_list':   _check_key_value_list,
         'combine':          _check_combine,
         'list':             _check_list,
         'history':          _check_history,

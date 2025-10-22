@@ -1,5 +1,7 @@
 '''This module contains code for validating the `complete` attribute.'''
 
+from types import NoneType
+
 from .errors import CrazyError, CrazyTypeError
 from .type_utils import is_dict_type, is_list_type
 from .str_utils import (
@@ -284,6 +286,61 @@ def _validate_value_list(ctxt, args):
         raise CrazyError(f'Invalid length for separator: {separator}')
 
 
+def _validate_key_value_list(ctxt, args):
+    pair_separator = args.get_required_arg('pair_separator')
+    value_separator = args.get_required_arg('value_separator')
+    values = args.get_required_arg('values')
+    args.require_no_more()
+
+    if not isinstance(pair_separator, str):
+        raise CrazyError('pair_separator: Not a string')
+
+    if not isinstance(value_separator, str):
+        raise CrazyError('value_separator: Not a string')
+
+    if not is_dict_type(values):
+        raise CrazyError('values: Not a dict')
+
+    if len(pair_separator) != 1:
+        raise CrazyError('Invalid length for pair_separator')
+
+    if len(value_separator) != 1:
+        raise CrazyError('Invalid length for value_separator')
+
+    if len(values) == 0:
+        raise CrazyError('values: cannot be empty')
+
+    for key, complete in values.items():
+        if not isinstance(key, str):
+            raise CrazyError(f'key: Not a string: {key}')
+
+        if not isinstance(complete, (list, NoneType)):
+            raise CrazyError(f'complete: Not a list: {complete}')
+
+        if is_empty_or_whitespace(key):
+            raise CrazyError('Key cannot be empty')
+
+        if contains_space(key):
+            raise CrazyError('Key cannot contain space')
+
+        if complete == None:
+            continue
+
+        if len(complete) == 0:
+            raise CrazyError('Missing command')
+
+        if complete[0] == 'key_list':
+            raise CrazyError('Nested `key_list` not allowed')
+
+        if complete[0] == 'command_arg':
+            raise CrazyError('Command `command_arg` not allowed inside key_list')
+
+        if complete[0] == 'list':
+            raise CrazyError('Command `list` not allowed inside key_list')
+
+        validate_complete(ctxt, complete)
+
+
 def _validate_combine(ctxt, args):
     commands = args.get_required_arg('commands')
     args.require_no_more()
@@ -429,6 +486,7 @@ def validate_complete(ctxt, complete):
         'exec_fast':     _validate_exec,
         'exec_internal': _validate_exec,
         'value_list':    _validate_value_list,
+        'key_value_list': _validate_key_value_list,
         'combine':       _validate_combine,
         'list':          _validate_list,
         'history':       _validate_history,
