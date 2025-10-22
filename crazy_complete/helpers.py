@@ -56,23 +56,24 @@ class FishFunction(FunctionBase):
         return r
 
 
-def make_completion_funcname_for_context(ctxt):
+def make_completion_funcname_for_context(ctxt, progname):
     '''TODO.'''
 
     commandlines = ctxt.commandline.get_parents(include_self=True)
-    del commandlines[0]
+    prognames = [p.prog for p in commandlines]
+    prognames[0] = progname
 
-    funcname = shell.make_identifier('_'.join(p.prog for p in commandlines))
+    funcname = shell.make_identifier('_'.join(prognames))
 
     if isinstance(ctxt.option, cli.Option):
-        return '%s_%s' % (funcname, ctxt.option.option_strings[0])
+        return '_%s__%s' % (funcname, ctxt.option.option_strings[0])
     if isinstance(ctxt.option, cli.Positional):
         if ctxt.option.metavar:
             identifier = shell.make_identifier(ctxt.option.metavar)
         else:
             identifier = 'arg%d' % ctxt.option.get_positional_num()
 
-        return '%s_%s' % (funcname, identifier)
+        return '_%s__%s' % (funcname, identifier)
 
     raise AssertionError('make_completion_funcname_for_context: Should not be reached')
 
@@ -109,8 +110,7 @@ class GeneralHelpers:
     def get_dynamic_funcname(self, ctxt):
         '''Return a unique function name for `ctxt`.'''
 
-        funcname = make_completion_funcname_for_context(ctxt)
-        funcname = '_%s__%s' % (self.function_prefix, funcname)
+        funcname = make_completion_funcname_for_context(ctxt, self.function_prefix)
         num = 0
         funcname_plus_num = funcname
         while funcname_plus_num in self.dynamic_functions_code_to_funcname.values():
