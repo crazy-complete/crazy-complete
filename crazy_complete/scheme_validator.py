@@ -132,12 +132,12 @@ def _check_choices(ctxt, arguments):
 
     if isinstance(choices.value, dict):
         for value, desc in choices.value.items():
-            _check_type(value, (str, int, float))
-            _check_type(desc,  (str, int, float))
+            _check_type(value, (str, int))
+            _check_type(desc,  (str, int))
 
     elif isinstance(choices.value, list):
         for value in choices.value:
-            _check_type(value, (str, int, float))
+            _check_type(value, (str, int))
 
 
 def _check_command(ctxt, arguments):

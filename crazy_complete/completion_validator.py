@@ -75,16 +75,16 @@ def _validate_choices(ctxt, args):
 
     if is_dict_type(choices):
         for item, desc in choices.items():
-            if not isinstance(item, (str, int, float)):
-                raise CrazyError(f'Item not a string/int/float: {item}')
+            if not isinstance(item, (str, int)):
+                raise CrazyError(f'Item not a string/int: {item}')
 
-            if not isinstance(desc, (str, int, float)):
-                raise CrazyError(f'Description not a string/int/float: {desc}')
+            if not isinstance(desc, (str, int)):
+                raise CrazyError(f'Description not a string/int: {desc}')
 
     elif is_list_type(choices):
         for item in choices:
-            if not isinstance(item, (str, int, float)):
-                raise CrazyError(f'Item not a string/int/float: {item}')
+            if not isinstance(item, (str, int)):
+                raise CrazyError(f'Item not a string/int: {item}')
 
     else:
         raise CrazyError('values: Not a list or dictionary')
