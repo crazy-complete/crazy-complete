@@ -3,7 +3,7 @@
 from . import helpers
 
 
-_ZSH_QUERY_FUNC = helpers.ShellFunction('zsh_query', r'''
+_QUERY = helpers.ShellFunction('query', r'''
 # ===========================================================================
 #
 # This function is for querying the command line.
@@ -37,9 +37,9 @@ _ZSH_QUERY_FUNC = helpers.ShellFunction('zsh_query', r'''
 #
 # EXAMPLE
 #   local POSITIONALS HAVING_OPTIONS OPTION_VALUES
-#   zsh_query init '-f,-a=,-optional=?' program_name -f -optional -a foo bar
-#   zsh_query has_option -f
-#   zsh_query option_is -a -- foo
+#   query init '-f,-a=,-optional=?' program_name -f -optional -a foo bar
+#   query has_option -f
+#   query option_is -a -- foo
 #
 #   Here, -f is a flag, -a takes an argument, and -optional takes an optional
 #   argument.
@@ -385,7 +385,7 @@ class ZshHelpers(helpers.GeneralHelpers):
 
     def __init__(self, function_prefix):
         super().__init__(function_prefix, helpers.ShellFunction)
-        self.add_function(_ZSH_QUERY_FUNC)
+        self.add_function(_QUERY)
         self.add_function(_EXEC)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)

@@ -19,7 +19,7 @@ Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
 
 
 class ZshQuery:
-    '''Helper class for using the `zsh_query` function.'''
+    '''Helper class for using the `query` function.'''
 
     def __init__(self, ctxt):
         self.ctxt = ctxt
@@ -27,7 +27,7 @@ class ZshQuery:
 
     def use(self, define=None):
         self.used = True
-        return self.ctxt.helpers.use_function('zsh_query', define)
+        return self.ctxt.helpers.use_function('query', define)
 
     def use_when(self, when):
         if 'option_is' in when:
@@ -110,7 +110,7 @@ class ZshCompletionFunction:
         self.code['3-options']     = ''
 
         # We have to call these functions first, because they tell us if
-        # the zsh_query function is used.
+        # the query function is used.
         self.code['1-capture']     = self._generate_option_capture()
         self.code['2-subcommands'] = self._generate_subcommand_call()
         self.code['3-options']     = self._generate_option_parsing()
@@ -146,10 +146,10 @@ class ZshCompletionFunction:
         if not self.subcommands:
             return ''
 
-        zsh_query = self.query.use('get_positional')
+        query = self.query.use('get_positional')
         positional_num = self.subcommands.get_positional_num()
 
-        r =  'case "$(%s get_positional %d)" in\n' % (zsh_query, positional_num)
+        r =  'case "$(%s get_positional %d)" in\n' % (query, positional_num)
         for subcommand in self.subcommands.subcommands:
             sub_funcname = shell.make_completion_funcname(subcommand)
             cmds = utils.get_all_command_variations(subcommand)
@@ -240,14 +240,14 @@ def generate_completion(commandline, config=None):
     functions = generation.visit_commandlines(ZshCompletionFunction, ctxt, commandline)
     all_progs = ' '.join([commandline.prog] + commandline.aliases)
 
-    if helpers.is_used('zsh_query'):
+    if helpers.is_used('query'):
         types = utils.get_defined_option_types(commandline)
         if types.short:
-            ctxt.helpers.use_function('zsh_query', 'short_options')
+            ctxt.helpers.use_function('query', 'short_options')
         if types.long:
-            ctxt.helpers.use_function('zsh_query', 'long_options')
+            ctxt.helpers.use_function('query', 'long_options')
         if types.old:
-            ctxt.helpers.use_function('zsh_query', 'old_options')
+            ctxt.helpers.use_function('query', 'old_options')
 
     output = []
 
