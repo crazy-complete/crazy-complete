@@ -298,6 +298,7 @@ class ZshCompleter(shell.ShellCompleter):
         desc   = ctxt.option.metavar or ''
         values = opts['values']
         separator = opts.get('separator', ',')
+        duplicates = opts.get('duplicates', False)
 
         if is_dict_type(values):
             esc = escape_square_brackets
@@ -305,7 +306,15 @@ class ZshCompleter(shell.ShellCompleter):
         else:
             values = [escape_square_brackets(i) for i in values]
 
-        return ZshComplFunc(ctxt, ['_values', '-s', separator, desc] + values)
+        if not duplicates:
+            return ZshComplFunc(ctxt, ['_values', '-s', separator, desc] + values)
+
+        values_func = ZshComplFunc(ctxt, ['_values', desc] + values).get_function()
+
+        if separator == ',':
+            return ZshComplFunc(ctxt, ['_sequence', '-d', values_func])
+
+        return ZshComplFunc(ctxt, ['_sequence', '-s', separator, '-d', values_func])
 
     def combine(self, ctxt, commands):
         return ZshCompleteCombine(ctxt, self, commands)

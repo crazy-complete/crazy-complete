@@ -1609,3 +1609,20 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --duplicate-list one,
   one    three  two
+---
+number: 104
+definition_file: "main"
+description: "complete: Check --value-list-dup"
+send: "crazy-complete-test complete --value-list-dup foo,"
+bash_expected: |
+  > crazy-complete-test complete --value-list-dup foo,
+  foo,bar  foo,baz  foo,foo
+  > crazy-complete-test complete --value-list-dup foo,
+fish_expected: |
+  > crazy-complete-test complete --value-list-dup foo,
+  foo,bar  (Complete a list (with duplicates))
+  foo,baz  (Complete a list (with duplicates))
+  foo,foo  (Complete a list (with duplicates))
+zsh_expected: |
+  > crazy-complete-test complete --value-list-dup foo,
+  bar  baz  foo

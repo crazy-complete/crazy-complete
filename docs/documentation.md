@@ -423,7 +423,7 @@ options:
  ~ > example --value-list-1=<TAB>
 exec    noexec
  ~ > example --value-list-1=exec,<TAB>
-exec    noexec
+noexec
  ~ > example --value-list-2=<TAB>
 one  -- Description 1
 two  -- Description 2
