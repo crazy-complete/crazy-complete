@@ -139,12 +139,26 @@ class Conditions:
         self.conditions = []
 
     def _optimized_conditions(self):
-        r = []
+        positional_contains = []
+        positional_num = []
+        has_option = []
+        other = []
+
         for condition in self.conditions:
-            if isinstance(condition, (PositionalContains, PositionalNum)):
-                r.insert(0, condition)
+            if isinstance(condition, PositionalContains):
+                positional_contains.append(condition)
+            elif isinstance(condition, PositionalNum):
+                positional_num.append(condition)
+            elif isinstance(condition, HasOption):
+                has_option.append(condition)
             else:
-                r.append(condition)
+                other.append(condition)
+
+        r = []
+        r.extend(positional_num)
+        r.extend(positional_contains)
+        r.extend(has_option)
+        r.extend(other)
         return r
 
     def query_code(self, ctxt):
