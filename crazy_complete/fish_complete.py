@@ -1,7 +1,5 @@
 '''This module contains code for completing arguments in Fish.'''
 
-import shlex
-
 from . import shell
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
@@ -77,6 +75,19 @@ class FishCompletionCommand(FishCompletionBase):
 
         func = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
         return func
+
+class FishCompletionRawCommand(FishCompletionBase):
+    '''Class for executing a command (without any escaping)'''
+
+    def __init__(self, ctxt, command):
+        super().__init__(ctxt)
+        self.command = command
+
+    def get_code(self):
+        return self.command
+
+    def get_args(self):
+        return ['-f', '-a', '(%s)' % self.command]
 
 
 class FishCompleteChoices(FishCompletionBase):
@@ -402,13 +413,13 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompletionCommand(ctxt, ["set", "-n", "-x"])
 
     def exec(self, ctxt, command):
-        return FishCompletionCommand(ctxt, shlex.split(command, posix=True))
+        return FishCompletionRawCommand(ctxt, command)
 
     def exec_fast(self, ctxt, command):
-        return FishCompletionCommand(ctxt, shlex.split(command, posix=True))
+        return FishCompletionRawCommand(ctxt, command)
 
     def exec_internal(self, ctxt, command):
-        return FishCompletionCommand(ctxt, shlex.split(command, posix=True))
+        return FishCompletionRawCommand(ctxt, command)
 
     def value_list(self, ctxt, opts):
         return FishCompleteValueList(ctxt, opts)
