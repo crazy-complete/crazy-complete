@@ -105,7 +105,7 @@ for ((argi=1; argi < cword; ++argi)); do
 done
 #ifdef positionals
 
-for ((; argi < ${#words[@]}; ++argi)); do
+for ((; argi <= cword; ++argi)); do
   case "${words[argi]}" in
     -?*);;
     *) POSITIONALS+=("${words[argi]}");;

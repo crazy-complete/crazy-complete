@@ -26,7 +26,10 @@ def _get_positional_condition(positional):
 def _generate_positionals_with_when(generator):
     code = []
 
-    for positional in generator.positionals:
+    no_command_arg = lambda p: not p.complete or p.complete[0] != 'command_arg'
+    positionals = [p for p in generator.positionals if no_command_arg(p)]
+
+    for positional in positionals:
         condition = _get_positional_condition(positional)
         r = '(( %s )) && ' % condition
         if positional.when:
@@ -40,8 +43,11 @@ def _generate_positionals_with_when(generator):
 def _generate_positionals_without_when(generator):
     code = []
 
+    no_command_arg = lambda p: not p.complete or p.complete[0] != 'command_arg'
+    positionals = [p for p in generator.positionals if no_command_arg(p)]
+
     keyfunc = lambda p: generator._complete_option(p, False)
-    grouped_by_complete = algo.group_by(generator.positionals, keyfunc)
+    grouped_by_complete = algo.group_by(positionals, keyfunc)
 
     for complete, positionals in grouped_by_complete.items():
         conditions = [_get_positional_condition(p) for p in positionals]

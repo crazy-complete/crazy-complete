@@ -77,6 +77,22 @@ class BashCompletionGenerator:
         r += 'fi'
         return r
 
+    def _generate_command_arg_call(self):
+        for positional in self.positionals:
+            if positional.complete and positional.complete[0] == 'command_arg':
+                r  = 'if (( ${#POSITIONALS[@]} >= %d )); then\n' % (positional.get_positional_num())
+                r += '  local realpos\n'
+                r += '  for realpos in "${!COMP_WORDS[@]}"; do\n'
+                r += '    [[ "${COMP_WORDS[realpos]}" == "${POSITIONALS[%d]}" ]] && {\n' % (positional.get_positional_num() - 2)
+                r += '      _command_offset $realpos\n'
+                r += '      return 0;\n'
+                r += '    }\n'
+                r += '  done\n'
+                r += 'fi'
+                return r
+
+        return None
+
     def _generate(self):
         # The completion function returns 0 (success) if there was a completion match.
         # This return code is used for dealing with subcommands.
@@ -96,6 +112,8 @@ class BashCompletionGenerator:
 
         if self.subcommands:
             code['subcommand_call'] = self._generate_subcommand_call()
+
+        code['command_arg'] = self._generate_command_arg_call()
 
         if len(self.options):
             # This code is used to complete arguments of options

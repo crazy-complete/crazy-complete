@@ -639,8 +639,6 @@ base32    base64    basename  basenc    bash      bashbug
 
 > **NOTE:** This completion requires `repeatable: true`.
 
-> **NOTE:** This command is currently only available in **Fish** and **Zsh**.
-
 ```yaml
 prog: "example"
 positionals:
