@@ -496,6 +496,8 @@ def validate_complete(ctxt, complete):
         'date_format':   _validate_void,
         'file_list':     _validate_file_list,
         'directory_list': _validate_directory_list,
+        'uid':           _validate_void,
+        'gid':           _validate_void,
         # Bonus
         'mountpoint':    _validate_void,
         'net_interface': _validate_void,

@@ -347,6 +347,16 @@ command file -L $i_opt -- "$cur"* 2>/dev/null | while read -r line; do
 done
 ''')
 
+_UID_LIST = helpers.ShellFunction('uid_list', r'''
+local items=($(command getent passwd | command awk -F: '{printf "%s:%s\n", $3, $1}'))
+_describe 'users' items
+''')
+
+_GID_LIST = helpers.ShellFunction('gid_list', r'''
+local items=($(command getent group | command awk -F: '{printf "%s:%s\n", $3, $1}'))
+_describe 'groups' items
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -363,7 +373,8 @@ command aplay -l \
   cards+=("$id:$name")
 done
 
-_describe 'ALSA card' cards''')
+_describe 'ALSA card' cards
+''')
 
 _ALSA_COMPLETE_DEVICES = helpers.ShellFunction('alsa_complete_devices', r'''
 local card='' id='' name='' devices=()
@@ -377,7 +388,8 @@ command aplay -l \
   devices+=("hw\\:$id:$name")
 done
 
-_describe 'ALSA device' devices''')
+_describe 'ALSA device' devices
+''')
 
 
 class ZshHelpers(helpers.GeneralHelpers):
@@ -389,5 +401,7 @@ class ZshHelpers(helpers.GeneralHelpers):
         self.add_function(_EXEC)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)
+        self.add_function(_UID_LIST)
+        self.add_function(_GID_LIST)
         self.add_function(_ALSA_COMPLETE_CARDS)
         self.add_function(_ALSA_COMPLETE_DEVICES)

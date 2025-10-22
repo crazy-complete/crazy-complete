@@ -482,6 +482,8 @@ def _check_complete(ctxt, args):
         'date_format':      _check_void,
         'file_list':        _check_file_list,
         'directory_list':   _check_directory_list,
+        'uid':              _check_void,
+        'gid':              _check_void,
         # Bonus
         'mountpoint':       _check_void,
         'net_interface':    _check_void,

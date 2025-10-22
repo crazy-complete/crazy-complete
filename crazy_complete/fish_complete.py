@@ -548,6 +548,14 @@ class FishCompleter(shell.ShellCompleter):
 
         return FishCompletionCommand(ctxt, [complete_list_func, separator, func])
 
+    def uid(self, ctxt):
+        func = ctxt.helpers.use_function('uid_list')
+        return FishCompletionCommand(ctxt, [func])
+
+    def gid(self, ctxt):
+        func = ctxt.helpers.use_function('gid_list')
+        return FishCompletionCommand(ctxt, [func])
+
     # =========================================================================
     # Bonus
     # =========================================================================

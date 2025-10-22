@@ -329,6 +329,14 @@ class BashCompleter(shell.ShellCompleter):
         }
         return self.list(ctxt, ['directory', opts], list_opts)
 
+    def uid(self, ctxt):
+        func = ctxt.helpers.use_function('uid_list')
+        return BashCompletionCommand(ctxt, func)
+
+    def gid(self, ctxt):
+        func = ctxt.helpers.use_function('gid_list')
+        return BashCompletionCommand(ctxt, func)
+
     # =========================================================================
     # Bonus
     # =========================================================================
