@@ -173,6 +173,9 @@
 3_28_10-list-separator-wrong-type        | foo: -o: separator: Not a string: False
 3_28_11-list-separator-wrong-value       | foo: -o: Invalid length for separator: foo
 3_28_12-list-unkown-option               | foo: -o: Unknown option: wrong
+3_29_00-command-arg-too-many-args        | foo: 1 (None): Too many arguments: [False]
+3_29_01-command-arg-in-option            | foo: -o: command_arg not allowed inside options
+3_29_02-command-arg-not-repeatable       | foo: The `command_arg` completer requires `repeatable=True`
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Only one positional argument can be marked as repeatable

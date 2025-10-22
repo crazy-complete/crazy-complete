@@ -13,9 +13,21 @@ from .str_utils import (
 
 _error = CrazySchemaValidationError
 
+
 # =============================================================================
 # Helper functions for validating
 # =============================================================================
+
+
+class Context:
+    '''Class for providing context to validation.'''
+
+    OPTION = 0
+    POSITIONAL = 1
+
+    def __init__(self):
+        self.defintion = None
+        self.type = None
 
 
 class Arguments:
@@ -109,11 +121,11 @@ def _check_when(value):
         raise _error(f'when: {e}', value) from e
 
 
-def _check_void(arguments):
+def _check_void(ctxt, arguments):
     arguments.require_no_more()
 
 
-def _check_choices(arguments):
+def _check_choices(ctxt, arguments):
     choices = arguments.get_required_arg('choices')
     _check_type(choices, (list, dict))
     arguments.require_no_more()
@@ -128,7 +140,7 @@ def _check_choices(arguments):
             _check_type(value, (str, int, float))
 
 
-def _check_command(arguments):
+def _check_command(ctxt, arguments):
     opts = arguments.get_optional_arg({})
     _check_type(opts, (dict, ))
     arguments.require_no_more()
@@ -162,7 +174,7 @@ def _check_command(arguments):
         raise _error('path_append/path_prepend cannot be used with path', opts)
 
 
-def _check_filedir(arguments, with_extensions=False, with_separator=False):
+def _check_filedir(ctxt, arguments, with_extensions=False, with_separator=False):
     options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
     arguments.require_no_more()
@@ -206,23 +218,23 @@ def _check_filedir(arguments, with_extensions=False, with_separator=False):
             raise _error('Invalid length for separator', separator)
 
 
-def _check_file(arguments):
-    _check_filedir(arguments, with_extensions=True)
+def _check_file(ctxt, arguments):
+    _check_filedir(ctxt, arguments, with_extensions=True)
 
 
-def _check_directory(arguments):
-    _check_filedir(arguments)
+def _check_directory(ctxt, arguments):
+    _check_filedir(ctxt, arguments)
 
 
-def _check_file_list(arguments):
-    _check_filedir(arguments, with_extensions=True, with_separator=True)
+def _check_file_list(ctxt, arguments):
+    _check_filedir(ctxt, arguments, with_extensions=True, with_separator=True)
 
 
-def _check_directory_list(arguments):
-    _check_filedir(arguments, with_separator=True)
+def _check_directory_list(ctxt, arguments):
+    _check_filedir(ctxt, arguments, with_separator=True)
 
 
-def _check_mime_file(arguments):
+def _check_mime_file(ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
     arguments.require_no_more()
@@ -231,7 +243,7 @@ def _check_mime_file(arguments):
         raise _error('Pattern: Not a valid extended regex', pattern)
 
 
-def _check_range(arguments):
+def _check_range(ctxt, arguments):
     start = arguments.get_required_arg("start")
     _check_type(start, (int,), "start")
 
@@ -255,13 +267,13 @@ def _check_range(arguments):
         raise _error("step: cannot be 0", step)
 
 
-def _check_exec(arguments):
+def _check_exec(ctxt, arguments):
     command = arguments.get_required_arg("command")
     _check_type(command, (str,), "command")
     arguments.require_no_more()
 
 
-def _check_value_list(arguments):
+def _check_value_list(ctxt, arguments):
     options = arguments.get_required_arg('options')
     _check_type(options, (dict,), 'options')
     arguments.require_no_more()
@@ -292,7 +304,7 @@ def _check_value_list(arguments):
             raise _error('Invalid length for separator', separator)
 
 
-def _check_combine(arguments):
+def _check_combine(ctxt, arguments):
     commands = arguments.get_required_arg('commands')
     arguments.require_no_more()
 
@@ -316,7 +328,7 @@ def _check_combine(arguments):
         if subcommand_args.value[0] == 'list':
             raise _error('Command `list` not allowed inside combine', subcommand_args)
 
-        _check_complete(subcommand_args)
+        _check_complete(ctxt, subcommand_args)
 
     if len(commands.value) == 0:
         raise _error('combine: Cannot be empty', commands)
@@ -325,7 +337,7 @@ def _check_combine(arguments):
         raise _error('combine: Must contain more than one command', commands)
 
 
-def _check_list(arguments):
+def _check_list(ctxt, arguments):
     command = arguments.get_required_arg('command')
     options = arguments.get_optional_arg({})
     arguments.require_no_more()
@@ -362,10 +374,10 @@ def _check_list(arguments):
         if len(separator.value) != 1:
             raise _error('Invalid length for separator', separator)
 
-    _check_complete(command)
+    _check_complete(ctxt, command)
 
 
-def _check_history(arguments):
+def _check_history(ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
     arguments.require_no_more()
@@ -374,7 +386,7 @@ def _check_history(arguments):
         raise _error('Pattern: Not a valid extended regex', pattern)
 
 
-def _check_date(arguments):
+def _check_date(ctxt, arguments):
     format_ = arguments.get_required_arg("format")
     _check_type(format_, (str,), "format")
     arguments.require_no_more()
@@ -383,9 +395,12 @@ def _check_date(arguments):
         raise _error('format cannot be empty', format_)
 
 
-def _check_complete(args):
+def _check_complete(ctxt, args):
     arguments = Arguments(args)
     cmd = arguments.get_required_arg('command')
+
+    if cmd.value == 'command_arg' and ctxt.type == Context.OPTION:
+        raise _error('command_arg not allowed inside options', cmd)
 
     commands = {
         'none':             _check_void,
@@ -433,7 +448,7 @@ def _check_complete(args):
     if cmd.value not in commands:
         raise _error(f'Invalid command: {cmd.value}', cmd)
 
-    commands[cmd.value](arguments)
+    commands[cmd.value](ctxt, arguments)
 
 
 def _check_positionals_repeatable(definition_tree, definition):
@@ -494,7 +509,7 @@ def _check_positionals_command_arg(definition):
                 raise _error('The `command_arg` completer requires a previous `command` completer', positional)
 
 
-def _check_option(option):
+def _check_option(ctxt, option):
     _check_dictionary(option, {
         'option_strings':       (True,  (list,)),
         'metavar':              (False, (str,  NoneType)),
@@ -538,7 +553,7 @@ def _check_option(option):
         _check_extended_bool(option.value['repeatable'])
 
     if _has_set(option, 'complete'):
-        _check_complete(option.value['complete'])
+        _check_complete(ctxt, option.value['complete'])
 
     if _has_set(option, 'when'):
         _check_when(option.value['when'])
@@ -548,7 +563,7 @@ def _check_option(option):
             raise _error('Invalid variable name', option.value['capture'])
 
 
-def _check_positional(positional):
+def _check_positional(ctxt, positional):
     _check_dictionary(positional, {
         'number':               (True,  (int,)),
         'metavar':              (False, (str,  NoneType)),
@@ -563,7 +578,7 @@ def _check_positional(positional):
         raise _error('number cannot be zero or negative', positional.value['number'])
 
     if _has_set(positional, 'complete'):
-        _check_complete(positional.value['complete'])
+        _check_complete(ctxt, positional.value['complete'])
 
     if _has_set(positional, 'when'):
         _check_when(positional.value['when'])
@@ -573,7 +588,7 @@ def _check_positional(positional):
             raise _error('Invalid variable name', positional.value['capture'])
 
 
-def _check_definition(definition):
+def _check_definition(ctxt, definition):
     _check_dictionary(definition, {
         'prog':                 (True,  (str,)),
         'help':                 (False, (str,  NoneType)),
@@ -618,12 +633,16 @@ def _check_definition(definition):
         _check_extended_bool(definition.value['inherit_options'])
 
     if _has_set(definition, 'options'):
+        ctxt.type = Context.OPTION
+
         for option in definition.value['options'].value:
-            _check_option(option)
+            _check_option(ctxt, option)
 
     if _has_set(definition, 'positionals'):
+        ctxt.type = Context.POSITIONAL
+
         for positional in definition.value['positionals'].value:
-            _check_positional(positional)
+            _check_positional(ctxt, positional)
 
 
 class DefinitionTree:
@@ -672,8 +691,11 @@ class DefinitionTree:
 def validate(definition_list):
     '''Validate a list of definitions.'''
 
+    context = Context()
+
     for definition in definition_list:
-        _check_definition(definition)
+        context.definition = definition
+        _check_definition(context, definition)
 
     tree = DefinitionTree.make_tree(definition_list)
 

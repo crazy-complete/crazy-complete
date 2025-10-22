@@ -11,6 +11,17 @@ from .str_utils import (
 # =============================================================================
 
 
+class Context:
+    '''Class for providing context to validation.'''
+
+    OPTION = 0
+    POSITIONAL = 1
+
+    def __init__(self):
+        self.cmdline = None
+        self.type = None
+
+
 class Arguments:
     '''Class for accessing arguments.'''
 
@@ -50,15 +61,15 @@ class Arguments:
 # =============================================================================
 
 
-def _validate_none(_args):
+def _validate_none(_ctxt, _args):
     pass
 
 
-def _validate_void(args):
+def _validate_void(ctxt, args):
     args.require_no_more()
 
 
-def _validate_choices(args):
+def _validate_choices(ctxt, args):
     choices = args.get_required_arg('values')
     args.require_no_more()
 
@@ -79,7 +90,7 @@ def _validate_choices(args):
         raise CrazyError('values: Not a list or dictionary')
 
 
-def _validate_command(args):
+def _validate_command(ctxt, args):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
@@ -110,7 +121,7 @@ def _validate_command(args):
         raise CrazyError('command: path_append/path_prepend cannot be used with path')
 
 
-def _validate_filedir(args, with_extensions=False, with_separator=False):
+def _validate_filedir(ctxt, args, with_extensions=False, with_separator=False):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
@@ -164,23 +175,23 @@ def _validate_filedir(args, with_extensions=False, with_separator=False):
             raise CrazyError(f'Unknown option: {key}')
 
 
-def _validate_file(args):
-    _validate_filedir(args, with_extensions=True)
+def _validate_file(ctxt, args):
+    _validate_filedir(ctxt, args, with_extensions=True)
 
 
-def _validate_directory(args):
-    _validate_filedir(args)
+def _validate_directory(ctxt, args):
+    _validate_filedir(ctxt, args)
 
 
-def _validate_file_list(args):
-    _validate_filedir(args, with_extensions=True, with_separator=True)
+def _validate_file_list(ctxt, args):
+    _validate_filedir(ctxt, args, with_extensions=True, with_separator=True)
 
 
-def _validate_directory_list(args):
-    _validate_filedir(args, with_separator=True)
+def _validate_directory_list(ctxt, args):
+    _validate_filedir(ctxt, args, with_separator=True)
 
 
-def _validate_mime_file(args):
+def _validate_mime_file(ctxt, args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
 
@@ -191,7 +202,7 @@ def _validate_mime_file(args):
         raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
 
 
-def _validate_range(args):
+def _validate_range(ctxt, args):
     start = args.get_required_arg("start")
     stop  = args.get_required_arg("stop")
     step  = args.get_optional_arg(1)
@@ -216,7 +227,7 @@ def _validate_range(args):
         raise CrazyError("step: cannot be 0")
 
 
-def _validate_exec(args):
+def _validate_exec(ctxt, args):
     cmd = args.get_required_arg('command')
     args.require_no_more()
 
@@ -224,7 +235,7 @@ def _validate_exec(args):
         raise CrazyError(f"Command is not a string: {cmd}")
 
 
-def _validate_value_list(args):
+def _validate_value_list(ctxt, args):
     opts = args.get_required_arg('options')
     args.require_no_more()
 
@@ -273,7 +284,7 @@ def _validate_value_list(args):
         raise CrazyError(f'Invalid length for separator: {separator}')
 
 
-def _validate_combine(args):
+def _validate_combine(ctxt, args):
     commands = args.get_required_arg('commands')
     args.require_no_more()
 
@@ -299,7 +310,7 @@ def _validate_combine(args):
         if subcommand_args[0] == 'list':
             raise CrazyError('Command `list` not allowed inside combine')
 
-        validate_complete(subcommand_args)
+        validate_complete(ctxt, subcommand_args)
 
     if len(commands) == 0:
         raise CrazyError('combine: Cannot be empty')
@@ -308,7 +319,7 @@ def _validate_combine(args):
         raise CrazyError('combine: Must contain more than one command')
 
 
-def _validate_list(args):
+def _validate_list(ctxt, args):
     command = args.get_required_arg('command')
     opts = args.get_optional_arg({})
     args.require_no_more()
@@ -350,10 +361,10 @@ def _validate_list(args):
         else:
             raise CrazyError(f'Unknown option: {key}')
 
-    validate_complete(command)
+    validate_complete(ctxt, command)
 
 
-def _validate_history(args):
+def _validate_history(ctxt, args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
 
@@ -364,7 +375,7 @@ def _validate_history(args):
         raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
 
 
-def _validate_date(args):
+def _validate_date(ctxt, args):
     format_ = args.get_required_arg('format')
     args.require_no_more()
 
@@ -380,7 +391,7 @@ def _validate_date(args):
 # =============================================================================
 
 
-def validate_complete(complete):
+def validate_complete(ctxt, complete):
     '''Validate a completion command.'''
 
     if not complete:
@@ -391,6 +402,9 @@ def validate_complete(complete):
 
     if not isinstance(command, str):
         raise CrazyError(f"Command is not a string: {command}")
+
+    if command == 'command_arg' and ctxt.type == Context.OPTION:
+        raise CrazyError('command_arg not allowed inside options')
 
     validate_commands = {
         'none':          _validate_none,
@@ -438,7 +452,7 @@ def validate_complete(complete):
     if command not in validate_commands:
         raise CrazyError(f"Unknown command for `complete`: {command}")
 
-    validate_commands[command](args)
+    validate_commands[command](ctxt, args)
 
 
 def validate_positionals_repeatable(cmdline):
@@ -498,18 +512,23 @@ def validate_wraps(cmdline):
 def validate_commandline(cmdline):
     '''Validate completion commands of options/positionals in a commandline.'''
 
+    context = Context()
+    context.cmdline = cmdline
+
+    context.type = Context.OPTION
     for option in cmdline.get_options():
         try:
-            validate_complete(option.complete)
+            validate_complete(context, option.complete)
         except CrazyError as e:
             raise CrazyError("%s: %s: %s" % (
                 cmdline.get_command_path(),
                 '|'.join(option.option_strings),
                 e)) from e
 
+    context.type = Context.POSITIONAL
     for positional in cmdline.get_positionals():
         try:
-            validate_complete(positional.complete)
+            validate_complete(context, positional.complete)
         except CrazyError as e:
             raise CrazyError("%s: %d (%s): %s" % (
                 cmdline.get_command_path(),

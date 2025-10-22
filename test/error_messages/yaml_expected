@@ -173,6 +173,9 @@
 3_28_10-list-separator-wrong-type        | line 4, column 48: separator: Invalid type. Expected types: string
 3_28_11-list-separator-wrong-value       | line 4, column 48: Invalid length for separator
 3_28_12-list-unkown-option               | line 4, column 35: Unknown key: wrong
+3_29_00-command-arg-too-many-args        | line 4, column 15: Too many arguments provided
+3_29_01-command-arg-in-option            | line 4, column 16: command_arg not allowed inside options
+3_29_02-command-arg-not-repeatable       | line 3, column 5: The `command_arg` completer requires `repeatable=True`
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary
 001-multiple-repeatable-positionals      | line 6, column 5: Only one positional argument can be marked as repeatable
