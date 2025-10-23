@@ -1634,14 +1634,14 @@ description: "key_value_list: Check -o"
 send: "crazy-complete-test -o "
 bash_expected: |
   > crazy-complete-test -o
-  animal  async   atime   number  pid     user
+  animal  async   nocomp  number  pid     user
   > crazy-complete-test -o
 fish_expected: |
   > crazy-complete-test -o
-  animal  async  atime  number  pid  user
+  animal=  async  nocomp=  number=  pid=  user=
 zsh_expected: |
   > crazy-complete-test -o
-  animal  async   atime   number  pid     user
+  animal  async   nocomp  number  pid     user
 ---
 number: 106
 definition_file: "key_value_list"
@@ -1649,14 +1649,14 @@ description: "key_value_list: Check -o a"
 send: "crazy-complete-test -o a"
 bash_expected: |
   > crazy-complete-test -o a
-  animal  async   atime
+  animal  async
   > crazy-complete-test -o a
 fish_expected: |
   > crazy-complete-test -o a
-  animal  async  atime
+  animal=  async
 zsh_expected: |
   > crazy-complete-test -o a
-  animal  async   atime
+  animal  async
 ---
 number: 107
 definition_file: "key_value_list"
@@ -1665,7 +1665,7 @@ send: "crazy-complete-test -o an"
 bash_expected: |
   > crazy-complete-test -o animal
 fish_expected: |
-  > crazy-complete-test -o animal
+  > crazy-complete-test -o animal=
 zsh_expected: |
   > crazy-complete-test -o animal=
 ---
@@ -1690,26 +1690,30 @@ description: "key_value_list: Check -o animal,"
 send: "crazy-complete-test -o animal,"
 bash_expected: |
   > crazy-complete-test -o animal,
-  animal,async   animal,atime   animal,number  animal,pid     animal,user
+  animal,async   animal,nocomp  animal,number  animal,pid     animal,user
   > crazy-complete-test -o animal,
 fish_expected: |
   > crazy-complete-test -o animal,
-  animal,animal  animal,atime   animal,pid
-  animal,async   animal,number  animal,user
+  animal,animal=  animal,nocomp=  animal,pid=
+  animal,async    animal,number=  animal,user=
 zsh_expected: |
   > crazy-complete-test -o animal,
-  async   atime   number  pid     user
+  async   nocomp  number  pid     user
 ---
 number: 110
 definition_file: "key_value_list"
 description: "key_value_list: Check -o animal,n"
 send: "crazy-complete-test -o animal,n"
 bash_expected: |
-  > crazy-complete-test -o animal,number
+  > crazy-complete-test -o animal,n
+  animal,nocomp  animal,number
+  > crazy-complete-test -o animal,n
 fish_expected: |
-  > crazy-complete-test -o animal,number
+  > crazy-complete-test -o animal,n
+  animal,nocomp=  animal,number=
 zsh_expected: |
-  > crazy-complete-test -o animal,number=
+  > crazy-complete-test -o animal,n
+  nocomp  number
 ---
 number: 111
 definition_file: "key_value_list"

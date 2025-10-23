@@ -189,14 +189,15 @@ class ZshKeyValueList(ZshComplFunc):
         spec = []
 
         for key, complete in values.items():
-            if not complete or complete[0] == 'none':
-                action = ''
+            if not complete:
+                spec.append('%s' % escape_colon(key))
+            elif complete[0] == 'none':
+                spec.append('%s:::' % escape_colon(key))
             else:
                 command, *args = complete
                 compl_obj = getattr(completer, command)(ctxt, *args)
                 action = compl_obj.get_action_string()
-
-            spec.append('%s:::%s' % (escape_colon(key), action))
+                spec.append('%s:::%s' % (escape_colon(key), action))
 
         code = '_values -s %s -S %s %s \\\n' % (
             shell.escape(pair_separator),

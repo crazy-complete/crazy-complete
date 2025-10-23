@@ -911,7 +911,9 @@ The second argument is the separator used for delimiting the value from the key.
 
 The third argument is a dictionary of keys and the completers that should be used.
 
-If a key does not have an argument, use `null` or `['none']`.
+If a key does not take an argument, use `null`.
+
+If a key does take an argument but cannot be completed, use `['none']`.
 
 
 ```yaml
@@ -919,10 +921,10 @@ prog: "example"
 options:
   - option_strings: ["--key-value-list"]
     complete: ["key_value_list", ",", "=", {
-      'async': null,
-      'atime': ['none'],
-      'user':  ['user'],
-      'check'  ['choices', {
+      'flag':   null,
+      'nocomp': ['none'],
+      'user':   ['user'],
+      'check'   ['choices', {
         'relaxed': "convert to lowercase before lookup",
         'strict': "no conversion"
       }]
@@ -930,7 +932,7 @@ options:
 ```
 
 ```
-~ > example --key-value-list async,atime,user=<TAB>
+~ > example --key-value-list flag,user=<TAB>
 bin                     braph
 colord                  dbus
 dhcpcd                  git

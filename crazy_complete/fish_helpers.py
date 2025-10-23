@@ -480,21 +480,28 @@ set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unesc
 set -l key
 set -l value
 set -l keys
+set -l keys_with_sep
 set -l funcs
 set -l i
 
 for i in (command seq 1 2 (count $argv))
   set -a keys $argv[$i]
   set -a funcs $argv[(math $i + 1)]
+
+  if test $funcs[-1] != 'false'
+    set -a keys_with_sep $argv[$i]=
+  else
+    set -a keys_with_sep $argv[$i]
+  end
 end
 
 if test -z "$comp"
-  printf '%s\n' $keys
+  printf '%s\n' $keys_with_sep
   return
 end
 
 if test (string sub -s -1 -l 1 -- $comp) = $sep1
-  for key in $keys
+  for key in $keys_with_sep
     printf '%s%s\n' $comp $key
   end
   return
@@ -528,7 +535,7 @@ switch $pair
     set -l key_len (string length -- $split[1])
     set comp (string sub -e -$key_len -- $comp)
 
-    for key in $keys
+    for key in $keys_with_sep
       printf '%s%s\n' $comp $key
     end
 end

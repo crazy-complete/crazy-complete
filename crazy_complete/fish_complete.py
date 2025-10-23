@@ -251,7 +251,9 @@ class FishCompletKeyValueList(FishCompletionCommand):
         funcs = {}
 
         for key, complete in values.items():
-            if complete is None or complete[0] == 'none':
+            if not complete:
+                funcs[key] = 'false'
+            elif complete[0] == 'none':
                 funcs[key] = 'true'
             else:
                 command, *args = complete
