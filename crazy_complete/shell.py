@@ -103,18 +103,18 @@ class ShellCompleter:
 
     # pylint: disable=missing-function-docstring
 
-    def complete(self, ctxt, completion, *a):
+    def complete(self, ctxt, trace, completion, *a):
         if not hasattr(self, completion):
             utils.warn(f"ShellCompleter: Falling back from `{completion}` to `none`")
             completion = 'none'
 
-        return getattr(self, completion)(ctxt, *a)
+        return getattr(self, completion)(ctxt, trace, *a)
 
-    def fallback(self, ctxt, from_, to, *a):
+    def fallback(self, ctxt, trace, from_, to, *a):
         utils.warn(f"ShellCompleter: Falling back from `{from_}` to `{to}`")
-        return self.complete(ctxt, to, *a)
+        return self.complete(ctxt, trace, to, *a)
 
-    def signal(self, ctxt, prefix=''):
+    def signal(self, ctxt, trace, prefix=''):
         sig = prefix
         signals = collections.OrderedDict([
             (sig+'ABRT',   'Process abort signal'),
@@ -146,29 +146,29 @@ class ShellCompleter:
             (sig+'XCPU',   'CPU time limit exceeded'),
         ])
 
-        return self.complete(ctxt, 'choices', signals)
+        return self.complete(ctxt, trace, 'choices', signals)
 
-    def range(self, ctxt, start, stop, step=1):
-        return self.fallback(ctxt, 'range', 'choices', list(range(start, stop, step)))
+    def range(self, ctxt, trace, start, stop, step=1):
+        return self.fallback(ctxt, trace, 'range', 'choices', list(range(start, stop, step)))
 
-    def directory(self, ctxt, opts):
-        return self.fallback(ctxt, 'directory', 'file', opts)
+    def directory(self, ctxt, trace, opts):
+        return self.fallback(ctxt, trace, 'directory', 'file', opts)
 
-    def command(self, ctxt):
-        return self.fallback(ctxt, 'command', 'file')
+    def command(self, ctxt, trace):
+        return self.fallback(ctxt, trace, 'command', 'file')
 
     # =========================================================================
     # Bonus
     # =========================================================================
 
-    def login_shell(self, ctxt):
-        return self.exec(ctxt, "command grep -E '^[^#]' /etc/shells")
+    def login_shell(self, ctxt, trace):
+        return self.exec(ctxt, trace, "command grep -E '^[^#]' /etc/shells")
 
-    def locale(self, ctxt):
-        return self.exec(ctxt, "command locale -a")
+    def locale(self, ctxt, trace):
+        return self.exec(ctxt, trace, "command locale -a")
 
-    def charset(self, ctxt):
-        return self.exec(ctxt, "command locale -m")
+    def charset(self, ctxt, trace):
+        return self.exec(ctxt, trace, "command locale -m")
 
-    def mountpoint(self, ctxt):
-        return self.exec(ctxt, "command mount | command cut -d' ' -f3")
+    def mountpoint(self, ctxt, trace):
+        return self.exec(ctxt, trace, "command mount | command cut -d' ' -f3")

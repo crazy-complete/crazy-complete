@@ -94,12 +94,12 @@ class BashCompletionCompgen(BashCompletionBase):
 class BashCompleteCombine(BashCompletionBase):
     '''Used for combining multiple complete commands.'''
 
-    def __init__(self, ctxt, completer, commands):
+    def __init__(self, ctxt, trace, completer, commands):
         self.completion_objects = []
 
         for command_args in commands:
             command, *args = command_args
-            obj = getattr(completer, command)(ctxt, *args)
+            obj = getattr(completer, command)(ctxt, trace, *args)
             self.completion_objects.append(obj)
 
     def get_code(self, append=False):
@@ -112,7 +112,7 @@ class BashCompleteCombine(BashCompletionBase):
 class BashCompleteKeyValueList(BashCompletionCommand):
     '''Used for completing a list of key-value pairs.'''
 
-    def __init__(self, ctxt, completer, pair_separator, value_separator, values):
+    def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         funcs = {}
 
         for key, complete in values.items():
@@ -122,7 +122,7 @@ class BashCompleteKeyValueList(BashCompletionCommand):
                 funcs[key] = 'true'
             else:
                 command, *args = complete
-                obj = getattr(completer, command)(ctxt, *args)
+                obj = getattr(completer, command)(ctxt, trace, *args)
                 code = obj.get_code()
                 funcs[key] = ctxt.helpers.add_dynamic_func(ctxt, code)
 
@@ -145,19 +145,19 @@ class BashCompleter(shell.ShellCompleter):
     # pylint: disable=missing-function-docstring
     # pylint: disable=too-many-public-methods
 
-    def none(self, ctxt, *_):
+    def none(self, ctxt, trace, *_):
         return BashCompletionCommand(ctxt, '')
 
-    def integer(self, ctxt, *_):
+    def integer(self, ctxt, trace, *_):
         return BashCompletionCommand(ctxt, '')
 
-    def float(self, ctxt, *_):
+    def float(self, ctxt, trace, *_):
         return BashCompletionCommand(ctxt, '')
 
-    def choices(self, ctxt, choices):
+    def choices(self, ctxt, trace, choices):
         return CompgenW(ctxt, choices)
 
-    def command(self, ctxt, opts=None):
+    def command(self, ctxt, trace, opts=None):
         code = None
         path = None
         append = None
@@ -181,7 +181,7 @@ class BashCompleter(shell.ShellCompleter):
 
         return BashCompletionCompgen(ctxt, '-A command', code=code)
 
-    def directory(self, ctxt, opts=None):
+    def directory(self, ctxt, trace, opts=None):
         directory = None if opts is None else opts.get('directory', None)
 
         if directory:
@@ -193,7 +193,7 @@ class BashCompleter(shell.ShellCompleter):
 
         return BashCompletionCommand(ctxt, '_filedir -d')
 
-    def file(self, ctxt, opts=None):
+    def file(self, ctxt, trace, opts=None):
         fuzzy = False
         directory = None
         extensions = None
@@ -219,52 +219,52 @@ class BashCompleter(shell.ShellCompleter):
 
         return BashCompletionCommand(ctxt, filedir_cmd)
 
-    def mime_file(self, ctxt, pattern):
+    def mime_file(self, ctxt, trace, pattern):
         funcname = ctxt.helpers.use_function('mime_file')
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(pattern)))
 
-    def group(self, ctxt):
+    def group(self, ctxt, trace):
         return BashCompletionCompgen(ctxt, '-A group')
 
-    def hostname(self, ctxt):
+    def hostname(self, ctxt, trace):
         return BashCompletionCompgen(ctxt, '-A hostname')
 
-    def pid(self, ctxt):
+    def pid(self, ctxt, trace):
         return BashCompletionCommand(ctxt, bash_versions.pids(ctxt))
 
-    def process(self, ctxt):
+    def process(self, ctxt, trace):
         return BashCompletionCommand(ctxt, bash_versions.pnames(ctxt))
 
-    def range(self, ctxt, start, stop, step=1):
+    def range(self, ctxt, trace, start, stop, step=1):
         if step == 1:
             return BashCompletionCompgen(ctxt, f"-W '{{{start}..{stop}}}'")
 
         return BashCompletionCompgen(ctxt, f"-W '{{{start}..{stop}..{step}}}'")
 
-    def service(self, ctxt):
+    def service(self, ctxt, trace):
         return BashCompletionCompgen(ctxt, '-A service')
 
-    def user(self, ctxt):
+    def user(self, ctxt, trace):
         return BashCompletionCompgen(ctxt, '-A user')
 
-    def variable(self, ctxt):
+    def variable(self, ctxt, trace):
         return BashCompletionCompgen(ctxt, '-A variable')
 
-    def environment(self, ctxt):
+    def environment(self, ctxt, trace):
         return BashCompletionCompgen(ctxt, '-A export')
 
-    def exec(self, ctxt, command):
+    def exec(self, ctxt, trace, command):
         funcname = ctxt.helpers.use_function('exec')
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(command)))
 
-    def exec_fast(self, ctxt, command):
+    def exec_fast(self, ctxt, trace, command):
         funcname = ctxt.helpers.use_function('exec_fast')
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(command)))
 
-    def exec_internal(self, ctxt, command):
+    def exec_internal(self, ctxt, trace, command):
         return BashCompletionCommand(ctxt, command)
 
-    def value_list(self, ctxt, opts):
+    def value_list(self, ctxt, trace, opts):
         funcname = ctxt.helpers.use_function('value_list')
         separator = opts.get('separator', ',')
         duplicates = opts.get('duplicates', False)
@@ -279,18 +279,18 @@ class BashCompleter(shell.ShellCompleter):
             shell.escape(separator),
             ' '.join(shell.escape(v) for v in values)))
 
-    def key_value_list(self, ctxt, pair_separator, value_separator, values):
-        return BashCompleteKeyValueList(ctxt, self, pair_separator, value_separator, values)
+    def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
+        return BashCompleteKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
 
-    def combine(self, ctxt, commands):
-        return BashCompleteCombine(ctxt, self, commands)
+    def combine(self, ctxt, trace, commands):
+        return BashCompleteCombine(ctxt, trace, self, commands)
 
-    def list(self, ctxt, command, opts=None):
+    def list(self, ctxt, trace, command, opts=None):
         separator = opts.get('separator', ',') if opts else ','
         duplicates = opts.get('duplicates', False) if opts else False
 
         cmd, *args = command
-        obj = getattr(self, cmd)(ctxt, *args)
+        obj = getattr(self, cmd)(ctxt, trace, *args)
         code = obj.get_code()
 
         funcname = ctxt.helpers.use_function('value_list')
@@ -303,72 +303,72 @@ class BashCompleter(shell.ShellCompleter):
         r += '%s%s %s "${COMPREPLY[@]}"' % (funcname, dup_arg, shell.escape(separator))
         return BashCompletionCommand(ctxt, r)
 
-    def history(self, ctxt, pattern):
+    def history(self, ctxt, trace, pattern):
         funcname = ctxt.helpers.use_function('history')
         return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(pattern)))
 
-    def commandline_string(self, ctxt):
+    def commandline_string(self, ctxt, trace):
         funcname = ctxt.helpers.use_function('commandline_string')
         return BashCompletionCommand(ctxt, '%s' % funcname)
 
-    def command_arg(self, ctxt):
+    def command_arg(self, ctxt, trace):
         return BashCompletionCommand(ctxt, '')
 
-    def date(self, ctxt, _format):
+    def date(self, ctxt, trace, _format):
         return BashCompletionCommand(ctxt, '')
 
-    def date_format(self, ctxt):
+    def date_format(self, ctxt, trace):
         return BashCompletionCommand(ctxt, '')
 
-    def file_list(self, ctxt, opts=None):
+    def file_list(self, ctxt, trace, opts=None):
         list_opts = {
             'separator': opts.pop('separator', ',') if opts else ',',
             'duplicates': opts.pop('duplicates', False) if opts else False
         }
-        return self.list(ctxt, ['file', opts], list_opts)
+        return self.list(ctxt, trace, ['file', opts], list_opts)
 
-    def directory_list(self, ctxt, opts=None):
+    def directory_list(self, ctxt, trace, opts=None):
         list_opts = {
             'separator': opts.pop('separator', ',') if opts else ',',
             'duplicates': opts.pop('duplicates', False) if opts else False
         }
-        return self.list(ctxt, ['directory', opts], list_opts)
+        return self.list(ctxt, trace, ['directory', opts], list_opts)
 
-    def uid(self, ctxt):
+    def uid(self, ctxt, trace):
         return BashCompletionCommand(ctxt, bash_versions.uids(ctxt))
 
-    def gid(self, ctxt):
+    def gid(self, ctxt, trace):
         return BashCompletionCommand(ctxt, bash_versions.gids(ctxt))
 
-    def signal(self, ctxt):
+    def signal(self, ctxt, trace):
         return BashCompletionCommand(ctxt, bash_versions.signals(ctxt))
 
-    def filesystem_type(self, ctxt):
+    def filesystem_type(self, ctxt, trace):
         return BashCompletionCommand(ctxt, bash_versions.fstypes(ctxt))
 
     # =========================================================================
     # Bonus
     # =========================================================================
 
-    def login_shell(self, ctxt):
+    def login_shell(self, ctxt, trace):
         return BashCompletionCommand(ctxt, bash_versions.shells(ctxt))
 
-    def net_interface(self, ctxt):
+    def net_interface(self, ctxt, trace):
         exec_func = ctxt.helpers.use_function('exec')
         list_func = ctxt.helpers.use_function('net_interfaces_list')
         return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
 
-    def timezone(self, ctxt):
+    def timezone(self, ctxt, trace):
         exec_func = ctxt.helpers.use_function('exec')
         list_func = ctxt.helpers.use_function('timezone_list')
         return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
 
-    def alsa_card(self, ctxt):
+    def alsa_card(self, ctxt, trace):
         exec_func = ctxt.helpers.use_function('exec')
         list_func = ctxt.helpers.use_function('alsa_list_cards')
         return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
 
-    def alsa_device(self, ctxt):
+    def alsa_device(self, ctxt, trace):
         exec_func = ctxt.helpers.use_function('exec')
         list_func = ctxt.helpers.use_function('alsa_list_devices')
         return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))

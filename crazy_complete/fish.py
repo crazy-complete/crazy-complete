@@ -148,9 +148,9 @@ class FishCompletionGenerator:
         context = self.ctxt.get_option_context(self.commandline, option)
 
         if option.complete:
-            completion_obj = self.completer.complete(context, *option.complete)
+            completion_obj = self.completer.complete(context, [], *option.complete)
         else:
-            completion_obj = self.completer.complete(context, 'none')
+            completion_obj = self.completer.complete(context, [], 'none')
 
         definition = FishCompletionDefinition(
             self.ctxt,
@@ -194,9 +194,9 @@ class FishCompletionGenerator:
         context = self.ctxt.get_option_context(self.commandline, option)
 
         if option.complete:
-            completion_obj = self.completer.complete(context, *option.complete)
+            completion_obj = self.completer.complete(context, [], *option.complete)
         else:
-            completion_obj = self.completer.complete(context, 'none')
+            completion_obj = self.completer.complete(context, [], 'none')
 
         definition = FishCompletionDefinition(
             self.ctxt,
@@ -218,7 +218,7 @@ class FishCompletionGenerator:
     def _complete_subcommands(self, option):
         items = option.get_choices()
         context = self.ctxt.get_option_context(self.commandline, option)
-        completion_obj = self.completer.complete(context, 'choices', items)
+        completion_obj = self.completer.complete(context, [], 'choices', items)
 
         definition = FishCompletionDefinition(
             self.ctxt,

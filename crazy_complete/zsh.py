@@ -57,7 +57,7 @@ class ZshCompletionFunction:
 
     def _complete(self, option, command, *args):
         context = self.ctxt.get_option_context(self.commandline, option)
-        return self.completer.complete(context, command, *args)
+        return self.completer.complete(context, [], command, *args)
 
     def _complete_option(self, option):
         if option.complete:
