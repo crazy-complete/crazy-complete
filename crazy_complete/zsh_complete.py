@@ -188,6 +188,7 @@ class ZshKeyValueList(ZshComplFunc):
 
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         spec = []
+        trace.append('key_value_list')
 
         for key, complete in values.items():
             if not complete:
@@ -215,6 +216,7 @@ class ZshKeyValueList(ZshComplFunc):
 class ZshCompleteCombine(ZshCompletionBase):
     def __init__(self, ctxt, trace, completer, commands):
         # metavar = shell.escape(ctxt.option.metavar or '')
+        trace.append('combine')
 
         completions = []
         for command_args in commands:
@@ -355,6 +357,7 @@ class ZshCompleter(shell.ShellCompleter):
     def list(self, ctxt, trace, command, opts=None):
         separator = opts.get('separator', ',') if opts else ','
         duplicates = opts.get('duplicates', False) if opts else False
+        trace.append('list')
 
         cmd, *args = command
         obj = getattr(self, cmd)(ctxt, trace, *args)

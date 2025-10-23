@@ -249,6 +249,7 @@ class FishCompletKeyValueList(FishCompletionCommand):
 
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         funcs = {}
+        trace.append('key_value_list')
 
         for key, complete in values.items():
             if not complete:
@@ -322,6 +323,7 @@ class FishCompleteCombine(FishCompletionBase):
         super().__init__(ctxt)
 
         self.code = []
+        trace.append('combine')
 
         for command_args in commands:
             command, *args = command_args
@@ -462,6 +464,7 @@ class FishCompleter(shell.ShellCompleter):
     def list(self, ctxt, trace, command, opts=None):
         separator = opts.get('separator', ',') if opts else ','
         duplicates = opts.get('duplicates', False) if opts else False
+        trace.append('list')
 
         cmd, *args = command
         obj = getattr(self, cmd)(ctxt, trace, *args)
