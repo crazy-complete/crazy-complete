@@ -46,10 +46,10 @@ long: |
   The separator can be changed by adding `{"separator": ...}`.
   
   By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
-notes:
-  - '`file` and `directory` are not supported. Use `file_list` and `directory_list` instead.'
 also:
   key_value_list: "For completing a list of key=value pairs"
+  file_list: "For completing a list of files"
+  directory_list: "For completing a list of directories"
 definition: |
   prog: "example"
   options:
@@ -190,15 +190,17 @@ command: 'file_list'
 category: 'basic'
 short: 'Complete a comma-separated list of files'
 long: |
+  This is an alias for `['list', ['file']]`.
+
   You can restrict completion to a specific directory by adding `{"directory": ...}`.
    
   You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
    
-  By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
-   
   You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
   Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
    
+  By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+
   The separator can be changed by adding `{"separator": ...}`
 definition: |
   prog: "example"
@@ -215,6 +217,8 @@ command: 'directory_list'
 category: 'basic'
 short: 'Complete a comma-separated list of directories'
 long: |
+  This is an alias for `['list', ['directory']]`.
+
   You can restrict completion to a specific directory by adding `{"directory": ...}`. Directory has to be an absolute path.
    
   The separator can be changed by adding `{"separator": ...}`

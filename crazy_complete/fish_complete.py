@@ -205,12 +205,19 @@ class FishCompleteFile(FishCompletionBase):
 class FishCompleteDir(FishCompletionCommand):
     '''Class for completing directories.'''
 
-    def __init__(self, ctxt, opts):
+    def __init__(self, ctxt, trace, opts):
         directory = None if opts is None else opts.get('directory', None)
 
-        if directory is not None:
+        # __fish_complete_directories does not respect __fish_stripprefix
+        # which is used inside list/key_value_list
+        use_filedir = 'list' in trace or 'key_value_list' in trace
+
+        if use_filedir or directory is not None:
             func = ctxt.helpers.use_function('fish_complete_filedir')
-            super().__init__(ctxt, [func, '-D', '-C', directory])
+            if directory:
+                super().__init__(ctxt, [func, '-D', '-C', directory])
+            else:
+                super().__init__(ctxt, [func, '-D'])
         else:
             super().__init__(ctxt, ['__fish_complete_directories'])
 
@@ -237,11 +244,10 @@ class FishCompleteValueList(FishCompletionCommand):
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
 
         if duplicates:
-            complete_list_func = '__fish_complete_list'
+            super().__init__(ctxt, ['__fish_complete_list', separator, func])
         else:
-            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
-
-        super().__init__(ctxt, [complete_list_func, separator, func])
+            complete_list_func = ctxt.helpers.use_function('list')
+            super().__init__(ctxt, [complete_list_func, separator, func])
 
 
 class FishCompletKeyValueList(FishCompletionCommand):
@@ -404,7 +410,7 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompleteCommand(ctxt, opts)
 
     def directory(self, ctxt, trace, opts=None):
-        return FishCompleteDir(ctxt, opts)
+        return FishCompleteDir(ctxt, trace, opts)
 
     def file(self, ctxt, trace, opts=None):
         return FishCompleteFile(ctxt, opts)
@@ -470,12 +476,11 @@ class FishCompleter(shell.ShellCompleter):
         obj = getattr(self, cmd)(ctxt, trace, *args)
         func = obj.get_function()
 
-        if duplicates:
-            complete_list_func = '__fish_complete_list'
-        else:
-            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
+        list_func = ctxt.helpers.use_function('list')
+        if not duplicates:
+            return FishCompletionCommand(ctxt, [list_func, separator, func])
 
-        return FishCompletionCommand(ctxt, [complete_list_func, separator, func])
+        return FishCompletionCommand(ctxt, [list_func, '-d', separator, func])
 
     def history(self, ctxt, trace, pattern):
         func = ctxt.helpers.use_function('history')
@@ -496,62 +501,18 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompletionCommand(ctxt, [func])
 
     def file_list(self, ctxt, trace, opts=None):
-        separator = ','
-        duplicates = False
-        fuzzy = False
-        directory = None
-        extensions = None
-
-        if opts:
-            separator = opts.get('separator', ',')
-            duplicates = opts.get('duplicates', False)
-            fuzzy = opts.get('fuzzy', False)
-            directory = opts.get('directory', None)
-            extensions = opts.get('extensions', None)
-
-        args = []
-
-        if directory:
-            args.extend(['-C', shell.escape(directory)])
-
-        if extensions:
-            ctxt.helpers.use_function('list_files', 'regex')
-            args.extend(['-r', shell.escape(_get_extension_regex(extensions, fuzzy))])
-
-        file_list_func = ctxt.helpers.use_function('list_files')
-        func = FishCompletionCommand(ctxt, [file_list_func] + args).get_function()
-
-        if duplicates:
-            complete_list_func = '__fish_complete_list'
-        else:
-            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
-
-        return FishCompletionCommand(ctxt, [complete_list_func, separator, func])
+        list_opts = {
+            'separator': opts.pop('separator', ',') if opts else ',',
+            'duplicates': opts.pop('duplicates', False) if opts else False
+        }
+        return self.list(ctxt, trace, ['file', opts], list_opts)
 
     def directory_list(self, ctxt, trace, opts=None):
-        separator = ','
-        duplicates = False
-        directory = None
-
-        if opts:
-            separator = opts.get('separator', ',')
-            directory = opts.get('directory', None)
-            duplicates = opts.get('duplicates', False)
-
-        args = ['-D']
-
-        if directory:
-            args.extend(['-C', shell.escape(directory)])
-
-        file_list_func = ctxt.helpers.use_function('list_files')
-        func = FishCompletionCommand(ctxt, [file_list_func] + args).get_function()
-
-        if duplicates:
-            complete_list_func = '__fish_complete_list'
-        else:
-            complete_list_func = ctxt.helpers.use_function('complete_list_uniq')
-
-        return FishCompletionCommand(ctxt, [complete_list_func, separator, func])
+        list_opts = {
+            'separator': opts.pop('separator', ',') if opts else ',',
+            'duplicates': opts.pop('duplicates', False) if opts else False
+        }
+        return self.list(ctxt, trace, ['directory', opts], list_opts)
 
     def uid(self, ctxt, trace):
         func = ctxt.helpers.use_function('uid_list')

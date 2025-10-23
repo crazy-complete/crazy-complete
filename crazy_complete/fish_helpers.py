@@ -400,6 +400,10 @@ else
   set comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
 end
 
+if test -n "$__fish_stripprefix"
+  set comp (string replace -r -- $__fish_stripprefix '' $comp)
+end
+
 if set -q _flag_cd[1]
   pushd $_flag_cd 2>/dev/null || return 1
 end
@@ -425,46 +429,70 @@ if set -q files[1]
 end
 ''')
 
-_LIST_FILES = helpers.FishFunction('list_files', r'''
-#ifdef regex
-argparse --max-args 0 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
-#else
-argparse --max-args 0 'D/directories' 'C/cd=' -- $argv || return 1
-#endif
+_LIST = helpers.FishFunction('list', r'''
+set -l duplicates false
 
-set -l files
-
-if set -q _flag_cd[1]
-  pushd $_flag_cd 2>/dev/null || return 1
+if test $argv[1] = '-d'
+  set duplicates true
+  set -e argv[1]
 end
 
-if set -q _flag_directories[1]
-  set files */
+set -l separator $argv[1]
+set -l func $argv[2]
+
+set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unescape)
+
+if test -z "$comp"
+  eval $func
+  return
+end
+
+set -l i
+set -l value
+set -l values
+set -l descriptions
+
+set -g __fish_stripprefix ".*"(string escape --style=regex -- $separator)
+
+for value in (eval $func)
+  set -l split (string split -- \t $value)
+  set -a values $split[1]
+  set -a descriptions "$split[2]"
+end
+
+set -e __fish_stripprefix
+
+set -l having_values (string split -- $separator $comp)
+set -l remaining_values_idxs
+
+if $duplicates
+  set remaining_values_idxs (command seq 1 (count $values))
 else
-  set files *
-end
+  set i 1
+  for value in $values
+    if not contains $value $having_values
+      set -a remaining_values_idxs $i
+    end
 
-if set -q _flag_cd[1]
-  popd
-end
-
-if set -q files[1]
-#ifdef regex
-  if set -q _flag_regex[1]
-    set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1])\$")
+    set i (math $i + 1)
   end
-
-#endif
-  printf '%s\n' $files
 end
-''')
 
-_COMPLETE_LIST_UNIQ = helpers.FishFunction('complete_list_uniq', r'''
-for comp in (__fish_complete_list $argv)
-  set -l vals (string split -- $argv[1] (string split -m 1 -- \t $comp)[1])
-  set -l last $vals[-1]
-  set -e vals[-1]
-  not contains $last $vals && printf "%s\n" $comp
+switch $comp
+  case "*$separator"
+    for i in $remaining_values_idxs
+      printf '%s%s\t%s\n' $comp $values[$i] "$descriptions[$i]"
+    end
+  case "*$separator*"
+    set comp (string split -r -m 1 -- $separator $comp)[1]
+
+    for i in $remaining_values_idxs
+      printf '%s,%s\t%s\n' $comp $values[$i] "$descriptions[$i]"
+    end
+  case '*'
+    for i in $remaining_values_idxs
+      printf '%s\t%s\n' $values[$i] "$descriptions[$i]"
+    end
 end
 ''')
 
@@ -511,7 +539,9 @@ function __call_func_for_key -S
   set -l i
   for i in (command seq 1 (count $keys))
     if test $keys[$i] = $argv[1]
+      set -g __fish_stripprefix ".*"(string escape --style=regex -- $sep2)
       $funcs[$i]
+      set -e __fish_stripprefix
       return
     end
   end
@@ -723,9 +753,8 @@ class FishHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.FishFunction)
         self.add_function(_QUERY)
         self.add_function(_FISH_COMPLETE_FILEDIR)
-        self.add_function(_LIST_FILES)
+        self.add_function(_LIST)
         self.add_function(_KEY_VALUE_LIST)
-        self.add_function(_COMPLETE_LIST_UNIQ)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)
         self.add_function(_MIME_FILE)

@@ -409,12 +409,6 @@ def _check_list(ctxt, arguments):
     if command.value[0] == 'command_arg':
         raise _error('Command `command_arg` not allowed inside list', command)
 
-    if command.value[0] == 'file':
-        raise _error('Command `file` not allowed inside list. Use `file_list` instead', command)
-
-    if command.value[0] == 'directory':
-        raise _error('Command `directory` not allowed inside list. Use `directory_list` instead', command)
-
     if _has_set(options, 'separator'):
         separator = options.value['separator']
 

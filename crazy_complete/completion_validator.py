@@ -396,12 +396,6 @@ def _validate_list(ctxt, args):
     if command[0] == 'command_arg':
         raise CrazyError('Command `command_arg` not allowed inside list')
 
-    if command[0] == 'file':
-        raise CrazyError('Command `file` not allowed inside list. Use `file_list` instead')
-
-    if command[0] == 'directory':
-        raise CrazyError('Command `directory` not allowed inside list. Use `directory_list` instead')
-
     if not is_dict_type(opts):
         raise CrazyTypeError('options', 'dict', opts)
 

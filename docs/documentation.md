@@ -534,6 +534,8 @@ dir1/  dir2/
 
 > Complete a comma-separated list of directories
 
+This is an alias for `['list', ['directory']]`.
+
 You can restrict completion to a specific directory by adding `{"directory": ...}`. Directory has to be an absolute path.
  
 The separator can be changed by adding `{"separator": ...}`
@@ -613,15 +615,17 @@ dir1/  dir2/  file.c  file.cpp
 
 > Complete a comma-separated list of files
 
+This is an alias for `['list', ['file']]`.
+
 You can restrict completion to a specific directory by adding `{"directory": ...}`.
  
 You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
  
-By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
- 
 You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
 Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
  
+By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+
 The separator can be changed by adding `{"separator": ...}`
 
 
@@ -1093,10 +1097,6 @@ The separator can be changed by adding `{"separator": ...}`.
 By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 
 
-**NOTES**
-
-- `file` and `directory` are not supported. Use `file_list` and `directory_list` instead.
-
 ```yaml
 prog: "example"
 options:
@@ -1116,6 +1116,10 @@ dhcpcd                  git
 **SEE ALSO**
 
 - [key\_value\_list](#key_value_list): For completing a list of key=value pairs
+
+- [file\_list](#file_list): For completing a list of files
+
+- [directory\_list](#directory_list): For completing a list of directories
 
 ### none
 
