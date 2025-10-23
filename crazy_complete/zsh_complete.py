@@ -421,9 +421,6 @@ class ZshCompleter(shell.ShellCompleter):
     def locale(self, ctxt):
         return ZshComplFunc(ctxt, ['_locales'])
 
-    def login_shell(self, ctxt):
-        return ZshComplFunc(ctxt, ['_shells'])
-
     def alsa_card(self, ctxt):
         func = ctxt.helpers.use_function('alsa_complete_cards')
         return ZshComplFunc(ctxt, [func], needs_braces=True)
