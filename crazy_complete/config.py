@@ -18,6 +18,7 @@ class Config:
         self.inherit_options        = False
         self.vim_modeline           = True
         self.include_files          = []
+        self.bash_completions_version = (2,)
         self.zsh_compdef            = True
         self.fish_fast              = False
         self.fish_inline_conditions = False
@@ -165,6 +166,22 @@ class Config:
         _assert_is_bool(enable, "set_vim_modeline", "enable")
 
         self.vim_modeline = enable
+
+    def set_bash_completions_version(self, version):
+        '''Sets the version of bash-completions.
+
+        Args:
+            version (tuple):
+                A tuple in form like (2,) or (2, 12).
+
+        Notes:
+            This defaults to (2,).
+        '''
+
+        assert isinstance(version, tuple), \
+            "Config.set_bash_completions_version(): version: expected tuple"
+
+        self.bash_completions_version = version
 
     def set_zsh_compdef(self, enable):
         '''Sets whether a `#compdef` comment is written at the top of the generated

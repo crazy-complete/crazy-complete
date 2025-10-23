@@ -26,6 +26,12 @@ def boolean(string):
         raise ValueError(f"Not a bool: {string}") from e
 
 
+def version(string):
+    '''Parse a version.'''
+
+    return tuple(map(int, string.split('.')))
+
+
 def feature_list(string):
     '''Convert a comma separated string of features to list.'''
 
@@ -87,6 +93,10 @@ p.add_argument('--disable', metavar='FEATURES', default=[], type=feature_list,
 p.add_argument('--vim-modeline', metavar='BOOL', default=True, type=boolean,
     help='Sets whether a vim modeline comment shall be appended to the generated code'
 ).complete('choices', ('True', 'False'))
+
+p.add_argument('--bash-completions-version', metavar='VERSION', default=(2,), type=version,
+    help='Generate code for a specific bash-completions version'
+)
 
 p.add_argument('--zsh-compdef', metavar='BOOL', default=True, type=boolean,
     help='Sets whether #compdef is used in zsh scripts'
@@ -169,6 +179,7 @@ def _get_config_from_options(opts):
     conf.set_repeatable_options(opts.repeatable_options)
     conf.set_inherit_options(opts.inherit_options)
     conf.set_vim_modeline(opts.vim_modeline)
+    conf.set_bash_completions_version(opts.bash_completions_version)
     conf.set_zsh_compdef(opts.zsh_compdef)
     conf.set_fish_fast(opts.fish_fast)
     conf.set_fish_inline_conditions(opts.fish_inline_conditions)

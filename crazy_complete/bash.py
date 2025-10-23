@@ -16,6 +16,7 @@ from . import bash_parser_v2
 from . import bash_option_completion
 from . import bash_option_strings_completion
 from . import bash_positionals_completion
+from . import bash_versions
 from . import bash_when
 from .str_utils import indent
 from .bash_utils import VariableManager
@@ -129,7 +130,7 @@ class BashCompletionGenerator:
         if self.commandline.parent is None:
             # The root parser makes those variables local and sets up the completion.
             r  = 'local cur prev words cword split\n'
-            r += '_init_completion -n =: || return'
+            r += '%s -n =: || return' % bash_versions.init_completion(self.ctxt)
             code['init_completion'] = r
 
             v1 = bash_parser.generate(self.commandline, self.variable_manager)
@@ -162,7 +163,7 @@ def generate_wrapper(generators):
     wrapper_funcname = '%s__wrapper' % completion_funcname
     complete_invoker_func = ctxt.helpers.use_function('invoke_complete')
 
-    r  = '_completion_loader %s\n' % commandline.wraps
+    r  = '%s %s\n' % (bash_versions.completion_loader(ctxt), commandline.wraps)
     r += '\n'
     r += '%s() {\n' % wrapper_funcname
     r += '  local WRAPS=\'%s\'\n' % commandline.wraps
@@ -197,6 +198,10 @@ def generate_completion(commandline, config=None):
     commandline = generation.enhance_commandline(commandline, config)
     helpers = bash_helpers.BashHelpers(commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
+
+    if ctxt.config.bash_completions_version >= (2, 12):
+        helpers.define('bash_completions_v_2_12')
+
     result = generation.visit_commandlines(BashCompletionGenerator, ctxt, commandline)
 
     completion_func, wrapper_code = generate_wrapper(result)

@@ -1,6 +1,7 @@
 '''This module contains code for completing arguments in Bash.'''
 
 from . import shell
+from . import bash_versions
 from .str_utils import indent
 from .type_utils import is_dict_type
 from .bash_utils import make_file_extension_pattern
@@ -185,7 +186,7 @@ class BashCompleter(shell.ShellCompleter):
 
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
-            cmd += '  _filedir -d\n'
+            cmd += '  %s -d\n' % bash_versions.filedir(ctxt)
             cmd += '  builtin popd &>/dev/null\n'
             cmd += '}'
             return BashCompletionCommand(ctxt, cmd)
@@ -203,9 +204,11 @@ class BashCompleter(shell.ShellCompleter):
             extensions = opts.get('extensions', None)
 
         if extensions:
-            filedir_cmd = '_filedir %s' % make_file_extension_pattern(extensions, fuzzy)
+            filedir_cmd = '%s %s' % (
+                bash_versions.filedir(ctxt),
+                make_file_extension_pattern(extensions, fuzzy))
         else:
-            filedir_cmd = '_filedir'
+            filedir_cmd = bash_versions.filedir(ctxt)
 
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
@@ -227,10 +230,10 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCompgen(ctxt, '-A hostname')
 
     def pid(self, ctxt):
-        return BashCompletionCommand(ctxt, '_pids')
+        return BashCompletionCommand(ctxt, bash_versions.pids(ctxt))
 
     def process(self, ctxt):
-        return BashCompletionCommand(ctxt, '_pnames')
+        return BashCompletionCommand(ctxt, bash_versions.pnames(ctxt))
 
     def range(self, ctxt, start, stop, step=1):
         if step == 1:

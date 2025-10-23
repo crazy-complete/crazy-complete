@@ -151,7 +151,11 @@ COMPREPLY=()
 if (( COMP_CWORD == 0 )); then
   local cur="${COMP_WORDS[0]}"
   if [[ "${cur:0:1}" == [./] ]]; then
+#ifdef bash_completions_v_2_12
+    _comp_compgen_filedir
+#else
     _filedir
+#endif
   else
     COMPREPLY=($(compgen -A command -- "$cur"))
   fi
@@ -177,7 +181,11 @@ COMP_CWORD=$COMP_CWORD_OLD
 _INVOKE_COMPLETE = helpers.ShellFunction('invoke_complete', r'''
 local prog="${1##*/}"; shift
 
+#ifdef bash_completions_v_2_12
+_comp_complete_load "$prog"
+#else
 _completion_loader "$prog"
+#endif
 
 local i=0 args=($(complete -p -- "$prog"))
 
@@ -372,7 +380,11 @@ if command file -i /dev/null &>/dev/null; then
 elif command file -I /dev/null &>/dev/null; then
   i_opt="-I"
 else
+#ifdef bash_completions_v_2_12
+  _comp_compgen_filedir
+#else
   _filedir
+#endif
   return
 fi
 
