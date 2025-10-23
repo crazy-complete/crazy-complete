@@ -421,9 +421,6 @@ class ZshCompleter(shell.ShellCompleter):
     def locale(self, ctxt):
         return ZshComplFunc(ctxt, ['_locales'])
 
-    def charset(self, ctxt):
-        return ZshComplFunc(ctxt, ['_charset'])
-
     def login_shell(self, ctxt):
         return ZshComplFunc(ctxt, ['_shells'])
 
