@@ -418,6 +418,9 @@ class ZshCompleter(shell.ShellCompleter):
     def filesystem_type(self, ctxt, trace):
         return ZshComplFunc(ctxt, ['_file_systems'])
 
+    def signal(self, ctxt, trace):
+        return ZshComplFunc(ctxt, ['_signals'])
+
     # =========================================================================
     # Bonus
     # =========================================================================
