@@ -344,6 +344,9 @@ class BashCompleter(shell.ShellCompleter):
     # Bonus
     # =========================================================================
 
+    def login_shell(self, ctxt):
+        return BashCompletionCommand(ctxt, bash_versions.shells(ctxt))
+
     def net_interface(self, ctxt):
         exec_func = ctxt.helpers.use_function('exec')
         list_func = ctxt.helpers.use_function('net_interfaces_list')
