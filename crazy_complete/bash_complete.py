@@ -340,6 +340,9 @@ class BashCompleter(shell.ShellCompleter):
     def gid(self, ctxt):
         return BashCompletionCommand(ctxt, bash_versions.gids(ctxt))
 
+    def signal(self, ctxt):
+        return BashCompletionCommand(ctxt, bash_versions.signals(ctxt))
+
     # =========================================================================
     # Bonus
     # =========================================================================

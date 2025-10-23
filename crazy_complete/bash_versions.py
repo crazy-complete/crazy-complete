@@ -55,3 +55,10 @@ def shells(ctxt):
         return '_comp_compgen -a shells'
 
     return '_shells'
+
+
+def signals(ctxt):
+    if ctxt.config.bash_completions_version >= (2, 12):
+        return '_comp_compgen_signals'
+
+    return '_signals'
