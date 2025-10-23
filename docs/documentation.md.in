@@ -1,0 +1,242 @@
+Crazy-Complete Documentation
+============================
+
+This documentation provides an overview of how to define shell completion for commands using crazy-complete.
+
+- [Generating a Defintion File from Help](#generating-a-definition-file-from-help)
+- [Defining a Command](#defining-a-command)
+- [Defining an Option](#defining-an-option)
+- [Defining a Positional Argument](#defining-a-positional-argument)
+- [Completion Commands](#completion-commands)
+  - [Meta Commands](#meta-commands)
+  - [Built-in Commands](#built-in-commands)
+  - [User-Defined Commands](#user-defined-commands)
+  - [Bonus Commands](#bonus-commands)
+- [When Conditionals](#when-conditionals)
+- [Capturing Options](#capturing-options)
+- [Tips and Tricks](#tips-and-tricks)
+
+## Generating a Definition File from Help
+
+It is possible to generate a definition file from a commands help output:
+
+```
+grep --help > help_file
+crazy-complete --input-type=help yaml help_file
+
+# or
+
+grep --help | crazy-complete --input-type=help yaml /dev/stdin
+```
+
+## Defining a Command
+
+To define a completion for a command, use the following structure:
+
+```yaml
+prog: "<PROGRAM NAME>"
+aliases: ["<ALIAS>", ...]
+help: "<PROGRAM DESCRIPTION>"
+wraps: "<PROGRAM>"
+options:
+  <OPTION ...>
+positionals:
+  <POSITIONAL ...>
+```
+
+- *prog*: The name of the program for which you want to create completion
+- *aliases* (optional): Specify alternative program names for which this completion should also apply
+- *help* (optional): A short description of the program
+- *wraps* (optional): Inherit completion behaviour of another command
+- *options* (optional): A list of [options](#defining-an-option) the program accepts
+- *positionals* (optional): A list of [positional arguments](#defining-a-positional-argument) the program uses
+
+## Defining an Option
+
+To define an option, use this format:
+
+```yaml
+[...]
+options:
+  - option_strings: ["<OPTION STRING>", ...]
+    metavar: "<METAVAR>"
+    help: "<OPTION DESCRIPTION>"
+    optional_arg: <BOOL>
+    complete: <COMPLETE ACTION>
+    repeatable: <BOOL>
+    final: <BOOL>
+    hidden: <BOOL>
+    groups: ["<GROUP>", ...]
+    when: "<CONDITION>"
+    capture: "<VARIABLE>"
+[...]
+```
+
+- *option\_strings*: A list of option strings (e.g., ["-h", "--help"])
+- *metavar* (optional): The placeholder used for the argument (e.g., "FILE")
+- *help* (optional): A description of the option
+- *optional\_arg* (optional): Indicates if the option's argument is optional (default: false)
+- *complete* (optional): Defines the method used to provide possible completions for this option. If not set, the option does not take an argument. Use `["none"]` if the option accepts an argument but no specific completion method applies. See [Completion Commands](#completion-commands)
+- *repeatable* (optional): Indicates whether an option can be suggested multiple times (true or false, default: false)
+- *final* (optional): The final parameter indicates that no further options are shown after this one if it is passed on command line. Mostly used for --help and --version (default: false)
+- *hidden* (optional): Specifies whether an option should be excluded from the auto-completion suggestions, though it remains usable when typed manually. (default: false)
+- *groups* (optional): Add this option into the specified groups. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags
+- *when* (optional): Only enable this option if [CONDITION](#when-conditionals) evaluates to true
+- *capture* (optional): Specify the [variable](#capturing-options) where values of this option should be captured
+
+## Defining a Positional Argument
+
+Positional arguments are defined as follows:
+
+```yaml
+[...]
+positionals:
+  - number: <NUMBER>
+    metavar: "<METAVAR>"
+    help: "<POSITIONAL DESCRIPTION>"
+    repeatable: <BOOL>
+    complete: <COMPLETE ACTION>
+    when: "<CONDITION>"
+[...]
+```
+
+- *number*: The order of the positional argument (e.g., 1 for the first argument)
+- *metavar* (optional): A placeholder for the positional argument in the help text
+- *help* (optional): A description of the positional argument
+- *repeatable* (optional): Indicates if this positional argument can be repeated (true or false, default: false)
+- *complete* (optional): The method used to generate possible completions for this positional argument. Default `["none"]`. See [Completion Commands](#completion-commands).
+- *when* (optional): Only enable this positional if [CONDITION](#when-conditionals) evaluates to true
+
+## Defining Subcommands
+
+To define subcommands, append the subcommand name directly to the program name:
+
+```yaml
+prog: "<PROGRAM NAME> <SUBCOMMAND> ..."
+aliases: ["<ALIAS>", ...]
+help: "<SUBCOMMAND DESCRIPTION>"
+[...]
+```
+
+- *prog*: The name of the program, followed by the subcommand(s)
+- *aliases* (optional): A list of alternative names for the subcommand. Aliases must not include the program name
+- *help* (optional): A description of the subcommand
+
+## Completion Commands
+
+%COMMANDS%
+
+## When Conditionals
+
+Options and Positional Arguments can include a `when` attribute that defines
+a *single* condition under which the option (or positional argument) should be
+activated.
+
+### has\_option
+
+> Checks if one or more specified options have been provided on the command line.
+
+> **NOTE**: The options used inside the condition have also to be defined as options!
+
+**Examples:**
+
+```yaml
+# This activates --conditional if --foo, --bar or --baz are present on the command line
+
+[...]
+options:
+  - option_strings: ["--conditional"]
+    when: "has_option --foo --bar --baz"
+
+  - option_strings: ["--foo", "--bar", "--baz"]
+[...]
+```
+
+### option\_is
+
+> Checks if one ore more specified options have been set to a specific value.
+
+> **NOTE**: The options used inside the condition have also to be defined as options!
+
+**Example:**
+
+```yaml
+# This activates --conditional if --foo, --bar or --baz are set to value1, value2 or value3
+
+[...]
+options:
+  - option_strings: ["--conditional"]
+    when: "option_is --foo --bar --baz -- value1 value2 value3"
+
+  - option_strings: ["--foo", "--bar", "--baz"]
+    complete: ["none"]
+[...]
+```
+
+## Capturing Options
+
+Options can include a `capture` field to store their values for later use.
+
+The value of `capture` is the **name of a variable** that will receive all values passed to that option.
+
+- The captured variable is always an **array**, containing one element for each occurence of the option on the command line.
+- This makes it easy to implement **context-sensitive completions** that depend on previously supplied option values
+
+> **NOTE:** There is currently **no automatic check for name clashes** between your capture variables and the parser's internal variables.
+> To minimize the risk of conflicts, it is recommended to prefix variable names with `CAPTURE_` or `CAPTURED_`.
+
+> **NOTE:** Captured variables are currently only available in **Bash** and **Zsh**.
+
+**Example:**
+
+```yaml
+prog: my_db_tool
+options:
+  - option_strings: ["--database", "-d"]
+    complete: ["choices", ["mysql", "postgres", "sqlite"]]
+    capture: "CAPTURED_DB"
+
+  - option_strings: ["--table", "-t"]
+    complete: ["exec", "_my_db_tool_complete_table"]
+```
+
+For **Bash** and **Zsh**:
+
+```bash
+_my_db_tool_complete_table() {
+  case "${CAPTURED_DB[-1]}" in
+    mysql)    printf '%s\n' users orders products;;
+    postgres) printf '%s\n' customers invoices transactions;;
+    sqlite)   printf '%s\n' local_cache config sessions;;
+  esac
+}
+```
+
+## Tips and Tricks
+
+It is always recommended to define your command line **as precisely as possible**.
+This helps crazy-complete generate reliable completions. Key practices include:
+- **Final options**: Use `final: true` for options like `--help` and `--version` that should
+  prevent further options from being completed
+- **Hidden options**: Use `hidden: true` for options that should be completable but not shown
+  in the suggestion list
+- **Mutually exclusive options**: Use `groups: [...]` to define sets of options that cannot appear
+    together
+
+### Trying out zsh autocompletion scripts
+
+By default, crazy-complete generates scripts that should be installed under `/usr/share/zsh/site-functions`
+and loaded from there. If you want to try the generated scripts directly, use `--zsh-compdef=False`.
+
+### Optimizing Script Output
+
+Especially for **Fish** scripts, performance can decrease if many options are defined.
+Features like final options and non-repeatable options require extra conditional code to execute, which can make completions slower.
+
+To improve performance these features can be completely disabled using:
+
+```
+crazy-complete fish --disable=final,repeatable DEFINITION_FILE
+```
+
+This turns off final and repeatable option handling, reducing script size and improving completion speed
