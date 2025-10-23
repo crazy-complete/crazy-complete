@@ -558,6 +558,10 @@ class FishCompleter(shell.ShellCompleter):
         func = ctxt.helpers.use_function('gid_list')
         return FishCompletionCommand(ctxt, [func])
 
+    def filesystem_type(self, ctxt):
+        cmd = "command cat /proc/filesystems | command awk '{print $2}'"
+        return FishCompletionRawCommand(ctxt, cmd)
+
     # =========================================================================
     # Bonus
     # =========================================================================

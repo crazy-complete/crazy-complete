@@ -22,6 +22,7 @@
 | [environment](#environment)                | Complete a shell environment variable name     |
 | [file](#file)                              | Complete a file                                |
 | [file\_list](#file_list)                   | Complete a comma-separated list of files       |
+| [filesystem\_type](#filesystem_type)       | Complete a filesystem type                     |
 | [float](#float)                            | Complete floating point number                 |
 | [gid](#gid)                                | Complete a group id                            |
 | [group](#group)                            | Complete a group                               |
@@ -508,6 +509,23 @@ options:
 ```
 ~ > example --file-list=file1,file2,<TAB>
 file3  file4
+```
+
+### filesystem\_type
+
+> Complete a filesystem type
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--filesystem-type"]
+    complete: ["filesystem_type"]
+```
+
+```
+~ > example --filesystem-type=<TAB>
+adfs     autofs   bdev      bfs     binder     binfmt_misc  bpf
+cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
 ```
 
 ### float

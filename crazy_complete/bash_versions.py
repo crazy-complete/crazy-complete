@@ -62,3 +62,10 @@ def signals(ctxt):
         return '_comp_compgen_signals'
 
     return '_signals'
+
+
+def fstypes(ctxt):
+    if ctxt.config.bash_completions_version >= (2, 12):
+        return '_comp_compgen -a fstypes'
+
+    return '_fstypes'

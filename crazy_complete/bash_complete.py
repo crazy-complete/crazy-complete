@@ -343,6 +343,9 @@ class BashCompleter(shell.ShellCompleter):
     def signal(self, ctxt):
         return BashCompletionCommand(ctxt, bash_versions.signals(ctxt))
 
+    def filesystem_type(self, ctxt):
+        return BashCompletionCommand(ctxt, bash_versions.fstypes(ctxt))
+
     # =========================================================================
     # Bonus
     # =========================================================================

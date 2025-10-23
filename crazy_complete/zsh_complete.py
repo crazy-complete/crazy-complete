@@ -409,6 +409,9 @@ class ZshCompleter(shell.ShellCompleter):
         func = ctxt.helpers.use_function('gid_list')
         return ZshComplFunc(ctxt, [func], needs_braces=True)
 
+    def filesystem_type(self, ctxt):
+        return ZshComplFunc(ctxt, ['_file_systems'])
+
     # =========================================================================
     # Bonus
     # =========================================================================

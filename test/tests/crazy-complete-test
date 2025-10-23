@@ -60,6 +60,7 @@ cmdp.add_argument('--date',             help='Complete a date').complete('date',
 cmdp.add_argument('--date-format',      help='Complete a date format').complete('date_format')
 cmdp.add_argument('--file-list',        help='Complete a list of files').complete('file_list')
 cmdp.add_argument('--directory-list',   help='Complete a list of directories').complete('directory_list')
+cmdp.add_argument('--filesystem-type',  help='Complete a filesystem type').complete('filesystem_type')
 
 # =============================================================================
 # Command 'when'

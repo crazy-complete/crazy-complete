@@ -499,6 +499,21 @@ output: |
 
 ---
 
+command: 'filesystem_type'
+category: 'basic'
+short: 'Complete a filesystem type'
+definition: |
+  prog: "example"
+  options:
+    - option_strings: ["--filesystem-type"]
+      complete: ["filesystem_type"]
+output: |
+  ~ > example --filesystem-type=<TAB>
+  adfs     autofs   bdev      bfs     binder     binfmt_misc  bpf
+  cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
+
+---
+
 command: 'command'
 category: 'basic'
 short: 'Complete a command'
