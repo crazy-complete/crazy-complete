@@ -411,14 +411,6 @@ while read -r line; do
 done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
 ''', ['my_dequote'])
 
-_UID_LIST = helpers.ShellFunction('uid_list', r'''
-COMPREPLY=($(command getent passwd | command awk -F: '{print $3}'))
-''')
-
-_GID_LIST = helpers.ShellFunction('gid_list', r'''
-COMPREPLY=($(command getent group | command awk -F: '{print $3}'))
-''')
-
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -480,8 +472,6 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)
-        self.add_function(_UID_LIST)
-        self.add_function(_GID_LIST)
         self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)
