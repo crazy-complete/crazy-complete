@@ -7,5 +7,6 @@ options:
       'animal': ["choices", ["cat", "dog", "horse"]],
       'number': ["choices", {"0": "zero", "1": "one", "2": "two"}],
       'user':   ["user"],
-      'pid':    ["pid"]
+      'pid':    ["pid"],
+      'file':   ["file", {"directory": "%TEST_DIR%/test_data"}]
     }]

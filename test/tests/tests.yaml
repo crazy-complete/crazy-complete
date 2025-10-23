@@ -1634,14 +1634,15 @@ description: "key_value_list: Check -o"
 send: "crazy-complete-test -o "
 bash_expected: |
   > crazy-complete-test -o
-  animal  async   nocomp  number  pid     user
+  animal  async   file    nocomp  number  pid     user
   > crazy-complete-test -o
 fish_expected: |
   > crazy-complete-test -o
-  animal=  async  nocomp=  number=  pid=  user=
+  animal=  file=    number=  user=
+  async    nocomp=  pid=
 zsh_expected: |
   > crazy-complete-test -o
-  animal  async   nocomp  number  pid     user
+  animal  async   file    nocomp  number  pid     user
 ---
 number: 106
 definition_file: "key_value_list"
@@ -1690,15 +1691,16 @@ description: "key_value_list: Check -o animal,"
 send: "crazy-complete-test -o animal,"
 bash_expected: |
   > crazy-complete-test -o animal,
-  animal,async   animal,nocomp  animal,number  animal,pid     animal,user
+  animal,async   animal,nocomp  animal,pid
+  animal,file    animal,number  animal,user
   > crazy-complete-test -o animal,
 fish_expected: |
   > crazy-complete-test -o animal,
-  animal,animal=  animal,nocomp=  animal,pid=
-  animal,async    animal,number=  animal,user=
+  animal,animal=  animal,file=    animal,number=  animal,user=
+  animal,async    animal,nocomp=  animal,pid=
 zsh_expected: |
   > crazy-complete-test -o animal,
-  async   nocomp  number  pid     user
+  async   file    nocomp  number  pid     user
 ---
 number: 110
 definition_file: "key_value_list"
@@ -1765,3 +1767,19 @@ zsh_expected: |
   0  -- zero
   1  -- one
   2  -- two
+---
+number: 114
+definition_file: "key_value_list"
+description: "key_value_list: Check -o file=f"
+send: "crazy-complete-test -o file=f"
+bash_expected: |
+  > crazy-complete-test -o file=f
+  file with spaces  file1.TXT         file4.txt.1
+  file0.txt         file3.tXt
+  > crazy-complete-test -o file=file
+fish_expected: |
+  > crazy-complete-test -o file=file
+  file=file with spaces  file=file1.TXT  file=file4.txt.1
+  file=file0.txt         file=file3.tXt
+zsh_expected: |
+  > crazy-complete-test -o file=file
