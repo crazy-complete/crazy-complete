@@ -83,16 +83,18 @@ class ZshCompleteChoices(ZshCompletionBase):
         return funcname
 
     def _dict_action_string(self):
-        #  This does not work with `combine`; maybe we have to introduce
-        #  a `combined` parameter to fix this
-        #
-        #  items   = [str(item) for item in choices.keys()]
-        #  values  = [str(value) for value in choices.values()]
-        #  colon   = any(':' in s for s in items + values)
-        #  escaped = ['%s\\:%s' % (shell.escape(item), shell.escape(value)) for item, value in zip(items, values)]
-        #  action  = shell.escape('((%s))' % ' '.join(escaped))
-        #  if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
-        #      return action
+        # _alternative (used in `combine`) does not allow inlined version
+        if self.trace and self.trace[-1] == 'combine':
+            return self._dict_function()
+
+        items   = [str(item) for item in self.choices.keys()]
+        values  = [str(value) for value in self.choices.values()]
+        colon   = any(':' in s for s in items + values)
+        escaped = ['%s\\:%s' % (shell.escape(item), shell.escape(value)) for item, value in zip(items, values)]
+        action  = shell.escape('((%s))' % ' '.join(escaped))
+        if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
+            return action
+
         return self._dict_function()
 
     def _dict_function(self):
