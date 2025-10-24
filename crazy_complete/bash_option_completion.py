@@ -258,14 +258,12 @@ def _get_cur_completion(info):
 
     r += '  --*);;\n'
 
-    if info.old_required or info.old_optional:
-        r += '  -*=*)\n'
-        r += '    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0;;\n'
-    else:
-        r += '  -*=*);;\n'
-
     if (info.short_required or info.short_optional) and info.old_option_strings:
         r += '  %s);;\n' % info.old_option_strings
+
+    if info.old_required or info.old_optional:
+        r += '  -*=*)\n'
+        r += '    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0;&\n'
 
     if info.short_required or info.short_optional:
         r += '  -%s[%s%s]*)\n' % (info.short_no_args_pattern, info.short_required_args, info.short_optional_args)

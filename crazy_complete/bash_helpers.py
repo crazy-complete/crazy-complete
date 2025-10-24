@@ -134,6 +134,10 @@ echo "$s1"
 ''')
 
 _COMMANDLINE_STRING = helpers.ShellFunction('commandline_string', r'''
+local quoted=0
+[[ "${cur:0:1}" == '"' ]] && quoted=1
+[[ "${cur:0:1}" == "'" ]] && quoted=1
+
 local l line="$(my_dequote "$cur")"
 
 local COMP_LINE_OLD="$COMP_LINE"
@@ -160,13 +164,21 @@ if (( COMP_CWORD == 0 )); then
     COMPREPLY=($(compgen -A command -- "$cur"))
   fi
 else
-  invoke_complete "${COMP_WORDS[0]}" "${COMP_WORDS[0]}"
+#ifdef bash_completions_v_2_12
+  _comp_command_offset 0
+#else
+  _command_offset 0
+#endif
 
   local REPLY COMPREPLY_NEW=()
 
   for REPLY in "${COMPREPLY[@]}"; do
-    l=("$(subtract_prefix_suffix "$line" "$REPLY")")
-    COMPREPLY_NEW+=("$l$REPLY")
+    l="$(subtract_prefix_suffix "$line" "$REPLY")"
+    if (( quoted )); then
+      COMPREPLY_NEW+=("$l$REPLY")
+    else
+      COMPREPLY_NEW+=("$(printf '%q' "$l$REPLY")")
+    fi
   done
 
   COMPREPLY=("${COMPREPLY_NEW[@]}")
@@ -176,7 +188,7 @@ COMP_LINE="$COMP_LINE_OLD"
 COMP_POINT=$COMP_POINT_OLD
 COMP_WORDS=("${COMP_WORDS_OLD[@]}")
 COMP_CWORD=$COMP_CWORD_OLD
-''', ['my_dequote', 'parse_line', 'invoke_complete', 'subtract_prefix_suffix'])
+''', ['my_dequote', 'parse_line', 'subtract_prefix_suffix'])
 
 _INVOKE_COMPLETE = helpers.ShellFunction('invoke_complete', r'''
 local prog="${1##*/}"; shift
@@ -355,6 +367,8 @@ fi
 ''', ['my_dequote'])
 
 _PREFIX_COMPREPLY = helpers.ShellFunction('prefix_compreply', r'''
+[[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
+
 local i prefix="$1"
 for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
   COMPREPLY[i]="$prefix${COMPREPLY[i]}"
