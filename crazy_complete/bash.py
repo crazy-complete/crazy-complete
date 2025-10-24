@@ -17,7 +17,6 @@ from . import bash_option_completion
 from . import bash_option_strings_completion
 from . import bash_positionals_completion
 from . import bash_versions
-from . import bash_when
 from .str_utils import indent
 from .bash_utils import VariableManager
 from . import generation

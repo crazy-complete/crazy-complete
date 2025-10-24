@@ -71,8 +71,8 @@ class ZshCompleteChoices(ZshCompletionBase):
         return self._list_function()
 
     def _list_function(self):
-        metavar  = shell.escape(self.ctxt.option.metavar or '')
-        escaped  = [shell.escape(escape_colon(c)) for c in self.choices]
+        metavar = shell.escape(self.ctxt.option.metavar or '')
+        escaped = [shell.escape(escape_colon(c)) for c in self.choices]
 
         code  = 'local items=(\n'
         code += indent(join_with_wrap(' ', '\n', 78, escaped), 2)
@@ -246,22 +246,22 @@ class ZshCompleter(shell.ShellCompleter):
     # pylint: disable=too-many-public-methods
     # pylint: disable=missing-function-docstring
 
-    def none(self, ctxt, trace, *_):
+    def none(self, ctxt, _trace, *_):
         return ZshComplFunc(ctxt, [' '])
 
-    def integer(self, ctxt, trace):
+    def integer(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_numbers'])
 
-    def float(self, ctxt, trace):
+    def float(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_numbers', '-f'])
 
     def choices(self, ctxt, trace, choices):
         return ZshCompleteChoices(ctxt, trace, choices)
 
-    def command(self, ctxt, trace, opts=None):
+    def command(self, ctxt, _trace, opts=None):
         return ZshCompleteCommand(ctxt, opts)
 
-    def directory(self, ctxt, trace, opts=None):
+    def directory(self, ctxt, _trace, opts=None):
         directory = None if opts is None else opts.get('directory', None)
 
         if not directory:
@@ -269,7 +269,7 @@ class ZshCompleter(shell.ShellCompleter):
 
         return ZshComplFunc(ctxt, ['_directories', '-W', directory])
 
-    def file(self, ctxt, trace, opts=None):
+    def file(self, ctxt, _trace, opts=None):
         fuzzy = False
         directory = None
         extensions = None
@@ -289,43 +289,43 @@ class ZshCompleter(shell.ShellCompleter):
 
         return ZshComplFunc(ctxt, ['_files'] + args)
 
-    def mime_file(self, ctxt, trace, pattern):
+    def mime_file(self, ctxt, _trace, pattern):
         func = ctxt.helpers.use_function('mime_file')
         return ZshComplFunc(ctxt, [func, pattern], needs_braces=True)
 
-    def group(self, ctxt, trace):
+    def group(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_groups'])
 
-    def hostname(self, ctxt, trace):
+    def hostname(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_hosts'])
 
-    def pid(self, ctxt, trace):
+    def pid(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_pids'])
 
-    def process(self, ctxt, trace):
+    def process(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_process_names', '-a'])
 
-    def range(self, ctxt, trace, start, stop, step=1):
+    def range(self, ctxt, _trace, start, stop, step=1):
         return ZshCompleteRange(ctxt, start, stop, step)
 
-    def user(self, ctxt, trace):
+    def user(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_users'])
 
-    def variable(self, ctxt, trace):
+    def variable(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_vars'])
 
-    def environment(self, ctxt, trace):
+    def environment(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_parameters', '-g', '*export*'])
 
-    def exec(self, ctxt, trace, command):
+    def exec(self, ctxt, _trace, command):
         funcname = ctxt.helpers.use_function('exec')
         return ZshComplFunc(ctxt, [funcname, command], needs_braces=True)
 
-    def exec_fast(self, ctxt, trace, command):
+    def exec_fast(self, ctxt, _trace, command):
         funcname = ctxt.helpers.use_function('exec')
         return ZshComplFunc(ctxt, [funcname, command], needs_braces=True)
 
-    def exec_internal(self, ctxt, trace, command):
+    def exec_internal(self, ctxt, _trace, command):
         return ZshComplFunc(ctxt, [command], needs_braces=True)
 
     def value_list(self, ctxt, trace, opts):
@@ -375,20 +375,20 @@ class ZshCompleter(shell.ShellCompleter):
 
         return ZshComplFunc(ctxt, ['_sequence', *args, func])
 
-    def history(self, ctxt, trace, pattern):
+    def history(self, ctxt, _trace, pattern):
         func = ctxt.helpers.use_function('history')
         return ZshComplFunc(ctxt, [func, pattern], needs_braces=True)
 
-    def commandline_string(self, ctxt, trace):
+    def commandline_string(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_cmdstring'])
 
-    def command_arg(self, ctxt, trace):
+    def command_arg(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_normal'])
 
-    def date(self, ctxt, trace, format_):
+    def date(self, ctxt, _trace, format_):
         return ZshComplFunc(ctxt, ['_dates', '-f', format_])
 
-    def date_format(self, ctxt, trace):
+    def date_format(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_date_formats'])
 
     def file_list(self, ctxt, trace, opts=None):
@@ -407,37 +407,37 @@ class ZshCompleter(shell.ShellCompleter):
 
         return self.list(ctxt, trace, ['directory', opts], list_opts)
 
-    def uid(self, ctxt, trace):
+    def uid(self, ctxt, _trace):
         func = ctxt.helpers.use_function('uid_list')
         return ZshComplFunc(ctxt, [func], needs_braces=True)
 
-    def gid(self, ctxt, trace):
+    def gid(self, ctxt, _trace):
         func = ctxt.helpers.use_function('gid_list')
         return ZshComplFunc(ctxt, [func], needs_braces=True)
 
-    def filesystem_type(self, ctxt, trace):
+    def filesystem_type(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_file_systems'])
 
-    def signal(self, ctxt, trace):
+    def signal(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_signals'])
 
     # =========================================================================
     # Bonus
     # =========================================================================
 
-    def net_interface(self, ctxt, trace):
+    def net_interface(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_net_interfaces'])
 
-    def timezone(self, ctxt, trace):
+    def timezone(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_time_zone'])
 
-    def locale(self, ctxt, trace):
+    def locale(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_locales'])
 
-    def alsa_card(self, ctxt, trace):
+    def alsa_card(self, ctxt, _trace):
         func = ctxt.helpers.use_function('alsa_complete_cards')
         return ZshComplFunc(ctxt, [func], needs_braces=True)
 
-    def alsa_device(self, ctxt, trace):
+    def alsa_device(self, ctxt, _trace):
         func = ctxt.helpers.use_function('alsa_complete_devices')
         return ZshComplFunc(ctxt, [func], needs_braces=True)

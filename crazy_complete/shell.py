@@ -2,7 +2,6 @@
 
 import re
 import shlex
-import collections
 
 from . import cli
 from . import utils
@@ -114,37 +113,36 @@ class ShellCompleter:
         utils.warn(f"ShellCompleter: Falling back from `{from_}` to `{to}`")
         return self.complete(ctxt, trace, to, *a)
 
-    def signal(self, ctxt, trace, prefix=''):
-        sig = prefix
-        signals = collections.OrderedDict([
-            (sig+'ABRT',   'Process abort signal'),
-            (sig+'ALRM',   'Alarm clock'),
-            (sig+'BUS',    'Access to an undefined portion of a memory object'),
-            (sig+'CHLD',   'Child process terminated, stopped, or continued'),
-            (sig+'CONT',   'Continue executing, if stopped'),
-            (sig+'FPE',    'Erroneous arithmetic operation'),
-            (sig+'HUP',    'Hangup'),
-            (sig+'ILL',    'Illegal instruction'),
-            (sig+'INT',    'Terminal interrupt signal'),
-            (sig+'KILL',   'Kill (cannot be caught or ignored)'),
-            (sig+'PIPE',   'Write on a pipe with no one to read it'),
-            (sig+'QUIT',   'Terminal quit signal'),
-            (sig+'SEGV',   'Invalid memory reference'),
-            (sig+'STOP',   'Stop executing (cannot be caught or ignored)'),
-            (sig+'TERM',   'Termination signal'),
-            (sig+'TSTP',   'Terminal stop signal'),
-            (sig+'TTIN',   'Background process attempting read'),
-            (sig+'TTOU',   'Background process attempting write'),
-            (sig+'USR1',   'User-defined signal 1'),
-            (sig+'USR2',   'User-defined signal 2'),
-            (sig+'POLL',   'Pollable event'),
-            (sig+'PROF',   'Profiling timer expired'),
-            (sig+'SYS',    'Bad system call'),
-            (sig+'TRAP',   'Trace/breakpoint trap'),
-            (sig+'XFSZ',   'File size limit exceeded'),
-            (sig+'VTALRM', 'Virtual timer expired'),
-            (sig+'XCPU',   'CPU time limit exceeded'),
-        ])
+    def signal(self, ctxt, trace):
+        signals = {
+            'ABRT':   'Process abort signal',
+            'ALRM':   'Alarm clock',
+            'BUS':    'Access to an undefined portion of a memory object',
+            'CHLD':   'Child process terminated: stopped: or continued',
+            'CONT':   'Continue executing: if stopped',
+            'FPE':    'Erroneous arithmetic operation',
+            'HUP':    'Hangup',
+            'ILL':    'Illegal instruction',
+            'INT':    'Terminal interrupt signal',
+            'KILL':   'Kill (cannot be caught or ignored)',
+            'PIPE':   'Write on a pipe with no one to read it',
+            'QUIT':   'Terminal quit signal',
+            'SEGV':   'Invalid memory reference',
+            'STOP':   'Stop executing (cannot be caught or ignored)',
+            'TERM':   'Termination signal',
+            'TSTP':   'Terminal stop signal',
+            'TTIN':   'Background process attempting read',
+            'TTOU':   'Background process attempting write',
+            'USR1':   'User-defined signal 1',
+            'USR2':   'User-defined signal 2',
+            'POLL':   'Pollable event',
+            'PROF':   'Profiling timer expired',
+            'SYS':    'Bad system call',
+            'TRAP':   'Trace/breakpoint trap',
+            'XFSZ':   'File size limit exceeded',
+            'VTALRM': 'Virtual timer expired',
+            'XCPU':   'CPU time limit exceeded',
+        }
 
         return self.complete(ctxt, trace, 'choices', signals)
 
@@ -156,6 +154,9 @@ class ShellCompleter:
 
     def command(self, ctxt, trace):
         return self.fallback(ctxt, trace, 'command', 'file')
+
+    def exec(self, _ctxt, _trace, command):
+        raise NotImplementedError()
 
     # =========================================================================
     # Bonus

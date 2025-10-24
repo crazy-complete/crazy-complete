@@ -95,11 +95,11 @@ def _validate_command_arg(ctxt, args):
         raise CrazyError('The `command_arg` completer requires a previous `command` completer')
 
 
-def _validate_void(ctxt, args):
+def _validate_void(_ctxt, args):
     args.require_no_more()
 
 
-def _validate_choices(ctxt, args):
+def _validate_choices(_ctxt, args):
     choices = args.get_required_arg('values')
     args.require_no_more()
 
@@ -120,7 +120,7 @@ def _validate_choices(ctxt, args):
         raise CrazyError('values: Not a list or dictionary')
 
 
-def _validate_command(ctxt, args):
+def _validate_command(_ctxt, args):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
@@ -151,7 +151,7 @@ def _validate_command(ctxt, args):
         raise CrazyError('command: path_append/path_prepend cannot be used with path')
 
 
-def _validate_filedir(ctxt, args, with_extensions=False, with_separator=False):
+def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
@@ -190,14 +190,14 @@ def _validate_filedir(ctxt, args, with_extensions=False, with_separator=False):
             if not isinstance(value, bool):
                 raise CrazyError(f"fuzzy: Not a bool: {value}")
 
-        elif with_separator and key == 'separator':
+        elif with_list_opts and key == 'separator':
             if not isinstance(value, str):
                 raise CrazyError(f'separator: Not a string: {value}')
 
             if len(value) != 1:
                 raise CrazyError(f'Invalid length for separator: {value}')
 
-        elif with_separator and key == 'duplicates':
+        elif with_list_opts and key == 'duplicates':
             if not isinstance(value, bool):
                 raise CrazyError(f"duplicates: Not a bool: {value}")
 
@@ -217,17 +217,17 @@ def _validate_file_list(ctxt, args):
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
         raise CrazyError(f'Command `file_list` not allowed inside {ctxt.trace[-1]}')
 
-    _validate_filedir(ctxt, args, with_extensions=True, with_separator=True)
+    _validate_filedir(ctxt, args, with_extensions=True, with_list_opts=True)
 
 
 def _validate_directory_list(ctxt, args):
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
         raise CrazyError(f'Command `directory_list` not allowed inside {ctxt.trace[-1]}')
 
-    _validate_filedir(ctxt, args, with_separator=True)
+    _validate_filedir(ctxt, args, with_list_opts=True)
 
 
-def _validate_mime_file(ctxt, args):
+def _validate_mime_file(_ctxt, args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
 
@@ -238,7 +238,7 @@ def _validate_mime_file(ctxt, args):
         raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
 
 
-def _validate_range(ctxt, args):
+def _validate_range(_ctxt, args):
     start = args.get_required_arg("start")
     stop  = args.get_required_arg("stop")
     step  = args.get_optional_arg(1)
@@ -263,7 +263,7 @@ def _validate_range(ctxt, args):
         raise CrazyError("step: cannot be 0")
 
 
-def _validate_exec(ctxt, args):
+def _validate_exec(_ctxt, args):
     cmd = args.get_required_arg('command')
     args.require_no_more()
 
@@ -271,7 +271,7 @@ def _validate_exec(ctxt, args):
         raise CrazyError(f"Command is not a string: {cmd}")
 
 
-def _validate_value_list(ctxt, args):
+def _validate_value_list(_ctxt, args):
     opts = args.get_required_arg('options')
     args.require_no_more()
 
@@ -365,7 +365,7 @@ def _validate_key_value_list(ctxt, args):
         if contains_space(key):
             raise CrazyError('Key cannot contain space')
 
-        if complete == None:
+        if complete is None:
             continue
 
         if len(complete) == 0:
@@ -440,7 +440,7 @@ def _validate_list(ctxt, args):
     validate_complete(ctxt, command)
 
 
-def _validate_history(ctxt, args):
+def _validate_history(_ctxt, args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
 
@@ -451,7 +451,7 @@ def _validate_history(ctxt, args):
         raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
 
 
-def _validate_date(ctxt, args):
+def _validate_date(_ctxt, args):
     format_ = args.get_required_arg('format')
     args.require_no_more()
 

@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from .errors import CrazyError, CrazyTypeError
 from .cli import CommandLine, ExtendedBool
-from .str_utils import is_empty_or_whitespace, validate_prog
+from .str_utils import validate_prog
 from . import compat
 
 
@@ -97,11 +97,11 @@ def _get_commandline_by_path(root, path):
         path_str = ' '.join(path[0:i + 1])
 
         if not current.get_subcommands():
-            raise CrazyError(f"Missing defintion of program `{path_str}`")
+            raise CrazyError(f"Missing definition of program `{path_str}`")
 
         current = current.get_subcommands().get_subcommand_by_name(name)
         if not current:
-            raise CrazyError(f"Missing defintion of program `{path_str}`")
+            raise CrazyError(f"Missing definition of program `{path_str}`")
 
     return current
 

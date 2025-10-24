@@ -1,11 +1,8 @@
 '''Code for generating a fish auto completion file.'''
 
-from collections import namedtuple, OrderedDict
-
 from . import config as config_
 from . import generation_notice
 from . import modeline
-from . import shell
 from . import utils
 from . import algo
 from . import fish_complete
@@ -13,9 +10,8 @@ from . import fish_helpers
 from .fish_utils import FishCompleteCommand, VariableManager
 from .fish_conditions import (
     Conditions, Not,
-    HasHiddenOption, HasOption, OptionIs, PositionalNum, PositionalContains
+    HasHiddenOption, HasOption, PositionalNum, PositionalContains
 )
-from . import when
 from . import generation
 
 

@@ -394,71 +394,71 @@ class FishCompleter(shell.ShellCompleter):
     # pylint: disable=missing-function-docstring
     # pylint: disable=too-many-public-methods
 
-    def none(self, ctxt, trace, *_):
+    def none(self, ctxt, _trace, *_):
         return FishCompleteNone(ctxt)
 
-    def integer(self, ctxt, trace, *_):
+    def integer(self, ctxt, _trace, *_):
         return FishCompleteNone(ctxt)
 
-    def float(self, ctxt, trace, *_):
+    def float(self, ctxt, _trace, *_):
         return FishCompleteNone(ctxt)
 
-    def choices(self, ctxt, trace, choices):
+    def choices(self, ctxt, _trace, choices):
         return FishCompleteChoices(ctxt, choices)
 
-    def command(self, ctxt, trace, opts=None):
+    def command(self, ctxt, _trace, opts=None):
         return FishCompleteCommand(ctxt, opts)
 
-    def directory(self, ctxt, trace, opts=None):
-        return FishCompleteDir(ctxt, trace, opts)
+    def directory(self, ctxt, _trace, opts=None):
+        return FishCompleteDir(ctxt, _trace, opts)
 
-    def file(self, ctxt, trace, opts=None):
+    def file(self, ctxt, _trace, opts=None):
         return FishCompleteFile(ctxt, opts)
 
-    def mime_file(self, ctxt, trace, pattern):
+    def mime_file(self, ctxt, _trace, pattern):
         func = ctxt.helpers.use_function('mime_file')
         return FishCompletionCommand(ctxt, [func, pattern])
 
-    def group(self, ctxt, trace):
+    def group(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["__fish_complete_groups"])
 
-    def hostname(self, ctxt, trace):
+    def hostname(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["__fish_print_hostnames"])
 
-    def pid(self, ctxt, trace):
+    def pid(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["__fish_complete_pids"])
 
-    def process(self, ctxt, trace):
+    def process(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["__fish_complete_proc"])
 
-    def range(self, ctxt, trace, start, stop, step=1):
+    def range(self, ctxt, _trace, start, stop, step=1):
         if step == 1:
             return FishCompletionCommand(ctxt, ['command', 'seq', str(start), str(stop)])
 
         return FishCompletionCommand(ctxt, ['command', 'seq', str(start), str(step), str(stop)])
 
-    def service(self, ctxt, trace):
+    def service(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["__fish_systemctl_services"])
 
-    def user(self, ctxt, trace):
+    def user(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["__fish_complete_users"])
 
-    def variable(self, ctxt, trace):
+    def variable(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["set", "-n"])
 
-    def environment(self, ctxt, trace):
+    def environment(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["set", "-n", "-x"])
 
-    def exec(self, ctxt, trace, command):
+    def exec(self, ctxt, _trace, command):
         return FishCompletionRawCommand(ctxt, command)
 
-    def exec_fast(self, ctxt, trace, command):
+    def exec_fast(self, ctxt, _trace, command):
         return FishCompletionRawCommand(ctxt, command)
 
-    def exec_internal(self, ctxt, trace, command):
+    def exec_internal(self, ctxt, _trace, command):
         return FishCompletionRawCommand(ctxt, command)
 
-    def value_list(self, ctxt, trace, opts):
+    def value_list(self, ctxt, _trace, opts):
         return FishCompleteValueList(ctxt, opts)
 
     def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
@@ -482,21 +482,21 @@ class FishCompleter(shell.ShellCompleter):
 
         return FishCompletionCommand(ctxt, [list_func, '-d', separator, func])
 
-    def history(self, ctxt, trace, pattern):
+    def history(self, ctxt, _trace, pattern):
         func = ctxt.helpers.use_function('history')
         return FishCompletionCommand(ctxt, [func, pattern])
 
-    def commandline_string(self, ctxt, trace):
+    def commandline_string(self, ctxt, _trace):
         func = ctxt.helpers.use_function('commandline_string')
         return FishCompletionCommand(ctxt, [func])
 
-    def command_arg(self, ctxt, trace):
+    def command_arg(self, ctxt, _trace):
         return FishCompleteCommandArg(ctxt)
 
-    def date(self, ctxt, trace, _format):
+    def date(self, ctxt, _trace, _format):
         return FishCompleteNone(ctxt)
 
-    def date_format(self, ctxt, trace):
+    def date_format(self, ctxt, _trace):
         func = ctxt.helpers.use_function('date_format')
         return FishCompletionCommand(ctxt, [func])
 
@@ -514,15 +514,15 @@ class FishCompleter(shell.ShellCompleter):
         }
         return self.list(ctxt, trace, ['directory', opts], list_opts)
 
-    def uid(self, ctxt, trace):
+    def uid(self, ctxt, _trace):
         func = ctxt.helpers.use_function('uid_list')
         return FishCompletionCommand(ctxt, [func])
 
-    def gid(self, ctxt, trace):
+    def gid(self, ctxt, _trace):
         func = ctxt.helpers.use_function('gid_list')
         return FishCompletionCommand(ctxt, [func])
 
-    def filesystem_type(self, ctxt, trace):
+    def filesystem_type(self, ctxt, _trace):
         cmd = "command cat /proc/filesystems | command awk '{print $2}'"
         return FishCompletionRawCommand(ctxt, cmd)
 
@@ -530,18 +530,18 @@ class FishCompleter(shell.ShellCompleter):
     # Bonus
     # =========================================================================
 
-    def net_interface(self, ctxt, trace):
+    def net_interface(self, ctxt, _trace):
         func = ctxt.helpers.use_function('net_interfaces_list')
         return FishCompletionCommand(ctxt, [func])
 
-    def timezone(self, ctxt, trace):
+    def timezone(self, ctxt, _trace):
         func = ctxt.helpers.use_function('timezone_list')
         return FishCompletionCommand(ctxt, [func])
 
-    def alsa_card(self, ctxt, trace):
+    def alsa_card(self, ctxt, _trace):
         func = ctxt.helpers.use_function('alsa_list_cards')
         return FishCompletionCommand(ctxt, [func])
 
-    def alsa_device(self, ctxt, trace):
+    def alsa_device(self, ctxt, _trace):
         func = ctxt.helpers.use_function('alsa_list_devices')
         return FishCompletionCommand(ctxt, [func])

@@ -8,7 +8,7 @@ from .type_utils import is_list_type
 class HasOption:
     def __init__(self, option_strings):
         if not is_list_type(option_strings):
-            raise InternalError(f'option_strings: Invalid type')
+            raise InternalError('option_strings: Invalid type')
 
         self.option_strings = option_strings
 
@@ -35,14 +35,14 @@ class HasOption:
 class HasHiddenOption:
     def __init__(self, option_strings):
         if not is_list_type(option_strings):
-            raise InternalError(f'option_strings: Invalid type')
+            raise InternalError('option_strings: Invalid type')
 
         self.option_strings = option_strings
 
     def query_code(self, ctxt):
         ctxt.helpers.use_function('query', 'has_option')
         ctxt.helpers.use_function('query', 'with_incomplete')
-        options  = ' '.join(self.option_strings)
+        options = ' '.join(self.option_strings)
         r = "$query '$opts' has_option WITH_INCOMPLETE %s" % options
         return r
 
@@ -53,10 +53,10 @@ class HasHiddenOption:
 class OptionIs:
     def __init__(self, option_strings, values):
         if not is_list_type(option_strings):
-            raise InternalError(f'option_strings: Invalid type')
+            raise InternalError('option_strings: Invalid type')
 
         if not is_list_type(values):
-            raise InternalError(f'values: Invalid type')
+            raise InternalError('values: Invalid type')
 
         self.option_strings = option_strings
         self.values = values
@@ -99,6 +99,7 @@ class PositionalNum:
         op = self.TEST_OPERATORS[self.operator]
         r = "test (__fish_number_of_cmd_args_wo_opts) %s %d" % (op, self.number)
         return r
+
 
 class PositionalContains:
     def __init__(self, number, values):

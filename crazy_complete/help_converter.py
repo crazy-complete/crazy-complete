@@ -39,7 +39,7 @@ def complete_for_metavar(string):
     '''Return completion for metavar.'''
 
     string = string.strip('<>')
-    lower  = string.lower()
+    lower = string.lower()
 
     equals = {
         'f':            ['file'],

@@ -74,6 +74,7 @@ def _make_long_opts_pattern(opts, arg_type):
 
     old = [o.lstrip('-') for o in old]
     long = [o.lstrip('-') for o in long]
+    r = ''
 
     if long and old:
         r = '-(%s|-(%s))' % ('|'.join(old), '|'.join(long))
@@ -82,9 +83,9 @@ def _make_long_opts_pattern(opts, arg_type):
     elif old:
         r = '-(%s)' % '|'.join(old)
 
-    if arg_type is 'arg':
+    if arg_type == 'arg':
         r += '=*'
-    elif arg_type is 'optional':
+    elif arg_type == 'optional':
         r += '(|=*)'
 
     return r

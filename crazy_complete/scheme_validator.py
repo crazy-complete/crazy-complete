@@ -27,7 +27,7 @@ class Context:
     TYPE_POSITIONAL = 1
 
     def __init__(self):
-        self.defintion = None
+        self.definition = None
         self.option = None
         self.positional = None
         self.type = None
@@ -60,7 +60,6 @@ class Arguments:
             return arg
 
         return ValueWithTrace(default, '<default value>', 1, 1)
-
 
     def require_no_more(self):
         '''Raise an exception if there are any arguments left.'''
@@ -125,7 +124,7 @@ def _check_when(value):
         raise _error(f'when: {e}', value) from e
 
 
-def _check_void(ctxt, arguments):
+def _check_void(_ctxt, arguments):
     arguments.require_no_more()
 
 
@@ -136,7 +135,7 @@ def _check_none(ctxt, arguments):
         raise _error(f'Command `none` not allowed inside {ctxt.trace[-1]}', arguments.args)
 
 
-def _check_choices(ctxt, arguments):
+def _check_choices(_ctxt, arguments):
     choices = arguments.get_required_arg('choices')
     _check_type(choices, (list, dict))
     arguments.require_no_more()
@@ -151,7 +150,7 @@ def _check_choices(ctxt, arguments):
             _check_type(value, (str, int))
 
 
-def _check_command(ctxt, arguments):
+def _check_command(_ctxt, arguments):
     opts = arguments.get_optional_arg({})
     _check_type(opts, (dict, ))
     arguments.require_no_more()
@@ -210,7 +209,7 @@ def _check_command_arg(ctxt, arguments):
         raise _error('The `command_arg` completer requires a previous `command` completer', ctxt.positional)
 
 
-def _check_filedir(ctxt, arguments, with_extensions=False, with_separator=False):
+def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False):
     options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
     arguments.require_no_more()
@@ -221,7 +220,7 @@ def _check_filedir(ctxt, arguments, with_extensions=False, with_separator=False)
         spec['extensions'] = (False, (list,))
         spec['fuzzy'] = (False, (bool,))
 
-    if with_separator:
+    if with_list_opts:
         spec['separator'] = (False, (str,))
         spec['duplicates'] = (False, (bool,))
 
@@ -264,19 +263,19 @@ def _check_directory(ctxt, arguments):
 
 def _check_file_list(ctxt, arguments):
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
-        raise _error(f'Command `file_list` not allowed inside {ctxt.trace[-1]}')
+        raise _error(f'Command `file_list` not allowed inside {ctxt.trace[-1]}', arguments.args)
 
-    _check_filedir(ctxt, arguments, with_extensions=True, with_separator=True)
+    _check_filedir(ctxt, arguments, with_extensions=True, with_list_opts=True)
 
 
 def _check_directory_list(ctxt, arguments):
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
-        raise _error(f'Command `directory_list` not allowed inside {ctxt.trace[-1]}')
+        raise _error(f'Command `directory_list` not allowed inside {ctxt.trace[-1]}', arguments.args)
 
-    _check_filedir(ctxt, arguments, with_separator=True)
+    _check_filedir(ctxt, arguments, with_list_opts=True)
 
 
-def _check_mime_file(ctxt, arguments):
+def _check_mime_file(_ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
     arguments.require_no_more()
@@ -285,15 +284,15 @@ def _check_mime_file(ctxt, arguments):
         raise _error('Pattern: Not a valid extended regex', pattern)
 
 
-def _check_range(ctxt, arguments):
+def _check_range(_ctxt, arguments):
     start = arguments.get_required_arg("start")
     _check_type(start, (int,), "start")
 
     stop  = arguments.get_required_arg("stop")
-    _check_type(stop,  (int,), "stop")
+    _check_type(stop, (int,), "stop")
 
     step  = arguments.get_optional_arg(1)
-    _check_type(step,  (int,), "step")
+    _check_type(step, (int,), "step")
 
     arguments.require_no_more()
 
@@ -309,13 +308,13 @@ def _check_range(ctxt, arguments):
         raise _error("step: cannot be 0", step)
 
 
-def _check_exec(ctxt, arguments):
+def _check_exec(_ctxt, arguments):
     command = arguments.get_required_arg("command")
     _check_type(command, (str,), "command")
     arguments.require_no_more()
 
 
-def _check_value_list(ctxt, arguments):
+def _check_value_list(_ctxt, arguments):
     options = arguments.get_required_arg('options')
     _check_type(options, (dict,), 'options')
     arguments.require_no_more()
@@ -383,7 +382,7 @@ def _check_key_value_list(ctxt, arguments):
         if contains_space(key.value):
             raise _error('Key cannot contain space', key)
 
-        if complete.value == None:
+        if complete.value is None:
             continue
 
         if len(complete.value) == 0:
@@ -432,10 +431,10 @@ def _check_list(ctxt, arguments):
     })
 
     if 'list' in ctxt.trace:
-         raise _error('Nested `list` not allowed', arguments.args)
+        raise _error('Nested `list` not allowed', arguments.args)
 
     if 'key_value_list' in ctxt.trace:
-         raise _error('Command `list` not allowed inside key_value_list', arguments.args)
+        raise _error('Command `list` not allowed inside key_value_list', arguments.args)
 
     if len(command.value) == 0:
         raise _error('Missing command', command)
@@ -450,7 +449,7 @@ def _check_list(ctxt, arguments):
     _check_complete(ctxt, command)
 
 
-def _check_history(ctxt, arguments):
+def _check_history(_ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
     arguments.require_no_more()
@@ -459,7 +458,7 @@ def _check_history(ctxt, arguments):
         raise _error('Pattern: Not a valid extended regex', pattern)
 
 
-def _check_date(ctxt, arguments):
+def _check_date(_ctxt, arguments):
     format_ = arguments.get_required_arg("format")
     _check_type(format_, (str,), "format")
     arguments.require_no_more()
