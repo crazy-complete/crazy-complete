@@ -8,6 +8,7 @@ from .str_utils import (
     is_valid_extended_regex, contains_space, is_empty_or_whitespace
 )
 
+
 # =============================================================================
 # Helper functions
 # =============================================================================
@@ -16,8 +17,8 @@ from .str_utils import (
 class Context:
     '''Class for providing context to validation.'''
 
-    OPTION = 0
-    POSITIONAL = 1
+    TYPE_OPTION = 0
+    TYPE_POSITIONAL = 1
 
     def __init__(self):
         self.cmdline = None
@@ -77,7 +78,7 @@ def _validate_command_arg(ctxt, args):
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
         raise CrazyError(f'Command `command_arg` not allowed inside {ctxt.trace[-1]}')
 
-    if ctxt.type != Context.POSITIONAL:
+    if ctxt.type != Context.TYPE_POSITIONAL:
         raise CrazyError('command_arg not allowed inside options')
 
     if not ctxt.positional.repeatable:
@@ -570,7 +571,7 @@ def validate_commandline(cmdline):
     context = Context()
     context.cmdline = cmdline
 
-    context.type = Context.OPTION
+    context.type = Context.TYPE_OPTION
     for option in cmdline.get_options():
         try:
             context.trace = []
@@ -582,7 +583,7 @@ def validate_commandline(cmdline):
                 '|'.join(option.option_strings),
                 e)) from e
 
-    context.type = Context.POSITIONAL
+    context.type = Context.TYPE_POSITIONAL
     for positional in cmdline.get_positionals():
         try:
             context.trace = []

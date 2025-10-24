@@ -11,6 +11,7 @@ from .str_utils import (
     is_valid_option_string, is_valid_variable_name,
     is_valid_extended_regex, validate_prog)
 
+
 _error = CrazySchemaValidationError
 
 
@@ -22,8 +23,8 @@ _error = CrazySchemaValidationError
 class Context:
     '''Class for providing context to validation.'''
 
-    OPTION = 0
-    POSITIONAL = 1
+    TYPE_OPTION = 0
+    TYPE_POSITIONAL = 1
 
     def __init__(self):
         self.defintion = None
@@ -190,7 +191,7 @@ def _check_command_arg(ctxt, arguments):
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
         raise _error(f'Command `command_arg` not allowed inside {ctxt.trace[-1]}', arguments.args)
 
-    if ctxt.type != Context.POSITIONAL:
+    if ctxt.type != Context.TYPE_POSITIONAL:
         raise _error('command_arg not allowed inside options', arguments.args)
 
     if (not _has_set(ctxt.positional, 'repeatable') or
@@ -596,6 +597,7 @@ def _check_option(ctxt, option):
         _check_extended_bool(option.value['repeatable'])
 
     if _has_set(option, 'complete'):
+        ctxt.type = Context.TYPE_OPTION
         ctxt.option = option
         ctxt.trace = []
         _check_complete(ctxt, option.value['complete'])
@@ -623,6 +625,7 @@ def _check_positional(ctxt, positional):
         raise _error('number cannot be zero or negative', positional.value['number'])
 
     if _has_set(positional, 'complete'):
+        ctxt.type = Context.TYPE_POSITIONAL
         ctxt.positional = positional
         ctxt.trace = []
         _check_complete(ctxt, positional.value['complete'])
@@ -680,14 +683,10 @@ def _check_definition(ctxt, definition):
         _check_extended_bool(definition.value['inherit_options'])
 
     if _has_set(definition, 'options'):
-        ctxt.type = Context.OPTION
-
         for option in definition.value['options'].value:
             _check_option(ctxt, option)
 
     if _has_set(definition, 'positionals'):
-        ctxt.type = Context.POSITIONAL
-
         for positional in definition.value['positionals'].value:
             _check_positional(ctxt, positional)
 
