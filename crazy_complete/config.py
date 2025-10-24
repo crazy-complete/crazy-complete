@@ -16,6 +16,7 @@ class Config:
         self.abbreviate_options     = False
         self.repeatable_options     = False
         self.inherit_options        = False
+        self.option_stacking        = True
         self.vim_modeline           = True
         self.include_files          = []
         self.comments               = []
@@ -147,6 +148,34 @@ class Config:
         _assert_is_bool(enable, "set_inherit_options", "enable")
 
         self.inherit_options = enable
+
+    def set_option_stacking(self, enable):
+        '''Sets wether short option stacking is allowed.
+
+        Args:
+            enable (bool):
+                IF True, option stacking is allowed.
+                If False, it is not.
+
+        Notes:
+            This feature defaults to `True`.
+
+            Implementation status for shells:
+                Bash:
+                    - set_option_stacking(True): works
+                    - set_option_stacking(False): not implemented
+                Fish:
+                    - set_option_stacking(True): works
+                    - set_option_stacking(False): works
+                Zsh:
+                    - set_option_stacking(True): works
+                    - set_option_stacking(False): works
+
+        '''
+
+        _assert_is_bool(enable, "set_option_stacking", "enable")
+
+        self.option_stacking = enable
 
     def set_vim_modeline(self, enable):
         '''Sets whether a vim modeline comment shall be appended to the generated code.

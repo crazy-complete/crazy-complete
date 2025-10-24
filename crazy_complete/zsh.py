@@ -217,7 +217,11 @@ class ZshCompletionFunction:
 
             r += '  args+=(%s)\n' % arg.option_spec
 
-        r += '_arguments -S -s -w "${args[@]}"'
+        if self.ctxt.config.option_stacking:
+            r += '_arguments -S -s -w "${args[@]}"'
+        else:
+            r += '_arguments -S "${args[@]}"'
+
         return r
 
     def get_code(self):

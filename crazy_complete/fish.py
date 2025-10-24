@@ -50,9 +50,14 @@ class FishCompletionDefinition:
     def get_complete_cmd(self, ctxt, unsafe=False):
         cmd = FishCompleteCommand()
         cmd.set_command('$prog', raw=True)
-        cmd.add_short_options(self.short_options)
-        cmd.add_long_options(self.long_options)
+
         cmd.add_old_options(self.old_options)
+        cmd.add_long_options(self.long_options)
+
+        if not ctxt.config.option_stacking:
+            cmd.add_old_options(self.short_options)
+        else:
+            cmd.add_short_options(self.short_options)
 
         if self.description is not None:
             cmd.set_description(self.description)
