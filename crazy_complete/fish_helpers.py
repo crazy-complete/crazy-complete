@@ -370,14 +370,11 @@ _FISH_COMPLETE_FILEDIR = helpers.FishFunction('fish_complete_filedir', r'''
 #
 # Options:
 #   -d|--description=DESC   The description for completed entries
-#   -c|--comp=STR           Complete STR instead of current command line argument
 #   -D|--directories        Only complete directories
 #   -C|--cd=DIR             List contents in DIR
 #ifdef regex
 #   -r|--regex=PATTERN      Only list files matching pattern
 #endif
-#
-# This function is made out of /usr/share/fish/functions/__fish_complete_directories.fish
 
 #ifdef regex
 argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
@@ -385,19 +382,13 @@ argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' 'r/rege
 argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' -- $argv || return 1
 #endif
 
-set -l comp
+set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
 set -l desc
 
 if set -q _flag_description[1]
   set desc $_flag_description
 else if set -g _flag_directories
   set desc 'Directory'
-end
-
-if set -q _flag_comp[1]
-  set comp $_flag_comp
-else
-  set comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
 end
 
 if test -n "$__fish_stripprefix"
@@ -579,6 +570,10 @@ _MIME_FILE = helpers.FishFunction('mime_file', r'''
 set -l i_opt
 
 set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
+
+if test -n "$__fish_stripprefix"
+  set comp (string replace -r -- $__fish_stripprefix '' $comp)
+end
 
 if command file -i /dev/null &>/dev/null
   set i_opt '-i'
