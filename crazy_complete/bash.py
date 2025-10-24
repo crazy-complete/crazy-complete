@@ -85,7 +85,7 @@ class BashCompletionGenerator:
                 r += '  local realpos\n'
                 r += '  for realpos in "${!COMP_WORDS[@]}"; do\n'
                 r += '    [[ "${COMP_WORDS[realpos]}" == "${POSITIONALS[%d]}" ]] && {\n' % (positional.get_positional_num() - 2)
-                r += '      _command_offset $realpos\n'
+                r += '      %s $realpos\n' % bash_versions.command_offset(self.ctxt)
                 r += '      return 0;\n'
                 r += '    }\n'
                 r += '  done\n'

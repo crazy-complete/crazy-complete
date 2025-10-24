@@ -69,3 +69,10 @@ def fstypes(ctxt):
         return '_comp_compgen -a fstypes'
 
     return '_fstypes'
+
+
+def command_offset(ctxt):
+    if ctxt.config.bash_completions_version >= (2, 12):
+        return '_comp_command_offset'
+
+    return '_command_offset'
