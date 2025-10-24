@@ -21,7 +21,10 @@ class Context:
 
     def __init__(self):
         self.cmdline = None
+        self.option = None
+        self.positional = None
         self.type = None
+        self.trace = None
 
 
 class Arguments:
@@ -63,8 +66,32 @@ class Arguments:
 # =============================================================================
 
 
-def _validate_none(_ctxt, _args):
-    pass
+def _validate_none(ctxt, args):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list'):
+        raise CrazyError(f'Command `none` not allowed inside {ctxt.trace[-1]}')
+
+
+def _validate_command_arg(ctxt, args):
+    args.require_no_more()
+
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
+        raise CrazyError(f'Command `command_arg` not allowed inside {ctxt.trace[-1]}')
+
+    if ctxt.type != Context.POSITIONAL:
+        raise CrazyError('command_arg not allowed inside options')
+
+    if not ctxt.positional.repeatable:
+        raise CrazyError('The `command_arg` completer requires `repeatable=True`')
+
+    def command_is_previous_to_command_arg(positional):
+        return (
+            positional.complete and
+            positional.complete[0] == 'command' and
+            positional.number + 1 == ctxt.positional.number
+        )
+
+    if not any(filter(command_is_previous_to_command_arg, ctxt.cmdline.positionals)):
+        raise CrazyError('The `command_arg` completer requires a previous `command` completer')
 
 
 def _validate_void(ctxt, args):
@@ -186,10 +213,16 @@ def _validate_directory(ctxt, args):
 
 
 def _validate_file_list(ctxt, args):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
+        raise CrazyError(f'Command `file_list` not allowed inside {ctxt.trace[-1]}')
+
     _validate_filedir(ctxt, args, with_extensions=True, with_separator=True)
 
 
 def _validate_directory_list(ctxt, args):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
+        raise CrazyError(f'Command `directory_list` not allowed inside {ctxt.trace[-1]}')
+
     _validate_filedir(ctxt, args, with_separator=True)
 
 
@@ -292,6 +325,14 @@ def _validate_key_value_list(ctxt, args):
     values = args.get_required_arg('values')
     args.require_no_more()
 
+    if 'key_value_list' in ctxt.trace:
+        raise CrazyError('Nested `key_value_list` not allowed')
+
+    if 'list' in ctxt.trace:
+        raise CrazyError('Command `key_value_list` not allowed inside list')
+
+    ctxt.trace.append('key_value_list')
+
     if not isinstance(pair_separator, str):
         raise CrazyError('pair_separator: Not a string')
 
@@ -315,7 +356,7 @@ def _validate_key_value_list(ctxt, args):
             raise CrazyError(f'key: Not a string: {key}')
 
         if not isinstance(complete, (list, NoneType)):
-            raise CrazyError(f'complete: Not a list: {complete}')
+            raise CrazyError(f'complete: Not a list or None: {complete}')
 
         if is_empty_or_whitespace(key):
             raise CrazyError('Key cannot be empty')
@@ -329,21 +370,17 @@ def _validate_key_value_list(ctxt, args):
         if len(complete) == 0:
             raise CrazyError('Missing command')
 
-        if complete[0] == 'key_list':
-            raise CrazyError('Nested `key_list` not allowed')
-
-        if complete[0] == 'command_arg':
-            raise CrazyError('Command `command_arg` not allowed inside key_list')
-
-        if complete[0] == 'list':
-            raise CrazyError('Command `list` not allowed inside key_list')
-
         validate_complete(ctxt, complete)
 
 
 def _validate_combine(ctxt, args):
     commands = args.get_required_arg('commands')
     args.require_no_more()
+
+    if 'combine' in ctxt.trace:
+        raise CrazyError('Nested `combine` not allowed')
+
+    ctxt.trace.append('combine')
 
     if not isinstance(commands, list):
         raise CrazyError(f'combine: Not a list: {commands}')
@@ -354,18 +391,6 @@ def _validate_combine(ctxt, args):
 
         if len(subcommand_args) == 0:
             raise CrazyError('combine: Missing command')
-
-        if subcommand_args[0] == 'combine':
-            raise CrazyError('Nested `combine` not allowed')
-
-        if subcommand_args[0] == 'none':
-            raise CrazyError('Command `none` not allowed inside combine')
-
-        if subcommand_args[0] == 'command_arg':
-            raise CrazyError('Command `command_arg` not allowed inside combine')
-
-        if subcommand_args[0] == 'list':
-            raise CrazyError('Command `list` not allowed inside combine')
 
         validate_complete(ctxt, subcommand_args)
 
@@ -381,20 +406,19 @@ def _validate_list(ctxt, args):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
+    if 'list' in ctxt.trace:
+        raise CrazyError('Nested `list` not allowed')
+
+    if 'key_value_list' in ctxt.trace:
+        raise CrazyError('Command `list` not allowed inside key_value_list')
+
+    ctxt.trace.append('list')
+
     if not isinstance(command, list):
         raise CrazyError(f'list: Not a list: {command}')
 
     if len(command) == 0:
         raise CrazyError('list: Missing command')
-
-    if command[0] == 'list':
-        raise CrazyError('Nested `list` not allowed')
-
-    if command[0] == 'none':
-        raise CrazyError('Command `none` not allowed inside list')
-
-    if command[0] == 'command_arg':
-        raise CrazyError('Command `command_arg` not allowed inside list')
 
     if not is_dict_type(opts):
         raise CrazyTypeError('options', 'dict', opts)
@@ -454,9 +478,6 @@ def validate_complete(ctxt, complete):
     if not isinstance(command, str):
         raise CrazyError(f"Command is not a string: {command}")
 
-    if command == 'command_arg' and ctxt.type == Context.OPTION:
-        raise CrazyError('command_arg not allowed inside options')
-
     validate_commands = {
         'none':          _validate_none,
         'integer':       _validate_void,
@@ -485,7 +506,7 @@ def validate_complete(ctxt, complete):
         'list':          _validate_list,
         'history':       _validate_history,
         'commandline_string': _validate_void,
-        'command_arg':   _validate_void,
+        'command_arg':   _validate_command_arg,
         'date':          _validate_date,
         'date_format':   _validate_void,
         'file_list':     _validate_file_list,
@@ -532,27 +553,6 @@ def validate_positionals_repeatable(cmdline):
         raise CrazyError('Repeatable positionals and subcommands cannot be used together')
 
 
-def validate_positionals_command_arg(cmdline):
-    '''Check for the right usage of `command_arg`.'''
-
-    positionals = cmdline.get_positionals()
-    command_position = None
-
-    for positional in sorted(positionals, key=lambda p: p.number):
-        complete = positional.complete or ['none']
-        positional_number = positional.get_positional_num()
-
-        if complete[0] == 'command':
-            command_position = positional_number
-
-        elif complete[0] == 'command_arg':
-            if not positional.repeatable:
-                raise CrazyError('The `command_arg` completer requires `repeatable=True`')
-
-            if command_position is None or command_position + 1 != positional_number:
-                raise CrazyError('The `command_arg` completer requires a previous `command` completer')
-
-
 def validate_wraps(cmdline):
     '''Check for the right usage of `wraps`.'''
 
@@ -573,6 +573,8 @@ def validate_commandline(cmdline):
     context.type = Context.OPTION
     for option in cmdline.get_options():
         try:
+            context.trace = []
+            context.option = option
             validate_complete(context, option.complete)
         except CrazyError as e:
             raise CrazyError("%s: %s: %s" % (
@@ -583,17 +585,18 @@ def validate_commandline(cmdline):
     context.type = Context.POSITIONAL
     for positional in cmdline.get_positionals():
         try:
+            context.trace = []
+            context.positional = positional
             validate_complete(context, positional.complete)
         except CrazyError as e:
-            raise CrazyError("%s: %d (%s): %s" % (
+            raise CrazyError("%s: positional %d (%s): %s" % (
                 cmdline.get_command_path(),
                 positional.number,
-                positional.metavar,
+                positional.metavar or 'unnamed',
                 e)) from e
 
     try:
         validate_positionals_repeatable(cmdline)
-        validate_positionals_command_arg(cmdline)
         validate_wraps(cmdline)
     except CrazyError as e:
         raise CrazyError("%s: %s" % (cmdline.get_command_path(), e)) from e

@@ -27,7 +27,10 @@ class Context:
 
     def __init__(self):
         self.defintion = None
+        self.option = None
+        self.positional = None
         self.type = None
+        self.trace = None
 
 
 class Arguments:
@@ -125,6 +128,13 @@ def _check_void(ctxt, arguments):
     arguments.require_no_more()
 
 
+def _check_none(ctxt, arguments):
+    arguments.require_no_more()
+
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list'):
+        raise _error(f'Command `none` not allowed inside {ctxt.trace[-1]}', arguments.args)
+
+
 def _check_choices(ctxt, arguments):
     choices = arguments.get_required_arg('choices')
     _check_type(choices, (list, dict))
@@ -172,6 +182,31 @@ def _check_command(ctxt, arguments):
 
     if path and (append or prepend):
         raise _error('path_append/path_prepend cannot be used with path', opts)
+
+
+def _check_command_arg(ctxt, arguments):
+    arguments.require_no_more()
+
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
+        raise _error(f'Command `command_arg` not allowed inside {ctxt.trace[-1]}', arguments.args)
+
+    if ctxt.type != Context.POSITIONAL:
+        raise _error('command_arg not allowed inside options', arguments.args)
+
+    if (not _has_set(ctxt.positional, 'repeatable') or
+        not ctxt.positional.value['repeatable'].value):
+        raise _error('The `command_arg` completer requires `repeatable=True`', ctxt.positional)
+
+    def command_is_previous_to_command_arg(positional):
+        return (
+            _has_set(positional, 'complete') and
+            positional.value['complete'].value[0] == 'command' and
+            positional.value['number'].value + 1 == ctxt.positional.value['number'].value
+        )
+
+    positionals = ctxt.definition.value['positionals'].value
+    if not any(filter(command_is_previous_to_command_arg, positionals)):
+        raise _error('The `command_arg` completer requires a previous `command` completer', ctxt.positional)
 
 
 def _check_filedir(ctxt, arguments, with_extensions=False, with_separator=False):
@@ -227,10 +262,16 @@ def _check_directory(ctxt, arguments):
 
 
 def _check_file_list(ctxt, arguments):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
+        raise _error(f'Command `file_list` not allowed inside {ctxt.trace[-1]}')
+
     _check_filedir(ctxt, arguments, with_extensions=True, with_separator=True)
 
 
 def _check_directory_list(ctxt, arguments):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
+        raise _error(f'Command `directory_list` not allowed inside {ctxt.trace[-1]}')
+
     _check_filedir(ctxt, arguments, with_separator=True)
 
 
@@ -314,6 +355,14 @@ def _check_key_value_list(ctxt, arguments):
     _check_type(value_separator, (str,), 'value_separator')
     _check_type(values, (dict,), 'values')
 
+    if 'key_value_list' in ctxt.trace:
+        raise _error('Nested `key_value_list` not allowed', arguments.arg)
+
+    if 'list' in ctxt.trace:
+        raise _error('Command `key_value_list` not allowed inside list', arguments.args)
+
+    ctxt.trace.append('key_value_list')
+
     if len(pair_separator.value) != 1:
         raise _error('Invalid length for pair_separator', pair_separator)
 
@@ -339,15 +388,6 @@ def _check_key_value_list(ctxt, arguments):
         if len(complete.value) == 0:
             raise _error('Missing command', complete)
 
-        if complete.value[0] == 'key_value_list':
-            raise _error('Nested `key_value_list` not allowed', complete)
-
-        if complete.value[0] == 'command_arg':
-            raise _error('Command `command_arg` not allowed inside key_value_list', complete)
-
-        if complete.value[0] == 'list':
-            raise _error('Command `list` not allowed inside key_value_list', complete)
-
         _check_complete(ctxt, complete)
 
 
@@ -357,25 +397,18 @@ def _check_combine(ctxt, arguments):
 
     _check_type(commands, (list,))
 
-    for subcommand_args in commands.value:
-        _check_type(subcommand_args, (list,))
+    if 'combine' in ctxt.trace:
+        raise _error('Nested `combine` not allowed', arguments.args)
 
-        if len(subcommand_args.value) == 0:
-            raise _error('Missing command', subcommand_args)
+    ctxt.trace.append('combine')
 
-        if subcommand_args.value[0] == 'combine':
-            raise _error('Nested `combine` not allowed', subcommand_args)
+    for completer in commands.value:
+        _check_type(completer, (list,))
 
-        if subcommand_args.value[0] == 'none':
-            raise _error('Command `none` not allowed inside combine', subcommand_args)
+        if len(completer.value) == 0:
+            raise _error('Missing command', completer)
 
-        if subcommand_args.value[0] == 'command_arg':
-            raise _error('Command `command_arg` not allowed inside combine', subcommand_args)
-
-        if subcommand_args.value[0] == 'list':
-            raise _error('Command `list` not allowed inside combine', subcommand_args)
-
-        _check_complete(ctxt, subcommand_args)
+        _check_complete(ctxt, completer)
 
     if len(commands.value) == 0:
         raise _error('combine: Cannot be empty', commands)
@@ -397,17 +430,14 @@ def _check_list(ctxt, arguments):
         'duplicates': (False, (bool,)),
     })
 
+    if 'list' in ctxt.trace:
+         raise _error('Nested `list` not allowed', arguments.args)
+
+    if 'key_value_list' in ctxt.trace:
+         raise _error('Command `list` not allowed inside key_value_list', arguments.args)
+
     if len(command.value) == 0:
         raise _error('Missing command', command)
-
-    if command.value[0] == 'list':
-        raise _error('Nested `list` not allowed', command)
-
-    if command.value[0] == 'none':
-        raise _error('Command `none` not allowed inside list', command)
-
-    if command.value[0] == 'command_arg':
-        raise _error('Command `command_arg` not allowed inside list', command)
 
     if _has_set(options, 'separator'):
         separator = options.value['separator']
@@ -415,6 +445,7 @@ def _check_list(ctxt, arguments):
         if len(separator.value) != 1:
             raise _error('Invalid length for separator', separator)
 
+    ctxt.trace.append('list')
     _check_complete(ctxt, command)
 
 
@@ -440,11 +471,8 @@ def _check_complete(ctxt, args):
     arguments = Arguments(args)
     cmd = arguments.get_required_arg('command')
 
-    if cmd.value == 'command_arg' and ctxt.type == Context.OPTION:
-        raise _error('command_arg not allowed inside options', cmd)
-
     commands = {
-        'none':             _check_void,
+        'none':             _check_none,
         'integer':          _check_void,
         'float':            _check_void,
         'command':          _check_command,
@@ -471,7 +499,7 @@ def _check_complete(ctxt, args):
         'list':             _check_list,
         'history':          _check_history,
         'commandline_string': _check_void,
-        'command_arg':      _check_void,
+        'command_arg':      _check_command_arg,
         'date':             _check_date,
         'date_format':      _check_void,
         'file_list':        _check_file_list,
@@ -523,37 +551,6 @@ def _check_positionals_repeatable(definition_tree, definition):
         raise _error('Repeatable positionals and subcommands cannot be used together', definition)
 
 
-def _check_positionals_command_arg(definition):
-    '''Check for the right usage of `command_arg`.'''
-
-    if not _has_set(definition, 'positionals'):
-        return
-
-    positionals = definition.value['positionals'].value
-    command_position = None
-
-    for positional in sorted(positionals, key=lambda p: p.value['number'].value):
-        complete = ['none']
-        if _has_set(positional, 'complete'):
-            complete = positional.value['complete'].value
-
-        repeatable = False
-        if _has_set(positional, 'repeatable'):
-            repeatable = positional.value['repeatable'].value
-
-        positional_number = positional.value['number'].value
-
-        if complete[0] == 'command':
-            command_position = positional_number
-
-        elif complete[0] == 'command_arg':
-            if not repeatable:
-                raise _error('The `command_arg` completer requires `repeatable=True`', positional)
-
-            if command_position is None or command_position + 1 != positional_number:
-                raise _error('The `command_arg` completer requires a previous `command` completer', positional)
-
-
 def _check_option(ctxt, option):
     _check_dictionary(option, {
         'option_strings':       (True,  (list,)),
@@ -598,6 +595,8 @@ def _check_option(ctxt, option):
         _check_extended_bool(option.value['repeatable'])
 
     if _has_set(option, 'complete'):
+        ctxt.option = option
+        ctxt.trace = []
         _check_complete(ctxt, option.value['complete'])
 
     if _has_set(option, 'when'):
@@ -623,6 +622,8 @@ def _check_positional(ctxt, positional):
         raise _error('number cannot be zero or negative', positional.value['number'])
 
     if _has_set(positional, 'complete'):
+        ctxt.positional = positional
+        ctxt.trace = []
         _check_complete(ctxt, positional.value['complete'])
 
     if _has_set(positional, 'when'):
@@ -754,4 +755,3 @@ def validate(definition_list):
 
     for definition in definition_list:
         _check_positionals_repeatable(tree, definition)
-        _check_positionals_command_arg(definition)

@@ -1,4 +1,4 @@
 prog: "foo"
 options:
   - option_strings: ["-o"]
-    complete: ["combine", [["user"], ["combine"]]]
+    complete: ["combine", [["user"], ["combine", ["user"]]]]
