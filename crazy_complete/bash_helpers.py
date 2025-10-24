@@ -281,9 +281,11 @@ for ((i=1; i <= $#; i += 2)); do
   keys["${@:i:1}"]="${@:i + 1:1}"
 done
 
-local needs_strip=1
-[[ "${cur:0:1}" == '"' ]] && needs_strip=0
-[[ "${cur:0:1}" == "'" ]] && needs_strip=0
+local strip_chars=''
+[[ "$COMP_WORDBREAKS" == *"$sep1"* ]] && strip_chars+="$sep1"
+[[ "$COMP_WORDBREAKS" == *"$sep2"* ]] && strip_chars+="$sep2"
+[[ "${cur:0:1}" == '"' ]] && strip_chars=''
+[[ "${cur:0:1}" == "'" ]] && strip_chars=''
 cur="$(my_dequote "$cur")"
 
 if [[ -z "$cur" ]]; then
@@ -318,7 +320,7 @@ done
 COMPREPLY=()
 
 if [[ "${cur: -1}" == "$sep1" ]]; then
-  (( needs_strip )) && cur_stripped="${cur_stripped##*=}"
+  [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
 
   for key in "${remaining_keys[@]}"; do
     COMPREPLY+=("$cur_stripped$key")
@@ -331,17 +333,16 @@ else
     cur="$value"
     ${keys[$key]}
 
-    if (( needs_strip )); then
-        cur_stripped="${cur_stripped##"$sep"*}"
-    else
-        cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
+    cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
+    if [[ -n "$strip_chars" ]]; then
+        cur_stripped="${cur_stripped##*[$strip_chars]}"
     fi
 
     for i in "${!COMPREPLY[@]}"; do
       COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
     done
   else
-    (( needs_strip )) && cur_stripped="${cur_stripped##*=}"
+    [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
     cur_stripped="${cur_stripped%"$pair"}"
 
     for key in "${remaining_keys[@]}"; do

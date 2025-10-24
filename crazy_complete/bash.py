@@ -109,8 +109,6 @@ class BashCompletionGenerator:
         code['init_completion'] = None
         code['command_line_parsing'] = None
 
-        code['set_wordbreaks'] = "local COMP_WORDBREAKS=''"
-
         if self.subcommands:
             code['subcommand_call'] = self._generate_subcommand_call()
 
