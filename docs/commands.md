@@ -271,9 +271,9 @@ base32    base64    basename  basenc    bash      bashbug
 
 **NOTES**
 
-- This completion type can only be used in combination with a previously defined `command` completer.
+- This completer can only be used in combination with a previously defined `command` completer.
 
-- This completion requires `repeatable: true`.
+- This completer requires `repeatable: true`.
 
 ```yaml
 prog: "example"
@@ -538,7 +538,7 @@ cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
 
 **NOTES**
 
-- This completion currently serves as documentation and does not provide actual functionality.
+- This completer currently serves as documentation and does not provide actual functionality.
 
 ```yaml
 prog: "example"
@@ -646,7 +646,7 @@ localhost
 
 **NOTES**
 
-- This completion currently serves as documentation and does not provide actual functionality.
+- This completer currently serves as documentation and does not provide actual functionality.
 
 ```yaml
 prog: "example"
@@ -668,7 +668,7 @@ options:
 
 > Complete a file based on it's MIME-type
 
-This command takes an extended regex passed to `grep -E` to filter the results.
+This completer takes an extended regex passed to `grep -E` to filter the results.
 
 
 ```yaml
@@ -905,7 +905,7 @@ HOME      HOSTNAME  HOSTTYPE
 
 With `combine` multiple completers can be combined into one.
 
-It takes a list of completion definitions as its argument.
+It takes a list of completers as its argument.
 
 
 ```yaml
@@ -964,7 +964,7 @@ dhcpcd                  git
 
 > Complete a comma separated list using a completer
 
-Complete a comma-separted list of any completion command.
+Complete a comma-separted list of any completer.
 
 The separator can be changed by adding `{"separator": ...}`.
 

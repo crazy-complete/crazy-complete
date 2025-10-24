@@ -22,7 +22,7 @@ short: 'Combine multiple completers'
 long: |
   With `combine` multiple completers can be combined into one.
 
-  It takes a list of completion definitions as its argument.
+  It takes a list of completers as its argument.
 definition: |
   prog: "example"
   options:
@@ -41,7 +41,7 @@ command: 'list'
 category: 'meta'
 short: 'Complete a comma separated list using a completer'
 long: |
-  Complete a comma-separted list of any completion command.
+  Complete a comma-separted list of any completer.
   
   The separator can be changed by adding `{"separator": ...}`.
   
@@ -103,7 +103,7 @@ command: 'integer'
 category: 'basic'
 short: 'Complete an integer'
 notes:
-  - "This completion currently serves as documentation and does not provide actual functionality."
+  - "This completer currently serves as documentation and does not provide actual functionality."
 also:
   range: "For completing a range of integers"
 definition: |
@@ -121,7 +121,7 @@ command: 'float'
 category: 'basic'
 short: 'Complete floating point number'
 notes:
-  - "This completion currently serves as documentation and does not provide actual functionality."
+  - "This completer currently serves as documentation and does not provide actual functionality."
 definition: |
   prog: "example"
   options:
@@ -239,7 +239,7 @@ command: 'mime_file'
 category: 'basic'
 short: "Complete a file based on it's MIME-type"
 long: |
-  This command takes an extended regex passed to `grep -E` to filter the results.
+  This completer takes an extended regex passed to `grep -E` to filter the results.
 definition: |
   prog: "example"
   options:
@@ -553,8 +553,8 @@ command: 'command_arg'
 category: 'basic'
 short: 'Complete arguments of a command'
 notes:
-  - 'This completion type can only be used in combination with a previously defined `command` completer.'
-  - 'This completion requires `repeatable: true`.'
+  - 'This completer can only be used in combination with a previously defined `command` completer.'
+  - 'This completer requires `repeatable: true`.'
 also:
   command: 'For completing a command'
   commandline_string: 'For completing a command line as a string'
