@@ -208,6 +208,8 @@ def generate_completion(commandline, config=None):
 
     output = []
     output += [generation_notice.GENERATION_NOTICE]
+    if config.comments:
+        output += [config.get_comments_as_string()]
     output += config.get_included_files_content()
     output += helpers.get_used_functions_code()
     output += [generator.result for generator in result if generator.result]

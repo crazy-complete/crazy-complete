@@ -18,6 +18,7 @@ class Config:
         self.inherit_options        = False
         self.vim_modeline           = True
         self.include_files          = []
+        self.comments               = []
         self.bash_completions_version = (2,)
         self.zsh_compdef            = True
         self.fish_fast              = False
@@ -236,6 +237,14 @@ class Config:
 
         self.include_files.extend(files)
 
+    def add_comments(self, comments):
+        '''Add comments to the generated output.'''
+
+        assert hasattr(comments, '__iter__') and not isinstance(comments, str), \
+            f"Config.include_many_comments: comments: expected iterable, got `{comments}`"
+
+        self.comments.extend(comments)
+
     def get_included_files_content(self):
         '''Return a list of contents of all included files.'''
 
@@ -246,6 +255,11 @@ class Config:
                 content.append(fh.read().strip())
 
         return content
+
+    def get_comments_as_string(self):
+        '''Return a string of all comments.'''
+
+        return '\n'.join(f'# {c}' for c in self.comments)
 
     def disable_hidden(self, disable):
         '''Disable hidden options.

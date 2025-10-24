@@ -114,6 +114,10 @@ p.add_argument('--include-file', metavar='FILE', action='append',
     help='Include file in output'
 ).complete('file')
 
+p.add_argument('--comment', metavar='COMMENT', action='append',
+    help='Add a comment to output'
+)
+
 p.add_argument('--debug', action='store_true', default=False,
     help='Enable debug mode')
 
@@ -184,6 +188,7 @@ def _get_config_from_options(opts):
     conf.set_fish_fast(opts.fish_fast)
     conf.set_fish_inline_conditions(opts.fish_inline_conditions)
     conf.include_many_files(opts.include_file or [])
+    conf.add_comments(opts.comment or [])
 
     for feature in opts.disable:
         if feature == 'hidden':

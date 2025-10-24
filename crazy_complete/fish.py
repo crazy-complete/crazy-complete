@@ -257,6 +257,10 @@ def generate_completion(commandline, config=None):
     output.append(generation_notice.GENERATION_NOTICE)
     output.append('')
 
+    if config.comments:
+        output += [config.get_comments_as_string()]
+        output.append('')
+
     for code in config.get_included_files_content():
         output.append(code)
         output.append('')

@@ -256,6 +256,9 @@ def generate_completion(commandline, config=None):
 
     output.append(generation_notice.GENERATION_NOTICE)
 
+    if config.comments:
+        output += [config.get_comments_as_string()]
+
     output.extend(config.get_included_files_content())
 
     completion_func, wrapper_code = zsh_wrapper.generate_wrapper(functions)

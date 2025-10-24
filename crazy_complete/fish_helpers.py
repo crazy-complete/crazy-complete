@@ -377,9 +377,9 @@ _FILEDIR = helpers.FishFunction('filedir', r'''
 #endif
 
 #ifdef regex
-argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
+argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
 #else
-argparse --max-args 0 'd/description=' 'c/comp=' 'D/directories' 'C/cd=' -- $argv || return 1
+argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' -- $argv || return 1
 #endif
 
 set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
