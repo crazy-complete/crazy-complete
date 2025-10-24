@@ -384,12 +384,7 @@ argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' -- $argv || retur
 
 set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
 set -l desc
-
-if set -q _flag_description[1]
-  set desc $_flag_description
-else if set -g _flag_directories
-  set desc 'Directory'
-end
+set -l files
 
 if test -n "$__fish_stripprefix"
   set comp (string replace -r -- $__fish_stripprefix '' $comp)
@@ -397,12 +392,16 @@ end
 
 if set -q _flag_cd[1]
   pushd $_flag_cd 2>/dev/null || return 1
+  set files (complete -C"'' $comp")
+  popd
+else
+  set files (complete -C"'' $comp")
 end
 
-set -l files (complete -C"'' $comp")
-
-if set -q _flag_cd[1]
-  popd
+if set -q _flag_description[1]
+  set desc $_flag_description
+else if set -g _flag_directories
+  set desc 'Directory'
 end
 
 if set -q files[1]
@@ -461,7 +460,7 @@ if $duplicates
 else
   set i 1
   for value in $values
-    if not contains $value $having_values
+    if not contains -- $value $having_values
       set -a remaining_values_idxs $i
     end
 
@@ -707,14 +706,16 @@ else if command ifconfig -l &>/dev/null
   command ifconfig -l # BSD / macOS
 else
   command ifconfig 2>/dev/null | command awk '/^[a-z0-9]/ {print $1}' | command sed 's/://'
-end''')
+end
+''')
 
 _TIMEZONE_LIST = helpers.FishFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null
   command find /usr/share/zoneinfo -type f |\
   command sed 's|/usr/share/zoneinfo/||g'  |\
   command grep -E -v '^(posix|right)'
-end''')
+end
+''')
 
 _ALSA_LIST_CARDS = helpers.FishFunction('alsa_list_cards', r'''
 set -l card
@@ -726,7 +727,8 @@ for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
   if set -q split[2]
     printf "%s\t%s\n" $split[1] $split[2]
   end
-end''')
+end
+''')
 
 _ALSA_LIST_DEVICES = helpers.FishFunction('alsa_list_devices', r'''
 set -l card
@@ -738,7 +740,8 @@ for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
   if set -q split[2]
     printf "hw:%s\t%s\n" $split[1] $split[2]
   end
-end''')
+end
+''')
 
 
 class FishHelpers(helpers.GeneralHelpers):
