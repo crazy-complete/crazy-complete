@@ -182,7 +182,15 @@ class ZshCompleteRange(ZshCompletionBase):
         return f"'({{{self.start}..{self.stop}..{self.step}}})'"
 
     def get_function(self):
-        raise NotImplementedError
+        if self.step == 1:
+            code = f"command seq {self.start} {self.step} {self.stop}"
+        else:
+            code = f"command seq {self.start}  {self.stop}"
+
+        code = f'compadd -- $({code})'
+
+        funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
+        return funcname
 
 
 class ZshKeyValueList(ZshComplFunc):
