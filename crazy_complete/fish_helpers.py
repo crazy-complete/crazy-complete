@@ -507,7 +507,7 @@ for i in (command seq 1 2 (count $argv))
   set -a funcs $argv[(math $i + 1)]
 
   if test $funcs[-1] != 'false'
-    set -a keys_with_sep $argv[$i]=
+    set -a keys_with_sep "$argv[$i]$sep2"
   else
     set -a keys_with_sep $argv[$i]
   end
