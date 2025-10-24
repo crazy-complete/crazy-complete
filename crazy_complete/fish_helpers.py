@@ -365,7 +365,7 @@ switch $cmd
 end
 ''')
 
-_FISH_COMPLETE_FILEDIR = helpers.FishFunction('fish_complete_filedir', r'''
+_FILEDIR = helpers.FishFunction('filedir', r'''
 # Function for completing files or directories
 #
 # Options:
@@ -747,7 +747,7 @@ class FishHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix, helpers.FishFunction)
         self.add_function(_QUERY)
-        self.add_function(_FISH_COMPLETE_FILEDIR)
+        self.add_function(_FILEDIR)
         self.add_function(_LIST)
         self.add_function(_KEY_VALUE_LIST)
         self.add_function(_HISTORY)

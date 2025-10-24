@@ -183,22 +183,22 @@ class FishCompleteFile(FishCompletionBase):
             self.args.extend(['-C', directory])
 
         if extensions:
-            ctxt.helpers.use_function('fish_complete_filedir', 'regex')
+            ctxt.helpers.use_function('filedir', 'regex')
             self.args.extend(['-r', _get_extension_regex(extensions, fuzzy)])
 
     def get_args(self):
         if len(self.args) == 0:
             return ['-F']
 
-        func = self.ctxt.helpers.use_function('fish_complete_filedir')
+        func = self.ctxt.helpers.use_function('filedir')
         return FishCompletionCommand(self.ctxt, [func] + self.args).get_args()
 
     def get_code(self):
-        func = self.ctxt.helpers.use_function('fish_complete_filedir')
+        func = self.ctxt.helpers.use_function('filedir')
         return FishCompletionCommand(self.ctxt, [func] + self.args).get_code()
 
     def get_function(self):
-        func = self.ctxt.helpers.use_function('fish_complete_filedir')
+        func = self.ctxt.helpers.use_function('filedir')
         return FishCompletionCommand(self.ctxt, [func] + self.args).get_function()
 
 
@@ -213,7 +213,7 @@ class FishCompleteDir(FishCompletionCommand):
         use_filedir = 'list' in trace or 'key_value_list' in trace
 
         if use_filedir or directory is not None:
-            func = ctxt.helpers.use_function('fish_complete_filedir')
+            func = ctxt.helpers.use_function('filedir')
             if directory:
                 super().__init__(ctxt, [func, '-D', '-C', directory])
             else:
