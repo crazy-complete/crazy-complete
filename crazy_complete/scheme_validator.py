@@ -467,61 +467,62 @@ def _check_date(ctxt, arguments):
         raise _error('format cannot be empty', format_)
 
 
+
+_COMMANDS = {
+    'alsa_card':          _check_void,
+    'alsa_device':        _check_void,
+    'charset':            _check_void,
+    'choices':            _check_choices,
+    'combine':            _check_combine,
+    'command':            _check_command,
+    'command_arg':        _check_command_arg,
+    'commandline_string': _check_void,
+    'date':               _check_date,
+    'date_format':        _check_void,
+    'directory':          _check_directory,
+    'directory_list':     _check_directory_list,
+    'environment':        _check_void,
+    'exec':               _check_exec,
+    'exec_fast':          _check_exec,
+    'exec_internal':      _check_exec,
+    'file':               _check_file,
+    'file_list':          _check_file_list,
+    'filesystem_type':    _check_void,
+    'float':              _check_void,
+    'gid':                _check_void,
+    'group':              _check_void,
+    'history':            _check_history,
+    'hostname':           _check_void,
+    'integer':            _check_void,
+    'key_value_list':     _check_key_value_list,
+    'list':               _check_list,
+    'locale':             _check_void,
+    'login_shell':        _check_void,
+    'mime_file':          _check_mime_file,
+    'mountpoint':         _check_void,
+    'net_interface':      _check_void,
+    'none':               _check_none,
+    'pid':                _check_void,
+    'process':            _check_void,
+    'range':              _check_range,
+    'service':            _check_void,
+    'signal':             _check_void,
+    'timezone':           _check_void,
+    'uid':                _check_void,
+    'user':               _check_void,
+    'value_list':         _check_value_list,
+    'variable':           _check_void,
+}
+
+
 def _check_complete(ctxt, args):
     arguments = Arguments(args)
     cmd = arguments.get_required_arg('command')
 
-    commands = {
-        'none':             _check_none,
-        'integer':          _check_void,
-        'float':            _check_void,
-        'command':          _check_command,
-        'environment':      _check_void,
-        'group':            _check_void,
-        'hostname':         _check_void,
-        'pid':              _check_void,
-        'process':          _check_void,
-        'service':          _check_void,
-        'signal':           _check_void,
-        'user':             _check_void,
-        'variable':         _check_void,
-        'choices':          _check_choices,
-        'file':             _check_file,
-        'directory':        _check_directory,
-        'mime_file':        _check_mime_file,
-        'range':            _check_range,
-        'exec':             _check_exec,
-        'exec_fast':        _check_exec,
-        'exec_internal':    _check_exec,
-        'value_list':       _check_value_list,
-        'key_value_list':   _check_key_value_list,
-        'combine':          _check_combine,
-        'list':             _check_list,
-        'history':          _check_history,
-        'commandline_string': _check_void,
-        'command_arg':      _check_command_arg,
-        'date':             _check_date,
-        'date_format':      _check_void,
-        'file_list':        _check_file_list,
-        'directory_list':   _check_directory_list,
-        'uid':              _check_void,
-        'gid':              _check_void,
-        'filesystem_type':  _check_void,
-        # Bonus
-        'mountpoint':       _check_void,
-        'net_interface':    _check_void,
-        'login_shell':      _check_void,
-        'locale':           _check_void,
-        'charset':          _check_void,
-        'timezone':         _check_void,
-        'alsa_card':        _check_void,
-        'alsa_device':      _check_void,
-    }
-
-    if cmd.value not in commands:
+    if cmd.value not in _COMMANDS:
         raise _error(f'Invalid command: {cmd.value}', cmd)
 
-    commands[cmd.value](ctxt, arguments)
+    _COMMANDS[cmd.value](ctxt, arguments)
 
 
 def _check_positionals_repeatable(definition_tree, definition):

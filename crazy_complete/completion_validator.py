@@ -466,6 +466,53 @@ def _validate_date(ctxt, args):
 # =============================================================================
 
 
+_COMMANDS = {
+    'alsa_card':          _validate_void,
+    'alsa_device':        _validate_void,
+    'charset':            _validate_void,
+    'choices':            _validate_choices,
+    'combine':            _validate_combine,
+    'command':            _validate_command,
+    'command_arg':        _validate_command_arg,
+    'commandline_string': _validate_void,
+    'date':               _validate_date,
+    'date_format':        _validate_void,
+    'directory':          _validate_directory,
+    'directory_list':     _validate_directory_list,
+    'environment':        _validate_void,
+    'exec':               _validate_exec,
+    'exec_fast':          _validate_exec,
+    'exec_internal':      _validate_exec,
+    'file':               _validate_file,
+    'file_list':          _validate_file_list,
+    'filesystem_type':    _validate_void,
+    'float':              _validate_void,
+    'gid':                _validate_void,
+    'group':              _validate_void,
+    'history':            _validate_history,
+    'hostname':           _validate_void,
+    'integer':            _validate_void,
+    'key_value_list':     _validate_key_value_list,
+    'list':               _validate_list,
+    'locale':             _validate_void,
+    'login_shell':        _validate_void,
+    'mime_file':          _validate_mime_file,
+    'mountpoint':         _validate_void,
+    'net_interface':      _validate_void,
+    'none':               _validate_none,
+    'pid':                _validate_void,
+    'process':            _validate_void,
+    'range':              _validate_range,
+    'service':            _validate_void,
+    'signal':             _validate_void,
+    'timezone':           _validate_void,
+    'uid':                _validate_void,
+    'user':               _validate_void,
+    'value_list':         _validate_value_list,
+    'variable':           _validate_void,
+}
+
+
 def validate_complete(ctxt, complete):
     '''Validate a completion command.'''
 
@@ -478,57 +525,10 @@ def validate_complete(ctxt, complete):
     if not isinstance(command, str):
         raise CrazyError(f"Command is not a string: {command}")
 
-    validate_commands = {
-        'none':          _validate_none,
-        'integer':       _validate_void,
-        'float':         _validate_void,
-        'command':       _validate_command,
-        'group':         _validate_void,
-        'hostname':      _validate_void,
-        'pid':           _validate_void,
-        'process':       _validate_void,
-        'user':          _validate_void,
-        'service':       _validate_void,
-        'signal':        _validate_void,
-        'variable':      _validate_void,
-        'environment':   _validate_void,
-        'choices':       _validate_choices,
-        'file':          _validate_file,
-        'directory':     _validate_directory,
-        'mime_file':     _validate_mime_file,
-        'range':         _validate_range,
-        'exec':          _validate_exec,
-        'exec_fast':     _validate_exec,
-        'exec_internal': _validate_exec,
-        'value_list':    _validate_value_list,
-        'key_value_list': _validate_key_value_list,
-        'combine':       _validate_combine,
-        'list':          _validate_list,
-        'history':       _validate_history,
-        'commandline_string': _validate_void,
-        'command_arg':   _validate_command_arg,
-        'date':          _validate_date,
-        'date_format':   _validate_void,
-        'file_list':     _validate_file_list,
-        'directory_list': _validate_directory_list,
-        'uid':           _validate_void,
-        'gid':           _validate_void,
-        'filesystem_type': _validate_void,
-        # Bonus
-        'mountpoint':    _validate_void,
-        'net_interface': _validate_void,
-        'login_shell':   _validate_void,
-        'locale':        _validate_void,
-        'charset':       _validate_void,
-        'timezone':      _validate_void,
-        'alsa_card':     _validate_void,
-        'alsa_device':   _validate_void,
-    }
-
-    if command not in validate_commands:
+    if command not in _COMMANDS:
         raise CrazyError(f"Unknown command for `complete`: {command}")
 
-    validate_commands[command](ctxt, args)
+    _COMMANDS[command](ctxt, args)
 
 
 def validate_positionals_repeatable(cmdline):
