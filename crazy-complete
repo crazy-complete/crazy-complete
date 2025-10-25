@@ -28,6 +28,7 @@ if __name__ == '__main__':
             FileNotFoundError,
             yaml.scanner.ScannerError,
             yaml.parser.ParserError,
+            yaml.constructor.ConstructorError,
             json.decoder.JSONDecodeError) as e:
         print_err('Error:', e)
         if app.options.debug:
