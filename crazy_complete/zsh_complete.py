@@ -183,9 +183,9 @@ class ZshCompleteRange(ZshCompletionBase):
 
     def get_function(self):
         if self.step == 1:
-            code = f"command seq {self.start} {self.step} {self.stop}"
+            code = f"command seq {self.start} {self.stop}"
         else:
-            code = f"command seq {self.start}  {self.stop}"
+            code = f"command seq {self.start} {self.step} {self.stop}"
 
         code = f'compadd -- $({code})'
 
