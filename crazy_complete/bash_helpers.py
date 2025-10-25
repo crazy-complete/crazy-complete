@@ -430,6 +430,14 @@ done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
 # Bonus
 # =============================================================================
 
+_LOCALES = helpers.ShellFunction('''locales''', r'''
+COMPREPLY=($(compgen -W "$(command locale -a)" -- "$cur"))
+''')
+
+_CHARSETS = helpers.ShellFunction('''charsets''', r'''
+COMPREPLY=($(compgen -W "$(command locale -m)" -- "$cur"))
+''')
+
 _TIMEZONE_LIST = helpers.ShellFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null; then
   command find /usr/share/zoneinfo -type f |\
@@ -478,6 +486,8 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)
+        self.add_function(_LOCALES)
+        self.add_function(_CHARSETS)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)
         self.add_function(_ALSA_LIST_DEVICES)

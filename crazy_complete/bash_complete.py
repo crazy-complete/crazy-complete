@@ -389,6 +389,14 @@ class BashCompleter(shell.ShellCompleter):
     # Bonus
     # =========================================================================
 
+    def locale(self, ctxt, trace):
+        func = ctxt.helpers.use_function('locales')
+        return BashCompletionFunc(ctxt, [func])
+
+    def charset(self, ctxt, trace):
+        func = ctxt.helpers.use_function('charsets')
+        return BashCompletionFunc(ctxt, [func])
+
     def login_shell(self, ctxt, _trace):
         return BashCompletionFunc(ctxt, [bash_versions.shells(ctxt)])
 
