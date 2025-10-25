@@ -19,34 +19,39 @@ done
 ''')
 
 _MY_DEQUOTE = helpers.ShellFunction('my_dequote', r'''
-local input="$1" result=''
-local i=0 len=${#input}
+local in="$1" len=${#1} i=0 result='' ___break_pos=-1
 
 for ((; i < len; ++i)); do
-  case "${input:i:1}" in
+  case "${in:i:1}" in
     "'")
       for ((++i; i < len; ++i)); do
-        [[ "${input:i:1}" == "'" ]] && break
-        result+="${input:i:1}"
+        [[ "${in:i:1}" == "'" ]] && break
+        result+="${in:i:1}"
       done;;
     '"')
       for ((++i; i < len; ++i)); do
-        [[ "${input:i:1}" == '"' ]] && break
+        [[ "${in:i:1}" == '"' ]] && break
 
-        if [[ "${input:i:1}" == '\' ]]; then
-          result+="${input:$((++i)):1}"
+        if [[ "${in:i:1}" == '\' ]]; then
+          result+="${in:$((++i)):1}"
         else
-          result+="${input:i:1}"
+          result+="${in:i:1}"
         fi
       done;;
     '\')
-      result+="${input:$((++i)):1}";;
+      result+="${in:$((++i)):1}";;
+    [$COMP_WORDBREAKS])
+      result+="${in:i:1}"
+      ___break_pos=${#result};;
     *)
-      result+="${input:i:1}";;
+      result+="${in:i:1}";;
   esac
 done
 
-printf '%s\n' "$result"
+local -n ___RESULT=$2
+local -n ___BREAK_POS=$3
+___RESULT="$result"
+___BREAK_POS=$___break_pos
 ''')
 
 _PARSE_LINE = helpers.ShellFunction('parse_line', r'''
@@ -138,7 +143,8 @@ local quoted=0
 [[ "${cur:0:1}" == '"' ]] && quoted=1
 [[ "${cur:0:1}" == "'" ]] && quoted=1
 
-local l line="$(my_dequote "$cur")"
+local l line break_pos
+my_dequote "$cur" line break_pos
 
 local COMP_LINE_OLD="$COMP_LINE"
 local COMP_POINT_OLD=$COMP_POINT
@@ -229,38 +235,36 @@ while IFS=$'\t' read -r item desc; do
 done < <(eval "$1")
 ''')
 
+_ARRAY_CONTAINS = helpers.ShellFunction('array_contains', r'''
+local w='' search="$1"; shift;
+for w; do [[ "$search" == "$w" ]] && return 0; done
+return 1
+''')
+
 _VALUE_LIST = helpers.ShellFunction('value_list', r'''
 local duplicates=0
 [[ "$1" == '-d' ]] && { duplicates=1; shift; }
-
 local separator="$1"; shift
 
-cur="$(my_dequote "$cur")"
+compopt -o nospace
 
-if [[ -z "$cur" ]]; then
+local cur_unquoted break_pos
+my_dequote "$cur" cur_unquoted break_pos
+
+if [[ -z "$cur_unquoted" ]]; then
   COMPREPLY=("$@")
   return
 fi
 
-local value having_value found_value
-local -a having_values remaining_values
+local value having_value having_values=() remaining_values=()
 
-IFS="$separator" read -r -a having_values <<< "$cur"
+IFS="$separator" read -r -a having_values <<< "$cur_unquoted"
 
 if (( duplicates )); then
   remaining_values=("$@")
 else
   for value; do
-    found_value=0
-
-    for having_value in "${having_values[@]}"; do
-      if [[ "$value" == "$having_value" ]]; then
-        found_value=1
-        break
-      fi
-    done
-
-    if (( ! found_value )); then
+    if ! array_contains "$value" "${having_values[@]}"; then
       remaining_values+=("$value")
     fi
   done
@@ -268,20 +272,30 @@ fi
 
 COMPREPLY=()
 
-if [[ "${cur: -1}" == "$separator" ]]; then
-  for value in "${remaining_values[@]}"; do
-    COMPREPLY+=("$cur$value")
-  done
-elif (( ${#having_values[@]} )); then
-  local cur_last_value=${having_values[-1]}
-
-  for value in "${remaining_values[@]}"; do
-    if [[ "$value" == "$cur_last_value"* ]]; then
-      COMPREPLY+=("${cur%"$cur_last_value"}$value")
-    fi
-  done
+local cur_stripped="$cur_unquoted"
+if (( break_pos > -1 )); then
+  cur_stripped="${cur_stripped:$((break_pos - 0))}"
 fi
-''', ['my_dequote'])
+
+if [[ "${cur_unquoted: -1}" == "$separator" ]]; then
+  for value in "${remaining_values[@]}"; do
+    COMPREPLY+=("$cur_stripped$value")
+  done
+elif (( ${#remaining_values[@]} )); then
+  if array_contains "${having_values[-1]}" "$@"; then
+    COMPREPLY+=("$cur_stripped$separator")
+  elif (( ${#having_values[@]} )); then
+    local cur_last_value=${having_values[-1]}
+    cur_stripped="${cur_stripped%"$cur_last_value"}"
+  
+    for value in "${remaining_values[@]}"; do
+      if [[ "$value" == "$cur_last_value"* ]]; then
+        COMPREPLY+=("$cur_stripped$value")
+      fi
+    done
+  fi
+fi
+''', ['my_dequote', 'array_contains'])
 
 _KEY_VALUE_LIST = helpers.ShellFunction('key_value_list', r'''
 local sep1="$1"; shift
@@ -298,7 +312,8 @@ local strip_chars=''
 [[ "$COMP_WORDBREAKS" == *"$sep2"* ]] && strip_chars+="$sep2"
 [[ "${cur:0:1}" == '"' ]] && strip_chars=''
 [[ "${cur:0:1}" == "'" ]] && strip_chars=''
-cur="$(my_dequote "$cur")"
+local cur="$cur" break_pos
+my_dequote "$cur" cur break_pos
 
 if [[ -z "$cur" ]]; then
   COMPREPLY=("${!keys[@]}")
@@ -387,6 +402,95 @@ while read -r match; do
 done < <(command grep -E -o -- "$1" "$HISTFILE")
 ''')
 
+_GET_LAST_BREAK_POSITION = helpers.ShellFunction('get_last_break_position', r'''
+local in="$1" i=0 len=${#1} pos=-1
+
+for ((i=0; i < len; ++i)); do
+  case "${in:i:1}" in
+    '"')
+      for ((++i; i < len; ++i)); do
+        if [[ "${in:i:1}" == '\' ]]; then
+          ((++i))
+        elif [[ "${in:i:1}" == '"' ]]; then
+          break;
+        fi
+      done;;
+    "'")
+      for ((++i; i < len; ++i)); do
+        [[ "${in:i:1}" == "'" ]] && break;
+      done;;
+    '\')
+      ((++i));;
+    [$COMP_WORDBREAKS])
+      pos=$i;;
+  esac
+done
+
+echo $pos
+''')
+
+_PREFIX = helpers.ShellFunction('prefix', r'''
+local prefix="$1" func="$2"
+local stripped="$(strip_prefix_keep_quoting "$prefix" "$cur")"
+
+if [[ "$stripped" == "$cur" ]]; then
+  COMPREPLY=($(compgen -W "$1" -- "$cur"))
+  return
+fi
+
+local break_position=$(get_last_break_position "$cur")
+
+local cur_old="$cur" cur="$stripped"
+$func
+
+if (( break_position < 0 )); then
+  for i in "${!COMPREPLY[@]}"; do
+    COMPREPLY[i]="$prefix${COMPREPLY[i]}"
+  done
+fi
+''', ['get_last_break_position', 'strip_prefix_keep_quoting'])
+
+_STRIP_PREFIX_KEEP_QUOTING = helpers.ShellFunction('strip_prefix_keep_quoting', r'''
+local p="$1" pi=0 plen=${#1}
+local s="$2" si=0 slen=${#2} state=w
+
+for (( pi=0; pi < plen; ++pi )); do
+  pc=${p:pi:1}
+  sc=''
+
+  while (( si < slen )); do
+    case "$state" in
+      w)
+        case "${s:si:1}" in
+          '"') state=dq; ((++si));;
+          "'") state=sq; ((++si));;
+          '\')           ((++si)); sc="${s:si:1}"; ((++si));   break;;
+          *)             sc="${s:si:1}"; ((++si));             break;;
+        esac;;
+      sq)
+        case "${s:si:1}" in
+          "'") state=w;  ((++si));;
+          *)             sc="${s:si:1}"; ((++si));             break;;
+        esac;;
+      dq)
+        case "${s:si:1}" in
+          '"') state=w;  ((++si));;
+          '\')           ((++si)); sc="${s:si:1}"; ((++si));   break;;
+          *)             sc="${s:si:1}"; ((++si));             break;;
+        esac;;
+    esac
+  done
+
+  [[ "$pc" != "$sc" ]] && { echo "$s"; return; }
+done
+
+case "$state" in
+  w)  printf '%s\n' "${s:si}";;
+  sq) printf '%s\n' "'${s:si}";;
+  dq) printf '%s\n' "\"${s:si}";;
+esac
+''')
+
 _MIME_FILE = helpers.ShellFunction('mime_file', r'''
 local line file mime i_opt cur_dequoted
 
@@ -403,7 +507,8 @@ else
   return
 fi
 
-cur_dequoted="$(my_dequote "$cur")"
+local cur_dequoted break_pos
+my_dequote "$cur" cur_dequoted break_pos
 
 while read -r line; do
   mime="${line##*:}"
@@ -475,6 +580,10 @@ class BashHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_COMPGEN_W_REPLACEMENT)
         self.add_function(_MY_DEQUOTE)
+        self.add_function(_PREFIX)
+        self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
+        self.add_function(_ARRAY_CONTAINS)
+        self.add_function(_GET_LAST_BREAK_POSITION)
         self.add_function(_PARSE_LINE)
         self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
         self.add_function(_COMMANDLINE_STRING)

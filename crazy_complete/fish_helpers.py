@@ -365,6 +365,16 @@ switch $cmd
 end
 ''')
 
+_GET_COMPLETING_ARG = helpers.FishFunction('get_completing_arg', r'''
+set -l arg (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unescape)
+
+if test -n "$__fish_stripprefix"
+  string replace -r -- $__fish_stripprefix '' "$arg"
+else
+  printf '%s\n' "$arg"
+end
+''')
+
 _FILEDIR = helpers.FishFunction('filedir', r'''
 # Function for completing files or directories
 #
@@ -382,13 +392,9 @@ argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' 'r/regex=' -- $ar
 argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' -- $argv || return 1
 #endif
 
-set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
+set -l comp (get_completing_arg)
 set -l desc
 set -l files
-
-if test -n "$__fish_stripprefix"
-  set comp (string replace -r -- $__fish_stripprefix '' $comp)
-end
 
 if set -q _flag_cd[1]
   pushd $_flag_cd 2>/dev/null || return 1
@@ -417,7 +423,7 @@ if set -q files[1]
 
   printf '%s\n' $files\t"$desc"
 end
-''')
+''', ['get_completing_arg'])
 
 _LIST = helpers.FishFunction('list', r'''
 set -l duplicates false
@@ -429,8 +435,7 @@ end
 
 set -l separator $argv[1]
 set -l func $argv[2]
-
-set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unescape)
+set -l comp (get_completing_arg)
 
 if test -z "$comp"
   eval $func
@@ -442,7 +447,7 @@ set -l value
 set -l values
 set -l descriptions
 
-set -g __fish_stripprefix ".*"(string escape --style=regex -- $separator)
+set -g __fish_stripprefix "^.*"(string escape --style=regex -- $separator)
 
 for value in (eval $func)
   set -l split (string split -- \t $value)
@@ -484,6 +489,12 @@ switch $comp
       printf '%s\t%s\n' $values[$i] "$descriptions[$i]"
     end
 end
+''', ['get_completing_arg'])
+
+_PREFIX = helpers.FishFunction('prefix', r'''
+set -g __fish_stripprefix "^"(string escape --style=regex -- $argv[1])
+printf "%s\n" $argv[1](eval $argv[2])
+set -e __fish_stripprefix
 ''')
 
 _KEY_VALUE_LIST = helpers.FishFunction('key_value_list', r'''
@@ -501,7 +512,7 @@ for i in (command seq 3 3 (count $argv))
   set -a functions $argv[(math $i + 2)]
 end
 
-set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unescape)
+set -l comp (get_completing_arg)
 
 if test -z "$comp" || test (string sub -s -1 -l 1 -- $comp) = $sep1
   for i in (command seq 1 (count $keys))
@@ -552,7 +563,7 @@ switch $pair
       end
     end
 end
-''')
+''', ['get_completing_arg'])
 
 _HISTORY = helpers.FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
@@ -561,11 +572,7 @@ builtin history | command grep -E -o -- $argv[1]
 _MIME_FILE = helpers.FishFunction('mime_file', r'''
 set -l i_opt
 
-set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
-
-if test -n "$__fish_stripprefix"
-  set comp (string replace -r -- $__fish_stripprefix '' $comp)
-end
+set -l comp (get_completing_arg)
 
 if command file -i /dev/null &>/dev/null
   set i_opt '-i'
@@ -586,7 +593,7 @@ command file -L $i_opt -- "$comp"* 2>/dev/null | while read line
     printf '%s\n' "$split[1]"
   end
 end
-''')
+''', ['get_completing_arg'])
 
 _SUBSTRACT_PREFIX_SUFFIX = helpers.FishFunction('subtract_prefix_suffix', r'''
 set -l s1 $argv[1]
@@ -623,17 +630,16 @@ echo $s1
 
 _COMMANDLINE_STRING = helpers.FishFunction('commandline_string', r'''
 set -l line
-set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
-set comp (string unescape -- "$comp")
+set -l comp (get_completing_arg)
 
 complete -C "$comp" | while read line
   set -l split (string split -m 1 -- \t $line)
   set -l comp2 (subtract_prefix_suffix "$comp" "$split[1]")
   printf '%s\t%s\n' "$comp2$split[1]" "$split[2]"
-end''', ['subtract_prefix_suffix'])
+end''', ['subtract_prefix_suffix', 'get_completing_arg'])
 
 _DATE_FORMAT = helpers.FishFunction('date_format', r'''
-set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '')
+set -l comp (get_completing_arg)
 
 if test "$(string sub -s -1 -l 1 -- $comp)" = '%'
   printf '%s%s\t%s\n' \
@@ -678,7 +684,7 @@ if test "$(string sub -s -1 -l 1 -- $comp)" = '%'
     "$comp" 'Z' 'timezone name' \
     "$comp" '%' 'literal %'
 end
-''')
+''', ['get_completing_arg'])
 
 _UID_LIST = helpers.FishFunction('uid_list', r'''
 command getent passwd | command awk -F: '{printf "%s\t%s\n", $3, $1}'
@@ -743,8 +749,10 @@ class FishHelpers(helpers.GeneralHelpers):
     def __init__(self, function_prefix):
         super().__init__(function_prefix, helpers.FishFunction)
         self.add_function(_QUERY)
+        self.add_function(_GET_COMPLETING_ARG)
         self.add_function(_FILEDIR)
         self.add_function(_LIST)
+        self.add_function(_PREFIX)
         self.add_function(_KEY_VALUE_LIST)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)

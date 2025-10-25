@@ -437,6 +437,13 @@ class ZshCompleter(shell.ShellCompleter):
     def signal(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_signals'])
 
+    def prefix(self, ctxt, trace, prefix, command):
+        prefix_func = ctxt.helpers.use_function('prefix')
+        cmd, *args = command
+        obj = getattr(self, cmd)(ctxt, trace, *args)
+        func = obj.get_function()
+        return ZshComplFunc(ctxt, [prefix_func, prefix, func], needs_braces=True)
+
     # =========================================================================
     # Bonus
     # =========================================================================

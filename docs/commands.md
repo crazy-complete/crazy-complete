@@ -6,6 +6,7 @@
 | [key\_value\_list](#key_value_list) | Complete a comma-separated list of key=value pairs        |
 | [list](#list)                       | Complete a comma-separated list using a completer         |
 | [none](#none)                       | No completion, but specifies that an argument is required |
+| [prefix](#prefix)                   | Prefix completion by a string                             |
 
 ### Built-in commands
 
@@ -1034,6 +1035,30 @@ options:
 ```
 ~ > example --none=<TAB>
 <NO OUTPUT>
+```
+
+### prefix
+
+> Prefix completion by a string
+
+The first argument is the prefix that should be used.
+
+The second argument is a completer.
+
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--prefix"]
+    complete: ["prefix", "input:", ['file']]
+```
+
+```
+~ > example --prefix=<TAB>
+~ > example --prefix=input:
+
+~ > example --prefix=input:<TAB>
+~ > example --prefix=input:file1.txt
 ```
 
 ### exec

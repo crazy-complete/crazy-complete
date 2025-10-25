@@ -68,7 +68,7 @@ class Arguments:
 
 
 def _validate_none(ctxt, args):
-    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list'):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'prefix'):
         raise CrazyError(f'Command `none` not allowed inside {ctxt.trace[-1]}')
 
 
@@ -472,6 +472,27 @@ def _validate_list(ctxt, args):
     validate_complete(ctxt, command)
 
 
+def _validate_prefix(ctxt, args):
+    prefix = args.get_required_arg('prefix')
+    command = args.get_required_arg('command')
+    args.require_no_more()
+
+    if 'prefix' in ctxt.trace:
+        raise CrazyError('Nested `prefix` not allowed')
+
+    if 'key_value_list' in ctxt.trace:
+        raise CrazyError('Command `list` not allowed inside key_value_list')
+
+    if not isinstance(command, list):
+        raise CrazyError(f'prefix: Not a list: {command}')
+
+    if len(command) == 0:
+        raise CrazyError('prefix: Missing command')
+
+    ctxt.trace.append('prefix')
+    validate_complete(ctxt, command)
+
+
 def _validate_history(_ctxt, args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
@@ -535,6 +556,7 @@ _COMMANDS = {
     'none':               _validate_none,
     'pid':                _validate_void,
     'process':            _validate_void,
+    'prefix':             _validate_prefix,
     'range':              _validate_range,
     'service':            _validate_void,
     'signal':             _validate_void,

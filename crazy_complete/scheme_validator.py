@@ -131,7 +131,7 @@ def _check_void(_ctxt, arguments):
 def _check_none(ctxt, arguments):
     arguments.require_no_more()
 
-    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list'):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'prefix'):
         raise _error(f'Command `none` not allowed inside {ctxt.trace[-1]}', arguments.args)
 
 
@@ -479,6 +479,27 @@ def _check_list(ctxt, arguments):
     _check_complete(ctxt, command)
 
 
+def _check_prefix(ctxt, arguments):
+    prefix = arguments.get_required_arg('prefix')
+    command = arguments.get_required_arg('command')
+    arguments.require_no_more()
+
+    _check_type(prefix, (str,), 'prefix')
+    _check_type(options, (list,), 'command')
+
+    if 'prefix' in ctxt.trace:
+        raise _error('Nested `prefix` not allowed', arguments.args)
+
+    if 'key_value_list' in ctxt.trace:
+        raise _error('Command `prefix` not allowed inside key_value_list', arguments.args)
+
+    if len(command.value) == 0:
+        raise _error('Missing command', command)
+
+    ctxt.trace.append('prefix')
+    _check_complete(ctxt, command)
+
+
 def _check_history(_ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
@@ -533,6 +554,7 @@ _COMMANDS = {
     'net_interface':      _check_void,
     'none':               _check_none,
     'pid':                _check_void,
+    'prefix':             _check_prefix,
     'process':            _check_void,
     'range':              _check_range,
     'service':            _check_void,

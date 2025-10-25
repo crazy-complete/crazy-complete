@@ -530,6 +530,14 @@ class FishCompleter(shell.ShellCompleter):
         cmd = "command cat /proc/filesystems | command awk '{print $2}'"
         return FishCompletionRawCommand(ctxt, cmd)
 
+    def prefix(self, ctxt, trace, prefix, command):
+        cmd, *args = command
+        obj = getattr(self, cmd)(ctxt, trace, *args)
+        func = obj.get_function()
+
+        prefix_func = ctxt.helpers.use_function('prefix')
+        return FishCompletionCommand(ctxt, [prefix_func, prefix, func])
+
     # =========================================================================
     # Bonus
     # =========================================================================

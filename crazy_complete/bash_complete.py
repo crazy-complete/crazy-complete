@@ -386,6 +386,13 @@ class BashCompleter(shell.ShellCompleter):
     def filesystem_type(self, ctxt, _trace):
         return BashCompletionFunc(ctxt, [bash_versions.fstypes(ctxt)])
 
+    def prefix(self, ctxt, trace, prefix, command):
+        cmd, *args = command
+        obj = getattr(self, cmd)(ctxt, trace, *args)
+        cmd_func = obj.get_function()
+        func = ctxt.helpers.use_function('prefix')
+        return BashCompletionFunc(ctxt, [func, prefix, cmd_func])
+
     # =========================================================================
     # Bonus
     # =========================================================================

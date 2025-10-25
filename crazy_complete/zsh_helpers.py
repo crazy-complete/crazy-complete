@@ -292,6 +292,16 @@ for ((; argi <= $#; ++argi)); do
 done
 ''')
 
+_PREFIX = helpers.ShellFunction('prefix', r'''
+if [[ "$PREFIX" == "$1"* ]]; then
+  PREFIX="${PREFIX#"$1"}"
+  IPREFIX="$IPREFIX$1"
+  $2
+else
+  compadd -- "$1"
+fi
+''')
+
 _EXEC = helpers.ShellFunction('exec', r'''
 local item='' desc='' describe=()
 
@@ -396,6 +406,7 @@ class ZshHelpers(helpers.GeneralHelpers):
         super().__init__(function_prefix, helpers.ShellFunction)
         self.add_function(_QUERY)
         self.add_function(_EXEC)
+        self.add_function(_PREFIX)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)
         self.add_function(_UID_LIST)

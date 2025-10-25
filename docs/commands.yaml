@@ -16,6 +16,27 @@ output: |
 
 ---
 
+command: 'prefix'
+category: 'meta'
+short: 'Prefix completion by a string'
+long: |
+  The first argument is the prefix that should be used.
+
+  The second argument is a completer.
+definition: |
+  prog: "example"
+  options:
+    - option_strings: ["--prefix"]
+      complete: ["prefix", "input:", ['file']]
+output: |
+  ~ > example --prefix=<TAB>
+  ~ > example --prefix=input:
+
+  ~ > example --prefix=input:<TAB>
+  ~ > example --prefix=input:file1.txt
+
+---
+
 command: 'combine'
 category: 'meta'
 short: 'Combine multiple completers'
