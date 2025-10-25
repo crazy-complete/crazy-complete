@@ -355,7 +355,7 @@ class BashCompleter(shell.ShellCompleter):
 
     def net_interface(self, ctxt, _trace):
         func = bash_versions.available_interfaces(ctxt)
-        return BashCompletionCommand(ctxt, '%s' % func)
+        return BashCompletionCommand(ctxt, func)
 
     def timezone(self, ctxt, _trace):
         exec_func = ctxt.helpers.use_function('exec')
@@ -363,11 +363,9 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
 
     def alsa_card(self, ctxt, _trace):
-        exec_func = ctxt.helpers.use_function('exec')
-        list_func = ctxt.helpers.use_function('alsa_list_cards')
-        return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
+        func = ctxt.helpers.use_function('alsa_list_cards')
+        return BashCompletionCommand(ctxt, func)
 
     def alsa_device(self, ctxt, _trace):
-        exec_func = ctxt.helpers.use_function('exec')
-        list_func = ctxt.helpers.use_function('alsa_list_devices')
-        return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
+        func = ctxt.helpers.use_function('alsa_list_devices')
+        return BashCompletionCommand(ctxt, func)

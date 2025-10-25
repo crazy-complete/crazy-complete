@@ -438,26 +438,26 @@ if ! command timedatectl list-timezones 2>/dev/null; then
 fi''')
 
 _ALSA_LIST_CARDS = helpers.ShellFunction('alsa_list_cards', r'''
-local card
-command aplay -l \
-  | command grep -Eo '^card [0-9]+: [^,]+' \
-  | command uniq \
-  | while builtin read card; do
+local card id cards=()
+while builtin read card; do
   card="${card#card }"
-  local id="${card%%: *}"
-  builtin echo "$id"
-done''')
+  id="${card%%: *}"
+  cards+=("$id")
+done < <(command aplay -l | command grep -Eo '^card [0-9]+: [^,]+')
+
+COMPREPLY=($(compgen -W "${cards[*]}" -- "$cur"))
+''')
 
 _ALSA_LIST_DEVICES = helpers.ShellFunction('alsa_list_devices', r'''
-local card
-command aplay -l \
-  | command grep -Eo '^card [0-9]+: [^,]+' \
-  | command uniq \
-  | while builtin read card; do
+local card id devices=()
+while builtin read card; do
   card="${card#card }"
-  local id="${card%%: *}"
-  builtin echo "hw:$id"
-done''')
+  id="${card%%: *}"
+  devices+=("hw:$id")
+done < <(command aplay -l | command grep -Eo '^card [0-9]+: [^,]+')
+
+COMPREPLY=($(compgen -W "${devices[*]}" -- "$cur"))
+''')
 
 
 class BashHelpers(helpers.GeneralHelpers):
@@ -478,7 +478,6 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)
-        self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)
         self.add_function(_ALSA_LIST_DEVICES)
