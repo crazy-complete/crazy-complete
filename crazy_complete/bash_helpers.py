@@ -430,15 +430,6 @@ done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
 # Bonus
 # =============================================================================
 
-_NET_INTERFACES_LIST = helpers.ShellFunction('net_interfaces_list', r'''
-if [[ -d /sys/class/net ]]; then
-  command ls /sys/class/net
-elif command ifconfig -l &>/dev/null; then
-  command ifconfig -l # BSD / macOS
-else
-  command ifconfig 2>/dev/null | command awk '/^[a-z0-9]/ {print $1}' | command sed 's/://'
-fi''')
-
 _TIMEZONE_LIST = helpers.ShellFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null; then
   command find /usr/share/zoneinfo -type f |\

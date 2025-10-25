@@ -57,21 +57,20 @@ class CompgenW(BashCompletionBase):
 
     def __init__(self, ctxt, values):
         self.ctxt = ctxt
-        self.values = values
+        self.values = [str(value) for value in values]
 
     def get_code(self, append=False):
-        needs_escape = any(shell.needs_escape(str(value)) for value in self.values)
+        needs_escape = any(filter(shell.needs_escape, self.values))
 
-        if needs_escape:
-            compgen_funcname = self.ctxt.helpers.use_function('compgen_w_replacement')
-            return ('%s %s-- "$cur" %s' % (
-                compgen_funcname,
-                ('-a ' if append else ''),
-                ' '.join(shell.escape(str(s)) for s in self.values)))
+        if not needs_escape:
+            return 'COMPREPLY%s=($(compgen -W %s -- "$cur"))' % (
+                ('+' if append else ''),
+                shell.escape(' '.join(self.values)))
 
-        return 'COMPREPLY%s=($(compgen -W %s -- "$cur"))' % (
-            ('+' if append else ''),
-            shell.escape(' '.join(str(v) for v in self.values)))
+        return ('%s %s-- "$cur" %s' % (
+            self.ctxt.helpers.use_function('compgen_w_replacement'),
+            ('-a ' if append else ''),
+            ' '.join(shell.escape(s) for s in self.values)))
 
 
 class BashCompletionCompgen(BashCompletionBase):
@@ -183,15 +182,16 @@ class BashCompleter(shell.ShellCompleter):
 
     def directory(self, ctxt, _trace, opts=None):
         directory = None if opts is None else opts.get('directory', None)
+        filedir = bash_versions.filedir(ctxt)
 
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
-            cmd += '  %s -d\n' % bash_versions.filedir(ctxt)
+            cmd += '  %s -d\n' % filedir
             cmd += '  builtin popd &>/dev/null\n'
             cmd += '}'
             return BashCompletionCommand(ctxt, cmd)
 
-        return BashCompletionCommand(ctxt, '_filedir -d')
+        return BashCompletionCommand(ctxt, '%s -d' % filedir)
 
     def file(self, ctxt, _trace, opts=None):
         fuzzy = False
@@ -254,12 +254,12 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCompgen(ctxt, '-A export')
 
     def exec(self, ctxt, _trace, command):
-        funcname = ctxt.helpers.use_function('exec')
-        return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(command)))
+        func = ctxt.helpers.use_function('exec')
+        return BashCompletionCommand(ctxt, '%s %s' % (func, shell.escape(command)))
 
     def exec_fast(self, ctxt, _trace, command):
-        funcname = ctxt.helpers.use_function('exec_fast')
-        return BashCompletionCommand(ctxt, '%s %s' % (funcname, shell.escape(command)))
+        func = ctxt.helpers.use_function('exec_fast')
+        return BashCompletionCommand(ctxt, '%s %s' % (func, shell.escape(command)))
 
     def exec_internal(self, ctxt, _trace, command):
         return BashCompletionCommand(ctxt, command)
@@ -354,9 +354,8 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionCommand(ctxt, bash_versions.shells(ctxt))
 
     def net_interface(self, ctxt, _trace):
-        exec_func = ctxt.helpers.use_function('exec')
-        list_func = ctxt.helpers.use_function('net_interfaces_list')
-        return BashCompletionCommand(ctxt, '%s %s' % (exec_func, list_func))
+        func = bash_versions.available_interfaces(ctxt)
+        return BashCompletionCommand(ctxt, '%s' % func)
 
     def timezone(self, ctxt, _trace):
         exec_func = ctxt.helpers.use_function('exec')

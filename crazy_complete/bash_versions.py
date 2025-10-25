@@ -76,3 +76,10 @@ def command_offset(ctxt):
         return '_comp_command_offset'
 
     return '_command_offset'
+
+
+def available_interfaces(ctxt):
+    if ctxt.config.bash_completions_version >= (2, 12):
+        return '_comp_compgen_available_interfaces'
+
+    return '_available_interfaces'
