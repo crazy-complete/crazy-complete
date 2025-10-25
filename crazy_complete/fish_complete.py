@@ -3,7 +3,10 @@
 from . import shell
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
-from .utils import get_query_option_strings, get_defined_option_types
+from .utils import (
+    get_query_option_strings, get_defined_option_types,
+    key_value_list_normalize_values
+)
 
 
 CHOICES_INLINE_THRESHOLD = 80
@@ -254,26 +257,27 @@ class FishCompletKeyValueList(FishCompletionCommand):
     '''Used for completing a list of key-value pairs.'''
 
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
-        funcs = {}
         trace.append('key_value_list')
-
-        for key, complete in values.items():
-            if not complete:
-                funcs[key] = 'false'
-            elif complete[0] == 'none':
-                funcs[key] = 'true'
-            else:
-                command, *args = complete
-                obj = getattr(completer, command)(ctxt, trace, *args)
-                funcs[key] = obj.get_function()
-
+        args = []
         e = shell.escape
-        args = ' \\\n'.join('%s %s' % (e(k), e(f)) for k, f in funcs.items())
+
+        for key, desc, complete in key_value_list_normalize_values(values):
+            if not complete:
+                func = 'false'
+            elif complete[0] == 'none':
+                func = 'true'
+            else:
+                command, *command_args = complete
+                obj = getattr(completer, command)(ctxt, trace, *command_args)
+                func = obj.get_function()
+
+            args.append('%s %s %s' % (e(key), e(desc or ''), e(func)))
+
         code = '%s %s %s \\\n%s' % (
             ctxt.helpers.use_function('key_value_list'),
             shell.escape(pair_separator),
             shell.escape(value_separator),
-            indent(args, 2)
+            indent(' \\\n'.join(args), 2)
         )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)

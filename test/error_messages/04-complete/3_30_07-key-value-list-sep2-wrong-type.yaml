@@ -1,0 +1,5 @@
+prog: "foo"
+options:
+  - option_strings: ["-o"]
+    complete: ["key_value_list", ',', false, {'key': null}]
+

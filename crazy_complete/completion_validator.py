@@ -340,8 +340,8 @@ def _validate_key_value_list(ctxt, args):
     if not isinstance(value_separator, str):
         raise CrazyError('value_separator: Not a string')
 
-    if not is_dict_type(values):
-        raise CrazyError('values: Not a dict')
+    if not is_dict_type(values) and not is_list_type(values):
+        raise CrazyError('values: Not a dict or list')
 
     if len(pair_separator) != 1:
         raise CrazyError('Invalid length for pair_separator')
@@ -352,26 +352,58 @@ def _validate_key_value_list(ctxt, args):
     if len(values) == 0:
         raise CrazyError('values: cannot be empty')
 
-    for key, complete in values.items():
-        if not isinstance(key, str):
-            raise CrazyError(f'key: Not a string: {key}')
+    if is_dict_type(values):
+        for key, complete in values.items():
+            if not isinstance(key, str):
+                raise CrazyError(f'key: Not a string: {key}')
 
-        if not isinstance(complete, (list, NoneType)):
-            raise CrazyError(f'complete: Not a list or None: {complete}')
+            if not isinstance(complete, (list, NoneType)):
+                raise CrazyError(f'complete: Not a list or None: {complete}')
 
-        if is_empty_or_whitespace(key):
-            raise CrazyError('Key cannot be empty')
+            if is_empty_or_whitespace(key):
+                raise CrazyError('Key cannot be empty')
 
-        if contains_space(key):
-            raise CrazyError('Key cannot contain space')
+            if contains_space(key):
+                raise CrazyError(f'Key cannot contain space: {key}')
 
-        if complete is None:
-            continue
+            if complete is None:
+                continue
 
-        if len(complete) == 0:
-            raise CrazyError('Missing command')
+            if len(complete) == 0:
+                raise CrazyError('Missing command')
 
-        validate_complete(ctxt, complete)
+            validate_complete(ctxt, complete)
+    else:
+        for compldef in values:
+            if not is_list_type(compldef):
+                raise CrazyError(f'Completion definition not a list: {compldef}')
+
+            if len(compldef) != 3:
+                raise CrazyError(f'Completion definition must have 3 fields: {compldef}')
+
+        for key, description, complete in values:
+            if not isinstance(key, str):
+                raise CrazyError(f'key: Not a string: {key}')
+
+            if not isinstance(description, (str, NoneType)):
+                raise CrazyError(f'description: Not a string or None: {description}')
+
+            if not isinstance(complete, (list, NoneType)):
+                raise CrazyError(f'complete: Not a list or None: {complete}')
+
+            if is_empty_or_whitespace(key):
+                raise CrazyError('Key cannot be empty')
+
+            if contains_space(key):
+                raise CrazyError(f'Key cannot contain space: {key}')
+
+            if complete is None:
+                continue
+
+            if len(complete) == 0:
+                raise CrazyError('Missing command')
+
+            validate_complete(ctxt, complete)
 
 
 def _validate_combine(ctxt, args):

@@ -1,6 +1,6 @@
 prog: "crazy-complete-test"
 options:
-  - option_strings: ["-o"]
+  - option_strings: ["--simple"]
     complete: ["key_value_list", ',', '=', {
       'async':  null,
       'nocomp': ["none"],
@@ -10,3 +10,14 @@ options:
       'pid':    ["pid"],
       'file':   ["file", {"directory": "%TEST_DIR%/test_data"}]
     }]
+
+  - option_strings: ["--description"]
+    complete: ["key_value_list", ',', '=', [
+      ['async',  'set async mode',      null],
+      ['nocomp', 'no completer',        ["none"]],
+      ['animal', 'select an animal',    ["choices", ["cat", "dog", "horse"]]],
+      ['number', 'select a number',     ["choices", {"0": "zero", "1": "one", "2": "two"}]],
+      ['user',   'select a user',       ["user"]],
+      ['proc',   'select a process',    ['combine', [["pid"], ['process']]]],
+      ['file',   null,                  ["file", {"directory": "%TEST_DIR%/test_data"}]]
+    ]]

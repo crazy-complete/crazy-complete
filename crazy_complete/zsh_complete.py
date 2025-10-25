@@ -4,6 +4,7 @@ from . import shell
 from .str_utils import join_with_wrap, indent
 from .zsh_utils import escape_colon, escape_square_brackets, make_file_extension_pattern
 from .type_utils import is_dict_type
+from .utils import key_value_list_normalize_values
 
 
 CHOICES_INLINE_THRESHOLD = 80
@@ -197,26 +198,33 @@ class ZshKeyValueList(ZshComplFunc):
     '''Used for completing a list of key-value pairs.'''
 
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
-        spec = []
         trace.append('key_value_list')
+        spec = []
 
-        for key, complete in values.items():
+        for key, desc, complete in key_value_list_normalize_values(values):
+            key = escape_colon(key)
+
+            if desc:
+                desc = shell.escape('[%s]' % escape_square_brackets(desc))
+            else:
+                desc = ''
+
             if not complete:
-                spec.append('%s' % escape_colon(key))
+                spec.append('%s%s' % (key, desc))
             elif complete[0] == 'none':
-                spec.append('%s:::' % escape_colon(key))
+                spec.append('%s%s:::' % (key, desc))
             else:
                 command, *args = complete
                 compl_obj = getattr(completer, command)(ctxt, trace, *args)
                 action = compl_obj.get_action_string()
-                spec.append('%s:::%s' % (escape_colon(key), action))
+                spec.append('%s%s:::%s' % (key, desc, action))
 
-        code = '_values -s %s -S %s %s \\\n' % (
+        code = '_values -s %s -S %s %s \\\n%s' % (
             shell.escape(pair_separator),
             shell.escape(value_separator),
-            shell.escape(ctxt.option.metavar or ''))
-
-        code += indent(' \\\n'.join(spec), 2)
+            shell.escape(ctxt.option.metavar or ''),
+            indent(' \\\n'.join(spec), 2)
+        )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
 

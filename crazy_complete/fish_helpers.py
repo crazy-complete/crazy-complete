@@ -488,39 +488,28 @@ end
 
 _KEY_VALUE_LIST = helpers.FishFunction('key_value_list', r'''
 set -l sep1 $argv[1]
-set -e argv[1]
+set -l sep2 $argv[2]
+set -l value
+set -l keys
+set -l descriptions
+set -l functions
+set -l i
 
-set -l sep2 $argv[1]
-set -e argv[1]
+for i in (command seq 3 3 (count $argv))
+  set -a keys $argv[$i]
+  set -a descriptions $argv[(math $i + 1)]
+  set -a functions $argv[(math $i + 2)]
+end
 
 set -l comp (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unescape)
 
-set -l key
-set -l value
-set -l keys
-set -l keys_with_sep
-set -l funcs
-set -l i
-
-for i in (command seq 1 2 (count $argv))
-  set -a keys $argv[$i]
-  set -a funcs $argv[(math $i + 1)]
-
-  if test $funcs[-1] != 'false'
-    set -a keys_with_sep "$argv[$i]$sep2"
-  else
-    set -a keys_with_sep $argv[$i]
-  end
-end
-
-if test -z "$comp"
-  printf '%s\n' $keys_with_sep
-  return
-end
-
-if test (string sub -s -1 -l 1 -- $comp) = $sep1
-  for key in $keys_with_sep
-    printf '%s%s\n' $comp $key
+if test -z "$comp" || test (string sub -s -1 -l 1 -- $comp) = $sep1
+  for i in (command seq 1 (count $keys))
+    if test "$functions[$i]" = false
+      printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
+    else
+      printf '%s%s%s\t%s\n' "$comp" $keys[$i] $sep2 "$descriptions[$i]"
+    end
   end
   return
 end
@@ -530,7 +519,7 @@ function __call_func_for_key -S
   for i in (command seq 1 (count $keys))
     if test $keys[$i] = $argv[1]
       set -g __fish_stripprefix ".*"(string escape --style=regex -- $sep2)
-      $funcs[$i]
+      $functions[$i]
       set -e __fish_stripprefix
       return
     end
@@ -555,8 +544,12 @@ switch $pair
     set -l key_len (string length -- $split[1])
     set comp (string sub -e -$key_len -- $comp)
 
-    for key in $keys_with_sep
-      printf '%s%s\n' $comp $key
+    for i in (command seq 1 (count $keys))
+      if test "$functions[$i]" = false
+        printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
+      else
+        printf '%s%s%s\t%s\n' "$comp" $keys[$i] $sep2 "$descriptions[$i]"
+      end
     end
 end
 ''')

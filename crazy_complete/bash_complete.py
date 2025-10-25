@@ -5,6 +5,7 @@ from . import bash_versions
 from .str_utils import indent
 from .type_utils import is_dict_type
 from .bash_utils import make_file_extension_pattern
+from .utils import key_value_list_normalize_values
 
 
 class BashCompletionBase:
@@ -156,7 +157,7 @@ class BashCompleteKeyValueList(BashCompletionCode):
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         funcs = {}
 
-        for key, complete in values.items():
+        for key, _desc, complete in key_value_list_normalize_values(values):
             if not complete:
                 funcs[key] = 'false'
             elif complete[0] == 'none':

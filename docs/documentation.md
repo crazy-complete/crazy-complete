@@ -130,7 +130,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | ----------------------------------- | --------------------------------------------------------- |
 | [combine](#combine)                 | Combine multiple completers                               |
 | [key\_value\_list](#key_value_list) | Complete a comma-separated list of key=value pairs        |
-| [list](#list)                       | Complete a comma separated list using a completer         |
+| [list](#list)                       | Complete a comma-separated list using a completer         |
 | [none](#none)                       | No completion, but specifies that an argument is required |
 
 ### Built-in commands
@@ -194,7 +194,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 ```yaml
 prog: "example"
 options:
-  - option_strings: ["--also-card"]
+  - option_strings: ["--alsa-card"]
     complete: ["alsa_card"]
 ```
 
@@ -214,7 +214,7 @@ options:
 ```yaml
 prog: "example"
 options:
-  - option_strings: ["--also-device"]
+  - option_strings: ["--alsa-device"]
     complete: ["alsa_device"]
 ```
 
@@ -1057,11 +1057,19 @@ The first argument is the separator used for delimiting the key-value pairs.
 
 The second argument is the separator used for delimiting the value from the key.
 
-The third argument is a dictionary of keys and the completers that should be used.
+The third argument is either a dictionary or a list.
 
-If a key does not take an argument, use `null`.
+The dictionary has to be in the form of:
 
-If a key does take an argument but cannot be completed, use `['none']`.
+  `{<key>: <completer>, ...}`
+
+The list has to be in the form of:
+
+  `[ [<key>, <description>, <completer>], ... ]`
+
+If a key does not take an argument, use `null` as completer.
+
+If a key does take an argument but cannot be completed, use `['none']` as completer.
 
 
 ```yaml
@@ -1072,11 +1080,23 @@ options:
       'flag':   null,
       'nocomp': ['none'],
       'user':   ['user'],
-      'check'   ['choices', {
+      'check':  ['choices', {
         'relaxed': "convert to lowercase before lookup",
         'strict': "no conversion"
       }]
     }]
+
+  - option_strings: ["--key-value-list-with-desc"]
+    complete: ["key_value_list", ",", "=", [
+      ['flag',   'An option flag', null],
+      ['nodesc', null, null],
+      ['nocomp', 'An option with arg but without completer', ['none']],
+      ['user',   'Takes a username',  ['user']],
+      ['check',  'Specify file name conversions', ['choices', {
+        'relaxed': "convert to lowercase before lookup",
+        'strict': "no conversion"
+      }]]
+    ]]
 ```
 
 ```
@@ -1088,9 +1108,9 @@ dhcpcd                  git
 
 ### list
 
-> Complete a comma separated list using a completer
+> Complete a comma-separated list using a completer
 
-Complete a comma-separted list of any completer.
+Complete a comma-separated list of any completer.
 
 The separator can be changed by adding `{"separator": ...}`.
 

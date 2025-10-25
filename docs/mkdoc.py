@@ -6,12 +6,16 @@ from collections import defaultdict
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-COMMANDS_INFILE = 'commands.yaml'
-COMMANDS_OUTFILE = 'commands.md'
-DOCUMENTATION_INFILE = 'documentation.md.in'
-DOCUMENTATION_OUTFILE = 'documentation.md'
-COMMANDS = []
-BY_CATEGORY = defaultdict(list)
+COMMANDS_INFILE         = 'commands.yaml'
+COMMANDS_OUTFILE        = 'commands.md'
+OPTIONS_INFILE          = 'options.yaml'
+OPTIONS_OUTFILE         = 'options.md'
+DOCUMENTATION_INFILE    = 'documentation.md.in'
+DOCUMENTATION_OUTFILE   = 'documentation.md'
+
+OPTIONS                 = []
+COMMANDS                = []
+BY_CATEGORY             = defaultdict(list)
 
 def escape_underscore(s):
     return s.replace('_', '\\_')
@@ -77,6 +81,8 @@ class Command:
         if self.definition is None:
             raise Exception(f"No definition: {self.command}")
 
+        yaml.safe_load(self.definition)
+
         if self.output is None:
             raise Exception(f"No output: {self.command}")
 
@@ -87,6 +93,39 @@ class Command:
             for implemented in self.implemented:
                 if not implemented in ('Bash', 'Fish', 'Zsh'):
                     raise Exception(f"Implemented: Wrong shell {implemented}")
+
+class Option:
+    def __init__(self, dictionary):
+        self.options = None
+        self.metavar = None
+        self.choices = None
+        self.default = None
+        self.short = None
+
+        for key, value in dictionary.items():
+            if key == 'options':
+                assert isinstance(value, list), key
+                self.options = value
+            elif key == 'short':
+                assert isinstance(value, str), key
+                self.short = value
+            elif key == 'metavar':
+                assert isinstance(value, str), key
+                self.metavar = value
+            elif key == 'default':
+                assert isinstance(value, str), key
+                self.default= value
+            elif key == 'choices':
+                assert isinstance(value, (list, dict)), key
+                self.choices = value
+            else:
+                raise Exception(f"Unknown key: {key}")
+
+        if self.options is None:
+            raise Exception("No options")
+
+        if self.short is None:
+            raise Exception(f"No short: {self.options}")
 
 def make_markup_table(header, rows):
     # Ensure everything is string
@@ -189,6 +228,10 @@ def make_markup(by_category):
 with open(COMMANDS_INFILE, 'r', encoding='utf-8') as fh:
     for command_def in yaml.safe_load_all(fh):
         COMMANDS.append(Command(command_def))
+
+with open(OPTIONS_INFILE, 'r', encoding='utf-8') as fh:
+    for option_def in yaml.safe_load_all(fh):
+        OPTIONS.append(Option(option_def))
 
 COMMANDS = sorted(COMMANDS, key=lambda c: c.command)
 

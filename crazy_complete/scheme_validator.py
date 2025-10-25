@@ -353,7 +353,7 @@ def _check_key_value_list(ctxt, arguments):
 
     _check_type(pair_separator, (str,), 'pair_separator')
     _check_type(value_separator, (str,), 'value_separator')
-    _check_type(values, (dict,), 'values')
+    _check_type(values, (dict, list), 'values')
 
     if 'key_value_list' in ctxt.trace:
         raise _error('Nested `key_value_list` not allowed', arguments.arg)
@@ -372,23 +372,53 @@ def _check_key_value_list(ctxt, arguments):
     if len(values.value) == 0:
         raise _error('values: cannot be empty', values)
 
-    for key, complete in values.value.items():
-        _check_type(key, (str,))
-        _check_type(complete, (list, NoneType))
+    if isinstance(values.value, dict):
+        for key, complete in values.value.items():
+            _check_type(key, (str,))
+            _check_type(complete, (list, NoneType))
 
-        if is_empty_or_whitespace(key.value):
-            raise _error('Key cannot be empty', key)
+            if is_empty_or_whitespace(key.value):
+                raise _error('Key cannot be empty', key)
 
-        if contains_space(key.value):
-            raise _error('Key cannot contain space', key)
+            if contains_space(key.value):
+                raise _error('Key cannot contain space', key)
 
-        if complete.value is None:
-            continue
+            if complete.value is None:
+                continue
 
-        if len(complete.value) == 0:
-            raise _error('Missing command', complete)
+            if len(complete.value) == 0:
+                raise _error('Missing command', complete)
 
-        _check_complete(ctxt, complete)
+            _check_complete(ctxt, complete)
+    else:
+        for compldef in values.value:
+            _check_type(compldef, (list,))
+
+            if len(compldef.value) != 3:
+                raise _error('Completion definition must have 3 fields', compldef)
+
+        for compldef in values.value:
+            key = compldef.value[0]
+            description = compldef.value[1]
+            complete = compldef.value[2]
+
+            _check_type(key, (str,))
+            _check_type(description, (str, NoneType))
+            _check_type(complete, (list, NoneType))
+
+            if is_empty_or_whitespace(key.value):
+                raise _error('Key cannot be empty', key)
+
+            if contains_space(key.value):
+                raise _error('Key cannot contain space', key)
+
+            if complete.value is None:
+                continue
+
+            if len(complete.value) == 0:
+                raise _error('Missing command', complete)
+
+            _check_complete(ctxt, complete)
 
 
 def _check_combine(ctxt, arguments):

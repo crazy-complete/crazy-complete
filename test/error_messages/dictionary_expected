@@ -174,6 +174,27 @@
 3_29_00-command-arg-too-many-args        | foo: positional 1 (unnamed): Too many arguments: [False]
 3_29_01-command-arg-in-option            | foo: -o: command_arg not allowed inside options
 3_29_02-command-arg-not-repeatable       | foo: positional 1 (unnamed): The `command_arg` completer requires `repeatable=True`
+3_30_00-key-value-list-missing-args      | foo: -o: Missing argument: pair_separator
+3_30_01-key-value-list-missing-args-1    | foo: -o: Missing argument: value_separator
+3_30_02-key-value-list-missing-args-2    | foo: -o: Missing argument: values
+3_30_03-key-value-list-too-many-args     | foo: -o: Too many arguments: ['wrong']
+3_30_04-key-value-list-sep1-wrong-type   | foo: -o: pair_separator: Not a string
+3_30_05-key-value-list-sep1-empty        | foo: -o: Invalid length for pair_separator
+3_30_06-key-value-list-sep1-wrong-value  | foo: -o: Invalid length for pair_separator
+3_30_07-key-value-list-sep2-wrong-type   | foo: -o: value_separator: Not a string
+3_30_08-key-value-list-sep2-empty        | foo: -o: Invalid length for value_separator
+3_30_09-key-value-list-sep2-wrong-value  | foo: -o: Invalid length for value_separator
+3_30_10-key-value-list-values-wrong-type | foo: -o: values: Not a dict or list
+3_30_11-key-value-list-1-key-not-string  | foo: -o: key: Not a string: False
+3_30_12-key-value-list-1-key-empty       | foo: -o: Key cannot be empty
+3_30_13-key-value-list-1-key-with-space  | foo: -o: Key cannot contain space: foo bar
+3_30_14-key-value-list-1-complete-wrong-type | foo: -o: complete: Not a list or None: False
+3_30_15-key-value-list-2-def-not-list    | foo: -o: Completion definition not a list: False
+3_30_16-key-value-list-2-def-invalid-length | foo: -o: Completion definition must have 3 fields: ['key', None]
+3_30_17-key-value-list-2-key-not-string  | foo: -o: key: Not a string: False
+3_30_18-key-value-list-2-key-empty       | foo: -o: Key cannot be empty
+3_30_19-key-value-list-key-with-space    | foo: -o: Key cannot contain space: foo bar
+3_30_20-key-value-list-2-desc-not-string | foo: -o: description: Not a string or None: False
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Only one positional argument can be marked as repeatable
