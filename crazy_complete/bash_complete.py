@@ -54,6 +54,9 @@ class BashCompletionCode(BashCompletionBase):
         return '\n'.join(r)
 
     def get_function(self):
+        if not self.code:
+            return 'true'
+
         return self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
 
 

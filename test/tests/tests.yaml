@@ -804,7 +804,7 @@ definition_file: "main"
 description: "complete: Check --value-list #3"
 send: "crazy-complete-test complete --value-list foo"
 bash_expected: |
-  > crazy-complete-test complete --value-list foo
+  > crazy-complete-test complete --value-list foo,
 fish_expected: |
   > crazy-complete-test complete --value-list foo
 zsh_expected: |
@@ -1553,12 +1553,11 @@ zsh_expected: |
 number: 100
 definition_file: "list"
 description: "Check --colon-list (2)"
-comment: "Does not work for Bash yet (thanks to $COMP_WORDBREAKS)"
 send: "crazy-complete-test --colon-list one:"
 bash_expected: |
   > crazy-complete-test --colon-list one:
-  one:three  one:two
-  > crazy-complete-test --colon-list one:one:t
+  three  two
+  > crazy-complete-test --colon-list one:t
 fish_expected: |
   > crazy-complete-test --colon-list one:t
   one:three  one:two
