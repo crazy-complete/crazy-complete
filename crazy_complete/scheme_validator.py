@@ -261,16 +261,10 @@ def _check_directory(ctxt, arguments):
 
 
 def _check_file_list(ctxt, arguments):
-    #if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
-    #    raise _error(f'Command `file_list` not allowed inside {ctxt.trace[-1]}', arguments.args)
-
     _check_filedir(ctxt, arguments, with_extensions=True, with_list_opts=True)
 
 
 def _check_directory_list(ctxt, arguments):
-    #if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
-    #    raise _error(f'Command `directory_list` not allowed inside {ctxt.trace[-1]}', arguments.args)
-
     _check_filedir(ctxt, arguments, with_list_opts=True)
 
 
@@ -344,12 +338,6 @@ def _check_key_value_list(ctxt, arguments):
     _check_type(value_separator, (str,), 'value_separator')
     _check_type(values, (dict, list), 'values')
 
-    #if 'key_value_list' in ctxt.trace:
-    #    raise _error('Nested `key_value_list` not allowed', arguments.arg)
-
-    #if 'list' in ctxt.trace:
-    #    raise _error('Command `key_value_list` not allowed inside list', arguments.args)
-
     ctxt.trace.append('key_value_list')
 
     _check_char(pair_separator, 'pair_separator')
@@ -400,9 +388,6 @@ def _check_combine(ctxt, arguments):
 
     _check_type(commands, (list,))
 
-    #if 'combine' in ctxt.trace:
-    #    raise _error('Nested `combine` not allowed', arguments.args)
-
     ctxt.trace.append('combine')
 
     for completer in commands.value:
@@ -429,12 +414,6 @@ def _check_list(ctxt, arguments):
         'duplicates': (False, (bool,), None),
     })
 
-    #if 'list' in ctxt.trace:
-    #    raise _error('Nested `list` not allowed', arguments.args)
-
-    #if 'key_value_list' in ctxt.trace:
-    #    raise _error('Command `list` not allowed inside key_value_list', arguments.args)
-
     ctxt.trace.append('list')
     _check_complete(ctxt, command)
 
@@ -446,12 +425,6 @@ def _check_prefix(ctxt, arguments):
 
     _check_type(prefix, (str,), 'prefix')
     _check_type(command, (list,), 'command')
-
-    #if 'prefix' in ctxt.trace:
-    #    raise _error('Nested `prefix` not allowed', arguments.args)
-
-    #if 'key_value_list' in ctxt.trace:
-    #    raise _error('Command `prefix` not allowed inside key_value_list', arguments.args)
 
     ctxt.trace.append('prefix')
     _check_complete(ctxt, command)

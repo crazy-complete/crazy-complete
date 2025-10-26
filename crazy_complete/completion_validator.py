@@ -237,16 +237,10 @@ def _validate_directory(ctxt, args):
 
 
 def _validate_file_list(ctxt, args):
-    #if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
-    #    raise CrazyError(f'Command `file_list` not allowed inside {ctxt.trace[-1]}')
-
     _validate_filedir(ctxt, args, with_extensions=True, with_list_opts=True)
 
 
 def _validate_directory_list(ctxt, args):
-    #if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
-    #    raise CrazyError(f'Command `directory_list` not allowed inside {ctxt.trace[-1]}')
-
     _validate_filedir(ctxt, args, with_list_opts=True)
 
 
@@ -315,12 +309,6 @@ def _validate_key_value_list(ctxt, args):
     values = args.get_required_arg('values')
     args.require_no_more()
 
-    #if 'key_value_list' in ctxt.trace:
-    #    raise CrazyError('Nested `key_value_list` not allowed')
-
-    #if 'list' in ctxt.trace:
-    #    raise CrazyError('Command `key_value_list` not allowed inside list')
-
     ctxt.trace.append('key_value_list')
 
     _validate_type(pair_separator, (str,), 'pair_separator')
@@ -369,9 +357,6 @@ def _validate_combine(ctxt, args):
     commands = args.get_required_arg('commands')
     args.require_no_more()
 
-    #if 'combine' in ctxt.trace:
-    #    raise CrazyError('Nested `combine` not allowed')
-
     ctxt.trace.append('combine')
 
     _validate_type(commands, (list,), 'commands')
@@ -392,12 +377,6 @@ def _validate_list(ctxt, args):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
-    #if 'list' in ctxt.trace:
-    #    raise CrazyError('Nested `list` not allowed')
-
-    #if 'key_value_list' in ctxt.trace:
-    #    raise CrazyError('Command `list` not allowed inside key_value_list')
-
     _validate_type(command, (list,), 'command')
 
     _validate_type(opts, (dict,), 'options')
@@ -414,12 +393,6 @@ def _validate_prefix(ctxt, args):
     prefix = args.get_required_arg('prefix')
     command = args.get_required_arg('command')
     args.require_no_more()
-
-    #if 'prefix' in ctxt.trace:
-    #    raise CrazyError('Nested `prefix` not allowed')
-
-    #if 'key_value_list' in ctxt.trace:
-    #    raise CrazyError('Command `list` not allowed inside key_value_list')
 
     _validate_non_empty_string(prefix, 'prefix')
     _validate_type(command, (list,), 'command')
