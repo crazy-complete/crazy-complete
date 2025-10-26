@@ -523,6 +523,8 @@ def _check_complete(ctxt, args):
     arguments = Arguments(args)
     cmd = arguments.get_required_arg('command')
 
+    _check_type(cmd, (str,), 'command')
+
     if cmd.value not in _COMMANDS:
         raise _error(f'Invalid command: {cmd.value}', cmd)
 
