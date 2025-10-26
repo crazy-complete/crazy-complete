@@ -69,11 +69,11 @@
 3_00_00-invalid-command                  | line 4, column 16: Invalid command: wrong
 3_01_00-command-options-wrong-type       | line 4, column 27: Invalid type. Expected types: dictionary
 3_01_01-command-path-wrong-type          | line 4, column 36: path: Invalid type. Expected types: string
-3_01_02-command-path-empty               | line 4, column 36: path cannot be empty
+3_01_02-command-path-empty               | line 4, column 36: path: Cannot be empty
 3_01_03-command-path-append-wrong-type   | line 4, column 43: path_append: Invalid type. Expected types: string
-3_01_04-command-path-append-empty        | line 4, column 43: path_append cannot be empty
+3_01_04-command-path-append-empty        | line 4, column 43: path_append: Cannot be empty
 3_01_05-command-path-prepend-wrong-type  | line 4, column 44: path_prepend: Invalid type. Expected types: string
-3_01_06-command-path-prepend-empty       | line 4, column 44: path_prepend cannot be empty
+3_01_06-command-path-prepend-empty       | line 4, column 44: path_prepend: Cannot be empty
 3_01_07-command-invalid-option           | line 4, column 28: Unknown key: wrong
 3_01_10-command-too-many-args            | line 4, column 15: Too many arguments provided
 3_02_00-environment-too-many-args        | line 4, column 15: Too many arguments provided
@@ -97,7 +97,7 @@
 3_15_00-file-options-wrong-type          | line 4, column 24: Invalid type. Expected types: dictionary
 3_15_01-file-unknown-key                 | line 4, column 25: Unknown key: wrong
 3_15_02-file-directory-wrong-type        | line 4, column 38: directory: Invalid type. Expected types: string
-3_15_03-file-directory-empty             | line 4, column 38: directory cannot not be empty
+3_15_03-file-directory-empty             | line 4, column 38: directory: Cannot be empty
 3_15_04-file-directory-not-absolute      | line 4, column 38: directory must be an absolute path
 3_15_05-file-extensions-wrong-type       | line 4, column 39: extensions: Invalid type. Expected types: list
 3_15_06-file-extensions-empty            | line 4, column 39: extensions cannot not be empty
@@ -107,7 +107,7 @@
 3_16_00-directory-options-wrong-type     | line 4, column 29: Invalid type. Expected types: dictionary
 3_16_01-directory-unknown-key            | line 4, column 30: Unknown key: wrong
 3_16_02-directory-directory-wrong-type   | line 4, column 43: directory: Invalid type. Expected types: string
-3_16_03-directory-directory-empty        | line 4, column 43: directory cannot not be empty
+3_16_03-directory-directory-empty        | line 4, column 43: directory: Cannot be empty
 3_16_04-directory-directory-not-absolute | line 4, column 43: directory must be an absolute path
 3_16_05-directory-too-many-args          | line 4, column 15: Too many arguments provided
 3_17_00-range-missing-arg-1              | line 4, column 15: Missing required arg `start`
@@ -129,7 +129,7 @@
 3_21_01-value-list-missing-values        | line 4, column 30: Missing required key: values
 3_21_02-value-list-values-wrong-type     | line 4, column 39: values: Invalid type. Expected types: list|dictionary
 3_21_03-value-list-separator-wrong-type  | line 4, column 64: separator: Invalid type. Expected types: string
-3_21_04-value-list-separator-wrong-value | line 4, column 64: Invalid length for separator
+3_21_04-value-list-separator-wrong-value | line 4, column 64: separator: Invalid length. Single character expected.
 3_21_05-value-list-values-empty          | line 4, column 41: values: cannot be empty
 3_21_06-value-list-list-wrong-type       | line 4, column 42: Invalid type. Expected types: string
 3_21_07-value-list-dict-key-wrong-type   | line 4, column 42: Invalid type. Expected types: string
@@ -148,17 +148,17 @@
 3_23_00-history-missing-arg              | line 4, column 15: Missing required arg `pattern`
 3_23_01-history-too-many-arguments       | line 4, column 15: Too many arguments provided
 3_23_02-history-pattern-wrong-type       | line 4, column 27: pattern: Invalid type. Expected types: string
-3_23_03-history-pattern-wrong-regex      | line 4, column 27: Pattern: Not a valid extended regex
+3_23_03-history-pattern-wrong-regex      | line 4, column 27: pattern: Not a valid extended regex
 3_24_00-command-arg-without-command      | line 3, column 5: The `command_arg` completer requires a previous `command` completer
 3_24_01-command-arg-non-repeatable       | line 6, column 5: The `command_arg` completer requires `repeatable=True`
 3_25_00-mime-file-missing-arg            | line 4, column 15: Missing required arg `pattern`
 3_25_01-mime-file-too-many-arguments     | line 4, column 15: Too many arguments provided
 3_25_02-mime-file-pattern-wrong-type     | line 4, column 29: pattern: Invalid type. Expected types: string
-3_25_03-mime-file-pattern-wrong-regex    | line 4, column 29: Pattern: Not a valid extended regex
+3_25_03-mime-file-pattern-wrong-regex    | line 4, column 29: pattern: Not a valid extended regex
 3_26_00-date-missing-arg                 | line 4, column 15: Missing required arg `format`
 3_26_01-date-too-many-arguments          | line 4, column 15: Too many arguments provided
 3_26_02-date-format-wrong-type           | line 4, column 24: format: Invalid type. Expected types: string
-3_26_03-date-format-empty                | line 4, column 24: format cannot be empty
+3_26_03-date-format-empty                | line 4, column 24: format: Cannot be empty
 3_27_00-date-format-too-many-arguments   | line 4, column 15: Too many arguments provided
 3_28_00-list-missing-arg                 | line 4, column 15: Missing required arg `command`
 3_28_01-list-wrong-type                  | line 4, column 24: Invalid type. Expected types: list
@@ -169,7 +169,7 @@
 3_28_06-list-command-is-list             | line 4, column 24: Nested `list` not allowed
 3_28_09-list-command-is-command-arg      | line 4, column 24: Command `command_arg` not allowed inside list
 3_28_10-list-separator-wrong-type        | line 4, column 48: separator: Invalid type. Expected types: string
-3_28_11-list-separator-wrong-value       | line 4, column 48: Invalid length for separator
+3_28_11-list-separator-wrong-value       | line 4, column 48: separator: Invalid length. Single character expected.
 3_28_12-list-unkown-option               | line 4, column 35: Unknown key: wrong
 3_29_00-command-arg-too-many-args        | line 4, column 15: Too many arguments provided
 3_29_01-command-arg-in-option            | line 4, column 15: command_arg not allowed inside options
@@ -179,21 +179,21 @@
 3_30_02-key-value-list-missing-args-2    | line 4, column 15: Missing required arg `values`
 3_30_03-key-value-list-too-many-args     | line 4, column 15: Too many arguments provided
 3_30_04-key-value-list-sep1-wrong-type   | line 4, column 34: pair_separator: Invalid type. Expected types: string
-3_30_05-key-value-list-sep1-empty        | line 4, column 34: Invalid length for pair_separator
-3_30_06-key-value-list-sep1-wrong-value  | line 4, column 34: Invalid length for pair_separator
+3_30_05-key-value-list-sep1-empty        | line 4, column 34: pair_separator: Invalid length. Single character expected.
+3_30_06-key-value-list-sep1-wrong-value  | line 4, column 34: pair_separator: Invalid length. Single character expected.
 3_30_07-key-value-list-sep2-wrong-type   | line 4, column 39: value_separator: Invalid type. Expected types: string
-3_30_08-key-value-list-sep2-empty        | line 4, column 39: Invalid length for value_separator
-3_30_09-key-value-list-sep2-wrong-value  | line 4, column 39: Invalid length for value_separator
+3_30_08-key-value-list-sep2-empty        | line 4, column 39: value_separator: Invalid length. Single character expected.
+3_30_09-key-value-list-sep2-wrong-value  | line 4, column 39: value_separator: Invalid length. Single character expected.
 3_30_10-key-value-list-values-wrong-type | line 4, column 44: values: Invalid type. Expected types: dictionary|list
 3_30_11-key-value-list-1-key-not-string  | line 4, column 45: Invalid type. Expected types: string
-3_30_12-key-value-list-1-key-empty       | line 4, column 45: Key cannot be empty
-3_30_13-key-value-list-1-key-with-space  | line 4, column 45: Key cannot contain space
+3_30_12-key-value-list-1-key-empty       | line 4, column 45: key: Cannot be empty
+3_30_13-key-value-list-1-key-with-space  | line 4, column 45: key: Cannot contain space
 3_30_14-key-value-list-1-complete-wrong-type | line 4, column 52: Invalid type. Expected types: list|none
 3_30_15-key-value-list-2-def-not-list    | line 4, column 45: Invalid type. Expected types: list
 3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: Completion definition must have 3 fields
 3_30_17-key-value-list-2-key-not-string  | line 4, column 46: Invalid type. Expected types: string
-3_30_18-key-value-list-2-key-empty       | line 4, column 46: Key cannot be empty
-3_30_19-key-value-list-key-with-space    | line 4, column 46: Key cannot contain space
+3_30_18-key-value-list-2-key-empty       | line 4, column 46: key: Cannot be empty
+3_30_19-key-value-list-key-with-space    | line 4, column 46: key: Cannot contain space
 3_30_20-key-value-list-2-desc-not-string | line 4, column 53: Invalid type. Expected types: string|none
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected types: dictionary

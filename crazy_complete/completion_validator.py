@@ -62,6 +62,63 @@ class Arguments:
             raise CrazyError(f'Too many arguments: {self.args[self.index:]}')
 
 
+def _validate_type(value, types, parameter_name):
+    okay = False
+
+    if list in types and is_list_type(value):
+        okay = True
+
+    if not okay and not isinstance(value, types):
+        types_strings = []
+        for t in types:
+            types_strings.append({
+                str:      'string',
+                int:      'integer',
+                float:    'float',
+                list:     'list',
+                dict:     'dictionary',
+                bool:     'boolean',
+                NoneType: 'none'}[t])
+        types_string = '|'.join(types_strings)
+
+        raise CrazyTypeError(parameter_name, types_string, value)
+
+
+def _validate_dictionary(dictionary, rules):
+    for key, value in dictionary.items():
+        if key not in rules:
+            raise CrazyError(f'Unknown key: {key}')
+
+        _validate_type(value, rules[key][1], key)
+
+        if rules[key][2]:
+            rules[key][2](value, key)
+
+    for key, rule in rules.items():
+        if rule[0] is True and key not in dictionary:
+            raise CrazyError(f'Missing required key: {key}')
+
+
+def _validate_non_empty_string(string, parameter):
+    if is_empty_or_whitespace(string):
+        raise CrazyError(f'{parameter}: Cannot be empty')
+
+
+def _validate_char(string, parameter):
+    if len(string) != 1:
+        raise CrazyError(f'{parameter}: Invalid length. Single character expected.')
+
+
+def _validate_regex(pattern, parameter):
+    if not is_valid_extended_regex(pattern):
+        raise CrazyError(f"{parameter}: Not a valid extended regex: {pattern}")
+
+
+def _validate_no_spaces(string, parameter):
+    if contains_space(string):
+        raise CrazyError(f"{parameter}: Cannot contain space")
+
+
 # =============================================================================
 # Command validation functions
 # =============================================================================
@@ -103,106 +160,72 @@ def _validate_choices(_ctxt, args):
     choices = args.get_required_arg('values')
     args.require_no_more()
 
+    _validate_type(choices, (dict, list), 'values')
+
     if is_dict_type(choices):
         for item, desc in choices.items():
-            if not isinstance(item, (str, int)):
-                raise CrazyError(f'Item not a string/int: {item}')
-
-            if not isinstance(desc, (str, int)):
-                raise CrazyError(f'Description not a string/int: {desc}')
+            _validate_type(item, (str, int), 'item')
+            _validate_type(desc, (str, int), 'description')
 
     elif is_list_type(choices):
         for item in choices:
-            if not isinstance(item, (str, int)):
-                raise CrazyError(f'Item not a string/int: {item}')
-
-    else:
-        raise CrazyError('values: Not a list or dictionary')
+            _validate_type(item, (str, int), 'item')
 
 
 def _validate_command(_ctxt, args):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
-    path = None
-    append = None
-    prepend = None
+    _validate_type(opts, (dict,), 'options')
+    _validate_dictionary(opts, {
+        'path':         (False, (str,), _validate_non_empty_string),
+        'path_append':  (False, (str,), _validate_non_empty_string),
+        'path_prepend': (False, (str,), _validate_non_empty_string),
+    })
 
-    if not is_dict_type(opts):
-        raise CrazyTypeError('options', 'dict', opts)
-
-    for key, value in opts.items():
-        if key == 'path':
-            path = value
-        elif key == 'path_append':
-            append = value
-        elif key == 'path_prepend':
-            prepend = value
-        else:
-            raise CrazyError(f'Unknown option: {key}')
-
-        if not isinstance(value, str):
-            raise CrazyError(f'{key}: Not a string: {value}')
-
-        if is_empty_or_whitespace(value):
-            raise CrazyError(f'{key}: Cannot be empty')
+    path = opts.get('path', None)
+    append = opts.get('path_append', None)
+    prepend = opts.get('path_prepend', None)
 
     if path and (append or prepend):
-        raise CrazyError('command: path_append/path_prepend cannot be used with path')
+        raise CrazyError('path_append/path_prepend cannot be used with path')
 
 
 def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
-    if not is_dict_type(opts):
-        raise CrazyTypeError('options', 'dict', opts)
+    _validate_type(opts, (dict,), 'options')
 
-    for key, value in opts.items():
-        if key == 'directory':
-            if not isinstance(value, str):
-                raise CrazyError(f"directory: Not a string: {value}")
+    spec = {'directory': (False, (str,), _validate_non_empty_string)}
+    if with_extensions:
+        spec['extensions'] = (False, (list,), None)
+        spec['fuzzy'] = (False, (bool,), None)
+    if with_list_opts:
+        spec['separator'] = (False, (str,), _validate_char)
+        spec['duplicates'] = (False, (bool,), None)
 
-            if value == '':
-                raise CrazyError('directory: Cannot be empty')
+    _validate_dictionary(opts, spec)
 
-            if not value.startswith('/'):
-                raise CrazyError('directory: Must be an absolute path')
+    if 'directory' in opts:
+        if not opts['directory'].startswith('/'):
+            raise CrazyError('directory: Must be an absolute path')
 
-        elif with_extensions and key == 'extensions':
-            if not is_list_type(value):
-                raise CrazyError(f"extensions: Not a list: {value}")
+    if 'extensions' in opts:
+        value = opts['extensions']
 
-            if len(value) == 0:
-                raise CrazyError("extensions: Cannot be empty")
+        if len(value) == 0:
+            raise CrazyError("extensions: Cannot be empty")
 
-            for i, subval in enumerate(value):
-                if not isinstance(subval, str):
-                    raise CrazyError(f"extensions[{i}]: Not a string: {subval}")
+        for i, subval in enumerate(value):
+            if not isinstance(subval, str):
+                raise CrazyError(f"extensions[{i}]: Not a string: {subval}")
 
-                if subval == '':
-                    raise CrazyError(f"extensions[{i}]: Cannot be empty")
+            if subval == '':
+                raise CrazyError(f"extensions[{i}]: Cannot be empty")
 
-                if contains_space(subval):
-                    raise CrazyError(f"extensions[{i}]: Contains space: {subval}")
-
-        elif with_extensions and key == 'fuzzy':
-            if not isinstance(value, bool):
-                raise CrazyError(f"fuzzy: Not a bool: {value}")
-
-        elif with_list_opts and key == 'separator':
-            if not isinstance(value, str):
-                raise CrazyError(f'separator: Not a string: {value}')
-
-            if len(value) != 1:
-                raise CrazyError(f'Invalid length for separator: {value}')
-
-        elif with_list_opts and key == 'duplicates':
-            if not isinstance(value, bool):
-                raise CrazyError(f"duplicates: Not a bool: {value}")
-
-        else:
-            raise CrazyError(f'Unknown option: {key}')
+            if contains_space(subval):
+                raise CrazyError(f"extensions[{i}]: Contains space: {subval}")
 
 
 def _validate_file(ctxt, args):
@@ -230,12 +253,8 @@ def _validate_directory_list(ctxt, args):
 def _validate_mime_file(_ctxt, args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
-
-    if not isinstance(pattern, str):
-        raise CrazyError(f"Pattern is not a string: {pattern}")
-
-    if not is_valid_extended_regex(pattern):
-        raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
+    _validate_type(pattern, (str,), 'pattern')
+    _validate_regex(pattern, 'pattern')
 
 
 def _validate_range(_ctxt, args):
@@ -244,14 +263,9 @@ def _validate_range(_ctxt, args):
     step  = args.get_optional_arg(1)
     args.require_no_more()
 
-    if not isinstance(start, int):
-        raise CrazyError(f"start: not an int: {start}")
-
-    if not isinstance(stop, int):
-        raise CrazyError(f"stop: not an int: {stop}")
-
-    if not isinstance(step, int):
-        raise CrazyError(f"step: not an int: {step}")
+    _validate_type(start, (int,), 'start')
+    _validate_type(stop, (int,), 'stop')
+    _validate_type(step, (int,), 'step')
 
     if step > 0:
         if start > stop:
@@ -266,58 +280,33 @@ def _validate_range(_ctxt, args):
 def _validate_exec(_ctxt, args):
     cmd = args.get_required_arg('command')
     args.require_no_more()
-
-    if not isinstance(cmd, str):
-        raise CrazyError(f"Command is not a string: {cmd}")
+    _validate_type(cmd, (str,), 'command')
 
 
 def _validate_value_list(_ctxt, args):
     opts = args.get_required_arg('options')
     args.require_no_more()
 
-    if not is_dict_type(opts):
-        raise CrazyTypeError('options', 'dict', opts)
+    _validate_type(opts, (dict,), 'options')
+    _validate_dictionary(opts, {
+        'values':     (True,  (dict, list), None),
+        'separator':  (False, (str,), _validate_char),
+        'duplicates': (False, (bool,), None)
+    })
 
-    values = None
-    separator = ','
-
-    for key, value in opts.items():
-        if key == 'values':
-            values = value
-        elif key == 'separator':
-            separator = value
-        elif key == 'duplicates':
-            if not isinstance(value, bool):
-                raise CrazyError(f"duplicates: Not a bool: {value}")
-        else:
-            raise CrazyError(f'Unknown option: {key}')
-
-    if values is None:
-        raise CrazyError(f'Missing `values` option: {opts}')
-
-    if not is_list_type(values) and not is_dict_type(values):
-        raise CrazyError(f'values: not a list|dictionary: {values}')
+    values = opts['values']
 
     if len(values) == 0:
         raise CrazyError('values: cannot be empty')
 
     if is_dict_type(values):
         for item, desc in values.items():
-            if not isinstance(item, str):
-                raise CrazyError(f'values: Not a string: {item}')
-
-            if not isinstance(desc, str):
-                raise CrazyError(f'values: Not a string: {desc}')
+            _validate_type(item, (str,), 'values (item)')
+            _validate_type(desc, (str,), 'values (description)')
     else:
         for index, value in enumerate(values):
             if not isinstance(value, str):
                 raise CrazyError(f'values[{index}]: Not a string: {value}')
-
-    if not isinstance(separator, str):
-        raise CrazyError(f'separator: Not a string: {separator}')
-
-    if len(separator) != 1:
-        raise CrazyError(f'Invalid length for separator: {separator}')
 
 
 def _validate_key_value_list(ctxt, args):
@@ -334,43 +323,25 @@ def _validate_key_value_list(ctxt, args):
 
     ctxt.trace.append('key_value_list')
 
-    if not isinstance(pair_separator, str):
-        raise CrazyError('pair_separator: Not a string')
+    _validate_type(pair_separator, (str,), 'pair_separator')
+    _validate_type(value_separator, (str,), 'value_separator')
+    _validate_type(values, (dict, list), 'values')
 
-    if not isinstance(value_separator, str):
-        raise CrazyError('value_separator: Not a string')
-
-    if not is_dict_type(values) and not is_list_type(values):
-        raise CrazyError('values: Not a dict or list')
-
-    if len(pair_separator) != 1:
-        raise CrazyError('Invalid length for pair_separator')
-
-    if len(value_separator) != 1:
-        raise CrazyError('Invalid length for value_separator')
+    _validate_char(pair_separator, 'pair_separator')
+    _validate_char(value_separator, 'value_separator')
 
     if len(values) == 0:
         raise CrazyError('values: cannot be empty')
 
     if is_dict_type(values):
         for key, complete in values.items():
-            if not isinstance(key, str):
-                raise CrazyError(f'key: Not a string: {key}')
-
-            if not isinstance(complete, (list, NoneType)):
-                raise CrazyError(f'complete: Not a list or None: {complete}')
-
-            if is_empty_or_whitespace(key):
-                raise CrazyError('Key cannot be empty')
-
-            if contains_space(key):
-                raise CrazyError(f'Key cannot contain space: {key}')
+            _validate_type(key, (str,), 'key')
+            _validate_type(complete, (list, NoneType), 'completer')
+            _validate_non_empty_string(key, 'key')
+            _validate_no_spaces(key, 'key')
 
             if complete is None:
                 continue
-
-            if len(complete) == 0:
-                raise CrazyError('Missing command')
 
             validate_complete(ctxt, complete)
     else:
@@ -382,26 +353,14 @@ def _validate_key_value_list(ctxt, args):
                 raise CrazyError(f'Completion definition must have 3 fields: {compldef}')
 
         for key, description, complete in values:
-            if not isinstance(key, str):
-                raise CrazyError(f'key: Not a string: {key}')
-
-            if not isinstance(description, (str, NoneType)):
-                raise CrazyError(f'description: Not a string or None: {description}')
-
-            if not isinstance(complete, (list, NoneType)):
-                raise CrazyError(f'complete: Not a list or None: {complete}')
-
-            if is_empty_or_whitespace(key):
-                raise CrazyError('Key cannot be empty')
-
-            if contains_space(key):
-                raise CrazyError(f'Key cannot contain space: {key}')
+            _validate_type(key, (str,), 'key')
+            _validate_type(description, (str, NoneType), 'description')
+            _validate_type(complete, (list, NoneType), 'completer')
+            _validate_non_empty_string(key, 'key')
+            _validate_no_spaces(key, 'key')
 
             if complete is None:
                 continue
-
-            if len(complete) == 0:
-                raise CrazyError('Missing command')
 
             validate_complete(ctxt, complete)
 
@@ -415,16 +374,10 @@ def _validate_combine(ctxt, args):
 
     ctxt.trace.append('combine')
 
-    if not isinstance(commands, list):
-        raise CrazyError(f'combine: Not a list: {commands}')
+    _validate_type(commands, (list,), 'commands')
 
     for subcommand_args in commands:
-        if not isinstance(subcommand_args, list):
-            raise CrazyError(f'combine: Not a list: {subcommand_args}')
-
-        if len(subcommand_args) == 0:
-            raise CrazyError('combine: Missing command')
-
+        _validate_type(subcommand_args, (list,), 'subcommand')
         validate_complete(ctxt, subcommand_args)
 
     if len(commands) == 0:
@@ -445,30 +398,15 @@ def _validate_list(ctxt, args):
     if 'key_value_list' in ctxt.trace:
         raise CrazyError('Command `list` not allowed inside key_value_list')
 
+    _validate_type(command, (list,), 'command')
+
+    _validate_type(opts, (dict,), 'options')
+    _validate_dictionary(opts, {
+        'separator': (False, (str,), _validate_char),
+        'duplicates': (False, (bool,), None)
+     })
+
     ctxt.trace.append('list')
-
-    if not isinstance(command, list):
-        raise CrazyError(f'list: Not a list: {command}')
-
-    if len(command) == 0:
-        raise CrazyError('list: Missing command')
-
-    if not is_dict_type(opts):
-        raise CrazyTypeError('options', 'dict', opts)
-
-    for key, value in opts.items():
-        if key == 'separator':
-            if not isinstance(value, str):
-                raise CrazyError(f'separator: Not a string: {value}')
-
-            if len(value) != 1:
-                raise CrazyError(f'Invalid length for separator: {value}')
-        elif key == 'duplicates':
-            if not isinstance(value, bool):
-                raise CrazyError(f"duplicates: Not a bool: {value}")
-        else:
-            raise CrazyError(f'Unknown option: {key}')
-
     validate_complete(ctxt, command)
 
 
@@ -483,12 +421,8 @@ def _validate_prefix(ctxt, args):
     if 'key_value_list' in ctxt.trace:
         raise CrazyError('Command `list` not allowed inside key_value_list')
 
-    if not isinstance(command, list):
-        raise CrazyError(f'prefix: Not a list: {command}')
-
-    if len(command) == 0:
-        raise CrazyError('prefix: Missing command')
-
+    _validate_non_empty_string(prefix, 'prefix')
+    _validate_type(command, (list,), 'command')
     ctxt.trace.append('prefix')
     validate_complete(ctxt, command)
 
@@ -496,23 +430,15 @@ def _validate_prefix(ctxt, args):
 def _validate_history(_ctxt, args):
     pattern = args.get_required_arg('pattern')
     args.require_no_more()
-
-    if not isinstance(pattern, str):
-        raise CrazyError(f"Pattern is not a string: {pattern}")
-
-    if not is_valid_extended_regex(pattern):
-        raise CrazyError(f"Pattern is not a valid extended regex: {pattern}")
+    _validate_type(pattern, (str,), 'pattern')
+    _validate_regex(pattern, 'pattern')
 
 
 def _validate_date(_ctxt, args):
     format_ = args.get_required_arg('format')
     args.require_no_more()
-
-    if not isinstance(format_, str):
-        raise CrazyError(f"Format is not a string: {format_}")
-
-    if is_empty_or_whitespace(format_):
-        raise CrazyError('Format: Cannot be empty')
+    _validate_type(format_, (str,), 'format')
+    _validate_non_empty_string(format_, 'format')
 
 
 # =============================================================================
@@ -571,19 +497,21 @@ _COMMANDS = {
 def validate_complete(ctxt, complete):
     '''Validate a completion command.'''
 
-    if not complete:
+    if complete is None:
         return
 
     args = Arguments(complete)
     command = args.get_required_arg('command')
 
-    if not isinstance(command, str):
-        raise CrazyError(f"Command is not a string: {command}")
+    _validate_type(command, (str,), 'command')
 
     if command not in _COMMANDS:
-        raise CrazyError(f"Unknown command for `complete`: {command}")
+        raise CrazyError(f"Unknown completer: {command}")
 
-    _COMMANDS[command](ctxt, args)
+    try:
+        _COMMANDS[command](ctxt, args)
+    except CrazyError as e:
+        raise CrazyError(f'{command}: {e}') from e
 
 
 def validate_positionals_repeatable(cmdline):
@@ -612,8 +540,7 @@ def validate_wraps(cmdline):
     '''Check for the right usage of `wraps`.'''
 
     if cmdline.wraps is not None:
-        if is_empty_or_whitespace(cmdline.wraps):
-            raise CrazyError('wraps is empty')
+        _validate_non_empty_string(cmdline.wraps, 'wraps')
 
         if contains_space(cmdline.get_command_path()):
             raise CrazyError('wraps not allowed in subcommands')

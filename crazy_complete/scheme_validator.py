@@ -101,9 +101,32 @@ def _check_dictionary(dictionary, rules):
 
         _check_type(value, rules[key.value][1], key.value)
 
+        if rules[key.value][2]:
+            rules[key.value][2](value, key.value)
+
     for key, rule in rules.items():
         if rule[0] is True and key not in dictionary.value:
             raise _error(f'Missing required key: {key}', dictionary)
+
+
+def _check_regex(value, parameter):
+    if not is_valid_extended_regex(value.value):
+        raise _error(f"{parameter}: Not a valid extended regex", value)
+
+
+def _check_char(value, parameter):
+    if len(value.value) != 1:
+        raise _error(f'{parameter}: Invalid length. Single character expected.', value)
+
+
+def _check_non_empty_string(value, parameter):
+    if is_empty_or_whitespace(value.value):
+        raise _error(f'{parameter}: Cannot be empty', value)
+
+
+def _check_no_spaces(value, parameter):
+    if contains_space(value.value):
+        raise _error(f'{parameter}: Cannot contain space', value)
 
 
 # =============================================================================
@@ -156,29 +179,14 @@ def _check_command(_ctxt, arguments):
     arguments.require_no_more()
 
     _check_dictionary(opts, {
-        'path':         (False, (str,)),
-        'path_append':  (False, (str,)),
-        'path_prepend': (False, (str,)),
+        'path':         (False, (str,), _check_non_empty_string),
+        'path_append':  (False, (str,), _check_non_empty_string),
+        'path_prepend': (False, (str,), _check_non_empty_string),
     })
 
-    path = None
-    append = None
-    prepend = None
-
-    if _has_set(opts, 'path'):
-        path = opts.value['path']
-        if is_empty_or_whitespace(path.value):
-            raise _error('path cannot be empty', path)
-
-    if _has_set(opts, 'path_append'):
-        path_append = opts.value['path_append']
-        if is_empty_or_whitespace(path_append.value):
-            raise _error('path_append cannot be empty', path_append)
-
-    if _has_set(opts, 'path_prepend'):
-        path_prepend = opts.value['path_prepend']
-        if is_empty_or_whitespace(path_prepend.value):
-            raise _error('path_prepend cannot be empty', path_prepend)
+    path = opts.value.get('path', None)
+    append = opts.value.get('path_append', None)
+    prepend = opts.value.get('path_prepend', None)
 
     if path and (append or prepend):
         raise _error('path_append/path_prepend cannot be used with path', opts)
@@ -214,22 +222,19 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
     _check_type(options, (dict,))
     arguments.require_no_more()
 
-    spec = {'directory': (False, (str,))}
+    spec = {'directory': (False, (str,), _check_non_empty_string)}
 
     if with_extensions:
-        spec['extensions'] = (False, (list,))
-        spec['fuzzy'] = (False, (bool,))
+        spec['extensions'] = (False, (list,), None)
+        spec['fuzzy'] = (False, (bool,), None)
 
     if with_list_opts:
-        spec['separator'] = (False, (str,))
-        spec['duplicates'] = (False, (bool,))
+        spec['separator'] = (False, (str,), _check_char)
+        spec['duplicates'] = (False, (bool,), None)
 
     _check_dictionary(options, spec)
 
     if _has_set(options, 'directory'):
-        if options.value['directory'].value == '':
-            raise _error('directory cannot not be empty', options.value['directory'])
-
         if not options.value['directory'].value.startswith('/'):
             raise _error('directory must be an absolute path', options.value['directory'])
 
@@ -245,12 +250,6 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
 
             if contains_space(extension.value):
                 raise _error('extension contains space', extension)
-
-    if _has_set(options, 'separator'):
-        separator = options.value['separator']
-
-        if len(separator.value) != 1:
-            raise _error('Invalid length for separator', separator)
 
 
 def _check_file(ctxt, arguments):
@@ -279,22 +278,18 @@ def _check_mime_file(_ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
     arguments.require_no_more()
-
-    if not is_valid_extended_regex(pattern.value):
-        raise _error('Pattern: Not a valid extended regex', pattern)
+    _check_regex(pattern, 'pattern')
 
 
 def _check_range(_ctxt, arguments):
     start = arguments.get_required_arg("start")
-    _check_type(start, (int,), "start")
-
     stop  = arguments.get_required_arg("stop")
-    _check_type(stop, (int,), "stop")
-
     step  = arguments.get_optional_arg(1)
-    _check_type(step, (int,), "step")
-
     arguments.require_no_more()
+
+    _check_type(start, (int,), "start")
+    _check_type(stop, (int,), "stop")
+    _check_type(step, (int,), "step")
 
     if step.value > 0:
         if start.value > stop.value:
@@ -320,9 +315,9 @@ def _check_value_list(_ctxt, arguments):
     arguments.require_no_more()
 
     _check_dictionary(options, {
-        'values':    (True,  (list, dict)),
-        'separator': (False, (str,)),
-        'duplicates': (False, (bool,)),
+        'values':    (True,  (list, dict), None),
+        'separator': (False, (str,), _check_char),
+        'duplicates': (False, (bool,), None),
     })
 
     values = options.value['values']
@@ -337,12 +332,6 @@ def _check_value_list(_ctxt, arguments):
     else:
         for value in values.value:
             _check_type(value, (str,))
-
-    if _has_set(options, 'separator'):
-        separator = options.value['separator']
-
-        if len(separator.value) != 1:
-            raise _error('Invalid length for separator', separator)
 
 
 def _check_key_value_list(ctxt, arguments):
@@ -363,11 +352,8 @@ def _check_key_value_list(ctxt, arguments):
 
     ctxt.trace.append('key_value_list')
 
-    if len(pair_separator.value) != 1:
-        raise _error('Invalid length for pair_separator', pair_separator)
-
-    if len(value_separator.value) != 1:
-        raise _error('Invalid length for value_separator', value_separator)
+    _check_char(pair_separator, 'pair_separator')
+    _check_char(value_separator, 'value_separator')
 
     if len(values.value) == 0:
         raise _error('values: cannot be empty', values)
@@ -377,11 +363,8 @@ def _check_key_value_list(ctxt, arguments):
             _check_type(key, (str,))
             _check_type(complete, (list, NoneType))
 
-            if is_empty_or_whitespace(key.value):
-                raise _error('Key cannot be empty', key)
-
-            if contains_space(key.value):
-                raise _error('Key cannot contain space', key)
+            _check_non_empty_string(key, 'key')
+            _check_no_spaces(key, 'key')
 
             if complete.value is None:
                 continue
@@ -405,12 +388,8 @@ def _check_key_value_list(ctxt, arguments):
             _check_type(key, (str,))
             _check_type(description, (str, NoneType))
             _check_type(complete, (list, NoneType))
-
-            if is_empty_or_whitespace(key.value):
-                raise _error('Key cannot be empty', key)
-
-            if contains_space(key.value):
-                raise _error('Key cannot contain space', key)
+            _check_non_empty_string(key, 'key')
+            _check_no_spaces(key, 'key')
 
             if complete.value is None:
                 continue
@@ -456,8 +435,8 @@ def _check_list(ctxt, arguments):
     _check_type(options, (dict,), 'options')
 
     _check_dictionary(options, {
-        'separator': (False, (str,)),
-        'duplicates': (False, (bool,)),
+        'separator': (False, (str,), _check_char),
+        'duplicates': (False, (bool,), None),
     })
 
     if 'list' in ctxt.trace:
@@ -468,12 +447,6 @@ def _check_list(ctxt, arguments):
 
     if len(command.value) == 0:
         raise _error('Missing command', command)
-
-    if _has_set(options, 'separator'):
-        separator = options.value['separator']
-
-        if len(separator.value) != 1:
-            raise _error('Invalid length for separator', separator)
 
     ctxt.trace.append('list')
     _check_complete(ctxt, command)
@@ -504,19 +477,14 @@ def _check_history(_ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
     arguments.require_no_more()
-
-    if not is_valid_extended_regex(pattern.value):
-        raise _error('Pattern: Not a valid extended regex', pattern)
+    _check_regex(pattern, 'pattern')
 
 
 def _check_date(_ctxt, arguments):
     format_ = arguments.get_required_arg("format")
     _check_type(format_, (str,), "format")
     arguments.require_no_more()
-
-    if is_empty_or_whitespace(format_.value):
-        raise _error('format cannot be empty', format_)
-
+    _check_non_empty_string(format_, 'format')
 
 
 _COMMANDS = {
@@ -606,18 +574,18 @@ def _check_positionals_repeatable(definition_tree, definition):
 
 def _check_option(ctxt, option):
     _check_dictionary(option, {
-        'option_strings':       (True,  (list,)),
-        'metavar':              (False, (str,  NoneType)),
-        'help':                 (False, (str,  NoneType)),
-        'optional_arg':         (False, (bool, NoneType)),
-        'group':                (False, (str,  NoneType)),
-        'groups':               (False, (list, NoneType)),
-        'repeatable':           (False, (bool, str, NoneType)),
-        'final':                (False, (bool, NoneType)),
-        'hidden':               (False, (bool, NoneType)),
-        'complete':             (False, (list, NoneType)),
-        'when':                 (False, (str,  NoneType)),
-        'capture':              (False, (str,  NoneType)),
+        'option_strings':       (True,  (list,),                None),
+        'metavar':              (False, (str,  NoneType),       None),
+        'help':                 (False, (str,  NoneType),       None),
+        'optional_arg':         (False, (bool, NoneType),       None),
+        'group':                (False, (str,  NoneType),       None),
+        'groups':               (False, (list, NoneType),       None),
+        'repeatable':           (False, (bool, str, NoneType),  None),
+        'final':                (False, (bool, NoneType),       None),
+        'hidden':               (False, (bool, NoneType),       None),
+        'complete':             (False, (list, NoneType),       None),
+        'when':                 (False, (str,  NoneType),       None),
+        'capture':              (False, (str,  NoneType),       None),
     })
 
     option_strings = option.value['option_strings']
@@ -663,13 +631,13 @@ def _check_option(ctxt, option):
 
 def _check_positional(ctxt, positional):
     _check_dictionary(positional, {
-        'number':               (True,  (int,)),
-        'metavar':              (False, (str,  NoneType)),
-        'help':                 (False, (str,  NoneType)),
-        'repeatable':           (False, (bool, NoneType)),
-        'complete':             (False, (list, NoneType)),
-        'when':                 (False, (str,  NoneType)),
-        'capture':              (False, (str,  NoneType)),
+        'number':               (True,  (int,),            None),
+        'metavar':              (False, (str,  NoneType),  None),
+        'help':                 (False, (str,  NoneType),  None),
+        'repeatable':           (False, (bool, NoneType),  None),
+        'complete':             (False, (list, NoneType),  None),
+        'when':                 (False, (str,  NoneType),  None),
+        'capture':              (False, (str,  NoneType),  None),
     })
 
     if positional.value['number'].value < 1:
@@ -691,15 +659,15 @@ def _check_positional(ctxt, positional):
 
 def _check_definition(ctxt, definition):
     _check_dictionary(definition, {
-        'prog':                 (True,  (str,)),
-        'help':                 (False, (str,  NoneType)),
-        'aliases':              (False, (list, NoneType)),
-        'wraps':                (False, (str,  NoneType)),
-        'abbreviate_commands':  (False, (bool, str, NoneType)),
-        'abbreviate_options':   (False, (bool, str, NoneType)),
-        'inherit_options':      (False, (bool, str, NoneType)),
-        'options':              (False, (list, NoneType)),
-        'positionals':          (False, (list, NoneType)),
+        'prog':                 (True,  (str,),                None),
+        'help':                 (False, (str,  NoneType),      None),
+        'aliases':              (False, (list, NoneType),      None),
+        'wraps':                (False, (str,  NoneType),      None),
+        'abbreviate_commands':  (False, (bool, str, NoneType), None),
+        'abbreviate_options':   (False, (bool, str, NoneType), None),
+        'inherit_options':      (False, (bool, str, NoneType), None),
+        'options':              (False, (list, NoneType),      None),
+        'positionals':          (False, (list, NoneType),      None),
     })
 
     try:
