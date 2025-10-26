@@ -369,9 +369,6 @@ def _check_key_value_list(ctxt, arguments):
             if complete.value is None:
                 continue
 
-            if len(complete.value) == 0:
-                raise _error('Missing command', complete)
-
             _check_complete(ctxt, complete)
     else:
         for compldef in values.value:
@@ -394,9 +391,6 @@ def _check_key_value_list(ctxt, arguments):
             if complete.value is None:
                 continue
 
-            if len(complete.value) == 0:
-                raise _error('Missing command', complete)
-
             _check_complete(ctxt, complete)
 
 
@@ -413,10 +407,6 @@ def _check_combine(ctxt, arguments):
 
     for completer in commands.value:
         _check_type(completer, (list,))
-
-        if len(completer.value) == 0:
-            raise _error('Missing command', completer)
-
         _check_complete(ctxt, completer)
 
     if len(commands.value) == 0:
@@ -445,9 +435,6 @@ def _check_list(ctxt, arguments):
     if 'key_value_list' in ctxt.trace:
         raise _error('Command `list` not allowed inside key_value_list', arguments.args)
 
-    if len(command.value) == 0:
-        raise _error('Missing command', command)
-
     ctxt.trace.append('list')
     _check_complete(ctxt, command)
 
@@ -465,9 +452,6 @@ def _check_prefix(ctxt, arguments):
 
     if 'key_value_list' in ctxt.trace:
         raise _error('Command `prefix` not allowed inside key_value_list', arguments.args)
-
-    if len(command.value) == 0:
-        raise _error('Missing command', command)
 
     ctxt.trace.append('prefix')
     _check_complete(ctxt, command)

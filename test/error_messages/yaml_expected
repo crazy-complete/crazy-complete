@@ -139,7 +139,7 @@
 3_22_01-combine-wrong-type               | line 4, column 27: Invalid type. Expected types: list
 3_22_02-combine-empty-subcommands        | line 4, column 27: combine: Cannot be empty
 3_22_03-combine-single-subcommand        | line 4, column 27: combine: Must contain more than one command
-3_22_04-combine-subcommand-no-command    | line 4, column 38: Missing command
+3_22_04-combine-subcommand-no-command    | line 4, column 38: Missing required arg `command`
 3_22_05-combine-subcommand-invalid-type  | line 4, column 38: Invalid type. Expected types: list
 3_22_06-combine-subcommand-invalid-command | line 4, column 39: Invalid command: invalid
 3_22_07-combine-subcommand-is-none       | line 4, column 38: Command `none` not allowed inside combine
@@ -164,7 +164,7 @@
 3_28_01-list-wrong-type                  | line 4, column 24: Invalid type. Expected types: list
 3_28_02-list-options-wrong-type          | line 4, column 34: options: Invalid type. Expected types: dictionary
 3_28_03-list-too-many-args               | line 4, column 15: Too many arguments provided
-3_28_04-list-no-command                  | line 4, column 24: Missing command
+3_28_04-list-no-command                  | line 4, column 24: Missing required arg `command`
 3_28_05-list-command-is-none             | line 4, column 24: Command `none` not allowed inside list
 3_28_06-list-command-is-list             | line 4, column 24: Nested `list` not allowed
 3_28_09-list-command-is-command-arg      | line 4, column 24: Command `command_arg` not allowed inside list
