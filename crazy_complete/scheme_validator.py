@@ -445,7 +445,7 @@ def _check_prefix(ctxt, arguments):
     arguments.require_no_more()
 
     _check_type(prefix, (str,), 'prefix')
-    _check_type(options, (list,), 'command')
+    _check_type(command, (list,), 'command')
 
     if 'prefix' in ctxt.trace:
         raise _error('Nested `prefix` not allowed', arguments.args)
