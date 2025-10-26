@@ -524,10 +524,16 @@ end
 ''', ['get_completing_arg'])
 
 _PREFIX = helpers.FishFunction('prefix', r'''
-set -g __fish_stripprefix "^"(string escape --style=regex -- $argv[1])
-printf "%s\n" $argv[1](eval $argv[2])
-set -e __fish_stripprefix
-''')
+set -l comp (get_completing_arg)
+set -l prefix_escaped (string escape --style=regex -- $argv[1])
+if string match -qr -- $prefix_escaped $comp
+  set -g __fish_stripprefix "^"$prefix_escaped
+  printf "%s\n" $argv[1](eval $argv[2])
+  set -e __fish_stripprefix
+else
+  printf "%s\n" $argv[1]
+end
+''', ['get_completing_arg'])
 
 _KEY_VALUE_LIST = helpers.FishFunction('key_value_list', r'''
 set -l sep1 $argv[1]
