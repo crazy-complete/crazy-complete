@@ -1,0 +1,84 @@
+lang: "spec"
+no_programs_defined:                  []
+too_many_programs_defined:            []
+multiple_definition_of_program:       ['program']
+missing_definition_of_program:        ['program']
+parameter_not_allowed_in_subcommand:  ['parameter']
+unknown_parameter:                    []
+unknown_completer:                    []
+missing_arg:                          []
+too_many_arguments:                   []
+not_an_extended_regex:                []
+not_an_absolute_path:                 []
+not_a_variable_name:                  []
+single_charater_expected:             []
+dict_cannot_be_empty:                 []
+list_cannot_be_empty:                 []
+list_must_contain_at_least_two_items: []
+string_cannot_be_empty:               []
+string_cannot_contain_space:          []
+integer_must_be_greater_than_zero:    []
+integer_cannot_be_zero:               []
+invalid_type_expected_types:          ['types']
+invalid_value:                        ['values']
+completer_not_allowed_in:             ['completer', 'completer2']
+completer_not_allowed_in_option:      ['completer']
+completer_requires_repeatable:        ['completer']
+
+---
+
+lang: "en"
+no_programs_defined:                  "No programs defined"
+too_many_programs_defined:            "Too many programs defined"
+multiple_definition_of_program:       "Multiple definition of program `{program}`"
+missing_definition_of_program:        "Missing definition of program `{program}`"
+parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` not allowed in subcommand"
+unknown_parameter:                    "Unknown parameter"
+unknown_completer:                    "Unknown completer"
+missing_arg:                          "Missing required argument"
+too_many_arguments:                   "Too many arguments"
+not_an_extended_regex:                "Not an extended regular expression"
+not_an_absolute_path:                 "Not an absolute path"
+not_a_variable_name:                  "Not a valid variable name"
+single_charater_expected:             "Invalid length. Single character expected"
+dict_cannot_be_empty:                 "Dictionary cannot be empty"
+list_cannot_be_empty:                 "List cannot be empty"
+list_must_contain_at_least_two_items: "List must contain at least two items"
+string_cannot_be_empty:               "String cannot be empty"
+string_cannot_contain_space:          "String cannot contain spaces"
+integer_must_be_greater_than_zero:    "Integer must be greater than zero"
+integer_cannot_be_zero:               "Integer cannot be zero"
+invalid_type_expected_types:          "Invalid type. Expected: {types}"
+invalid_value:                        "Invalid value. Expected: {values}"
+completer_not_allowed_in:             "Completer `{completer}` not allowed in `{completer2}`"
+completer_not_allowed_in_option:      "Completer `{completer}` not allowed inside an option"
+completer_requires_repeatable:        "Completer `{completer}` requires `repeatable=true`"
+
+---
+
+lang: "de"
+no_programs_defined:                  "Keine Programme definiert"
+too_many_programs_defined:            "Zu viele Programme definiert"
+multiple_definition_of_program:       "Mehrfache Definition des Programms `{program}`"
+missing_definition_of_program:        "Fehlende Definition des Programms `{program}`"
+parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` ist nicht erlaub einem Unterkommando"
+unknown_parameter:                    "Unbekannter Parameter"
+unknown_completer:                    "Unbekannter Vervollständiger"
+missing_arg:                          "Fehlendes benötigtes Argument"
+too_many_arguments:                   "Zu viele Argumente"
+not_an_extended_regex:                "Ungültiger regulärer Ausdruck"
+not_an_absolute_path:                 "Kein absoluter Pfad"
+not_a_variable_name:                  "Ungültiger Variablenname"
+dict_cannot_be_empty:                 "Dictionary darf nicht leer sein"
+list_cannot_be_empty:                 "Liste darf nicht leer sein"
+list_must_contain_at_least_two_items: "Liste muss mindestens zwei Elemente enthalten"
+single_charater_expected:             "Ungültige Länge. Einzelner Buchstabe erwartet"
+string_cannot_be_empty:               "Zeichenkette darf nicht leer sein"
+string_cannot_contain_space:          "Zeichenkette darf keine Leerzeichen enthalten"
+integer_must_be_greater_than_zero:    "Ganzzahl muss größser als Null sein"
+integer_cannot_be_zero:               "Ganzzahl darf nicht Null sein"
+invalid_type_expected_types:          "Ungültiger Typ. Erwartet: {types}"
+invalid_value:                        "Ungültiger Wert. Erwartet: {values}"
+completer_not_allowed_in:             "Vervollständiger `{completer}` nicht in `{completer2}` erlaubt"
+completer_not_allowed_in_option:      "Vervollständiger `{completer}` nicht erlaubt in einer Option"
+completer_requires_repeatable:        "Vervollständiger `{completer}` benötigt `repeatable=True`"

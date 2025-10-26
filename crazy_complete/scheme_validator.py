@@ -10,6 +10,7 @@ from .str_utils import (
     contains_space, is_empty_or_whitespace,
     is_valid_option_string, is_valid_variable_name,
     is_valid_extended_regex, validate_prog)
+from . import messages as m
 
 
 _error = CrazySchemaValidationError
@@ -49,7 +50,7 @@ class Arguments:
             self.index += 1
             return arg
 
-        raise _error(f'Missing required arg `{name}`', self.args)
+        raise _error('%s: %s' % (m.missing_arg(), name), self.args)
 
     def get_optional_arg(self, default=None):
         '''Return an optional arg, else return a default.'''
@@ -65,7 +66,7 @@ class Arguments:
         '''Raise an exception if there are any arguments left.'''
 
         if self.index < len(self.args.value):
-            raise _error('Too many arguments provided', self.args)
+            raise _error(m.too_many_arguments(), self.args)
 
 
 def _has_set(dictionary, key):
@@ -86,7 +87,7 @@ def _check_type(value, types, parameter_name=None):
                 NoneType: 'none'}[t])
         types_string = '|'.join(types_strings)
 
-        msg = f'Invalid type. Expected types: {types_string}'
+        msg = m.invalid_type_expected_types(types_string)
         if parameter_name is not None:
             msg = f'{parameter_name}: {msg}'
         raise _error(msg, value)
@@ -97,7 +98,7 @@ def _check_dictionary(dictionary, rules):
 
     for key, value in dictionary.value.items():
         if key.value not in rules:
-            raise _error(f'Unknown key: {key.value}', key)
+            raise _error('%s: %s' % (m.unknown_parameter(), key.value), key)
 
         _check_type(value, rules[key.value][1], key.value)
 
@@ -106,38 +107,54 @@ def _check_dictionary(dictionary, rules):
 
     for key, rule in rules.items():
         if rule[0] is True and key not in dictionary.value:
-            raise _error(f'Missing required key: {key}', dictionary)
+            raise _error('%s: %s' % (m.missing_arg(), key),  dictionary)
 
 
 def _check_regex(value, parameter):
     if not is_valid_extended_regex(value.value):
-        raise _error(f"{parameter}: Not a valid extended regex", value)
+        raise _error('%s: %s' % (parameter, m.not_an_extended_regex()), value)
 
 
 def _check_char(value, parameter):
     if len(value.value) != 1:
-        raise _error(f'{parameter}: Invalid length. Single character expected.', value)
+        raise _error('%s: %s' % (parameter, m.single_charater_expected()), value)
+
+
+def _check_variable_name(value, parameter):
+    if not is_valid_variable_name(value.value):
+        raise _error('%s: %s' % (parameter, m.not_a_variable_name()), value)
 
 
 def _check_non_empty_string(value, parameter):
     if is_empty_or_whitespace(value.value):
-        raise _error(f'{parameter}: Cannot be empty', value)
+        raise _error('%s: %s' % (parameter, m.string_cannot_be_empty()), value)
 
 
 def _check_no_spaces(value, parameter):
     if contains_space(value.value):
-        raise _error(f'{parameter}: Cannot contain space', value)
+        raise _error('%s: %s' % (parameter, m.string_cannot_contain_space()), value)
+
+
+def _check_non_empty_list(value, parameter):
+    if len(value.value) == 0:
+        raise _error('%s: %s' % (parameter, m.list_cannot_be_empty()), value)
+
+
+def _check_non_empty_dict(value, parameter):
+    if len(value.value) == 0:
+        raise _error('%s: %s' % (parameter, m.dict_cannot_be_empty()), value)
+
+
+def _check_extended_bool(value, parameter):
+    if not is_extended_bool(value.value):
+        expected = 'true, false or `%s`' % ExtendedBool.INHERIT
+        msg = '%s: %s' % (parameter, m.invalid_value(expected))
+        raise _error(msg, value)
 
 
 # =============================================================================
 # Actual validation code
 # =============================================================================
-
-
-def _check_extended_bool(value):
-    if not is_extended_bool(value.value):
-        msg = f'Invalid value. Expected true, false or "{ExtendedBool.INHERIT}"'
-        raise _error(msg, value)
 
 
 def _check_when(value):
@@ -155,7 +172,8 @@ def _check_none(ctxt, arguments):
     arguments.require_no_more()
 
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'prefix'):
-        raise _error(f'Command `none` not allowed inside {ctxt.trace[-1]}', arguments.args)
+        msg = m.completer_not_allowed_in('none', ctxt.trace[-1])
+        raise _error(msg, arguments.args)
 
 
 def _check_choices(_ctxt, arguments):
@@ -188,7 +206,7 @@ def _check_command(_ctxt, arguments):
     append = opts.value.get('path_append', None)
     prepend = opts.value.get('path_prepend', None)
 
-    if path and (append or prepend):
+    if path and (append or prepend): # TRANSLATION
         raise _error('path_append/path_prepend cannot be used with path', opts)
 
 
@@ -196,14 +214,17 @@ def _check_command_arg(ctxt, arguments):
     arguments.require_no_more()
 
     if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
-        raise _error(f'Command `command_arg` not allowed inside {ctxt.trace[-1]}', arguments.args)
+        msg = m.completer_not_allowed_in('command_arg', ctxt.trace[-1])
+        raise _error(msg, arguments.args)
 
     if ctxt.type != Context.TYPE_POSITIONAL:
-        raise _error('command_arg not allowed inside options', arguments.args)
+        msg = m.completer_not_allowed_in_option('command_arg')
+        raise _error(msg, arguments.args)
 
     if (not _has_set(ctxt.positional, 'repeatable') or
         not ctxt.positional.value['repeatable'].value):
-        raise _error('The `command_arg` completer requires `repeatable=True`', ctxt.positional)
+        msg = m.completer_requires_repeatable('command_arg')
+        raise _error(msg, ctxt.positional)
 
     def command_is_previous_to_command_arg(positional):
         return (
@@ -212,7 +233,7 @@ def _check_command_arg(ctxt, arguments):
             positional.value['number'].value + 1 == ctxt.positional.value['number'].value
         )
 
-    positionals = ctxt.definition.value['positionals'].value
+    positionals = ctxt.definition.value['positionals'].value # TRANSLATION
     if not any(filter(command_is_previous_to_command_arg, positionals)):
         raise _error('The `command_arg` completer requires a previous `command` completer', ctxt.positional)
 
@@ -236,20 +257,16 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
 
     if _has_set(options, 'directory'):
         if not options.value['directory'].value.startswith('/'):
-            raise _error('directory must be an absolute path', options.value['directory'])
+            msg = '%s: %s' % ('directory', m.not_an_absolute_path())
+            raise _error(msg, options.value['directory'])
 
     if _has_set(options, 'extensions'):
-        if len(options.value['extensions'].value) == 0:
-            raise _error('extensions cannot not be empty', options.value['extensions'])
+        _check_non_empty_list(options.value['extensions'], 'extensions')
 
         for extension in options.value['extensions'].value:
             _check_type(extension, (str,), 'extension')
-
-            if extension.value == '':
-                raise _error('extension canonot not be empty', extension)
-
-            if contains_space(extension.value):
-                raise _error('extension contains space', extension)
+            _check_non_empty_string(extension,'extension')
+            _check_no_spaces(extension, 'extension')
 
 
 def _check_file(ctxt, arguments):
@@ -294,7 +311,8 @@ def _check_range(_ctxt, arguments):
             msg = f"stop > start: {stop.value} > {start.value} (step={step.value})"
             raise _error(msg, step)
     else:
-        raise _error("step: cannot be 0", step)
+        msg = '%s: %s' % ('step', m.integer_cannot_be_zero())
+        raise _error(msg, step)
 
 
 def _check_exec(_ctxt, arguments):
@@ -316,14 +334,15 @@ def _check_value_list(_ctxt, arguments):
 
     values = options.value['values']
 
-    if len(values.value) == 0:
-        raise _error('values: cannot be empty', values)
-
     if isinstance(values.value, dict):
+        _check_non_empty_dict(values, 'values')
+
         for item, desc in values.value.items():
             _check_type(item, (str,))
             _check_type(desc, (str,))
     else:
+        _check_non_empty_list(values, 'values')
+
         for value in values.value:
             _check_type(value, (str,))
 
@@ -343,10 +362,9 @@ def _check_key_value_list(ctxt, arguments):
     _check_char(pair_separator, 'pair_separator')
     _check_char(value_separator, 'value_separator')
 
-    if len(values.value) == 0:
-        raise _error('values: cannot be empty', values)
-
     if isinstance(values.value, dict):
+        _check_non_empty_dict(values, 'values')
+
         for key, complete in values.value.items():
             _check_type(key, (str,))
             _check_type(complete, (list, NoneType))
@@ -359,10 +377,12 @@ def _check_key_value_list(ctxt, arguments):
 
             _check_complete(ctxt, complete)
     else:
+        _check_non_empty_list(values, 'values')
+
         for compldef in values.value:
             _check_type(compldef, (list,))
 
-            if len(compldef.value) != 3:
+            if len(compldef.value) != 3: # TRANSLATION
                 raise _error('Completion definition must have 3 fields', compldef)
 
         for compldef in values.value:
@@ -394,11 +414,11 @@ def _check_combine(ctxt, arguments):
         _check_type(completer, (list,))
         _check_complete(ctxt, completer)
 
-    if len(commands.value) == 0:
-        raise _error('combine: Cannot be empty', commands)
+    _check_non_empty_list(commands, 'commands')
 
     if len(commands.value) == 1:
-        raise _error('combine: Must contain more than one command', commands)
+        msg = m.list_must_contain_at_least_two_items()
+        raise _error(msg, commands)
 
 
 def _check_list(ctxt, arguments):
@@ -499,7 +519,8 @@ def _check_complete(ctxt, args):
     _check_type(cmd, (str,), 'command')
 
     if cmd.value not in _COMMANDS:
-        raise _error(f'Invalid command: {cmd.value}', cmd)
+        msg = '%s: %s' % (m.unknown_completer(), cmd.value)
+        raise _error(msg, cmd)
 
     _COMMANDS[cmd.value](ctxt, arguments)
 
@@ -518,7 +539,7 @@ def _check_positionals_repeatable(definition_tree, definition):
 
         positional_number = positional.value['number'].value
 
-        if repeatable:
+        if repeatable: # TRANSLATION
             if repeatable_number is not None and repeatable_number != positional_number:
                 raise _error('Only one positional argument can be marked as repeatable', positional)
             else:
@@ -532,6 +553,8 @@ def _check_positionals_repeatable(definition_tree, definition):
 
 
 def _check_option(ctxt, option):
+    chkbool = _check_extended_bool
+
     _check_dictionary(option, {
         'option_strings':       (True,  (list,),                None),
         'metavar':              (False, (str,  NoneType),       None),
@@ -539,7 +562,7 @@ def _check_option(ctxt, option):
         'optional_arg':         (False, (bool, NoneType),       None),
         'group':                (False, (str,  NoneType),       None),
         'groups':               (False, (list, NoneType),       None),
-        'repeatable':           (False, (bool, str, NoneType),  None),
+        'repeatable':           (False, (bool, str, NoneType),  chkbool),
         'final':                (False, (bool, NoneType),       None),
         'hidden':               (False, (bool, NoneType),       None),
         'complete':             (False, (list, NoneType),       None),
@@ -549,8 +572,7 @@ def _check_option(ctxt, option):
 
     option_strings = option.value['option_strings']
 
-    if len(option_strings.value) == 0:
-        raise _error('option_strings: cannot be empty', option_strings)
+    _check_non_empty_list(option_strings, 'option_strings')
 
     for option_string in option_strings.value:
         _check_type(option_string, (str,), "option_string")
@@ -570,9 +592,6 @@ def _check_option(ctxt, option):
     if _has_set(option, 'groups'):
         for group in option.value['groups'].value:
             _check_type(group, (str,), "group")
-
-    if _has_set(option, 'repeatable'):
-        _check_extended_bool(option.value['repeatable'])
 
     if _has_set(option, 'complete'):
         ctxt.type = Context.TYPE_OPTION
@@ -600,7 +619,8 @@ def _check_positional(ctxt, positional):
     })
 
     if positional.value['number'].value < 1:
-        raise _error('number cannot be zero or negative', positional.value['number'])
+        msg = m.integer_must_be_greater_than_zero()
+        raise _error('%s: %s' % ('number', msg), positional.value['number'])
 
     if _has_set(positional, 'complete'):
         ctxt.type = Context.TYPE_POSITIONAL
@@ -612,19 +632,20 @@ def _check_positional(ctxt, positional):
         _check_when(positional.value['when'])
 
     if _has_set(positional, 'capture'):
-        if not is_valid_variable_name(positional.value['capture'].value):
-            raise _error('Invalid variable name', positional.value['capture'])
+        _check_variable_name(positional.value['capture'], 'capture')
 
 
 def _check_definition(ctxt, definition):
+    chkbool = _check_extended_bool
+
     _check_dictionary(definition, {
         'prog':                 (True,  (str,),                None),
         'help':                 (False, (str,  NoneType),      None),
         'aliases':              (False, (list, NoneType),      None),
         'wraps':                (False, (str,  NoneType),      None),
-        'abbreviate_commands':  (False, (bool, str, NoneType), None),
-        'abbreviate_options':   (False, (bool, str, NoneType), None),
-        'inherit_options':      (False, (bool, str, NoneType), None),
+        'abbreviate_commands':  (False, (bool, str, NoneType), chkbool),
+        'abbreviate_options':   (False, (bool, str, NoneType), chkbool),
+        'inherit_options':      (False, (bool, str, NoneType), chkbool),
         'options':              (False, (list, NoneType),      None),
         'positionals':          (False, (list, NoneType),      None),
     })
@@ -637,28 +658,17 @@ def _check_definition(ctxt, definition):
     if _has_set(definition, 'aliases'):
         for alias in definition.value['aliases'].value:
             _check_type(alias, (str,), 'alias')
-
-            if contains_space(alias.value):
-                raise _error('alias contains space', alias)
+            _check_non_empty_string(alias, 'alias')
+            _check_no_spaces(alias, 'alias')
 
     if _has_set(definition, 'wraps'):
-        if is_empty_or_whitespace(definition.value['wraps'].value):
-            raise _error('wraps is empty', definition.value['wraps'])
-
-        if contains_space(definition.value['wraps'].value):
-            raise _error('wraps contains space', definition.value['wraps'])
+        wraps = definition.value['wraps']
+        _check_non_empty_string(wraps, 'wraps')
+        _check_no_spaces(wraps, 'wraps')
 
         if contains_space(definition.value['prog'].value):
-            raise _error('wraps not allowed in subcommands', definition.value['wraps'])
-
-    if _has_set(definition, 'abbreviate_commands'):
-        _check_extended_bool(definition.value['abbreviate_commands'])
-
-    if _has_set(definition, 'abbreviate_options'):
-        _check_extended_bool(definition.value['abbreviate_options'])
-
-    if _has_set(definition, 'inherit_options'):
-        _check_extended_bool(definition.value['inherit_options'])
+            msg = m.parameter_not_allowed_in_subcommand('wraps')
+            raise _error(msg, definition.value['wraps'])
 
     if _has_set(definition, 'options'):
         for option in definition.value['options'].value:
@@ -685,11 +695,13 @@ class DefinitionTree:
                 node = node.subcommands[part]
             except KeyError:
                 prog = ' '.join(commands[0:i+1])
-                raise _error(f'Missing definition of program `{prog}`', definition) from None
+                msg = m.missing_definition_of_program(prog)
+                raise _error(msg, definition) from None
 
         if subcommand in node.subcommands:
             prog = definition.value['prog'].value
-            raise _error(f'Multiple definition of program `{prog}`', definition)
+            msg = m.multiple_definition_of_program(prog)
+            raise _error(msg, definition)
 
         node.subcommands[subcommand] = DefinitionTree(subcommand)
 
@@ -724,12 +736,14 @@ def validate(definition_list):
     tree = DefinitionTree.make_tree(definition_list)
 
     if len(tree.subcommands) == 0:
-        raise _error('No programs defined', ValueWithTrace(None, '', 1, 1))
+        msg = m.no_programs_defined()
+        raise _error(msg, ValueWithTrace(None, '', 1, 1))
 
     if len(tree.subcommands) > 1:
         value = ValueWithTrace(None, '', 1, 1)
         progs = list(tree.subcommands.keys())
-        raise _error('Too many main programs defined: %s' % progs, value)
+        msg = m.too_many_programs_defined()
+        raise _error('%s: %s' % (msg, progs), value)
 
     for definition in definition_list:
         _check_positionals_repeatable(tree, definition)

@@ -13,6 +13,8 @@ YAML_TESTS_EXPECTED_OUTFILE = 'yaml_expected.new'
 DICTIONARY_TESTS_EXPECTED_INFILE  = 'dictionary_expected'
 DICTIONARY_TESTS_EXPECTED_OUTFILE = 'dictionary_expected.new'
 
+os.environ['LANGUAGE'] = 'en'
+
 # We want to import the development version of cracy-complete,
 # not the installed version.
 CRAZY_COMPLETE_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))

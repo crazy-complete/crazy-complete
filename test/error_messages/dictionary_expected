@@ -24,7 +24,7 @@
 070-positionals-wrong-type               | Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)
 080-wraps-wrong-type                     | Parameter `wraps` has an invalid type. Expected types: str. Received: False (bool)
 081-wraps-empty                          | wraps is empty
-082-wraps-in-subcommand                  | foo bar: wraps not allowed in subcommands
+082-wraps-in-subcommand                  | foo bar: Parameter `wraps` not allowed in subcommand
 ======= Directory "02-option" =======
 100-no-option-strings                    | Parameter `option_strings` has an invalid type. Expected types: list. Received: None (NoneType)
 101-option-strings-wrong-type            | Parameter `option_strings` has an invalid type. Expected types: list. Received: False (bool)
@@ -69,12 +69,12 @@
 3_00_00-invalid-command                  | foo: -o: Unknown completer: wrong
 3_01_00-command-options-wrong-type       | foo: -o: command: Parameter `options` has an invalid type. Expected types: dictionary. Received: 'wrong' (str)
 3_01_01-command-path-wrong-type          | foo: -o: command: Parameter `path` has an invalid type. Expected types: string. Received: False (bool)
-3_01_02-command-path-empty               | foo: -o: command: path: Cannot be empty
+3_01_02-command-path-empty               | foo: -o: command: path: String cannot be empty
 3_01_03-command-path-append-wrong-type   | foo: -o: command: Parameter `path_append` has an invalid type. Expected types: string. Received: False (bool)
-3_01_04-command-path-append-empty        | foo: -o: command: path_append: Cannot be empty
+3_01_04-command-path-append-empty        | foo: -o: command: path_append: String cannot be empty
 3_01_05-command-path-prepend-wrong-type  | foo: -o: command: Parameter `path_prepend` has an invalid type. Expected types: string. Received: False (bool)
-3_01_06-command-path-prepend-empty       | foo: -o: command: path_prepend: Cannot be empty
-3_01_07-command-invalid-option           | foo: -o: command: Unknown key: wrong
+3_01_06-command-path-prepend-empty       | foo: -o: command: path_prepend: String cannot be empty
+3_01_07-command-invalid-option           | foo: -o: command: Unknown parameter: wrong
 3_01_10-command-too-many-args            | foo: -o: command: Too many arguments: ['wrong']
 3_02_00-environment-too-many-args        | foo: -o: environment: Too many arguments: ['wrong']
 3_03_00-float-too-many-args              | foo: -o: float: Too many arguments: ['wrong']
@@ -88,112 +88,112 @@
 3_11_00-signal-too-many-args             | foo: -o: signal: Too many arguments: ['wrong']
 3_12_00-user-too-many-args               | foo: -o: user: Too many arguments: ['wrong']
 3_13_00-variable-too-many-args           | foo: -o: variable: Too many arguments: ['wrong']
-3_14_00-choices-missing-arg              | foo: -o: choices: Missing argument: values
+3_14_00-choices-missing-arg              | foo: -o: choices: Missing required argument: values
 3_14_01-choices-arg-wrong-type           | foo: -o: choices: Parameter `values` has an invalid type. Expected types: dictionary|list. Received: 'wrong' (str)
 3_14_02-choices-dict-key-wrong-type      | No error
 3_14_03-choices-dict-desc-wrong-type     | foo: -o: choices: Parameter `description` has an invalid type. Expected types: string|integer. Received: [] (list)
 3_14_04-choices-list-value-wrong-type    | foo: -o: choices: Parameter `item` has an invalid type. Expected types: string|integer. Received: [] (list)
 3_14_05-choices-too-many-args            | foo: -o: choices: Too many arguments: ['wrong']
 3_15_00-file-options-wrong-type          | foo: -o: file: Parameter `options` has an invalid type. Expected types: dictionary. Received: False (bool)
-3_15_01-file-unknown-key                 | foo: -o: file: Unknown key: wrong
+3_15_01-file-unknown-key                 | foo: -o: file: Unknown parameter: wrong
 3_15_02-file-directory-wrong-type        | foo: -o: file: Parameter `directory` has an invalid type. Expected types: string. Received: False (bool)
-3_15_03-file-directory-empty             | foo: -o: file: directory: Cannot be empty
-3_15_04-file-directory-not-absolute      | foo: -o: file: directory: Must be an absolute path
+3_15_03-file-directory-empty             | foo: -o: file: directory: String cannot be empty
+3_15_04-file-directory-not-absolute      | foo: -o: file: directory: Not an absolute path
 3_15_05-file-extensions-wrong-type       | foo: -o: file: Parameter `extensions` has an invalid type. Expected types: list. Received: False (bool)
-3_15_06-file-extensions-empty            | foo: -o: file: extensions: Cannot be empty
-3_15_07-file-extension-empty             | foo: -o: file: extensions[0]: Cannot be empty
-3_15_08-file-extension-with-space        | foo: -o: file: extensions[0]: Contains space: foo 
+3_15_06-file-extensions-empty            | foo: -o: file: extensions: List cannot be empty
+3_15_07-file-extension-empty             | foo: -o: file: extensions[0]: String cannot be empty
+3_15_08-file-extension-with-space        | foo: -o: file: extensions[0]: String cannot contain spaces
 3_15_09-file-too-many-args               | foo: -o: file: Too many arguments: ['wrong']
 3_16_00-directory-options-wrong-type     | foo: -o: directory: Parameter `options` has an invalid type. Expected types: dictionary. Received: False (bool)
-3_16_01-directory-unknown-key            | foo: -o: directory: Unknown key: wrong
+3_16_01-directory-unknown-key            | foo: -o: directory: Unknown parameter: wrong
 3_16_02-directory-directory-wrong-type   | foo: -o: directory: Parameter `directory` has an invalid type. Expected types: string. Received: False (bool)
-3_16_03-directory-directory-empty        | foo: -o: directory: directory: Cannot be empty
-3_16_04-directory-directory-not-absolute | foo: -o: directory: directory: Must be an absolute path
+3_16_03-directory-directory-empty        | foo: -o: directory: directory: String cannot be empty
+3_16_04-directory-directory-not-absolute | foo: -o: directory: directory: Not an absolute path
 3_16_05-directory-too-many-args          | foo: -o: directory: Too many arguments: ['wrong']
-3_17_00-range-missing-arg-1              | foo: -o: range: Missing argument: start
-3_17_01-range-missing-arg-2              | foo: -o: range: Missing argument: stop
+3_17_00-range-missing-arg-1              | foo: -o: range: Missing required argument: start
+3_17_01-range-missing-arg-2              | foo: -o: range: Missing required argument: stop
 3_17_02-range-too-many-args              | foo: -o: range: Too many arguments: [4]
 3_17_03-range-step-zero                  | foo: -o: range: step: cannot be 0
 3_17_04-range-invalid-range-0            | foo: -o: range: stop > start: 2 > 1 (step=-1)
 3_17_05-range-invalid-range-1            | foo: -o: range: start > stop: 2 > 1 (step=1)
-3_18_00-exec-missing-arg                 | foo: -o: exec: Missing argument: command
+3_18_00-exec-missing-arg                 | foo: -o: exec: Missing required argument: command
 3_18_01-exec-too-many-arguments          | foo: -o: exec: Too many arguments: ['wrong']
 3_18_02-exec-command-wrong-type          | foo: -o: exec: Parameter `command` has an invalid type. Expected types: string. Received: False (bool)
-3_19_00-exec-fast-missing-arg            | foo: -o: exec_fast: Missing argument: command
+3_19_00-exec-fast-missing-arg            | foo: -o: exec_fast: Missing required argument: command
 3_19_01-exec-fast-too-many-arguments     | foo: -o: exec_fast: Too many arguments: ['wrong']
 3_19_02-exec-fast-command-wrong-type     | foo: -o: exec_fast: Parameter `command` has an invalid type. Expected types: string. Received: False (bool)
-3_20_00-exec-internal-missing-arg        | foo: -o: exec_internal: Missing argument: command
+3_20_00-exec-internal-missing-arg        | foo: -o: exec_internal: Missing required argument: command
 3_20_01-exec-internal-too-many-arguments | foo: -o: exec_internal: Too many arguments: ['wrong']
 3_20_02-exec-internal-command-wrong-type | foo: -o: exec_internal: Parameter `command` has an invalid type. Expected types: string. Received: False (bool)
-3_21_00-value-list-missing-arg           | foo: -o: value_list: Missing argument: options
-3_21_01-value-list-missing-values        | foo: -o: value_list: Missing required key: values
+3_21_00-value-list-missing-arg           | foo: -o: value_list: Missing required argument: options
+3_21_01-value-list-missing-values        | foo: -o: value_list: Missing required argument: values
 3_21_02-value-list-values-wrong-type     | foo: -o: value_list: Parameter `values` has an invalid type. Expected types: dictionary|list. Received: None (NoneType)
 3_21_03-value-list-separator-wrong-type  | foo: -o: value_list: Parameter `separator` has an invalid type. Expected types: string. Received: False (bool)
-3_21_04-value-list-separator-wrong-value | foo: -o: value_list: separator: Invalid length. Single character expected.
-3_21_05-value-list-values-empty          | foo: -o: value_list: values: cannot be empty
-3_21_06-value-list-list-wrong-type       | foo: -o: value_list: values[0]: Not a string: False
+3_21_04-value-list-separator-wrong-value | foo: -o: value_list: separator: Invalid length. Single character expected
+3_21_05-value-list-values-empty          | foo: -o: value_list: values: List cannot be empty
+3_21_06-value-list-list-wrong-type       | foo: -o: value_list: Parameter `values[0]` has an invalid type. Expected types: string. Received: False (bool)
 3_21_07-value-list-dict-key-wrong-type   | foo: -o: value_list: Parameter `values (item)` has an invalid type. Expected types: string. Received: False (bool)
 3_21_08-value-list-dict-desc-wrong-type  | foo: -o: value_list: Parameter `values (description)` has an invalid type. Expected types: string. Received: None (NoneType)
 3_21_09-value-list-too-many-args         | foo: -o: value_list: Too many arguments: ['wrong']
-3_22_00-combine-missing-arg              | foo: -o: combine: Missing argument: commands
+3_22_00-combine-missing-arg              | foo: -o: combine: Missing required argument: commands
 3_22_01-combine-wrong-type               | foo: -o: combine: Parameter `commands` has an invalid type. Expected types: list. Received: True (bool)
-3_22_02-combine-empty-subcommands        | foo: -o: combine: combine: Cannot be empty
-3_22_03-combine-single-subcommand        | foo: -o: combine: combine: Must contain more than one command
-3_22_04-combine-subcommand-no-command    | foo: -o: combine: Missing argument: command
+3_22_02-combine-empty-subcommands        | foo: -o: combine: commands: List cannot be empty
+3_22_03-combine-single-subcommand        | foo: -o: combine: commands: List must contain at least two items
+3_22_04-combine-subcommand-no-command    | foo: -o: combine: Missing required argument: command
 3_22_05-combine-subcommand-invalid-type  | foo: -o: combine: Parameter `subcommand` has an invalid type. Expected types: list. Received: True (bool)
 3_22_06-combine-subcommand-invalid-command | foo: -o: combine: Unknown completer: invalid
-3_22_07-combine-subcommand-is-none       | foo: -o: combine: none: Command `none` not allowed inside combine
-3_22_08-combine-subcommand-is-combine    | foo: -o: combine: combine: Nested `combine` not allowed
+3_22_07-combine-subcommand-is-none       | foo: -o: combine: none: Completer `none` not allowed in `combine`
+3_22_08-combine-subcommand-is-combine    | foo: -o: combine: combine: commands: List must contain at least two items
 3_22_09-combine-too-many-args            | foo: -o: combine: Too many arguments: ['wrong']
-3_23_00-history-missing-arg              | foo: -o: history: Missing argument: pattern
+3_23_00-history-missing-arg              | foo: -o: history: Missing required argument: pattern
 3_23_01-history-too-many-arguments       | foo: -o: history: Too many arguments: ['wrong']
 3_23_02-history-pattern-wrong-type       | foo: -o: history: Parameter `pattern` has an invalid type. Expected types: string. Received: False (bool)
-3_23_03-history-pattern-wrong-regex      | foo: -o: history: pattern: Not a valid extended regex: [foo
+3_23_03-history-pattern-wrong-regex      | foo: -o: history: pattern: Not an extended regular expression
 3_24_00-command-arg-without-command      | foo: positional 1 (unnamed): command_arg: The `command_arg` completer requires a previous `command` completer
-3_24_01-command-arg-non-repeatable       | foo: positional 2 (unnamed): command_arg: The `command_arg` completer requires `repeatable=True`
-3_25_00-mime-file-missing-arg            | foo: -o: mime_file: Missing argument: pattern
+3_24_01-command-arg-non-repeatable       | foo: positional 2 (unnamed): command_arg: Completer `command_arg` requires `repeatable=true`
+3_25_00-mime-file-missing-arg            | foo: -o: mime_file: Missing required argument: pattern
 3_25_01-mime-file-too-many-arguments     | foo: -o: mime_file: Too many arguments: ['wrong']
 3_25_02-mime-file-pattern-wrong-type     | foo: -o: mime_file: Parameter `pattern` has an invalid type. Expected types: string. Received: False (bool)
-3_25_03-mime-file-pattern-wrong-regex    | foo: -o: mime_file: pattern: Not a valid extended regex: [foo
-3_26_00-date-missing-arg                 | foo: -o: date: Missing argument: format
+3_25_03-mime-file-pattern-wrong-regex    | foo: -o: mime_file: pattern: Not an extended regular expression
+3_26_00-date-missing-arg                 | foo: -o: date: Missing required argument: format
 3_26_01-date-too-many-arguments          | foo: -o: date: Too many arguments: ['wrong']
 3_26_02-date-format-wrong-type           | foo: -o: date: Parameter `format` has an invalid type. Expected types: string. Received: False (bool)
-3_26_03-date-format-empty                | foo: -o: date: format: Cannot be empty
+3_26_03-date-format-empty                | foo: -o: date: format: String cannot be empty
 3_27_00-date-format-too-many-arguments   | foo: -o: date_format: Too many arguments: ['wrong']
-3_28_00-list-missing-arg                 | foo: -o: list: Missing argument: command
+3_28_00-list-missing-arg                 | foo: -o: list: Missing required argument: command
 3_28_01-list-wrong-type                  | foo: -o: list: Parameter `command` has an invalid type. Expected types: list. Received: False (bool)
 3_28_02-list-options-wrong-type          | foo: -o: list: Parameter `options` has an invalid type. Expected types: dictionary. Received: False (bool)
 3_28_03-list-too-many-args               | foo: -o: list: Too many arguments: [False]
-3_28_04-list-no-command                  | foo: -o: list: Missing argument: command
-3_28_05-list-command-is-none             | foo: -o: list: none: Command `none` not allowed inside list
-3_28_06-list-command-is-list             | foo: -o: list: list: Nested `list` not allowed
-3_28_09-list-command-is-command-arg      | foo: -o: list: command_arg: Command `command_arg` not allowed inside list
+3_28_04-list-no-command                  | foo: -o: list: Missing required argument: command
+3_28_05-list-command-is-none             | foo: -o: list: none: Completer `none` not allowed in `list`
+3_28_06-list-command-is-list             | No error
+3_28_09-list-command-is-command-arg      | foo: -o: list: command_arg: Completer `command_arg` not allowed in `list`
 3_28_10-list-separator-wrong-type        | foo: -o: list: Parameter `separator` has an invalid type. Expected types: string. Received: False (bool)
-3_28_11-list-separator-wrong-value       | foo: -o: list: separator: Invalid length. Single character expected.
-3_28_12-list-unkown-option               | foo: -o: list: Unknown key: wrong
+3_28_11-list-separator-wrong-value       | foo: -o: list: separator: Invalid length. Single character expected
+3_28_12-list-unkown-option               | foo: -o: list: Unknown parameter: wrong
 3_29_00-command-arg-too-many-args        | foo: positional 1 (unnamed): command_arg: Too many arguments: [False]
-3_29_01-command-arg-in-option            | foo: -o: command_arg: command_arg not allowed inside options
-3_29_02-command-arg-not-repeatable       | foo: positional 1 (unnamed): command_arg: The `command_arg` completer requires `repeatable=True`
-3_30_00-key-value-list-missing-args      | foo: -o: key_value_list: Missing argument: pair_separator
-3_30_01-key-value-list-missing-args-1    | foo: -o: key_value_list: Missing argument: value_separator
-3_30_02-key-value-list-missing-args-2    | foo: -o: key_value_list: Missing argument: values
+3_29_01-command-arg-in-option            | foo: -o: command_arg: Completer `command_arg` not allowed inside an option
+3_29_02-command-arg-not-repeatable       | foo: positional 1 (unnamed): command_arg: Completer `command_arg` requires `repeatable=true`
+3_30_00-key-value-list-missing-args      | foo: -o: key_value_list: Missing required argument: pair_separator
+3_30_01-key-value-list-missing-args-1    | foo: -o: key_value_list: Missing required argument: value_separator
+3_30_02-key-value-list-missing-args-2    | foo: -o: key_value_list: Missing required argument: values
 3_30_03-key-value-list-too-many-args     | foo: -o: key_value_list: Too many arguments: ['wrong']
 3_30_04-key-value-list-sep1-wrong-type   | foo: -o: key_value_list: Parameter `pair_separator` has an invalid type. Expected types: string. Received: False (bool)
-3_30_05-key-value-list-sep1-empty        | foo: -o: key_value_list: pair_separator: Invalid length. Single character expected.
-3_30_06-key-value-list-sep1-wrong-value  | foo: -o: key_value_list: pair_separator: Invalid length. Single character expected.
+3_30_05-key-value-list-sep1-empty        | foo: -o: key_value_list: pair_separator: Invalid length. Single character expected
+3_30_06-key-value-list-sep1-wrong-value  | foo: -o: key_value_list: pair_separator: Invalid length. Single character expected
 3_30_07-key-value-list-sep2-wrong-type   | foo: -o: key_value_list: Parameter `value_separator` has an invalid type. Expected types: string. Received: False (bool)
-3_30_08-key-value-list-sep2-empty        | foo: -o: key_value_list: value_separator: Invalid length. Single character expected.
-3_30_09-key-value-list-sep2-wrong-value  | foo: -o: key_value_list: value_separator: Invalid length. Single character expected.
+3_30_08-key-value-list-sep2-empty        | foo: -o: key_value_list: value_separator: Invalid length. Single character expected
+3_30_09-key-value-list-sep2-wrong-value  | foo: -o: key_value_list: value_separator: Invalid length. Single character expected
 3_30_10-key-value-list-values-wrong-type | foo: -o: key_value_list: Parameter `values` has an invalid type. Expected types: dictionary|list. Received: False (bool)
 3_30_11-key-value-list-1-key-not-string  | foo: -o: key_value_list: Parameter `key` has an invalid type. Expected types: string. Received: False (bool)
-3_30_12-key-value-list-1-key-empty       | foo: -o: key_value_list: key: Cannot be empty
-3_30_13-key-value-list-1-key-with-space  | foo: -o: key_value_list: key: Cannot contain space
+3_30_12-key-value-list-1-key-empty       | foo: -o: key_value_list: key: String cannot be empty
+3_30_13-key-value-list-1-key-with-space  | foo: -o: key_value_list: key: String cannot contain spaces
 3_30_14-key-value-list-1-complete-wrong-type | foo: -o: key_value_list: Parameter `completer` has an invalid type. Expected types: list|none. Received: False (bool)
 3_30_15-key-value-list-2-def-not-list    | foo: -o: key_value_list: Completion definition not a list: False
 3_30_16-key-value-list-2-def-invalid-length | foo: -o: key_value_list: Completion definition must have 3 fields: ['key', None]
 3_30_17-key-value-list-2-key-not-string  | foo: -o: key_value_list: Parameter `key` has an invalid type. Expected types: string. Received: False (bool)
-3_30_18-key-value-list-2-key-empty       | foo: -o: key_value_list: key: Cannot be empty
-3_30_19-key-value-list-key-with-space    | foo: -o: key_value_list: key: Cannot contain space
+3_30_18-key-value-list-2-key-empty       | foo: -o: key_value_list: key: String cannot be empty
+3_30_19-key-value-list-key-with-space    | foo: -o: key_value_list: key: String cannot contain spaces
 3_30_20-key-value-list-2-desc-not-string | foo: -o: key_value_list: Parameter `description` has an invalid type. Expected types: string|none. Received: False (bool)
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
