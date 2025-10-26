@@ -1,8 +1,14 @@
 #!/usr/bin/python3
 
 import os
-import yaml
+import pprint
 from collections import defaultdict
+
+import yaml
+from pygments import highlight
+from pygments.lexers import YamlLexer
+from pygments.lexers import MarkdownLexer
+from pygments.formatters import TerminalFormatter
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -12,6 +18,8 @@ OPTIONS_INFILE          = 'options.yaml'
 OPTIONS_OUTFILE         = 'options.md'
 DOCUMENTATION_INFILE    = 'documentation.md.in'
 DOCUMENTATION_OUTFILE   = 'documentation.md'
+MANUAL_INFILE           = 'manual.in.py'
+MANUAL_OUTFILE          = '../crazy_complete/manual.py'
 
 OPTIONS                 = []
 COMMANDS                = []
@@ -127,6 +135,7 @@ class Option:
         if self.short is None:
             raise Exception(f"No short: {self.options}")
 
+
 def make_markup_table(header, rows):
     # Ensure everything is string
     header = [str(h) for h in header]
@@ -155,6 +164,7 @@ def make_markup_table(header, rows):
 
     return "\n".join(table_lines)
 
+
 def make_english_listing(words):
     if len(words) == 1:
         return words[0]
@@ -165,13 +175,16 @@ def make_english_listing(words):
 
     raise AssertionError("Not reached")
 
+
 def make_implemented_sentence(shells):
     shells_formatted = [f'**{w}**' for w in sorted(shells)]
     r = f'This completer is currently only implemented in {make_english_listing(shells_formatted)}.'
     return r
 
+
 def make_markup_link(text, link):
     return f'[{escape_underscore(text)}](#{link})'
+
 
 def make_markup_summary_table(header, commands, pre_text=None):
     r = [f'### {escape_underscore(header)}']
@@ -187,6 +200,7 @@ def make_markup_summary_table(header, commands, pre_text=None):
     r += [make_markup_table(header, rows)]
 
     return '\n\n'.join(r)
+
 
 def make_markup_command(command):
     r =  [f'### {escape_underscore(command.command)}']
@@ -211,6 +225,7 @@ def make_markup_command(command):
 
     return '\n\n'.join(r)
 
+
 def make_markup(by_category):
     r = []
     r = []
@@ -225,6 +240,37 @@ def make_markup(by_category):
 
     return '\n\n'.join(r)
 
+def make_python_commands(commands):
+    data = []
+
+    for command in commands:
+        def_colored = highlight(command.definition, YamlLexer(), TerminalFormatter())
+
+        if command.long:
+            long_colored = highlight(command.long, MarkdownLexer(), TerminalFormatter())
+        else:
+            long_colored = None
+
+        data.append({
+            'command':              command.command,
+            'category':             command.category,
+            'short':                command.short,
+            'long':                 command.long,
+            'long_colored':         long_colored,
+            'notes':                command.notes,
+            'implemented':          command.implemented,
+            'definition':           command.definition,
+            'definition_colored':   def_colored,
+            'output':               command.output,
+            'also':                 command.also
+        })
+
+    return 'COMMANDS = ' + pprint.pformat(data)
+
+# =============================================================================
+# Read commands and options
+# =============================================================================
+
 with open(COMMANDS_INFILE, 'r', encoding='utf-8') as fh:
     for command_def in yaml.safe_load_all(fh):
         COMMANDS.append(Command(command_def))
@@ -234,6 +280,10 @@ with open(OPTIONS_INFILE, 'r', encoding='utf-8') as fh:
         OPTIONS.append(Option(option_def))
 
 COMMANDS = sorted(COMMANDS, key=lambda c: c.command)
+
+# =============================================================================
+# Generate command files
+# =============================================================================
 
 for command in COMMANDS:
     BY_CATEGORY[command.category].append(command)
@@ -249,4 +299,17 @@ with open(DOCUMENTATION_INFILE, 'r', encoding='utf-8') as fh:
 content = content.replace('%COMMANDS%', commands_markup)
 
 with open(DOCUMENTATION_OUTFILE, 'w', encoding='utf-8') as fh:
+    fh.write(content)
+
+# =============================================================================
+# Generate python manual data
+# =============================================================================
+
+with open(MANUAL_INFILE, 'r', encoding='utf-8') as fh:
+    content = fh.read()
+
+commands_python = make_python_commands(COMMANDS)
+content = content.replace('%COMMANDS%', commands_python)
+
+with open(MANUAL_OUTFILE, 'w', encoding='utf-8') as fh:
     fh.write(content)

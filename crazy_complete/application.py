@@ -1,9 +1,11 @@
 '''Class for main command line application.'''
 
 import os
+import sys
 import argparse
 
 from .errors import CrazyError
+from . import manual
 from . import bash, fish, zsh
 from . import argparse_source, json_source, yaml_source
 from . import argparse_mod # .complete()
@@ -57,6 +59,9 @@ p.add_argument('definition_file',
 
 p.add_argument('--version', action='version', version='%(prog)s 0.3.6',
     help='Show program version')
+
+p.add_argument('--manual', metavar='TOPIC', nargs='?',
+    help='Show manual for topic')
 
 p.add_argument('--parser-variable', default=None,
     help='Specify the variable name of the ArgumentParser object (for --input-type=python)')
@@ -210,6 +215,20 @@ def _get_config_from_options(opts):
     return conf
 
 
+def try_print_manual(args):
+    '''Print manual.'''
+
+    p = argparse.ArgumentParser()
+    p.add_argument('--manual', nargs='?', const='all')
+    opts, _ = p.parse_known_args(args)
+
+    if not opts.manual:
+        return
+
+    manual.print_help_topic(opts.manual, os.isatty(sys.stdout.fileno()))
+    sys.exit(0)
+
+
 def generate(opts):
     '''Generate output file as specified in `opts`.'''
 
@@ -270,6 +289,7 @@ class Application:
         Raises:
             - argparse.ArgumentError
         '''
+        try_print_manual(args)
         self.options = _crazy_complete_argument_parser.parse_args(args)
 
     def run(self):

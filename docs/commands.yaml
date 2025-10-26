@@ -2,7 +2,7 @@ command: 'none'
 category: 'meta'
 short: 'No completion, but specifies that an argument is required'
 long: |
-  Disables autocompletion for this option but still marks it as requiring an argument.
+  Disables autocompletion for an option but still marks it as requiring an argument.
   
   Without specifying `complete`, the option would not take an argument.
 definition: |
@@ -60,17 +60,15 @@ output: |
 
 command: 'list'
 category: 'meta'
-short: 'Complete a comma-separated list using a completer'
+short: 'Complete a comma-separated list of any completer'
 long: |
-  Complete a comma-separated list of any completer.
-  
   The separator can be changed by adding `{"separator": ...}`.
   
   By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 also:
-  key_value_list: "For completing a list of key=value pairs"
-  file_list: "For completing a list of files"
-  directory_list: "For completing a list of directories"
+  key_value_list: "For completing a comma-separated list of key=value pairs"
+  file_list: "For completing a comma-separated list of files"
+  directory_list: "For completing a comma-separated list of directories"
 definition: |
   prog: "example"
   options:
@@ -188,7 +186,7 @@ long: |
   **NOTE:** Restricting completion to specific file extensions only makes sense if the program being completed actually expects files of those types.
   On Unix-like systems, file extensions generally have no inherent meaning -- they are purely conventional and not required for determining file types.
 also:
-  file_list: 'For completing a list of files'
+  file_list: 'For completing a comma-separated list of files'
   mime_file: "For completing a file based on it's MIME-type"
 definition: |
   prog: "example"
@@ -213,7 +211,7 @@ short: 'Complete a directory'
 long: |
   You can restrict completion to a specific directory by adding `{"directory": ...}`.
 also:
-  directory_list: 'For completing a list of directories'
+  directory_list: 'For completing a comma-separated list of directories'
 definition: |
   prog: "example"
   options:
@@ -243,6 +241,8 @@ long: |
   By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 
   The separator can be changed by adding `{"separator": ...}`
+also:
+  directory_list: 'For completing a comma-separated list of directories'
 definition: |
   prog: "example"
   options:
@@ -265,6 +265,8 @@ long: |
   The separator can be changed by adding `{"separator": ...}`
    
   By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+also:
+  file_list: 'For completing a comma-separated list of files'
 definition: |
   prog: "example"
   options:
@@ -315,11 +317,9 @@ output: |
 
 command: 'value_list'
 category: 'basic'
-short: 'Complete a list of values'
+short: 'Complete a comma-separated list of values'
 long: |
   Complete one or more items from a list of items. Similar to `mount -o`.
-   
-  Arguments with assignable values (`mount -o uid=1000`) aren't supported.
    
   Arguments are supplied by adding `{"values": ...}`.
    
@@ -556,6 +556,7 @@ output: |
   ~ > example --filesystem-type=<TAB>
   adfs     autofs   bdev      bfs     binder     binfmt_misc  bpf
   cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
+  [...]
 
 ---
 

@@ -4,7 +4,7 @@
 | ----------------------------------- | --------------------------------------------------------- |
 | [combine](#combine)                 | Combine multiple completers                               |
 | [key\_value\_list](#key_value_list) | Complete a comma-separated list of key=value pairs        |
-| [list](#list)                       | Complete a comma-separated list using a completer         |
+| [list](#list)                       | Complete a comma-separated list of any completer          |
 | [none](#none)                       | No completion, but specifies that an argument is required |
 | [prefix](#prefix)                   | Prefix completion by a string                             |
 
@@ -38,7 +38,7 @@
 | [signal](#signal)                          | Complete signal names                          |
 | [uid](#uid)                                | Complete a user id                             |
 | [user](#user)                              | Complete a username                            |
-| [value\_list](#value_list)                 | Complete a list of values                      |
+| [value\_list](#value_list)                 | Complete a comma-separated list of values      |
 | [variable](#variable)                      | Complete a shell variable name                 |
 
 ### User-defined commands
@@ -403,7 +403,7 @@ dir1/  dir2/
 
 **SEE ALSO**
 
-- [directory\_list](#directory_list): For completing a list of directories
+- [directory\_list](#directory_list): For completing a comma-separated list of directories
 
 ### directory\_list
 
@@ -429,6 +429,10 @@ options:
 ~ > example --directory-list=directory1,directory2,<TAB>
 directory3  directory4
 ```
+
+**SEE ALSO**
+
+- [file\_list](#file_list): For completing a comma-separated list of files
 
 ### environment
 
@@ -482,7 +486,7 @@ dir1/  dir2/  file.c  file.cpp
 
 **SEE ALSO**
 
-- [file\_list](#file_list): For completing a list of files
+- [file\_list](#file_list): For completing a comma-separated list of files
 
 - [mime\_file](#mime_file): For completing a file based on it's MIME-type
 
@@ -516,6 +520,10 @@ options:
 file3  file4
 ```
 
+**SEE ALSO**
+
+- [directory\_list](#directory_list): For completing a comma-separated list of directories
+
 ### filesystem\_type
 
 > Complete a filesystem type
@@ -531,6 +539,7 @@ options:
 ~ > example --filesystem-type=<TAB>
 adfs     autofs   bdev      bfs     binder     binfmt_misc  bpf
 cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
+[...]
 ```
 
 ### float
@@ -844,11 +853,9 @@ dhcpcd                  ftp                     git
 
 ### value\_list
 
-> Complete a list of values
+> Complete a comma-separated list of values
 
 Complete one or more items from a list of items. Similar to `mount -o`.
- 
-Arguments with assignable values (`mount -o uid=1000`) aren't supported.
  
 Arguments are supplied by adding `{"values": ...}`.
  
@@ -983,9 +990,7 @@ dhcpcd                  git
 
 ### list
 
-> Complete a comma-separated list using a completer
-
-Complete a comma-separated list of any completer.
+> Complete a comma-separated list of any completer
 
 The separator can be changed by adding `{"separator": ...}`.
 
@@ -1010,17 +1015,17 @@ dhcpcd                  git
 
 **SEE ALSO**
 
-- [key\_value\_list](#key_value_list): For completing a list of key=value pairs
+- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
 
-- [file\_list](#file_list): For completing a list of files
+- [file\_list](#file_list): For completing a comma-separated list of files
 
-- [directory\_list](#directory_list): For completing a list of directories
+- [directory\_list](#directory_list): For completing a comma-separated list of directories
 
 ### none
 
 > No completion, but specifies that an argument is required
 
-Disables autocompletion for this option but still marks it as requiring an argument.
+Disables autocompletion for an option but still marks it as requiring an argument.
 
 Without specifying `complete`, the option would not take an argument.
 
