@@ -366,7 +366,39 @@ end
 ''')
 
 _GET_COMPLETING_ARG = helpers.FishFunction('get_completing_arg', r'''
-set -l arg (commandline -ct | string replace -r -- '^-[^=]*=' '' | string unescape)
+set -l arg (commandline -ct | string unescape)
+
+switch $arg
+  case '--*=' '--*=*'
+    set arg (string replace -r -- '^-[^=]*=' '' $arg)
+  case '-*'
+    set -l prog (commandline -po)[1]
+    set -l progdef (complete -c $prog)
+
+    set -l full_opt (string match -r -- '^-[a-zA-Z0-9]+=' $arg)
+    set -l opt (string sub -s 2 -e -1 -- $full_opt)
+    set -l optdefs (string match -re -- " -(o|-old-option) $opt( |\$)" $progdefs)
+    set -l optdefs (string match -re -- " -(x|r|a|-(exclusive|require-parameter|arguments))( |\$)" $optdefs)
+
+    if test (count $optdefs) -gt 0
+      set arg (string replace -m 1 -- $full_opt '' $arg)
+    else
+      set -l i 2
+
+      while test $i -lt (string length -- $arg)
+        set -l opt (string sub -s $i -l 1 -- $arg)
+        set -l optdefs (string match -re -- " -(s|-short-option) $opt( |\$)" $progdef)
+        set -l optdefs (string match -re -- " -(x|r|a|-(exclusive|require-parameter|arguments))( |\$)" $optdefs)
+
+        if test (count $optdefs) -gt 0
+          set arg (string sub -s (math $i + 1) -- "$arg")
+          break
+        end
+
+        set i (math $i + 1)
+      end
+    end
+end
 
 if test -n "$__fish_stripprefix"
   string replace -r -- $__fish_stripprefix '' "$arg"
@@ -482,7 +514,7 @@ switch $comp
     set comp (string split -r -m 1 -- $separator $comp)[1]
 
     for i in $remaining_values_idxs
-      printf '%s,%s\t%s\n' $comp $values[$i] "$descriptions[$i]"
+      printf '%s%s%s\t%s\n' "$comp" $separator $values[$i] "$descriptions[$i]"
     end
   case '*'
     for i in $remaining_values_idxs
@@ -529,7 +561,7 @@ function __call_func_for_key -S
   set -l i
   for i in (command seq 1 (count $keys))
     if test $keys[$i] = $argv[1]
-      set -g __fish_stripprefix ".*"(string escape --style=regex -- $sep2)
+      set -g __fish_stripprefix "^.*"(string escape --style=regex -- $sep2)
       $functions[$i]
       set -e __fish_stripprefix
       return
