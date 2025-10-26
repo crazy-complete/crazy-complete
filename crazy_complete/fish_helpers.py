@@ -377,7 +377,7 @@ switch $arg
 
     set -l full_opt (string match -r -- '^-[a-zA-Z0-9]+=' $arg)
     set -l opt (string sub -s 2 -e -1 -- $full_opt)
-    set -l optdefs (string match -re -- " -(o|-old-option) $opt( |\$)" $progdefs)
+    set -l optdefs (string match -re -- " -(o|-old-option) $opt( |\$)" $progdef)
     set -l optdefs (string match -re -- " -(x|r|a|-(exclusive|require-parameter|arguments))( |\$)" $optdefs)
 
     if test (count $optdefs) -gt 0
