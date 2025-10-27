@@ -81,9 +81,14 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                 'options:\n'
                 '  - option_strings: ["--choices-1"]\n'
                 '    complete: ["choices", ["Item 1", "Item 2"]]\n'
+                '\n'
                 '  - option_strings: ["--choices-2"]\n'
                 '    complete: ["choices", {"Item 1": "Description 1", "Item '
-                '2": "Description 2"}]\n',
+                '2": "Description 2"}]\n'
+                '\n'
+                '  - option_strings: ["--choices-keep-order"]\n'
+                '    complete: ["choices", ["zebra", "cat", "monkey"]]\n'
+                '    nosort: true\n',
   'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
@@ -97,6 +102,7 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                         '\x1b[39;49;00m\x1b[33m1\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mItem\x1b[39;49;00m\x1b[31m '
                         '\x1b[39;49;00m\x1b[33m2\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
                         '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--choices-2\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
@@ -110,7 +116,20 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mItem\x1b[39;49;00m\x1b[31m '
                         '\x1b[39;49;00m\x1b[33m2\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mDescription\x1b[39;49;00m\x1b[31m '
-                        '\x1b[39;49;00m\x1b[33m2\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m}]\x1b[37m\x1b[39;49;00m\n',
+                        '\x1b[39;49;00m\x1b[33m2\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m}]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--choices-keep-order\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mchoices\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mzebra\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mcat\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mmonkey\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mnosort\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00mtrue\x1b[37m\x1b[39;49;00m\n',
   'implemented': None,
   'long': 'Items can be a list or a dictionary.\n'
           ' \n'
@@ -122,7 +141,8 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                   'If a dictionary is supplied, the keys are used as items and '
                   'the values are used\x1b[37m\x1b[39;49;00m\n'
                   'as description.\x1b[37m\x1b[39;49;00m\n',
-  'notes': [],
+  'notes': ['If the completion suggestions should appear in their original '
+            'order, set `nosort` to `true`'],
   'output': '~ > example --choices-2=<TAB>\n'
             'Item 1  (Description 1)  Item 2  (Description 2)\n',
   'short': 'Complete from a set of words'},

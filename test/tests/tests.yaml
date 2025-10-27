@@ -1978,3 +1978,63 @@ fish_expected: |
   > crazy-complete-test log:level=warn output:
 zsh_expected: |
   > crazy-complete-test log:level=warn output:
+---
+number: 128
+definition_file: "choices"
+description: "Check if nosort is respected (long option)"
+send: "crazy-complete-test --choices-no-sort "
+bash_expected: |
+  > crazy-complete-test --choices-no-sort
+  3  1  2
+  > crazy-complete-test --choices-no-sort
+fish_expected: |
+  > crazy-complete-test --choices-no-sort
+  3  1  2
+zsh_expected: |
+  > crazy-complete-test --choices-no-sort
+  3  1  2
+---
+number: 129
+definition_file: "choices"
+description: "Check if nosort is respected (old option)"
+send: "crazy-complete-test -choices-no-sort "
+bash_expected: |
+  > crazy-complete-test -choices-no-sort
+  3  1  2
+  > crazy-complete-test -choices-no-sort
+fish_expected: |
+  > crazy-complete-test -choices-no-sort
+  3  1  2
+zsh_expected: |
+  > crazy-complete-test -choices-no-sort
+  3  1  2
+---
+number: 130
+definition_file: "choices"
+description: "Check if nosort is respected (short option)"
+send: "crazy-complete-test -n "
+bash_expected: |
+  > crazy-complete-test -n
+  3  1  2
+  > crazy-complete-test -n
+fish_expected: |
+  > crazy-complete-test -n
+  3  1  2
+zsh_expected: |
+  > crazy-complete-test -n
+  3  1  2
+---
+number: 131
+definition_file: "choices"
+description: "Check if nosort is respected (positional)"
+send: "crazy-complete-test "
+bash_expected: |
+  > crazy-complete-test
+  3  1  2
+  > crazy-complete-test
+fish_expected: |
+  > crazy-complete-test
+  3  1  2
+zsh_expected: |
+  > crazy-complete-test
+  3  1  2

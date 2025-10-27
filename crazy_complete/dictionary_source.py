@@ -46,7 +46,8 @@ def dictionary_to_commandline(dictionary, prog=None):
     for option in options:
         _validate_keys(option,
             ['option_strings', 'metavar', 'help', 'optional_arg', 'groups',
-             'repeatable', 'final', 'hidden', 'complete', 'when', 'capture'])
+             'repeatable', 'final', 'hidden', 'complete', 'nosort',
+             'when', 'capture'])
 
         commandline.add_option(
             option.get('option_strings',  None),
@@ -58,12 +59,14 @@ def dictionary_to_commandline(dictionary, prog=None):
             final           = option.get('final',           False),
             hidden          = option.get('hidden',          False),
             complete        = option.get('complete',        None),
+            nosort          = option.get('nosort',          False),
             when            = option.get('when',            None),
             capture         = option.get('capture',         None))
 
     for positional in positionals:
         _validate_keys(positional,
-            ['number', 'metavar', 'help', 'repeatable', 'complete', 'when', 'capture'])
+            ['number', 'metavar', 'help', 'repeatable', 'complete', 'nosort',
+             'when', 'capture'])
 
         commandline.add_positional(
             positional.get('number', None),
@@ -71,6 +74,7 @@ def dictionary_to_commandline(dictionary, prog=None):
             help       = positional.get('help',       None),
             repeatable = positional.get('repeatable', False),
             complete   = positional.get('complete',   None),
+            nosort     = positional.get('nosort',     False),
             when       = positional.get('when',       None),
             capture    = positional.get('capture',    None))
 
@@ -175,6 +179,9 @@ def option_to_dictionary(self):
     if self.complete:
         r['complete'] = self.complete
 
+    if self.nosort is True:
+        r['nosort'] = self.nosort
+
     if self.when is not None:
         r['when'] = self.when
 
@@ -202,6 +209,9 @@ def positional_to_dictionary(self):
 
     if self.complete:
         r['complete'] = self.complete
+
+    if self.nosort is True:
+        r['nosort'] = self.nosort
 
     if self.when is not None:
         r['when'] = self.when

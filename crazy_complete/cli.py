@@ -389,6 +389,7 @@ class CommandLine:
                 metavar         = option.metavar,
                 help            = option.help,
                 complete        = option.complete,
+                nosort          = option.nosort,
                 optional_arg    = option.optional_arg,
                 groups          = option.groups,
                 repeatable      = option.repeatable,
@@ -404,6 +405,7 @@ class CommandLine:
                 metavar         = positional.metavar,
                 help            = positional.help,
                 repeatable      = positional.repeatable,
+                nosort          = positional.nosort,
                 complete        = positional.complete,
                 when            = positional.when,
                 capture         = positional.capture
@@ -446,6 +448,7 @@ class Positional:
             metavar=None,
             help=None,
             complete=None,
+            nosort=False,
             repeatable=False,
             when=None,
             capture=None):
@@ -458,6 +461,7 @@ class Positional:
             help (str): The help message for the positional.
             repeatable (bool): Specifies if positional can be specified more times
             complete (list): The completion specification for the positional.
+            nosort (bool): Do not sort the completion suggestions.
             when (str): Specifies a condition for showing this positional.
             capture (str): Specifies the variable name for capturing
         '''
@@ -480,6 +484,9 @@ class Positional:
         if not isinstance(repeatable, bool):
             raise CrazyTypeError('repeatable', 'bool', repeatable)
 
+        if not isinstance(nosort, bool):
+            raise CrazyTypeError('nosort', 'bool', nosort)
+
         if not isinstance(when, (str, NoneType)):
             raise CrazyTypeError('when', 'str|None', when)
 
@@ -498,6 +505,7 @@ class Positional:
         self.help = help
         self.repeatable = repeatable
         self.complete = complete if complete else ['none']
+        self.nosort = nosort
         self.when = when
         self.capture = capture
 
@@ -543,6 +551,7 @@ class Positional:
             self.help       == other.help       and
             self.repeatable == other.repeatable and
             self.complete   == other.complete   and
+            self.nosort     == other.nosort     and
             self.when       == other.when       and
             self.capture    == other.capture
         )
@@ -558,6 +567,7 @@ class Option:
             metavar=None,
             help=None,
             complete=None,
+            nosort=False,
             groups=None,
             optional_arg=False,
             repeatable=ExtendedBool.INHERIT,
@@ -573,6 +583,7 @@ class Option:
             metavar (str): The metavar for the option.
             help (str): The help message for the option.
             complete (tuple): The completion specification for the option.
+            nosort (bool): Do not sort the completion suggestions.
             optional_arg (bool): Specifies if option's argument is optional.
             groups (list of str): Specify to which mutually exclusive groups this option belongs to.
             repeatable (ExtendedBool): Specifies if the option can be repeated.
@@ -620,6 +631,9 @@ class Option:
         if not isinstance(hidden, bool):
             raise CrazyTypeError('hidden', 'bool', hidden)
 
+        if not isinstance(nosort, bool):
+            raise CrazyTypeError('nosort', 'bool', nosort)
+
         if not isinstance(when, (str, NoneType)):
             raise CrazyTypeError('when', 'str|None', when)
 
@@ -650,6 +664,7 @@ class Option:
         self.metavar = metavar
         self.help = help
         self.complete = complete
+        self.nosort = nosort
         self.groups = groups
         self.optional_arg = optional_arg
         self.repeatable = repeatable
@@ -741,6 +756,7 @@ class Option:
             self.final          == other.final          and
             self.hidden         == other.hidden         and
             self.complete       == other.complete       and
+            self.nosort         == other.nosort         and
             self.groups         == other.groups         and
             self.when           == other.when           and
             self.capture        == other.capture

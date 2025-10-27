@@ -25,6 +25,7 @@ class FishCompletionDefinition:
           positional=None,         # Positional number
           description=None,        # Description
           requires_argument=False, # Option requires an argument
+          keep_order=False,        # Do not sort completion suggestions
           completion_obj=None
         ):
         if short_options is None:
@@ -40,6 +41,7 @@ class FishCompletionDefinition:
         self.positional = positional
         self.description = description
         self.requires_argument = requires_argument
+        self.keep_order = keep_order
         self.completion_obj = completion_obj
         self.conditions = Conditions()
 
@@ -60,6 +62,9 @@ class FishCompletionDefinition:
 
         if self.requires_argument:
             cmd.flags.add('r')
+
+        if self.keep_order:
+            cmd.flags.add('k')
 
         cmd.parse_args(self.completion_obj.get_args())
 
@@ -159,6 +164,7 @@ class FishCompletionGenerator:
             long_options        = option.get_long_option_strings(),
             old_options         = option.get_old_option_strings(),
             requires_argument   = (option.complete and not option.optional_arg),
+            keep_order          = option.nosort,
             description         = option.help,
             completion_obj      = completion_obj)
 
@@ -203,6 +209,7 @@ class FishCompletionGenerator:
             self.ctxt,
             positional          = option.get_positional_num(),
             requires_argument   = True,
+            keep_order          = option.nosort,
             description         = option.help,
             completion_obj      = completion_obj
         )

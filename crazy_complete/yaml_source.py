@@ -28,6 +28,7 @@ def option_to_yaml(dictionary):
     final           = dictionary.get('final',           False)
     hidden          = dictionary.get('hidden',          False)
     complete        = dictionary.get('complete',        None)
+    nosort          = dictionary.get('nosort',          None)
     when            = dictionary.get('when',            None)
     capture         = dictionary.get('capture',         None)
 
@@ -57,6 +58,9 @@ def option_to_yaml(dictionary):
     if complete is not None:
         r += '  complete: %s\n' % json.dumps(complete)
 
+    if nosort is True:
+        r += '  nosort: %s\n' % json.dumps(nosort)
+
     if when is not None:
         r += '  when: %s\n' % json.dumps(when)
 
@@ -74,6 +78,7 @@ def positional_to_yaml(dictionary):
     help       = dictionary.get('help',       None)
     repeatable = dictionary.get('repeatable', False)
     complete   = dictionary.get('complete',   None)
+    nosort     = dictionary.get('nosort',     None)
     when       = dictionary.get('when',       None)
     capture    = dictionary.get('capture',    None)
 
@@ -90,6 +95,9 @@ def positional_to_yaml(dictionary):
 
     if complete is not None:
         r += '  complete: %s\n' % json.dumps(complete)
+
+    if nosort is True:
+        r += '  nosort: %s\n' % json.dumps(nosort)
 
     if when is not None:
         r += '  when: %s\n' % json.dumps(when)

@@ -232,6 +232,22 @@ class ZshCompletionFunction:
             indent('\n\n'.join(c for c in self.code.values() if c), 2))
 
 
+def get_zstyles(commandline, out_list):
+    '''Get zstyle commands for disabling sorting completion suggestions.'''
+
+    prog = commandline.get_program_name()
+
+    for option in filter(lambda o: o.nosort, commandline.options):
+        for option_string in option.option_strings:
+            r = f"zstyle ':completion:*:*:{prog}:option{option_string}-*' sort false"
+            out_list.append(r)
+
+    for positional in filter(lambda p: p.nosort, commandline.positionals):
+        number = positional.number
+        r = f"zstyle ':completion:*:*:{prog}:argument-{number}:*' sort false"
+        out_list.append(r)
+
+
 def generate_completion(commandline, config=None):
     '''Code for generating a Zsh auto completion file.'''
 
@@ -271,6 +287,11 @@ def generate_completion(commandline, config=None):
         output.append(code)
 
     output += [function.get_code() for function in functions]
+
+    zstyles = []
+    commandline.visit_commandlines(lambda c: get_zstyles(c, zstyles))
+    if zstyles:
+        output.append('\n'.join(zstyles))
 
     if wrapper_code:
         output.append(wrapper_code)

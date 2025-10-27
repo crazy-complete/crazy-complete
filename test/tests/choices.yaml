@@ -47,3 +47,12 @@ options:
       "d:d": "d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d:d",
       "e:e": "e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e:e",
       "f:f": "f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f:f"}]
+
+  - option_strings: ["--choices-no-sort", "-choices-no-sort", "-n"]
+    complete: ["choices", ["3", "1", "2"]]
+    nosort: true
+
+positionals:
+  - number: 1
+    complete: ["choices", ["3", "1", "2"]]
+    nosort: true

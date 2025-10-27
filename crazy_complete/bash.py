@@ -35,7 +35,10 @@ class BashCompletionGenerator:
 
     def _complete_option(self, option, append=True):
         context = self.ctxt.get_option_context(self.commandline, option)
-        return self.completer.complete(context, [], *option.complete).get_code(append)
+        code = self.completer.complete(context, [], *option.complete).get_code(append)
+        if code and option.nosort:
+            code += '\ncompopt -o nosort'
+        return code
 
     def _generate_commandline_parsing(self):
         local_vars = []

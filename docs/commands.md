@@ -213,13 +213,22 @@ If a dictionary is supplied, the keys are used as items and the values are used
 as description.
 
 
+**NOTES**
+
+- If the completion suggestions should appear in their original order, set `nosort` to `true`
+
 ```yaml
 prog: "example"
 options:
   - option_strings: ["--choices-1"]
     complete: ["choices", ["Item 1", "Item 2"]]
+
   - option_strings: ["--choices-2"]
     complete: ["choices", {"Item 1": "Description 1", "Item 2": "Description 2"}]
+
+  - option_strings: ["--choices-keep-order"]
+    complete: ["choices", ["zebra", "cat", "monkey"]]
+    nosort: true
 ```
 
 ```
