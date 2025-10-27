@@ -287,7 +287,7 @@ elif (( ${#remaining_values[@]} )); then
   elif (( ${#having_values[@]} )); then
     local cur_last_value=${having_values[-1]}
     cur_stripped="${cur_stripped%"$cur_last_value"}"
-  
+
     for value in "${remaining_values[@]}"; do
       if [[ "$value" == "$cur_last_value"* ]]; then
         COMPREPLY+=("$cur_stripped$value")

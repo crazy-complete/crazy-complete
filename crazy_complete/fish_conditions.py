@@ -5,7 +5,19 @@ from .errors import InternalError
 from .type_utils import is_list_type
 
 
-class HasOption:
+class Condition:
+    '''Base class for conditions.'''
+
+    def query_code(self, ctxt):
+        '''Returns code using the `query` function.'''
+        raise NotImplementedError
+
+    def unsafe_code(self, ctxt):
+        '''Returns code using Fish's internal functions.'''
+        raise NotImplementedError
+
+
+class HasOption(Condition):
     def __init__(self, option_strings):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
@@ -32,7 +44,7 @@ class HasOption:
         return r
 
 
-class HasHiddenOption:
+class HasHiddenOption(Condition):
     def __init__(self, option_strings):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
@@ -50,7 +62,7 @@ class HasHiddenOption:
         return self.query_code(ctxt)
 
 
-class OptionIs:
+class OptionIs(Condition):
     def __init__(self, option_strings, values):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
@@ -68,8 +80,11 @@ class OptionIs:
         r = "$query '$opts' option_is %s -- %s" % (options, values)
         return r
 
+    def unsafe_code(self, ctxt):
+        return self.query_code(ctxt)
 
-class PositionalNum:
+
+class PositionalNum(Condition):
     TEST_OPERATORS = {
         '==': '-eq',
         '!=': '-ne',
@@ -101,7 +116,7 @@ class PositionalNum:
         return r
 
 
-class PositionalContains:
+class PositionalContains(Condition):
     def __init__(self, number, values):
         if not isinstance(number, int):
             raise InternalError(f'number: Invalid type: {number}')
@@ -124,7 +139,7 @@ class PositionalContains:
         return r
 
 
-class Not:
+class Not(Condition):
     def __init__(self, conditional):
         self.conditional = conditional
 
@@ -135,7 +150,7 @@ class Not:
         return 'not %s' % self.conditional.unsafe_code(ctxt)
 
 
-class Conditions:
+class Conditions(Condition):
     def __init__(self):
         self.conditions = []
 

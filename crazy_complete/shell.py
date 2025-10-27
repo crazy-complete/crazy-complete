@@ -102,12 +102,16 @@ class ShellCompleter:
 
     # pylint: disable=missing-function-docstring
 
-    def complete(self, ctxt, trace, completion, *a):
-        if not hasattr(self, completion):
-            utils.warn(f"ShellCompleter: Falling back from `{completion}` to `none`")
-            completion = 'none'
+    def complete(self, ctxt, trace, command, *a):
+        if not hasattr(self, command):
+            utils.warn(f"Shellcommand: Falling back from `{command}` to `none`")
+            command = 'none'
 
-        return getattr(self, completion)(ctxt, trace, *a)
+        return getattr(self, command)(ctxt, trace, *a)
+
+    def complete_from_def(self, ctxt, trace, definition):
+        command, *args = definition
+        return self.complete(ctxt, trace, command, *args)
 
     def fallback(self, ctxt, trace, from_, to, *a):
         utils.warn(f"ShellCompleter: Falling back from `{from_}` to `{to}`")

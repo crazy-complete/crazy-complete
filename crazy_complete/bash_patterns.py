@@ -66,5 +66,5 @@ def compact_glob_trie(strings):
 def make_pattern(strings):
     candidate0 = '|'.join(strings)
     candidate1 = compact_glob_trie(strings)
-    
+
     return candidate0 if len(candidate0) < len(candidate1) else candidate1

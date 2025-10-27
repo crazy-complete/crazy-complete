@@ -218,9 +218,9 @@ def _get_config_from_options(opts):
 def try_print_manual(args):
     '''Print manual.'''
 
-    p = argparse.ArgumentParser()
-    p.add_argument('--manual', nargs='?', const='all')
-    opts, _ = p.parse_known_args(args)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--manual', nargs='?', const='all')
+    opts, _ = parser.parse_known_args(args)
 
     if not opts.manual:
         return

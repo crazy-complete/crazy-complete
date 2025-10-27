@@ -100,5 +100,5 @@ def make_file_extension_pattern(extensions, fuzzy):
 
     if not fuzzy:
         return '@(%s)' % '|'.join(patterns)
-    
+
     return '@(%s)*' % '|'.join(patterns)

@@ -143,7 +143,7 @@
 3_22_05-combine-subcommand-invalid-type  | foo: -o: combine: Parameter `subcommand` has an invalid type. Expected types: list. Received: True (bool)
 3_22_06-combine-subcommand-invalid-command | foo: -o: combine: Unknown completer: invalid
 3_22_07-combine-subcommand-is-none       | foo: -o: combine: none: Completer `none` not allowed in `combine`
-3_22_08-combine-subcommand-is-combine    | foo: -o: combine: combine: commands: List must contain at least two items
+3_22_08-combine-subcommand-is-combine    | No error
 3_22_09-combine-too-many-args            | foo: -o: combine: Too many arguments: ['wrong']
 3_23_00-history-missing-arg              | foo: -o: history: Missing required argument: pattern
 3_23_01-history-too-many-arguments       | foo: -o: history: Too many arguments: ['wrong']

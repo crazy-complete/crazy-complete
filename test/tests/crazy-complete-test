@@ -42,6 +42,7 @@ cmdp.add_argument('--choices',          help='Complete from choices', choices={'
 cmdp.add_argument('--value-list',       help='Complete a list').complete('value_list', {'values': ['foo', 'bar', 'baz']})
 cmdp.add_argument('--value-list-2',     help='Complete a list').complete('value_list', {'values': {'foo': 'Some foo', 'bar': 'Some bar'}})
 cmdp.add_argument('--value-list-dup',   help='Complete a list (with duplicates)').complete('value_list', {'values': ['foo', 'bar', 'baz'], 'duplicates': True})
+cmdp.add_argument('--value-list-colon', help='Complete a list (colon)').complete('value_list', {'values': ['foo', 'bar', 'baz'], 'separator': ':'})
 cmdp.add_argument('--range-1',          help='Complete a range', type=int, choices=range(1,10))
 cmdp.add_argument('--range-2',          help='Complete a range', type=int, choices=range(1,10,2))
 cmdp.add_argument('--history',          help='Complete a history').complete('history', '[^"\' ]+@[^"\' ]+(/[^"\' ]+)?')
@@ -61,6 +62,8 @@ cmdp.add_argument('--date-format',      help='Complete a date format').complete(
 cmdp.add_argument('--file-list',        help='Complete a list of files').complete('file_list')
 cmdp.add_argument('--directory-list',   help='Complete a list of directories').complete('directory_list')
 cmdp.add_argument('--filesystem-type',  help='Complete a filesystem type').complete('filesystem_type')
+cmdp.add_argument('--prefix',           help='Complete with a prefix').complete('prefix', 'prefix:', ['file'])
+cmdp.add_argument('--prefix-list',      help='Complete with a prefix').complete('prefix', 'prefix:', ['file_list'])
 
 # =============================================================================
 # Command 'when'

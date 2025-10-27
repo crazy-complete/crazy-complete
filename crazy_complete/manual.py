@@ -4,6 +4,9 @@ from .errors import CrazyError
 from .str_utils import indent, join_with_wrap
 
 
+# pylint: disable=line-too-long
+
+
 COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
   'category': 'bonus',
   'command': 'alsa_card',
@@ -1758,7 +1761,7 @@ class Output:
     def bold(self, s):
         if not self.use_colors:
             print(s, end='')
-        else:    
+        else:
             print(f"\033[1m{s}\033[0m", end='')
 
     def underline(self, s):
@@ -1853,7 +1856,7 @@ def print_help_for_command(name, use_colors):
 def print_help_topic(topic, use_colors):
     try:
         print_help_for_command(topic, use_colors)
-    except CrazyError as e:
+    except CrazyError:
         commands = [cmd['command'] for cmd in COMMANDS]
         print('Topic not found')
         print('')

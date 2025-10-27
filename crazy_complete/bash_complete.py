@@ -140,8 +140,7 @@ class BashCompleteCombine(BashCompletionBase):
         self.completion_objects = []
 
         for command_args in commands:
-            command, *args = command_args
-            obj = getattr(completer, command)(ctxt, trace, *args)
+            obj = completer.complete_from_def(ctxt, trace, command_args)
             self.completion_objects.append(obj)
 
     def get_code(self, append=False):
@@ -166,8 +165,7 @@ class BashCompleteKeyValueList(BashCompletionCode):
             elif complete[0] == 'none':
                 funcs[key] = 'true'
             else:
-                command, *args = complete
-                obj = getattr(completer, command)(ctxt, trace, *args)
+                obj = completer.complete_from_def(ctxt, trace, complete)
                 funcs[key] = obj.get_function()
 
         e = shell.escape
@@ -332,8 +330,7 @@ class BashCompleter(shell.ShellCompleter):
         separator = opts.get('separator', ',') if opts else ','
         duplicates = opts.get('duplicates', False) if opts else False
 
-        cmd, *args = command
-        obj = getattr(self, cmd)(ctxt, trace, *args)
+        obj = self.complete_from_def(ctxt, trace, command)
         code = obj.get_code()
 
         func = ctxt.helpers.use_function('value_list')
@@ -390,11 +387,10 @@ class BashCompleter(shell.ShellCompleter):
         return BashCompletionFunc(ctxt, [bash_versions.fstypes(ctxt)])
 
     def prefix(self, ctxt, trace, prefix, command):
-        cmd, *args = command
-        obj = getattr(self, cmd)(ctxt, trace, *args)
-        cmd_func = obj.get_function()
-        func = ctxt.helpers.use_function('prefix')
-        return BashCompletionFunc(ctxt, [func, prefix, cmd_func])
+        obj = self.complete_from_def(ctxt, trace, command)
+        func = obj.get_function()
+        prefix_func = ctxt.helpers.use_function('prefix')
+        return BashCompletionFunc(ctxt, [prefix_func, prefix, func])
 
     # =========================================================================
     # Bonus

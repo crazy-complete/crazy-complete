@@ -271,8 +271,8 @@ def _validate_mime_file(_ctxt, args):
 
 def _validate_range(_ctxt, args):
     start = args.get_required_arg("start")
-    stop  = args.get_required_arg("stop")
-    step  = args.get_optional_arg(1)
+    stop = args.get_required_arg("stop")
+    step = args.get_optional_arg(1)
     args.require_no_more()
 
     _validate_type(start, (int,), 'start')
@@ -361,10 +361,10 @@ def _validate_key_value_list(ctxt, args):
 
         for key, description, complete in values:
             _validate_type(key, (str,), 'key')
-            _validate_type(description, (str, NoneType), 'description')
-            _validate_type(complete, (list, NoneType), 'completer')
             _validate_non_empty_string(key, 'key')
             _validate_no_spaces(key, 'key')
+            _validate_type(description, (str, NoneType), 'description')
+            _validate_type(complete, (list, NoneType), 'completer')
 
             if complete is None:
                 continue
@@ -376,14 +376,14 @@ def _validate_combine(ctxt, args):
     commands = args.get_required_arg('commands')
     args.require_no_more()
 
-    ctxt.trace.append('combine')
-
     _validate_type(commands, (list,), 'commands')
     _validate_non_empty_list(commands, 'commands')
 
     if len(commands) == 1:
         msg = '%s: %s' % ('commands', m.list_must_contain_at_least_two_items())
         raise CrazyError(msg)
+
+    ctxt.trace.append('combine')
 
     for subcommand_args in commands:
         _validate_type(subcommand_args, (list,), 'subcommand')

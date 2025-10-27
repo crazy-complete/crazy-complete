@@ -367,10 +367,9 @@ def _check_key_value_list(ctxt, arguments):
 
         for key, complete in values.value.items():
             _check_type(key, (str,))
-            _check_type(complete, (list, NoneType))
-
             _check_non_empty_string(key, 'key')
             _check_no_spaces(key, 'key')
+            _check_type(complete, (list, NoneType))
 
             if complete.value is None:
                 continue
@@ -407,18 +406,17 @@ def _check_combine(ctxt, arguments):
     arguments.require_no_more()
 
     _check_type(commands, (list,))
+    _check_non_empty_list(commands, 'commands')
+
+    if len(commands.value) == 1:
+        msg = m.list_must_contain_at_least_two_items()
+        raise _error(msg, commands)
 
     ctxt.trace.append('combine')
 
     for completer in commands.value:
         _check_type(completer, (list,))
         _check_complete(ctxt, completer)
-
-    _check_non_empty_list(commands, 'commands')
-
-    if len(commands.value) == 1:
-        msg = m.list_must_contain_at_least_two_items()
-        raise _error(msg, commands)
 
 
 def _check_list(ctxt, arguments):

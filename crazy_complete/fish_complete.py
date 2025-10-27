@@ -267,8 +267,7 @@ class FishCompletKeyValueList(FishCompletionCommand):
             elif complete[0] == 'none':
                 func = 'true'
             else:
-                command, *command_args = complete
-                obj = getattr(completer, command)(ctxt, trace, *command_args)
+                obj = completer.complete_from_def(ctxt, trace, complete)
                 func = obj.get_function()
 
             args.append('%s %s %s' % (e(key), e(desc or ''), e(func)))
@@ -335,9 +334,8 @@ class FishCompleteCombine(FishCompletionBase):
         self.code = []
         trace.append('combine')
 
-        for command_args in commands:
-            command, *args = command_args
-            obj = getattr(completer, command)(ctxt, trace, *args)
+        for command in commands:
+            obj = completer.complete_from_def(ctxt, trace, command)
             self.code.append(obj.get_code())
 
     def get_code(self):
@@ -476,8 +474,7 @@ class FishCompleter(shell.ShellCompleter):
         duplicates = opts.get('duplicates', False) if opts else False
         trace.append('list')
 
-        cmd, *args = command
-        obj = getattr(self, cmd)(ctxt, trace, *args)
+        obj = self.complete_from_def(ctxt, trace, command)
         func = obj.get_function()
 
         list_func = ctxt.helpers.use_function('list')
@@ -531,8 +528,7 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompletionRawCommand(ctxt, cmd)
 
     def prefix(self, ctxt, trace, prefix, command):
-        cmd, *args = command
-        obj = getattr(self, cmd)(ctxt, trace, *args)
+        obj = self.complete_from_def(ctxt, trace, command)
         func = obj.get_function()
 
         prefix_func = ctxt.helpers.use_function('prefix')

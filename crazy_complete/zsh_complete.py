@@ -29,6 +29,8 @@ class ZshCompletionBase:
 
 
 class ZshComplFunc(ZshCompletionBase):
+    '''Complete using a function.'''
+
     def __init__(self, ctxt, args, needs_braces=False):
         self.ctxt = ctxt
         self.args = args
@@ -57,6 +59,8 @@ class ZshComplFunc(ZshCompletionBase):
 
 
 class ZshCompleteChoices(ZshCompletionBase):
+    '''Complete from a set of words.'''
+
     def __init__(self, ctxt, trace, choices):
         self.ctxt = ctxt
         self.trace = trace
@@ -129,6 +133,8 @@ class ZshCompleteChoices(ZshCompletionBase):
 
 
 class ZshCompleteCommand(ZshCompletionBase):
+    '''Complete a command from $PATH.'''
+
     def __init__(self, ctxt, opts):
         self.ctxt = ctxt
         self.code = None
@@ -170,6 +176,8 @@ class ZshCompleteCommand(ZshCompletionBase):
 
 
 class ZshCompleteRange(ZshCompletionBase):
+    '''Complete a range of integers.'''
+
     def __init__(self, ctxt, start, stop, step):
         self.ctxt = ctxt
         self.start = start
@@ -214,8 +222,7 @@ class ZshKeyValueList(ZshComplFunc):
             elif complete[0] == 'none':
                 spec.append('%s%s:::' % (key, desc))
             else:
-                command, *args = complete
-                compl_obj = getattr(completer, command)(ctxt, trace, *args)
+                compl_obj = completer.complete_from_def(ctxt, trace, complete)
                 action = compl_obj.get_action_string()
                 spec.append('%s%s:::%s' % (key, desc, action))
 
@@ -232,14 +239,15 @@ class ZshKeyValueList(ZshComplFunc):
 
 
 class ZshCompleteCombine(ZshCompletionBase):
+    '''Combine multiple completers into one.'''
+
     def __init__(self, ctxt, trace, completer, commands):
         # metavar = shell.escape(ctxt.option.metavar or '')
         trace.append('combine')
 
         completions = []
         for command_args in commands:
-            command, *args = command_args
-            compl_obj = getattr(completer, command)(ctxt, trace, *args)
+            compl_obj = completer.complete_from_def(ctxt, trace, command_args)
             completions.append(compl_obj.get_action_string())
 
         code  = '_alternative \\\n'
@@ -344,7 +352,7 @@ class ZshCompleter(shell.ShellCompleter):
     def exec_internal(self, ctxt, _trace, command):
         return ZshComplFunc(ctxt, [command], needs_braces=True)
 
-    def value_list(self, ctxt, trace, opts):
+    def value_list(self, ctxt, _trace, opts):
         desc   = ctxt.option.metavar or ''
         values = opts['values']
         separator = opts.get('separator', ',')
@@ -377,8 +385,7 @@ class ZshCompleter(shell.ShellCompleter):
         duplicates = opts.get('duplicates', False) if opts else False
         trace.append('list')
 
-        cmd, *args = command
-        obj = getattr(self, cmd)(ctxt, trace, *args)
+        obj = self.complete_from_def(ctxt, trace, command)
         func = obj.get_function()
 
         args = []
@@ -439,8 +446,7 @@ class ZshCompleter(shell.ShellCompleter):
 
     def prefix(self, ctxt, trace, prefix, command):
         prefix_func = ctxt.helpers.use_function('prefix')
-        cmd, *args = command
-        obj = getattr(self, cmd)(ctxt, trace, *args)
+        obj = self.complete_from_def(ctxt, trace, command)
         func = obj.get_function()
         return ZshComplFunc(ctxt, [prefix_func, prefix, func], needs_braces=True)
 

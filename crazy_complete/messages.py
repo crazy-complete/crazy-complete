@@ -10,7 +10,7 @@ def normalize_lang(lang_code):
     '''Normalize locale code to short language like `de`.'''
 
     if not lang_code:
-        return 'en' 
+        return 'en'
 
     return lang_code.split('_')[0].split('.')[0].lower()
 
@@ -19,9 +19,9 @@ def get_lang():
     '''Get system language.'''
 
     lang = (
-        os.environ.get("LANGUAGE") or \
-        os.environ.get("LC_ALL") or \
-        os.environ.get("LC_MESSAGES") or \
+        os.environ.get("LANGUAGE") or
+        os.environ.get("LC_ALL") or
+        os.environ.get("LC_MESSAGES") or
         os.environ.get("LANG")
     )
 
@@ -32,7 +32,6 @@ def get_lang():
 
 
 LANG = get_lang()
-
 
 
 def completer_not_allowed_in(completer, completer2):
