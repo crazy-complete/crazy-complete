@@ -215,11 +215,12 @@ done
 ''')
 
 _EXEC = helpers.ShellFunction('exec', r'''
-local item desc
+local item desc special="$COMP_WORDBREAKS\"'><=;|&({:\\\$\`"
 
 while IFS=$'\t' read -r item desc; do
   if [[ "$item" == "$cur"* ]]; then
-    COMPREPLY+=("$(printf '%q' "$item")")
+    [[ "$item" == *[$special]* ]] && item="$(printf '%q' "$item")"
+    COMPREPLY+=("$item")
   fi
 done < <(eval "$1")
 ''')
