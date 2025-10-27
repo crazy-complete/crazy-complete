@@ -2,12 +2,11 @@
 
 from . import helpers
 
-_COMPGEN_W_REPLACEMENT = helpers.ShellFunction('compgen_w_replacement', r'''
-local cur word append=0
+_COMPGEN_W_REPLACEMENT = helpers.ShellFunction('values', r'''
+local word append=0
 
 [[ "$1" == "-a" ]] && { shift; append=1; }
 [[ "$1" == "--" ]] && { shift; }
-cur="$1"; shift
 
 (( append )) || COMPREPLY=()
 

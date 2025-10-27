@@ -102,8 +102,8 @@ class CompgenW(BashCompletionCode):
                 ('+' if append else ''),
                 shell.escape(' '.join(self.values)))
 
-        return ('%s %s-- "$cur" %s' % (
-            self.ctxt.helpers.use_function('compgen_w_replacement'),
+        return ('%s %s-- %s' % (
+            self.ctxt.helpers.use_function('values'),
             ('-a ' if append else ''),
             ' '.join(shell.escape(s) for s in self.values)))
 
