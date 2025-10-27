@@ -87,7 +87,7 @@ class BashCompletionFunc(BashCompletionBase):
         return self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
 
 
-class CompgenW(BashCompletionCode):
+class CompgenW(BashCompletionBase):
     '''Used for completing a list of words.'''
 
     def __init__(self, ctxt, values):
@@ -230,7 +230,7 @@ class BashCompleter(shell.ShellCompleter):
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  %s -d\n' % filedir
-            cmd += '  builtin popd &>/dev/null\n'
+            cmd += '  builtin popd >/dev/null\n'
             cmd += '}'
             return BashCompletionCode(ctxt, cmd)
 
@@ -254,7 +254,7 @@ class BashCompleter(shell.ShellCompleter):
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  %s\n' % ' '.join(shell.escape(a) for a in args)
-            cmd += '  builtin popd &>/dev/null\n'
+            cmd += '  builtin popd >/dev/null\n'
             cmd += '}'
             return BashCompletionCode(ctxt, cmd)
 
