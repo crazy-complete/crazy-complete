@@ -360,20 +360,6 @@ class BashCompleter(shell.ShellCompleter):
     def date_format(self, ctxt, _trace):
         return BashCompletionCode(ctxt, '')
 
-    def file_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-        return self.list(ctxt, trace, ['file', opts], list_opts)
-
-    def directory_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-        return self.list(ctxt, trace, ['directory', opts], list_opts)
-
     def uid(self, ctxt, _trace):
         return BashCompletionFunc(ctxt, [bash_versions.uids(ctxt)])
 

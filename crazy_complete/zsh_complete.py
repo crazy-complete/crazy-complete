@@ -414,22 +414,6 @@ class ZshCompleter(shell.ShellCompleter):
     def date_format(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_date_formats'])
 
-    def file_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-
-        return self.list(ctxt, trace, ['file', opts], list_opts)
-
-    def directory_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-
-        return self.list(ctxt, trace, ['directory', opts], list_opts)
-
     def uid(self, ctxt, _trace):
         func = ctxt.helpers.use_function('uid_list')
         return ZshComplFunc(ctxt, [func], needs_braces=True)

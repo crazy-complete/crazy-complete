@@ -212,15 +212,19 @@ class FishCompleteDir(FishCompletionCommand):
         directory = None if opts is None else opts.get('directory', None)
 
         # __fish_complete_directories does not respect __fish_stripprefix
-        # which is used inside list/key_value_list
-        use_filedir = 'list' in trace or 'key_value_list' in trace
+        # which is used inside list/key_value_list/prefix
+        use_filedir = (
+            'list' in trace or
+            'key_value_list' in trace or
+            'prefix' in trace
+        )
 
-        if use_filedir or directory is not None:
+        if directory is not None:
             func = ctxt.helpers.use_function('filedir')
-            if directory:
-                super().__init__(ctxt, [func, '-D', '-C', directory])
-            else:
-                super().__init__(ctxt, [func, '-D'])
+            super().__init__(ctxt, [func, '-D', '-C', directory])
+        elif use_filedir:
+            func = ctxt.helpers.use_function('filedir')
+            super().__init__(ctxt, [func, '-D'])
         else:
             super().__init__(ctxt, ['__fish_complete_directories'])
 
@@ -500,20 +504,6 @@ class FishCompleter(shell.ShellCompleter):
     def date_format(self, ctxt, _trace):
         func = ctxt.helpers.use_function('date_format')
         return FishCompletionCommand(ctxt, [func])
-
-    def file_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-        return self.list(ctxt, trace, ['file', opts], list_opts)
-
-    def directory_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-        return self.list(ctxt, trace, ['directory', opts], list_opts)
 
     def uid(self, ctxt, _trace):
         func = ctxt.helpers.use_function('uid_list')
