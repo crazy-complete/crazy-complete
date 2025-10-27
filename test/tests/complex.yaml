@@ -1,0 +1,16 @@
+prog: "crazy-complete-test"
+positionals:
+  - number: 1
+    repeatable: true
+    complete: ['combine', [
+      ['prefix', 'log:', ['key_value_list', ',', '=', [
+        ['level',  'specify log level',     ['choices', ['info', 'debug', 'warn', 'error']]],
+        ['format', 'specify output format', ['choices', ['text', 'json']]],
+      ]]],
+
+      ['prefix', 'output:', ['key_value_list', ',', '=', [
+        ['sync',   'disable buffering',     null],
+        ['file',   'specify output file',   ['file']],
+        ['mode',   'specify output mode',   ['choices', ['append', 'truncate']]]
+      ]]]
+    ]]

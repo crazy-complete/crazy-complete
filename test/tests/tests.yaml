@@ -11,6 +11,7 @@ filedir: {"args": ["--input-type=yaml"], "definition_file": "filedir.yaml"}
 wrapper: {"args": ["--input-type=yaml"], "definition_file": "wrapper.yaml"}
 list: {"args": ["--input-type=yaml"], "definition_file": "list.yaml"}
 key_value_list: {"args": ["--input-type=yaml"], "definition_file": "key_value_list.yaml"}
+complex: {"args": ["--input-type=yaml"], "definition_file": "complex.yaml"}
 ---
 number: 1
 definition_file: "main"
@@ -1887,3 +1888,93 @@ zsh_expected: |
   > crazy-complete-test --description animal,n
   nocomp  -- no completer
   number  -- select a number
+---
+number: 121
+definition_file: "complex"
+description: "complex: Check no arguments"
+send: "crazy-complete-test "
+bash_expected: |
+  > crazy-complete-test
+  log:     output:
+  > crazy-complete-test
+fish_expected: |
+  > crazy-complete-test
+  log:  output:
+zsh_expected: |
+  > crazy-complete-test
+  log:     output:
+---
+number: 122
+definition_file: "complex"
+description: "complex: Check l"
+send: "crazy-complete-test l"
+bash_expected: |
+  > crazy-complete-test log:
+fish_expected: |
+  > crazy-complete-test log:
+zsh_expected: |
+  > crazy-complete-test log:
+---
+number: 123
+definition_file: "complex"
+description: "complex: Check log:"
+send: "crazy-complete-test log:"
+bash_expected: |
+  > crazy-complete-test log:
+  format  level
+  > crazy-complete-test log:
+fish_expected: |
+  > crazy-complete-test log:
+  log:format=  (specify output format)  log:level=  (specify log level)
+zsh_expected: |
+  > crazy-complete-test log:
+  format  -- specify output format
+  level   -- specify log level
+---
+number: 124
+definition_file: "complex"
+description: "complex: Check log:l"
+send: "crazy-complete-test log:l"
+bash_expected: |
+  > crazy-complete-test log:level
+fish_expected: |
+  > crazy-complete-test log:level=
+zsh_expected: |
+  > crazy-complete-test log:level=
+---
+number: 125
+definition_file: "complex"
+description: "complex: Check log:level="
+send: "crazy-complete-test log:level="
+bash_expected: |
+  > crazy-complete-test log:level=
+  debug  error  info   warn
+  > crazy-complete-test log:level=
+fish_expected: |
+  > crazy-complete-test log:level=
+  …og:level=debug  …og:level=error  …og:level=info  …og:level=warn
+zsh_expected: |
+  > crazy-complete-test log:level=
+  debug  error  info   warn
+---
+number: 126
+definition_file: "complex"
+description: "complex: Check log:level=w"
+send: "crazy-complete-test log:level=w"
+bash_expected: |
+  > crazy-complete-test log:level=warn
+fish_expected: |
+  > crazy-complete-test log:level=warn
+zsh_expected: |
+  > crazy-complete-test log:level=warn,
+---
+number: 127
+definition_file: "complex"
+description: "complex: Check log:level=warn o"
+send: "crazy-complete-test log:level=warn o"
+bash_expected: |
+  > crazy-complete-test log:level=warn output:
+fish_expected: |
+  > crazy-complete-test log:level=warn output:
+zsh_expected: |
+  > crazy-complete-test log:level=warn output:

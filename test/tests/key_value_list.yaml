@@ -1,6 +1,6 @@
 prog: "crazy-complete-test"
 options:
-  - option_strings: ["--simple"]
+  - option_strings: ["--simple", '-O', '-old']
     complete: ["key_value_list", ',', '=', {
       'async':  null,
       'nocomp': ["none"],

@@ -33,6 +33,9 @@ options:
   - option_strings: ["--file-list"]
     complete: ["file_list", {"directory": "%TEST_DIR%/test_data"}]
 
+  - option_strings: ["--file-list-colon"]
+    complete: ["file_list", {"directory": "%TEST_DIR%/test_data", "separator": ':'}]
+
   - option_strings: ["--file-list-txt-jpg"]
     complete: ["file_list", {"directory": "%TEST_DIR%/test_data", "extensions": ["txt", "jpg"]}]
 
@@ -42,3 +45,6 @@ options:
 
   - option_strings: ["--directory-list"]
     complete: ["directory_list", {"directory": "%TEST_DIR%/test_data"}]
+
+  - option_strings: ["--directory-list-colon"]
+    complete: ["directory_list", {"directory": "%TEST_DIR%/test_data", "separator": ':'}]

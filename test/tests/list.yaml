@@ -17,3 +17,8 @@ options:
   - option_strings: ["--user-list"]
     complete: ["list", ["user"]]
 
+  - option_strings: ["--image-list"]
+    complete: ["list", ["mime_file", "image/"]]
+
+  - option_strings: ["--video-list"]
+    complete: ["list", ["mime_file", "video/"]]
