@@ -158,7 +158,6 @@ def generate_wrapper(generators):
 
     completion_funcname = shell.make_completion_funcname(commandline)
     wrapper_funcname = '%s__wrapper' % completion_funcname
-    complete_invoker_func = ctxt.helpers.use_function('invoke_complete')
 
     r  = '%s %s\n' % (bash_versions.completion_loader(ctxt), commandline.wraps)
     r += '\n'
@@ -172,7 +171,7 @@ def generate_wrapper(generators):
     r += '  COMP_WORDS[0]=\'%s\'\n' % commandline.wraps
     r += '  COMP_POINT=$(( COMP_POINT + ${#WRAPS} - ${#1} ))\n'
     r += '\n'
-    r += '  %s %s %s "${@:1}"\n' % (complete_invoker_func, commandline.wraps, commandline.wraps)
+    r += '  %s 0\n' % bash_versions.command_offset(ctxt)
     r += '\n'
     r += '  COMP_LINE="$COMP_LINE_OLD"\n'
     r += '  COMP_POINT="$COMP_POINT_OLD"\n'

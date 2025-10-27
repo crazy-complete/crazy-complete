@@ -195,25 +195,6 @@ COMP_WORDS=("${COMP_WORDS_OLD[@]}")
 COMP_CWORD=$COMP_CWORD_OLD
 ''', ['my_dequote', 'parse_line', 'subtract_prefix_suffix'])
 
-_INVOKE_COMPLETE = helpers.ShellFunction('invoke_complete', r'''
-local prog="${1##*/}"; shift
-
-#ifdef bash_completions_v_2_12
-_comp_complete_load "$prog"
-#else
-_completion_loader "$prog"
-#endif
-
-local i=0 args=($(complete -p -- "$prog"))
-
-for ((; i < ${#args[@]}; ++i)); do
-  if [[ "${args[i]}" == '-F' ]]; then
-    "${args[i+1]}" "$@"
-    return
-  fi
-done
-''')
-
 _EXEC = helpers.ShellFunction('exec', r'''
 local item desc special="$COMP_WORDBREAKS\"'><=;|&({:\\\$\`"
 
@@ -588,7 +569,6 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_PARSE_LINE)
         self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
         self.add_function(_COMMANDLINE_STRING)
-        self.add_function(_INVOKE_COMPLETE)
         self.add_function(_EXEC)
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
