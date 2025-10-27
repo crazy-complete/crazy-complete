@@ -66,9 +66,10 @@ long: |
   
   By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 also:
-  key_value_list: "For completing a comma-separated list of key=value pairs"
+  value_list: "For completing a comma-separated list of values"
   file_list: "For completing a comma-separated list of files"
   directory_list: "For completing a comma-separated list of directories"
+  key_value_list: "For completing a comma-separated list of key=value pairs"
 definition: |
   prog: "example"
   options:
@@ -105,6 +106,9 @@ long: |
   If a key does not take an argument, use `null` as completer.
   
   If a key does take an argument but cannot be completed, use `['none']` as completer.
+also:
+  list: "For completing a comma-separated list of any completer"
+  value_list: "For completing a comma-separated list of values"
 definition: |
   prog: "example"
   options:
@@ -327,6 +331,7 @@ long: |
    
   By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 also:
+  list: "For completing a comma-separated list of any completer"
   key_value_list: "For completing a comma-separated list of key=value pairs"
 definition: |
   prog: "example"

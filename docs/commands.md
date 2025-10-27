@@ -885,6 +885,8 @@ two  -- Description 2
 
 **SEE ALSO**
 
+- [list](#list): For completing a comma-separated list of any completer
+
 - [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
 
 ### variable
@@ -988,6 +990,12 @@ colord                  dbus
 dhcpcd                  git
 ```
 
+**SEE ALSO**
+
+- [list](#list): For completing a comma-separated list of any completer
+
+- [value\_list](#value_list): For completing a comma-separated list of values
+
 ### list
 
 > Complete a comma-separated list of any completer
@@ -1015,11 +1023,13 @@ dhcpcd                  git
 
 **SEE ALSO**
 
-- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
+- [value\_list](#value_list): For completing a comma-separated list of values
 
 - [file\_list](#file_list): For completing a comma-separated list of files
 
 - [directory\_list](#directory_list): For completing a comma-separated list of directories
+
+- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
 
 ### none
 
