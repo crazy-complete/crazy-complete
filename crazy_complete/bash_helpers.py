@@ -435,6 +435,7 @@ local stripped="$(strip_prefix_keep_quoting "$prefix" "$cur")"
 
 if [[ "$stripped" == "$cur" ]]; then
   COMPREPLY=($(compgen -W "$1" -- "$cur"))
+  compopt -o nospace
   return
 fi
 
