@@ -528,6 +528,9 @@ class FishCompleter(shell.ShellCompleter):
     def net_interface(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ['__fish_print_interfaces'])
 
+    def mountpoint(self, ctxt, _trace):
+        return FishCompletionCommand(ctxt, ['__fish_print_mounted'])
+
     def timezone(self, ctxt, _trace):
         func = ctxt.helpers.use_function('timezone_list')
         return FishCompletionCommand(ctxt, [func])
