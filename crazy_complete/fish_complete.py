@@ -512,8 +512,7 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompletionCommand(ctxt, ['__fish_complete_group_ids'])
 
     def filesystem_type(self, ctxt, _trace):
-        cmd = "command cat /proc/filesystems | command awk '{print $2}'"
-        return FishCompletionRawCommand(ctxt, cmd)
+        return FishCompletionCommand(ctxt, ['__fish_print_filesystems'])
 
     def prefix(self, ctxt, trace, prefix, command):
         obj = self.complete_from_def(ctxt, trace, command)
