@@ -733,16 +733,6 @@ end
 # Bonus
 # =============================================================================
 
-_NET_INTERFACES_LIST = helpers.FishFunction('net_interfaces_list', r'''
-if test -d /sys/class/net
-  command ls /sys/class/net
-else if command ifconfig -l &>/dev/null
-  command ifconfig -l # BSD / macOS
-else
-  command ifconfig 2>/dev/null | command awk '/^[a-z0-9]/ {print $1}' | command sed 's/://'
-end
-''')
-
 _TIMEZONE_LIST = helpers.FishFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null
   command find /usr/share/zoneinfo -type f |\
@@ -794,7 +784,6 @@ class FishHelpers(helpers.GeneralHelpers):
         self.add_function(_MIME_FILE)
         self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
         self.add_function(_COMMANDLINE_STRING)
-        self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)
         self.add_function(_ALSA_LIST_DEVICES)

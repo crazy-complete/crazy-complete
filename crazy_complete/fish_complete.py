@@ -526,8 +526,7 @@ class FishCompleter(shell.ShellCompleter):
     # =========================================================================
 
     def net_interface(self, ctxt, _trace):
-        func = ctxt.helpers.use_function('net_interfaces_list')
-        return FishCompletionCommand(ctxt, [func])
+        return FishCompletionCommand(ctxt, ['__fish_print_interfaces'])
 
     def timezone(self, ctxt, _trace):
         func = ctxt.helpers.use_function('timezone_list')
