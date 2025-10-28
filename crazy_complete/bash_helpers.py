@@ -2,7 +2,7 @@
 
 from . import helpers
 
-_COMPGEN_W_REPLACEMENT = helpers.ShellFunction('values', r'''
+_VALUES = helpers.ShellFunction('values', r'''
 local word append=0
 
 [[ "$1" == "-a" ]] && { shift; append=1; }
@@ -17,7 +17,7 @@ for word; do
 done
 ''')
 
-_MY_DEQUOTE = helpers.ShellFunction('my_dequote', r'''
+_DEQUOTE = helpers.ShellFunction('dequote', r'''
 local in="$1" len=${#1} i=0 result='' ___break_pos=-1 ___in_quotes=0
 
 for ((; i < len; ++i)); do
@@ -143,7 +143,7 @@ echo ${#s1}
 
 _COMMANDLINE_STRING = helpers.ShellFunction('commandline_string', r'''
 local l line break_pos in_quotes
-my_dequote "$cur" line break_pos in_quotes
+dequote "$cur" line break_pos in_quotes
 
 local COMP_LINE_OLD="$COMP_LINE"
 local COMP_POINT_OLD=$COMP_POINT
@@ -167,20 +167,18 @@ compopt -o noquote
 
 if (( break_pos >= 0 )); then
   line="${line:break_pos}"
-else
-  line="$line"
 fi
 
 if (( ${#COMPREPLY[@]} )); then
   local len=$(get_prefix_suffix_len "$line" "${COMPREPLY[0]}")
+  line="${line:0:len}"
 
   for i in "${!COMPREPLY[@]}"; do
     local REPLY="${COMPREPLY[i]}"
-    local l="${line:0:len}"
     if (( in_quotes )); then
-      COMPREPLY[i]="$l$REPLY"
+      COMPREPLY[i]="$line$REPLY"
     else
-      COMPREPLY[i]="$(printf '%q' "$l$REPLY")"
+      COMPREPLY[i]="$(printf '%q' "$line$REPLY")"
     fi
   done
 fi
@@ -189,7 +187,7 @@ COMP_LINE="$COMP_LINE_OLD"
 COMP_POINT=$COMP_POINT_OLD
 COMP_WORDS=("${COMP_WORDS_OLD[@]}")
 COMP_CWORD=$COMP_CWORD_OLD
-''', ['my_dequote', 'parse_line', 'get_prefix_suffix_len'])
+''', ['dequote', 'parse_line', 'get_prefix_suffix_len'])
 
 _EXEC = helpers.ShellFunction('exec', r'''
 local item desc special="$COMP_WORDBREAKS\"'><=;|&({:\\\$\`"
@@ -226,7 +224,7 @@ local separator="$1"; shift
 compopt -o nospace
 
 local cur_unquoted break_pos in_quotes
-my_dequote "$cur" cur_unquoted break_pos in_quotes
+dequote "$cur" cur_unquoted break_pos in_quotes
 
 if [[ -z "$cur_unquoted" ]]; then
   COMPREPLY=("$@")
@@ -272,7 +270,7 @@ elif (( ${#remaining_values[@]} )); then
     done
   fi
 fi
-''', ['my_dequote', 'array_contains'])
+''', ['dequote', 'array_contains'])
 
 _KEY_VALUE_LIST = helpers.ShellFunction('key_value_list', r'''
 local sep1="$1"; shift
@@ -290,7 +288,7 @@ local strip_chars=''
 [[ "${cur:0:1}" == '"' ]] && strip_chars=''
 [[ "${cur:0:1}" == "'" ]] && strip_chars=''
 local cur="$cur" break_pos in_quotes
-my_dequote "$cur" cur break_pos in_quotes
+dequote "$cur" cur break_pos in_quotes
 
 if [[ -z "$cur" ]]; then
   COMPREPLY=("${!keys[@]}")
@@ -356,7 +354,7 @@ else
     done
   fi
 fi
-''', ['my_dequote'])
+''', ['dequote'])
 
 _PREFIX_COMPREPLY = helpers.ShellFunction('prefix_compreply', r'''
 [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
@@ -486,7 +484,7 @@ else
 fi
 
 local cur_dequoted break_pos in_quotes
-my_dequote "$cur" cur_dequoted break_pos in_quotes
+dequote "$cur" cur_dequoted break_pos in_quotes
 
 while read -r line; do
   mime="${line##*:}"
@@ -507,7 +505,7 @@ while read -r line; do
     fi
   fi
 done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
-''', ['my_dequote'])
+''', ['dequote'])
 
 # =============================================================================
 # Bonus
@@ -556,8 +554,8 @@ class BashHelpers(helpers.GeneralHelpers):
 
     def __init__(self, config, function_prefix):
         super().__init__(config, function_prefix, helpers.ShellFunction)
-        self.add_function(_COMPGEN_W_REPLACEMENT)
-        self.add_function(_MY_DEQUOTE)
+        self.add_function(_VALUES)
+        self.add_function(_DEQUOTE)
         self.add_function(_PREFIX)
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
         self.add_function(_ARRAY_CONTAINS)

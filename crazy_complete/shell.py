@@ -75,7 +75,7 @@ class ShellCompleter:
 
     def complete(self, ctxt, trace, command, *a):
         if not hasattr(self, command):
-            utils.warn(f"Shellcommand: Falling back from `{command}` to `none`")
+            utils.warn(f"ShellCompleter: Falling back from `{command}` to `none`")
             command = 'none'
 
         return getattr(self, command)(ctxt, trace, *a)
