@@ -329,21 +329,16 @@ switch $cmd
 #endif
 #ifdef option_is
   case 'option_is'
-    set -l options
-    set -l values
-
-    for arg in $argv
-      set -e argv[1]
-
-      if string match -q -- -- $arg
-        set values $argv
-        break
-      else
-        set -a options $arg
-      end
-    end
+    set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
+    set -l options $argv[1..$(math $eof_string - 1)]
+    set -l values $argv[$eof_string..]
 
 #ifdef DEBUG
+    if test (count $options) -eq 0
+      echo '%FUNCNAME%: missing options' >&2
+      return 1
+    end
+
     if test (count $values) -eq 0
       echo '%FUNCNAME%: missing values' >&2
       return 1
