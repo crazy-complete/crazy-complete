@@ -205,7 +205,7 @@ class FishCompleteFile(FishCompletionBase):
         return FishCompletionCommand(self.ctxt, [func] + self.args).get_function()
 
 
-class FishCompleteDir(FishCompletionCommand):
+class FishCompleteDirectory(FishCompletionCommand):
     '''Class for completing directories.'''
 
     def __init__(self, ctxt, trace, opts):
@@ -415,8 +415,8 @@ class FishCompleter(shell.ShellCompleter):
     def command(self, ctxt, _trace, opts=None):
         return FishCompleteCommand(ctxt, opts)
 
-    def directory(self, ctxt, _trace, opts=None):
-        return FishCompleteDir(ctxt, _trace, opts)
+    def directory(self, ctxt, trace, opts=None):
+        return FishCompleteDirectory(ctxt, trace, opts)
 
     def file(self, ctxt, _trace, opts=None):
         return FishCompleteFile(ctxt, opts)

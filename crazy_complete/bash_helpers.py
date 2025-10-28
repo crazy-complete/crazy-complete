@@ -18,18 +18,20 @@ done
 ''')
 
 _MY_DEQUOTE = helpers.ShellFunction('my_dequote', r'''
-local in="$1" len=${#1} i=0 result='' ___break_pos=-1
+local in="$1" len=${#1} i=0 result='' ___break_pos=-1 ___in_quotes=0
 
 for ((; i < len; ++i)); do
   case "${in:i:1}" in
     "'")
+      ___in_quotes=1
       for ((++i; i < len; ++i)); do
-        [[ "${in:i:1}" == "'" ]] && break
+        [[ "${in:i:1}" == "'" ]] && { ___in_quotes=0; break; }
         result+="${in:i:1}"
       done;;
     '"')
+      ___in_quotes=1
       for ((++i; i < len; ++i)); do
-        [[ "${in:i:1}" == '"' ]] && break
+        [[ "${in:i:1}" == '"' ]] && { ___in_quotes=0; break; }
 
         if [[ "${in:i:1}" == '\' ]]; then
           result+="${in:$((++i)):1}"
@@ -49,8 +51,10 @@ done
 
 local -n ___RESULT=$2
 local -n ___BREAK_POS=$3
+local -n ___IN_QUOTES=$4
 ___RESULT="$result"
 ___BREAK_POS=$___break_pos
+___IN_QUOTES=$___in_quotes
 ''')
 
 _PARSE_LINE = helpers.ShellFunction('parse_line', r'''
@@ -103,7 +107,7 @@ elif [[ "${in:$((len - 1)):1}" == ' ' ]]; then
 fi
 ''')
 
-_SUBSTRACT_PREFIX_SUFFIX = helpers.ShellFunction('subtract_prefix_suffix', r'''
+_GET_PREFIX_SUFFIX_LEN = helpers.ShellFunction('get_prefix_suffix_len', r'''
 local s1="$1"
 local s2="$2"
 
@@ -123,9 +127,9 @@ while (( k > 0 )); do
 
   if [[ "$suf" == "$pre" ]]; then
     if (( len1 == k )); then
-      echo ""
+      echo 0
     else
-      echo "${s1:0:len1-k}"
+      echo $((len1-k))
     fi
 
     return
@@ -134,16 +138,12 @@ while (( k > 0 )); do
   ((k--))
 done
 
-echo "$s1"
+echo ${#s1}
 ''')
 
 _COMMANDLINE_STRING = helpers.ShellFunction('commandline_string', r'''
-local quoted=0
-[[ "${cur:0:1}" == '"' ]] && quoted=1
-[[ "${cur:0:1}" == "'" ]] && quoted=1
-
-local l line break_pos
-my_dequote "$cur" line break_pos
+local l line break_pos in_quotes
+my_dequote "$cur" line break_pos in_quotes
 
 local COMP_LINE_OLD="$COMP_LINE"
 local COMP_POINT_OLD=$COMP_POINT
@@ -157,43 +157,39 @@ parse_line COMP_WORDS "$line"
 COMP_CWORD=$(( ${#COMP_WORDS[@]} - 1 ))
 COMPREPLY=()
 
-if (( COMP_CWORD == 0 )); then
-  local cur="${COMP_WORDS[0]}"
-  if [[ "${cur:0:1}" == [./] ]]; then
 #ifdef bash_completions_v_2_12
-    _comp_compgen_filedir
+_comp_command_offset 0
 #else
-    _filedir
+_command_offset 0
 #endif
-  else
-    COMPREPLY=($(compgen -A command -- "$cur"))
-  fi
+compopt -o nospace
+compopt -o noquote
+
+if (( break_pos >= 0 )); then
+  line="${line:break_pos}"
 else
-#ifdef bash_completions_v_2_12
-  _comp_command_offset 0
-#else
-  _command_offset 0
-#endif
+  line="$line"
+fi
 
-  local REPLY COMPREPLY_NEW=()
+if (( ${#COMPREPLY[@]} )); then
+  local len=$(get_prefix_suffix_len "$line" "${COMPREPLY[0]}")
 
-  for REPLY in "${COMPREPLY[@]}"; do
-    l="$(subtract_prefix_suffix "$line" "$REPLY")"
-    if (( quoted )); then
-      COMPREPLY_NEW+=("$l$REPLY")
+  for i in "${!COMPREPLY[@]}"; do
+    local REPLY="${COMPREPLY[i]}"
+    local l="${line:0:len}"
+    if (( in_quotes )); then
+      COMPREPLY[i]="$l$REPLY"
     else
-      COMPREPLY_NEW+=("$(printf '%q' "$l$REPLY")")
+      COMPREPLY[i]="$(printf '%q' "$l$REPLY")"
     fi
   done
-
-  COMPREPLY=("${COMPREPLY_NEW[@]}")
 fi
 
 COMP_LINE="$COMP_LINE_OLD"
 COMP_POINT=$COMP_POINT_OLD
 COMP_WORDS=("${COMP_WORDS_OLD[@]}")
 COMP_CWORD=$COMP_CWORD_OLD
-''', ['my_dequote', 'parse_line', 'subtract_prefix_suffix'])
+''', ['my_dequote', 'parse_line', 'get_prefix_suffix_len'])
 
 _EXEC = helpers.ShellFunction('exec', r'''
 local item desc special="$COMP_WORDBREAKS\"'><=;|&({:\\\$\`"
@@ -229,8 +225,8 @@ local separator="$1"; shift
 
 compopt -o nospace
 
-local cur_unquoted break_pos
-my_dequote "$cur" cur_unquoted break_pos
+local cur_unquoted break_pos in_quotes
+my_dequote "$cur" cur_unquoted break_pos in_quotes
 
 if [[ -z "$cur_unquoted" ]]; then
   COMPREPLY=("$@")
@@ -255,7 +251,7 @@ COMPREPLY=()
 
 local cur_stripped="$cur_unquoted"
 if (( break_pos > -1 )); then
-  cur_stripped="${cur_stripped:$((break_pos - 0))}"
+  cur_stripped="${cur_stripped:break_pos}"
 fi
 
 if [[ "${cur_unquoted: -1}" == "$separator" ]]; then
@@ -293,8 +289,8 @@ local strip_chars=''
 [[ "$COMP_WORDBREAKS" == *"$sep2"* ]] && strip_chars+="$sep2"
 [[ "${cur:0:1}" == '"' ]] && strip_chars=''
 [[ "${cur:0:1}" == "'" ]] && strip_chars=''
-local cur="$cur" break_pos
-my_dequote "$cur" cur break_pos
+local cur="$cur" break_pos in_quotes
+my_dequote "$cur" cur break_pos in_quotes
 
 if [[ -z "$cur" ]]; then
   COMPREPLY=("${!keys[@]}")
@@ -489,8 +485,8 @@ else
   return
 fi
 
-local cur_dequoted break_pos
-my_dequote "$cur" cur_dequoted break_pos
+local cur_dequoted break_pos in_quotes
+my_dequote "$cur" cur_dequoted break_pos in_quotes
 
 while read -r line; do
   mime="${line##*:}"
@@ -567,7 +563,7 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_ARRAY_CONTAINS)
         self.add_function(_GET_LAST_BREAK_POSITION)
         self.add_function(_PARSE_LINE)
-        self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
+        self.add_function(_GET_PREFIX_SUFFIX_LEN)
         self.add_function(_COMMANDLINE_STRING)
         self.add_function(_EXEC)
         self.add_function(_EXEC_FAST)
