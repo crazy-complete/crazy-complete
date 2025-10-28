@@ -59,6 +59,7 @@ local cmd="$1"; shift
 case "$cmd" in
 #ifdef get_positional
   get_positional)
+#ifdef DEBUG
     if (( $# != 1 )); then
       echo "%FUNCNAME%: get_positional: takes exactly one argument" >&2
       return 1
@@ -69,6 +70,7 @@ case "$cmd" in
       return 1
     fi
 
+#endif
     printf "%s" "${POSITIONALS[$1]}"
     return 0;;
 #endif
@@ -76,11 +78,13 @@ case "$cmd" in
   get_option)
     local i=0
 
+#ifdef DEBUG
     if (( $# == 0 )); then
       echo "%FUNCNAME%: get_option: arguments required" >&2
       return 1
     fi
 
+#endif
     for (( i=0; i <= ${#HAVING_OPTIONS[@]}; ++i )); do
       local option="${HAVING_OPTIONS[$i]}"
       if __zsh_query_contains "$option" "$@"; then
@@ -99,11 +103,13 @@ case "$cmd" in
     local option=''
 #endif
 
+#ifdef DEBUG
     if (( $# == 0 )); then
       echo "%FUNCNAME%: has_option: arguments required" >&2
       return 1
     fi
 
+#endif
     for option in "${HAVING_OPTIONS[@]}"; do
       __zsh_query_contains "$option" "$@" && return 0
     done
@@ -123,6 +129,7 @@ case "$cmd" in
     cmd_option_is_options=("${@:1:$((dash_dash_pos - 1))}")
     cmd_option_is_values=("${@:$((dash_dash_pos + 1))}")
 
+#ifdef DEBUG
     if (( ${#cmd_option_is_options[@]} == 0 )); then
       echo "%FUNCNAME%: option_is: missing options" >&2
       return 1
@@ -133,6 +140,7 @@ case "$cmd" in
       return 1
     fi
 
+#endif
     for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
       local option="${HAVING_OPTIONS[$i]}"
       if __zsh_query_contains "$option" "${cmd_option_is_options[@]}"; then
@@ -187,7 +195,9 @@ for option in "${options[@]}"; do
     -??*=\?)  old_opts_with_optional_arg+=("${option%=?}");;
     -??*)     old_opts_without_arg+=("$option");;
 #endif
+#ifdef DEBUG
     *) echo "%FUNCNAME%: $option: not a valid short, long or oldstyle option" >&2; return 1;;
+#endif
   esac
 done
 

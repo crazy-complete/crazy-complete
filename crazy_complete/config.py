@@ -13,6 +13,7 @@ class Config:
 
     def __init__(self):
         self.function_prefix        = '_$PROG'
+        self.debug                  = False
         self.abbreviate_commands    = False
         self.abbreviate_options     = False
         self.repeatable_options     = False
@@ -48,6 +49,21 @@ class Config:
             f"Config.set_function_prefix: prefix: expected str, got `{prefix}`"
 
         self.function_prefix = prefix
+
+    def set_debug(self, enable):
+        '''Sets debug mode.
+
+        Args:
+            enable (bool):
+                If True, additional code for debugging is generated.
+
+        Notes:
+            This feature defaults to `False`.
+        '''
+
+        _assert_is_bool(enable, "set_debug", "enable")
+
+        self.debug = enable
 
     def set_abbreviate_commands(self, enable):
         '''Sets whether commands can be abbreviated.

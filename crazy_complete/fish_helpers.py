@@ -255,11 +255,13 @@ end
 switch $cmd
 #ifdef positional_contains
   case 'positional_contains'
+#ifdef DEBUG
     if test (count $argv) -eq 0
       echo '%FUNCNAME%: positional_contains: argv[3]: missing number' >&2
       return 1
     end
 
+#endif
     set -l positional_num $argv[1]
     set -e argv[1]
     contains -- $positionals[$positional_num] $argv && return 0 || return 1
@@ -304,19 +306,25 @@ switch $cmd
     switch (count $argv)
       case 0
         count $positionals
+#ifdef DEBUG
       case 1
         echo '%FUNCNAME%: num_of_positionals: $argv[1]: missing operand' >&2
         return 1
+#endif
       case 2
         if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
           test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
+#ifdef DEBUG
         else
           echo '%FUNCNAME%: num_of_positionals: $argv[1]: unknown operator' >&2
           return 1
+#endif
         end
+#ifdef DEBUG
       case '*'
         echo '%FUNCNAME%: num_of_positionals: too many arguments' >&2
         return 1
+#endif
     end
 #endif
 #ifdef option_is
@@ -335,11 +343,13 @@ switch $cmd
       end
     end
 
+#ifdef DEBUG
     if test (count $values) -eq 0
       echo '%FUNCNAME%: missing values' >&2
       return 1
     end
 
+#endif
     set -l i (count $having_options)
     while test $i -ge 1
       if contains -- $having_options[$i] $options

@@ -94,6 +94,10 @@ class GeneralHelpers:
         self.used_functions = {} # funcname:set(defines)
         self.global_defines = set()
 
+        # Set debug mode
+        if self.config.debug:
+            self.define('DEBUG')
+
     # =========================================================================
     # Dynamic functions
     # =========================================================================

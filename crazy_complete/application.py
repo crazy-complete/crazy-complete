@@ -193,6 +193,7 @@ def load_definition_file(opts):
 
 def _get_config_from_options(opts):
     conf = config.Config()
+    conf.set_debug(opts.debug)
     conf.set_function_prefix(opts.function_prefix)
     conf.set_abbreviate_commands(opts.abbreviate_commands)
     conf.set_abbreviate_options(opts.abbreviate_options)
