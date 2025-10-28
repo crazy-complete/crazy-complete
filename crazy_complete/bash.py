@@ -68,9 +68,9 @@ class BashCompletionGenerator:
             pattern = '|'.join(shell.escape(s) for s in cmds)
             if utils.is_worth_a_function(subcommand):
                 if self.commandline.inherit_options:
-                    r += '    %s) %s && return 0;;\n' % (pattern, shell.make_completion_funcname(subcommand))
+                    r += '    %s) %s && return 0;;\n' % (pattern, self.ctxt.helpers.make_completion_funcname(subcommand))
                 else:
-                    r += '    %s) %s && return 0 || return 1;;\n' % (pattern, shell.make_completion_funcname(subcommand))
+                    r += '    %s) %s && return 0 || return 1;;\n' % (pattern, self.ctxt.helpers.make_completion_funcname(subcommand))
             else:
                 if self.commandline.inherit_options:
                     r += '    %s);;\n' % pattern
@@ -143,7 +143,7 @@ class BashCompletionGenerator:
             # This sets up END_OF_OPTIONS, POSITIONALS and the OPT_* variables.
             code['command_line_parsing'] = self._generate_commandline_parsing()
 
-        r  = '%s() {\n' % shell.make_completion_funcname(self.commandline)
+        r  = '%s() {\n' % self.ctxt.helpers.make_completion_funcname(self.commandline)
         r += '%s\n\n'   % indent('\n\n'.join(c for c in code.values() if c), 2)
         r += '  return 1\n'
         r += '}'
@@ -151,16 +151,12 @@ class BashCompletionGenerator:
         self.result = r
 
 
-def generate_wrapper(generators):
-    first_generator = generators[0]
-    commandline = first_generator.commandline
-    ctxt = first_generator.ctxt
+def generate_wrapper(ctxt, commandline):
+    completion_funcname = ctxt.helpers.make_completion_funcname(commandline)
+    wrapper_funcname = ctxt.helpers.make_completion_funcname(commandline, '__wrapper')
 
     if not commandline.wraps:
-        return (shell.make_completion_funcname(commandline), None)
-
-    completion_funcname = shell.make_completion_funcname(commandline)
-    wrapper_funcname = '%s__wrapper' % completion_funcname
+        return (completion_funcname, None)
 
     r  = '%s %s\n' % (bash_versions.completion_loader(ctxt), commandline.wraps)
     r += '\n'
@@ -203,7 +199,7 @@ def generate_completion(commandline, config=None):
 
     result = generation.visit_commandlines(BashCompletionGenerator, ctxt, commandline)
 
-    completion_func, wrapper_code = generate_wrapper(result)
+    completion_func, wrapper_code = generate_wrapper(ctxt, commandline)
 
     output = []
     output += [generation_notice.GENERATION_NOTICE]

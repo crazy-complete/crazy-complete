@@ -12,6 +12,7 @@ class Config:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self):
+        self.function_prefix        = '_$PROG'
         self.abbreviate_commands    = False
         self.abbreviate_options     = False
         self.repeatable_options     = False
@@ -31,6 +32,22 @@ class Config:
         self.disabled_groups        = False
         self.disabled_repeatable    = False
         self.disabled_when          = False
+
+    def set_function_prefix(self, prefix):
+        '''Sets the function prefix used for generated functions.
+
+        Args:
+            prefix (str):
+                The prefix to be used. May contain the `$PROG` placeholder.
+
+        Notes:
+            This defaults to `_$PROG`
+        '''
+
+        assert isinstance(prefix, str), \
+            f"Config.set_function_prefix: prefix: expected str, got `{prefix}`"
+
+        self.function_prefix = prefix
 
     def set_abbreviate_commands(self, enable):
         '''Sets whether commands can be abbreviated.

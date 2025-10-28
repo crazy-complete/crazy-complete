@@ -115,15 +115,12 @@ def _make_short_opts_arg_regex(flag_opts, arg_opts, arg_type):
     return f'^{r}$'
 
 
-def generate_wrapper(generators):
-    first_generator = generators[0]
-    commandline = first_generator.commandline
+def generate_wrapper(ctxt, commandline):
+    completion_funcname = ctxt.helpers.make_completion_funcname(commandline)
+    wrapper_funcname = ctxt.helpers.make_completion_funcname(commandline, '__wrapper')
 
     if not commandline.wraps:
-        return (shell.make_completion_funcname(commandline), None)
-
-    completion_funcname = shell.make_completion_funcname(commandline)
-    wrapper_funcname = '%s__wrapper' % completion_funcname
+        return (completion_funcname, None)
 
     long_opts_arg = []
     long_opts_flag = []

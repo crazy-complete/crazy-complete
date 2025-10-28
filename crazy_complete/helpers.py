@@ -56,24 +56,24 @@ class FishFunction(FunctionBase):
         return r
 
 
-def make_completion_funcname_for_context(ctxt, progname):
+def make_completion_funcname_for_context(ctxt, prefix):
     '''TODO.'''
 
     commandlines = ctxt.commandline.get_parents(include_self=True)
     prognames = [p.prog for p in commandlines]
-    prognames[0] = progname
+    prognames[0] = prefix
 
     funcname = shell.make_identifier('_'.join(prognames))
 
     if isinstance(ctxt.option, cli.Option):
-        return '_%s__%s' % (funcname, ctxt.option.option_strings[0])
+        return '%s__%s' % (funcname, ctxt.option.option_strings[0])
     if isinstance(ctxt.option, cli.Positional):
         if ctxt.option.metavar:
             identifier = shell.make_identifier(ctxt.option.metavar)
         else:
             identifier = 'arg%d' % ctxt.option.get_positional_num()
 
-        return '_%s__%s' % (funcname, identifier)
+        return '%s__%s' % (funcname, identifier)
 
     raise AssertionError('make_completion_funcname_for_context: Should not be reached')
 
@@ -81,9 +81,9 @@ def make_completion_funcname_for_context(ctxt, progname):
 class GeneralHelpers:
     '''Class for including functions in the generation process.'''
 
-    def __init__(self, config, function_prefix, function_class):
+    def __init__(self, config, prog, function_class):
         self.config = config
-        self.function_prefix = function_prefix
+        self.function_prefix = config.function_prefix.replace('$PROG', prog)
         self.function_class = function_class
 
         # Dynamic functions
@@ -164,7 +164,7 @@ class GeneralHelpers:
     def get_real_function_name(self, function_name):
         '''Return the function name with its prefix.'''
 
-        return '_%s__%s' % (self.function_prefix, function_name)
+        return '%s__%s' % (self.function_prefix, function_name)
 
     def is_used(self, function_name):
         '''Check if a function is used.'''
@@ -184,6 +184,8 @@ class GeneralHelpers:
             for dep_func in function.dependencies:
                 code = code.replace(dep_func, self.get_real_function_name(dep_func))
 
+            code = code.replace('%PREFIX%', self.function_prefix)
+
             if not self.config.keep_comments:
                 code = strip_comments(code)
 
@@ -194,3 +196,36 @@ class GeneralHelpers:
         r.extend(self.get_all_dynamic_functions())
 
         return r
+
+    # =========================================================================
+    # Other methods
+    # =========================================================================
+
+    def make_completion_funcname(self, commandline, suffix=''):
+        '''Generates a function name for auto-completing a program or subcommand.
+
+        Args:
+            cmdline (CommandLine): The CommandLine instance representing the program or subcommand.
+            suffix (str): The suffix that shall be appended to the result.
+
+        Returns:
+            str: The generated function name for auto-completion.
+
+        This function is used to generate a unique function name for auto-completing
+        a program or subcommand in the specified shell. It concatenates the names of
+        all parent commandlines, including the current commandline, and converts them
+        into a valid function name format.
+
+        Example:
+            For a program with the name 'my_program' and a subcommand with the name 'subcommand',
+            the generated function name is '_my_program_subcommand'.
+        '''
+        assert isinstance(commandline, cli.CommandLine), \
+            "make_completion_funcname: cmdline: expected CommandLine, got %r" % commandline
+
+        commandlines = commandline.get_parents(include_self=True)
+        prognames = [cmdline.prog for cmdline in commandlines]
+        prognames[0] = self.function_prefix
+        identifier = shell.make_identifier('_'.join(prognames))
+
+        return f'{identifier}{suffix}'

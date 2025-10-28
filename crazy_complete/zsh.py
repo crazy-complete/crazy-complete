@@ -47,7 +47,7 @@ class ZshCompletionFunction:
     def __init__(self, ctxt, commandline):
         self.commandline = commandline
         self.ctxt = ctxt
-        self.funcname = shell.make_completion_funcname(commandline)
+        self.funcname = ctxt.helpers.make_completion_funcname(commandline)
         self.subcommands = commandline.get_subcommands()
         self.command_counter = 0
         self.completer = zsh_complete.ZshCompleter()
@@ -151,7 +151,7 @@ class ZshCompletionFunction:
 
         r =  'case "$(%s get_positional %d)" in\n' % (query, positional_num)
         for subcommand in self.subcommands.subcommands:
-            sub_funcname = shell.make_completion_funcname(subcommand)
+            sub_funcname = self.ctxt.helpers.make_completion_funcname(subcommand)
             cmds = utils.get_all_command_variations(subcommand)
             pattern = '|'.join(shell.escape(s) for s in cmds)
             r += f'  {pattern}) {sub_funcname}; return $?;;\n'
@@ -281,7 +281,7 @@ def generate_completion(commandline, config=None):
 
     output.extend(config.get_included_files_content())
 
-    completion_func, wrapper_code = zsh_wrapper.generate_wrapper(functions)
+    completion_func, wrapper_code = zsh_wrapper.generate_wrapper(ctxt, commandline)
 
     for code in helpers.get_used_functions_code():
         output.append(code)

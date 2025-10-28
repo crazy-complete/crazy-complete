@@ -563,7 +563,7 @@ if test -z "$comp" || test (string sub -s -1 -l 1 -- $comp) = $sep1
   return
 end
 
-function __call_func_for_key -S
+function %PREFIX%__call_func_for_key -S
   set -l i
   for i in (command seq 1 (count $keys))
     if test $keys[$i] = $argv[1]
@@ -586,7 +586,7 @@ switch $pair
       set comp (string sub -e -$value_len -- $comp)
     end
 
-    for value in (__call_func_for_key $split[1])
+    for value in (%PREFIX%__call_func_for_key $split[1])
       printf '%s%s\n' $comp $value
     end
   case '*'
