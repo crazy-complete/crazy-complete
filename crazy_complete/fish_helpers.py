@@ -724,14 +724,6 @@ if test "$(string sub -s -1 -l 1 -- $comp)" = '%'
 end
 ''', ['get_completing_arg'])
 
-_UID_LIST = helpers.FishFunction('uid_list', r'''
-command getent passwd | command awk -F: '{printf "%s\t%s\n", $3, $1}'
-''')
-
-_GID_LIST = helpers.FishFunction('gid_list', r'''
-command getent group | command awk -F: '{printf "%s\t%s\n", $3, $1}'
-''')
-
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -797,8 +789,6 @@ class FishHelpers(helpers.GeneralHelpers):
         self.add_function(_MIME_FILE)
         self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
         self.add_function(_COMMANDLINE_STRING)
-        self.add_function(_UID_LIST)
-        self.add_function(_GID_LIST)
         self.add_function(_NET_INTERFACES_LIST)
         self.add_function(_TIMEZONE_LIST)
         self.add_function(_ALSA_LIST_CARDS)

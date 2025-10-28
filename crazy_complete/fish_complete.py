@@ -506,12 +506,10 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompletionCommand(ctxt, [func])
 
     def uid(self, ctxt, _trace):
-        func = ctxt.helpers.use_function('uid_list')
-        return FishCompletionCommand(ctxt, [func])
+        return FishCompletionCommand(ctxt, ['__fish_complete_user_ids'])
 
     def gid(self, ctxt, _trace):
-        func = ctxt.helpers.use_function('gid_list')
-        return FishCompletionCommand(ctxt, [func])
+        return FishCompletionCommand(ctxt, ['__fish_complete_group_ids'])
 
     def filesystem_type(self, ctxt, _trace):
         cmd = "command cat /proc/filesystems | command awk '{print $2}'"
