@@ -132,3 +132,23 @@ def is_valid_variable_name(string):
     '''Check if string is a valid shell variable name.'''
 
     return _VALID_VARIABLE_RE.fullmatch(string)
+
+
+def strip_comments(string):
+    '''Strip shell comments from string.'''
+
+    lines = []
+
+    for line in string.split('\n'):
+        if line.lstrip().startswith('#'):
+            continue
+
+        lines.append(line)
+
+    return '\n'.join(lines)
+
+
+def strip_double_empty_lines(string):
+    '''Collapse triple newlines into double newlines.'''
+
+    return string.replace('\n\n\n', '\n\n')

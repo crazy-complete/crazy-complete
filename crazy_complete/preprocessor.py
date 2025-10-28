@@ -1,5 +1,7 @@
 '''Contains code for preprocessing text.'''
 
+from .str_utils import strip_double_empty_lines
+
 
 def preprocess(string, defines):
     '''Simple preprocessor function with #ifdef, #else, and #endif support.'''
@@ -38,12 +40,6 @@ def preprocess(string, defines):
         raise SyntaxError("Unclosed #ifdef")
 
     return ''.join(output)
-
-
-def strip_double_empty_lines(string):
-    '''Collapse triple newlines into double newlines.'''
-
-    return string.replace('\n\n\n', '\n\n')
 
 
 def _test():

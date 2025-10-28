@@ -3,7 +3,7 @@
 from . import cli
 from . import shell
 from . import preprocessor
-from .str_utils import indent
+from .str_utils import indent, strip_comments, strip_double_empty_lines
 
 
 # pylint: disable=too-few-public-methods
@@ -81,7 +81,8 @@ def make_completion_funcname_for_context(ctxt, progname):
 class GeneralHelpers:
     '''Class for including functions in the generation process.'''
 
-    def __init__(self, function_prefix, function_class):
+    def __init__(self, config, function_prefix, function_class):
+        self.config = config
         self.function_prefix = function_prefix
         self.function_class = function_class
 
@@ -182,6 +183,11 @@ class GeneralHelpers:
 
             for dep_func in function.dependencies:
                 code = code.replace(dep_func, self.get_real_function_name(dep_func))
+
+            if not self.config.keep_comments:
+                code = strip_comments(code)
+
+            code = strip_double_empty_lines(code)
 
             r.append(code)
 

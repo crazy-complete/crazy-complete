@@ -402,8 +402,8 @@ _describe 'ALSA device' devices
 class ZshHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Zsh.'''
 
-    def __init__(self, function_prefix):
-        super().__init__(function_prefix, helpers.ShellFunction)
+    def __init__(self, config, function_prefix):
+        super().__init__(config, function_prefix, helpers.ShellFunction)
         self.add_function(_QUERY)
         self.add_function(_EXEC)
         self.add_function(_PREFIX)

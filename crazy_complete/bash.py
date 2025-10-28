@@ -195,7 +195,7 @@ def generate_completion(commandline, config=None):
         config = config_.Config()
 
     commandline = generation.enhance_commandline(commandline, config)
-    helpers = bash_helpers.BashHelpers(commandline.prog)
+    helpers = bash_helpers.BashHelpers(config, commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
 
     if ctxt.config.bash_completions_version >= (2, 12):

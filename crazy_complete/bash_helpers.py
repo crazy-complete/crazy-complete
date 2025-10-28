@@ -554,8 +554,8 @@ COMPREPLY=($(compgen -W "${devices[*]}" -- "$cur"))
 class BashHelpers(helpers.GeneralHelpers):
     '''Class holding helper functions for Bash.'''
 
-    def __init__(self, function_prefix):
-        super().__init__(function_prefix, helpers.ShellFunction)
+    def __init__(self, config, function_prefix):
+        super().__init__(config, function_prefix, helpers.ShellFunction)
         self.add_function(_COMPGEN_W_REPLACEMENT)
         self.add_function(_MY_DEQUOTE)
         self.add_function(_PREFIX)

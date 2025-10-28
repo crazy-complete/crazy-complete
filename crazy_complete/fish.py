@@ -247,7 +247,7 @@ def generate_completion(commandline, config=None):
         config = config_.Config()
 
     commandline = generation.enhance_commandline(commandline, config)
-    helpers = fish_helpers.FishHelpers(commandline.prog)
+    helpers = fish_helpers.FishHelpers(config, commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
     result = FishCompletionGenerator(ctxt, commandline)
 

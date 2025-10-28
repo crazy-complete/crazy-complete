@@ -255,7 +255,7 @@ def generate_completion(commandline, config=None):
         config = config_.Config()
 
     commandline = generation.enhance_commandline(commandline, config)
-    helpers = zsh_helpers.ZshHelpers(commandline.prog)
+    helpers = zsh_helpers.ZshHelpers(config, commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
     functions = generation.visit_commandlines(ZshCompletionFunction, ctxt, commandline)
     all_progs = ' '.join([commandline.prog] + commandline.aliases)

@@ -20,6 +20,7 @@ class Config:
         self.vim_modeline           = True
         self.include_files          = []
         self.comments               = []
+        self.keep_comments          = False
         self.bash_completions_version = (2,)
         self.zsh_compdef            = True
         self.fish_fast              = False
@@ -235,6 +236,22 @@ class Config:
         _assert_is_bool(enable, "set_zsh_compdef", "enable")
 
         self.zsh_compdef = enable
+
+    def set_keep_comments(self, enable):
+        '''Sets whether comments shall be included in the generated code.
+
+        Args:
+            enable (bool):
+                If True, comments are included.
+                if False, don't include comments.
+
+        Notes:
+            This feature defaults to `False`.
+        '''
+
+        _assert_is_bool(enable, "set_keep_comments", "enable")
+
+        self.keep_comments = enable
 
     def set_fish_fast(self, enable):
         '''Use faster conditions at the cost of correctness.'''
