@@ -1,7 +1,5 @@
 '''Contains code for preprocessing text.'''
 
-from .str_utils import strip_double_empty_lines
-
 
 def preprocess(string, defines):
     '''Simple preprocessor function with #ifdef, #else, and #endif support.'''

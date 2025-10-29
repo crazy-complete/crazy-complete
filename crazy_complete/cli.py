@@ -31,7 +31,7 @@ def is_extended_bool(obj):
 
 
 class CommandLine:
-    '''Represents a command line interface with options, positionals, and subcommands.'''
+    '''Represents a command line with options, positionals, and subcommands.'''
 
     def __init__(self,
                  prog,
@@ -45,13 +45,29 @@ class CommandLine:
         '''Initializes a CommandLine object with the specified parameters.
 
         Args:
-            prog (str): The name of the program (or subcommand).
-            help (str): The help message for the program (or subcommand).
-            parent (CommandLine or None): The parent command line object, if any.
-            aliases (list of str or None): Aliases for this command.
-            abbreviate_commands (ExtendedBool): Specifies if commands can be abbreviated.
-            abbreviate_options (ExtendedBool): Specifies if options can be abbreviated.
-            inherit_options (ExtendedBool): Specifies if options are visible to subcommands.
+            prog (str):
+                The name of the program (or subcommand).
+
+            help (str):
+                The help message for the program (or subcommand).
+
+            parent (CommandLine or None):
+                The parent command line object, if any.
+
+            aliases (list of str or None):
+                Aliases for this command.
+
+            wraps (str or None):
+                Specify the command to inherit options from.
+
+            abbreviate_commands (ExtendedBool):
+                Specifies if commands can be abbreviated.
+
+            abbreviate_options (ExtendedBool):
+                Specifies if options can be abbreviated.
+
+            inherit_options (ExtendedBool):
+                Specifies if options are visible to subcommands.
         '''
         if aliases is None:
             aliases = []
@@ -142,7 +158,7 @@ class CommandLine:
         return MutuallyExclusiveGroup(self, group)
 
     def add_subcommands(self):
-        '''Adds a subcommands option to the command line if none exists already.
+        '''Adds a subcommands option to the command line.
 
         Returns:
             SubCommandsOption: The newly created subcommands option.
@@ -262,7 +278,8 @@ class CommandLine:
         '''Gets a list of positional arguments associated with the command line.
 
         Note:
-            SubCommandsOption objects are not considered positional arguments and are not included in the list.
+            SubCommandsOption objects are not considered positional arguments
+            and are not included in the list.
 
         Returns:
             list: A list of positional arguments
@@ -274,7 +291,8 @@ class CommandLine:
         '''Gets the subcommands of the command line.
 
         Returns:
-            SubCommandsOption or None: The subcommands option if it exists, otherwise None.
+            SubCommandsOption or None:
+                The subcommands option if it exists, otherwise None.
         '''
 
         return self.subcommands
@@ -283,7 +301,8 @@ class CommandLine:
         '''Gets a list of parent CommandLine objects.
 
         Args:
-            include_self (bool): If True, includes the current CommandLine object in the list.
+            include_self (bool):
+                If True, includes the current CommandLine object in the list.
 
         Returns:
             list: A list of parent CommandLine objects.
@@ -455,15 +474,32 @@ class Positional:
         '''Initializes a Positional object with the specified parameters.
 
         Args:
-            parent (CommandLine): The parent command line object, if any.
-            number (int): The number of the positional argument (starting from 1)
-            metavar (str): The metavar for the positional.
-            help (str): The help message for the positional.
-            repeatable (bool): Specifies if positional can be specified more times
-            complete (list): The completion specification for the positional.
-            nosort (bool): Do not sort the completion suggestions.
-            when (str): Specifies a condition for showing this positional.
-            capture (str): Specifies the variable name for capturing
+            parent (CommandLine):
+                The parent command line object, if any.
+
+            number (int):
+                The number of the positional argument (starting from 1)
+
+            metavar (str):
+                The metavar for the positional.
+
+            help (str):
+                The help message for the positional.
+
+            repeatable (bool):
+                Specifies if positional can be specified more times
+
+            complete (list):
+                The completion specification for the positional.
+
+            nosort (bool):
+                Do not sort the completion suggestions.
+
+            when (str):
+                Specifies a condition for showing this positional.
+
+            capture (str):
+                Specifies the variable name for capturing
         '''
 
         if not isinstance(parent, (CommandLine, NoneType)):
@@ -531,8 +567,8 @@ class Positional:
         return positional_no
 
     def get_positional_num(self):
-        '''Returns the number of the current positional argument within the current
-        commandline, including parent commandlines.
+        '''Returns the number of the current positional argument within the
+        current commandline, including parent commandlines.
 
         Note:
             This is the same as `CommandLine.get_positional_index() + 1`.
@@ -578,19 +614,44 @@ class Option:
         '''Initializes an Option object with the specified parameters.
 
         Args:
-            parent (CommandLine): The parent command line object, if any.
-            option_strings (list of str): The list of option strings.
-            metavar (str): The metavar for the option.
-            help (str): The help message for the option.
-            complete (tuple): The completion specification for the option.
-            nosort (bool): Do not sort the completion suggestions.
-            optional_arg (bool): Specifies if option's argument is optional.
-            groups (list of str): Specify to which mutually exclusive groups this option belongs to.
-            repeatable (ExtendedBool): Specifies if the option can be repeated.
-            final (bool): If True, no more options are suggested after this one.
-            hidden (bool): Specifies if this option is hidden.
-            when (str): Specifies a condition for showing this option.
-            capture (str): Specifies the variable name for capturing
+            parent (CommandLine):
+                The parent command line object, if any.
+
+            option_strings (list of str):
+                The list of option strings.
+
+            metavar (str):
+                The metavar for the option.
+
+            help (str):
+                The help message for the option.
+
+            complete (tuple):
+                The completion specification for the option.
+
+            nosort (bool):
+                Do not sort the completion suggestions.
+
+            optional_arg (bool):
+                Specifies if option's argument is optional.
+
+            groups (list of str):
+                Specify to which mutually exclusive groups this option belongs to.
+
+            repeatable (ExtendedBool):
+                Specifies if the option can be repeated.
+
+            final (bool):
+                If True, no more options are suggested after this one.
+
+            hidden (bool):
+                Specifies if this option is hidden.
+
+            when (str):
+                Specifies a condition for showing this option.
+
+            capture (str):
+                Specifies the variable name for capturing
 
         Returns:
             Option: The newly added Option object.

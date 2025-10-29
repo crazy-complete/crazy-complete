@@ -3,7 +3,7 @@
 from . import cli
 from . import shell
 from . import preprocessor
-from .str_utils import indent, strip_comments, strip_double_empty_lines
+from .str_utils import (indent, strip_comments, strip_double_empty_lines)
 
 
 # pylint: disable=too-few-public-methods
@@ -31,7 +31,7 @@ class ShellFunction(FunctionBase):
 
         code = self.code.replace('%FUNCNAME%', funcname)
         code = preprocessor.preprocess(code, defines)
-        code = preprocessor.strip_double_empty_lines(code)
+        code = strip_double_empty_lines(code)
 
         r  = '%s() {\n' % funcname
         r += '%s\n'     % indent(code, 2).rstrip()
@@ -48,7 +48,7 @@ class FishFunction(FunctionBase):
 
         code = self.code.replace('%FUNCNAME%', funcname)
         code = preprocessor.preprocess(code, defines)
-        code = preprocessor.strip_double_empty_lines(code)
+        code = strip_double_empty_lines(code)
 
         r  = 'function %s\n' % funcname
         r += '%s\n'          % indent(code, 2).rstrip()

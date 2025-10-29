@@ -1,6 +1,9 @@
 '''Version-dependent Bash code.'''
 
 
+# pylint: disable=missing-function-docstring
+
+
 def filedir(ctxt):
     if ctxt.config.bash_completions_version >= (2, 12):
         return '_comp_compgen_filedir'

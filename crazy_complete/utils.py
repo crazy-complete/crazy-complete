@@ -21,9 +21,14 @@ class GeneralAbbreviationGenerator:
     '''A class for generating abbreviations from a list of words.
 
     Attributes:
-        min_abbreviated_length (int): The minimum length of an abbreviation.
-        abbreviations (dict): A dictionary mapping each word to its list of abbreviations.
-        min_lengths (dict): A dictionary mapping each word to its minimum abbreviation length.
+        min_abbreviated_length (int):
+            The minimum length of an abbreviation.
+
+        abbreviations (dict):
+            A dictionary mapping each word to its list of abbreviations.
+
+        min_lengths (dict):
+            A dictionary mapping each word to its minimum abbreviation length.
     '''
 
     def __init__(self, min_abbreviated_length, words):

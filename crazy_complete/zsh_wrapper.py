@@ -1,7 +1,6 @@
 '''Code for generating wrapper.'''
 
 from . import algo
-from . import shell
 from . import preprocessor
 
 _CODE = r'''

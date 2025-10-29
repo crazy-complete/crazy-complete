@@ -434,7 +434,7 @@ class ZshCompleter(shell.ShellCompleter):
         func = obj.get_function()
         return ZshComplFunc(ctxt, [prefix_func, prefix, func], needs_braces=True)
 
-    def ip_address(self, ctxt, trace_, type_='all'):
+    def ip_address(self, ctxt, _trace, type_='all'):
         if type_ == 'ipv4':
             return ZshComplFunc(ctxt, ['_bind_addresses', '-4'])
 

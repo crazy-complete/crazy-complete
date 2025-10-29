@@ -129,7 +129,7 @@ class FishCompletionGenerator:
 
             if not self.ctxt.config.fish_inline_conditions:
                 if cmd.condition is not None:
-                    cmd.set_condition(self.conditions.add(cmd.condition.s), raw=True)
+                    cmd.set_condition(self.conditions.add(cmd.condition.string), raw=True)
 
             self.lines.append(cmd.get())
 

@@ -91,7 +91,7 @@ def _check_prog_in_dictionary(dictionary):
     try:
         validate_prog(dictionary['prog'])
     except CrazyError as e:
-        raise CrazyError(f'prog: {e}')
+        raise CrazyError(f'prog: {e}') from e
 
 
 def _get_commandline_by_path(root, path):

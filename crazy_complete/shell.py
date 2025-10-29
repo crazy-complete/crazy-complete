@@ -3,7 +3,6 @@
 import re
 import shlex
 
-from . import cli
 from . import utils
 
 
@@ -72,6 +71,8 @@ class ShellCompleter:
     '''Base class for argument completion.'''
 
     # pylint: disable=missing-function-docstring
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
 
     def complete(self, ctxt, trace, command, *a):
         if not hasattr(self, command):

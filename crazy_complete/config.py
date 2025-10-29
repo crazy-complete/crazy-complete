@@ -10,6 +10,7 @@ class Config:
     '''Class representing configuration settings for command line completion.'''
 
     # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-public-methods
 
     def __init__(self):
         self.function_prefix        = '_$PROG'

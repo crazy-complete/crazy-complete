@@ -7,65 +7,76 @@ from . import shell
 class FishString:
     '''A utility class for handling command-line strings that may or may not require escaping.
 
-    When building command-line commands, it's important to ensure that strings are properly
-    escaped to prevent shell injection vulnerabilities or syntax errors. However, in some
-    cases, the string may already be escaped, and applying escaping again would result in
-    incorrect behavior. The `FishString` class provides an abstraction to manage both
-    escaped and unescaped strings.
+    When building command-line commands, it's important to ensure that strings
+    are properly escaped to prevent shell injection vulnerabilities or
+    syntax errors. However, in some cases, the string may already be escaped,
+    and applying escaping again would result in incorrect behavior.
+    The `FishString` class provides an abstraction to manage both escaped and
+    unescaped strings.
 
     Attributes:
-        s (str):
+        string (str):
             The string that represents the command or command argument.
+
         raw (bool):
-            A flag that indicates whether the string is already escaped. If `True`,
-            the string is assumed to be already escaped and will not be escaped again.
+            A flag that indicates whether the string is already escaped.
+            If `True`, the string is assumed to be already escaped and will
+            not be escaped again.
 
     Args:
-        s (str):
+        string (str):
             The string to be used in the command.
+
         raw (bool, optional):
-            If `True`, the string will be treated as already escaped. Defaults to `False`.
+            If `True`, the string will be treated as already escaped.
+            Defaults to `False`.
 
     Methods:
         escape():
-            Returns the escaped version of the string, unless the string is already escaped (`raw=True`).
+            Returns the escaped version of the string, unless the string is
+            already escaped (`raw=True`).
+
         __str__():
-            Returns the raw string `s` for direct use or display.
+            Returns the raw string `string` for direct use or display.
     '''
 
-    def __init__(self, s, raw=False):
+    def __init__(self, string, raw=False):
         '''Initializes a FishString instance.
 
         Args:
-            s (str):
+            string (str):
                 The string to be used for command-line purposes.
+
             raw (bool, optional):
                 If True, indicates that the string `s` is already escaped
                 and should not be escaped again. Defaults to False.
         '''
-        assert isinstance(s, str)
+        assert isinstance(string, str)
         assert isinstance(raw, bool)
-        self.s = s
+        self.string = string
         self.raw = raw
 
     def escape(self):
         '''Escapes the string unless it's marked as already escaped.
 
-        If the `raw` attribute is set to `True`, the method returns the string without any changes.
-        Otherwise, it applies shell escaping to ensure the string is safe to use in a command-line context.
+        If the `raw` attribute is set to `True`, the method returns the string
+        without any changes.
+
+        Otherwise, it applies shell escaping to ensure the string is safe to
+        use in a command-line context.
 
         Returns:
             str: The escaped string, or the raw string if it's already escaped.
         '''
         if self.raw:
-            return self.s
-        return shell.escape(self.s)
+            return self.string
+        return shell.escape(self.string)
 
     def __str__(self):
-        return self.s
+        return self.string
 
     def __repr__(self):
-        return repr(self.s)
+        return repr(self.string)
 
 
 def make_fish_string(s, raw):

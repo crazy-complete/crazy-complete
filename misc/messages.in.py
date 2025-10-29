@@ -3,6 +3,8 @@
 import os
 import locale
 
+# flake8: noqa: E501
+# pylint: disable=line-too-long
 # pylint: disable=missing-function-docstring
 
 
