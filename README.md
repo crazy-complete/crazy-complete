@@ -20,7 +20,6 @@ Table of Contents
 - [Disadvantages of crazy-complete](#disadvantages-of-crazy-complete)
 - [Installation](#installation)
 - [Synposis](#synopsis)
-- [Options](#options)
 - [Usage examples](#usage-examples)
 - [Definition file examples](#definition-file-examples)
 - [Documentation](#documentation)
@@ -60,7 +59,7 @@ While crazy-complete offers many advantages, there are some trade-offs to be awa
 - **Code size and verbosity:**
   Its biggest strength - **secure, fully controlled completions** - can also be its biggest weakness.
   - For **Bash**, this means the generated scripts contain a significant amount of boilerplate code for parsing options and positional arguments.
-  - For **Fish**, large command-line definitions may result in slower completions, although performance is usually acceptable for most use cases.
+  - For **Fish**, large command-line definitions (more than 500 options) may result in slower completions, although performance is usually acceptable for most use cases.
   - **Mitigation:** There are ways to reduce script size and improve performance. See [Tips And Tricks](docs/documentation.md#tips-and-tricks) for more details.
 - **Not as optimized as hand-written scripts:**
    The generated scripts prioritize correctness and reliability over minimal size or maximum performance. Hand-written scripts may be more compact and slightly faster in some cases.
@@ -99,54 +98,7 @@ Synopsis
 
 > `crazy-complete [OPTIONS] {bash,fish,zsh,yaml,json} <DEFINITION_FILE>`
 
-Options
-=======
-
-**--input-type={yaml,json,python,help,auto}**
-
-> Specify input file type. With 'auto' the file extension will be used
-> to determine the input type.
-
-**--abbreviate-commands={True,False}**
-
-> Sets whether commands can be abbreviated.
-
-**--abbreviate-options={True,False}**
-
-> Sets whether options can be abbreviated.
-> Note: abbreviated options are not supported by FISH and ZSH.
-
-**--repeatable-options={True,False}**
-
-> Sets whether options are suggested multiple times during completion.
-
-**--inherit-options={True,False}**
-
-> Sets whether parent options are visible to subcommands.
-
-**--disable=FEATURES** *(hidden,final,groups,repeatable,when)*
-
-> Disable a list of features.
-
-**--vim-modeline={True,False}**
-
-> Sets whether a vim modeline comment shall be appended to the generated code.
-
-**--include-file=FILE**
-
-> Include contents of FILE in output.
-
-**-o|--output=FILE**
-
-> Write output to destination file [default: stdout].
-
-**-i|--install-system-wide**
-
-> Write output to the system-wide completions dir of shell.
-
-**-u|--uninstall-system-wide**
-
-> Uninstall the system-wide completion file for program.
+See [docs/documentation.md#options](docs/documentation.md#options) for a list of options.
 
 Completions for crazy-complete
 ==============================
@@ -185,10 +137,10 @@ crazy-complete --input-type=help yaml help_file
 grep --help | crazy-complete --input-type=help yaml /dev/stdin
 ```
 
-Generate shell auto completions for BASH:
+Generate shell auto completions for Bash:
 
 ```
-crazy-complete --input-type=yaml --include my_program.bash bash my_program.yaml
+crazy-complete --input-type=yaml --include-file my_program.bash bash my_program.yaml
 ```
 
 Definition file examples

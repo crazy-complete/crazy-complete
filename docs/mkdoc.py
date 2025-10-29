@@ -109,6 +109,8 @@ class Option:
         self.choices = None
         self.default = None
         self.short = None
+        self.long = None
+        self.optional = False
 
         for key, value in dictionary.items():
             if key == 'options':
@@ -117,6 +119,9 @@ class Option:
             elif key == 'short':
                 assert isinstance(value, str), key
                 self.short = value
+            elif key == 'long':
+                assert isinstance(value, str), key
+                self.long = value
             elif key == 'metavar':
                 assert isinstance(value, str), key
                 self.metavar = value
@@ -126,6 +131,9 @@ class Option:
             elif key == 'choices':
                 assert isinstance(value, (list, dict)), key
                 self.choices = value
+            elif key == 'optional':
+                assert isinstance(value, bool), key
+                self.optional = value
             else:
                 raise Exception(f"Unknown key: {key}")
 
@@ -201,7 +209,6 @@ def make_markup_summary_table(header, commands, pre_text=None):
 
     return '\n\n'.join(r)
 
-
 def make_markup_command(command):
     r =  [f'### {escape_underscore(command.command)}']
     r += [f'> {command.short}']
@@ -228,7 +235,6 @@ def make_markup_command(command):
 
 def make_markup(by_category):
     r = []
-    r = []
     r += [make_markup_summary_table('Meta commands', BY_CATEGORY['meta'])]
     r += [make_markup_summary_table('Built-in commands', BY_CATEGORY['basic'])]
     r += [make_markup_summary_table('User-defined commands', BY_CATEGORY['custom'])]
@@ -238,7 +244,49 @@ def make_markup(by_category):
         for command in commands:
             r += [make_markup_command(command)]
 
-    return '\n\n'.join(r)
+    return '\n\n---\n\n'.join(r)
+
+
+def make_option_markup(option):
+    option_strings = '|'.join(option.options)
+
+    r = f'**{option_strings}'
+    if option.metavar:
+        r += '='
+    if option.optional:
+        r += '['
+    if option.metavar:
+        r += option.metavar
+    if option.optional:
+        r += ']'
+    r += '**'
+
+    if option.choices:
+        choices = ', '.join(option.choices)
+        r += f' *({choices})*'
+
+    r += f'\n\n> {option.short}'
+
+    if option.long:
+        r += f'\n\n{option.long.strip()}'
+
+    if isinstance(option.choices, dict):
+        r += '\n'
+        for key, value in option.choices.items():
+            r += f'\n- {key}: {value}'
+
+    if option.default:
+        r += f'\n\nThis option defaults to `{option.default}`.'
+
+    return r
+
+def options_markup(options):
+    r = []
+    for option in options:
+        r.append(make_option_markup(option))
+
+    return '\n\n---\n\n'.join(r)
+
 
 def make_python_commands(commands):
     data = []
@@ -282,21 +330,26 @@ with open(OPTIONS_INFILE, 'r', encoding='utf-8') as fh:
 COMMANDS = sorted(COMMANDS, key=lambda c: c.command)
 
 # =============================================================================
-# Generate command files
+# Generate command and option files
 # =============================================================================
 
 for command in COMMANDS:
     BY_CATEGORY[command.category].append(command)
 
 commands_markup = make_markup(BY_CATEGORY)
+options_markup = options_markup(OPTIONS)
 
 with open(COMMANDS_OUTFILE, 'w', encoding='utf-8') as fh:
     fh.write(commands_markup)
+
+with open(OPTIONS_OUTFILE, 'w', encoding='utf-8') as fh:
+    fh.write(options_markup)
 
 with open(DOCUMENTATION_INFILE, 'r', encoding='utf-8') as fh:
     content = fh.read()
 
 content = content.replace('%COMMANDS%', commands_markup)
+content = content.replace('%OPTIONS%', options_markup)
 
 with open(DOCUMENTATION_OUTFILE, 'w', encoding='utf-8') as fh:
     fh.write(content)

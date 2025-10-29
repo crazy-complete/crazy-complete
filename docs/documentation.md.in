@@ -12,6 +12,7 @@ This documentation provides an overview of how to define shell completion for co
   - [Built-in Commands](#built-in-commands)
   - [User-Defined Commands](#user-defined-commands)
   - [Bonus Commands](#bonus-commands)
+- [Options](#options)
 - [When Conditionals](#when-conditionals)
 - [Capturing Options](#capturing-options)
 - [Tips and Tricks](#tips-and-tricks)
@@ -129,6 +130,10 @@ help: "<SUBCOMMAND DESCRIPTION>"
 ## Completion Commands
 
 %COMMANDS%
+
+### Options
+
+%OPTIONS%
 
 ## When Conditionals
 

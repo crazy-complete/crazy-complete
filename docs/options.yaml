@@ -1,0 +1,195 @@
+options: ['--version']
+short: 'Show program version'
+
+---
+
+options: ['--help']
+short: 'Show program help'
+
+---
+
+options: ['--manual']
+metavar: 'TOPIC'
+optional: true
+short: 'Show a manual for a help topic'
+
+---
+
+options: ['--input-type']
+metavar: 'TYPE'
+default: 'auto'
+choices: ['yaml', 'json', 'python', 'help', 'auto']
+short: 'Specify input file type. If "auto", input type is determined by the file extension'
+long: |
+  For security reasons, reading python files must be explicitly enabled.
+
+---
+
+options: ['--abbreviate-commands']
+metavar: 'BOOL'
+default: 'False'
+choices: ['True', 'False']
+short: 'Sets whether sub commands can be abbreviated'
+
+---
+
+options: ['--abbreviate-options']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'False'
+short: 'Sets whether options can be abbreviated'
+long: |
+  Currently only supported in Bash.
+
+---
+
+options: ['--repeatable-options']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'False'
+short: 'Sets whether options are suggested multiple times during completion'
+long: |
+  This only overrides the `repeatable` parameter of options that don't have
+  it explicitly set to `True` or `False`.
+  
+  If you wish to make all options repeatable regardless of how they are
+  defined in the definition file, use `--disable=repeatable`.
+
+---
+
+options: ['--inherit-options']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'False'
+short: 'Sets whether parent options are visible to subcommands'
+
+---
+
+options: ['--option-stacking']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'True'
+short: 'Sets whether short option stacking is allowed'
+long: |
+  Enables or disables short option stacking, where multiple short options are
+  combined in a single argument (e.g. `-fo` instead of `-f -o`).
+
+---
+
+options: ['--disable']
+metavar: 'FEATURES'
+short: 'Disable features'
+choices: {
+  'hidden':     'Disable hidden options',
+  'final':      'Disable final options',
+  'groups':     'Disable option groups',
+  'repeatable': 'Make all options repeatable',
+  'when':       'Disable conditional options and positionals'
+}
+
+---
+
+options: ['--vim-modeline']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'True'
+short: 'Sets whether a vim modeline comment shall be appended to the generated code'
+long: |
+  The modeline comment looks like this:
+  
+    `# vim: ft=zsh ts=2 sts=2 sw=2 et`
+
+---
+
+options: ['--bash-completions-version']
+metavar: 'VERSION'
+default: '2.0'
+short: 'Generate code for a specific bash-completions version'
+long: |
+  Use a value greater or equal to `2.12` to generate code for the "new"
+  version of bash-completions.
+
+---
+
+options: ['--zsh-compdef']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'True'
+short: 'Sets whether #compdef is used in zsh scripts'
+long: |
+  Set this option to `False` if the generated script should be sourcable.
+
+---
+
+options: ['--fish-fast']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'False'
+short: 'Use faster commandline parsing for fish at the cost of correctness'
+
+---
+
+options: ['--fish-inline-conditions']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'False'
+short:   "Don't store conditions in a variable"
+
+---
+
+options: ['--parser-variable']
+metavar: 'VARIABLE'
+short: 'Specify the variable name of the ArgumentParser object (for --input-type=python)'
+
+---
+
+options: ['--include-file']
+metavar: "FILE"
+short: 'Include file in output'
+
+---
+
+options: ['--comment']
+metavar: "COMMENT"
+short: 'Add a comment to output'
+
+---
+
+options: ['--keep-comments']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'False'
+short: 'Keep comments of helper functions used in the generated code'
+
+---
+
+options: ['--function-prefix']
+metavar: 'PREFIX'
+default: "_$PROG"
+short: "Set the prefix for generated functions"
+long: |
+  The placeholder `$PROG` will be replaced by the program name.
+
+---
+
+options: ['--debug']
+short: 'Enable debug mode'
+long: |
+  Keep comments, generate shell code for debugging and print a full stack
+  trace in case of an error.
+
+---
+
+options: ['-o', '--output']
+metavar: 'FILE'
+short: 'Write output to destination file [default: stdout]'
+
+---
+
+options: ['-i', '--install-system-wide']
+short: 'Write output to the system-wide completions dir of shell'
+
+---
+
+options: ['-u', '--uninstall-system-wide']
+short: 'Uninstall the system-wide completion file for program'

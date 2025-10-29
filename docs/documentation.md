@@ -12,6 +12,7 @@ This documentation provides an overview of how to define shell completion for co
   - [Built-in Commands](#built-in-commands)
   - [User-Defined Commands](#user-defined-commands)
   - [Bonus Commands](#bonus-commands)
+- [Options](#options)
 - [When Conditionals](#when-conditionals)
 - [Capturing Options](#capturing-options)
 - [Tips and Tricks](#tips-and-tricks)
@@ -138,6 +139,8 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [none](#none)                       | No completion, but specifies that an argument is required |
 | [prefix](#prefix)                   | Prefix completion by a string                             |
 
+---
+
 ### Built-in commands
 
 | Command                                    | Description                                    |
@@ -172,6 +175,8 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [value\_list](#value_list)                 | Complete a comma-separated list of values      |
 | [variable](#variable)                      | Complete a shell variable name                 |
 
+---
+
 ### User-defined commands
 
 | Command                          | Description                                                                 |
@@ -179,6 +184,8 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [exec](#exec)                    | Complete by the output of a command or function                             |
 | [exec\_fast](#exec_fast)         | Complete by the output of a command or function (fast and unsafe)           |
 | [exec\_internal](#exec_internal) | Complete by a function that uses the shell's internal completion mechanisms |
+
+---
 
 ### Bonus commands
 
@@ -192,6 +199,8 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [mountpoint](#mountpoint)        | Complete a mountpoint        |
 | [net\_interface](#net_interface) | Complete a network interface |
 | [timezone](#timezone)            | Complete a timezone          |
+
+---
 
 ### alsa\_card
 
@@ -213,6 +222,8 @@ options:
 
 - [alsa\_device](#alsa_device): For completing an ALSA device
 
+---
+
 ### alsa\_device
 
 > Complete an ALSA device
@@ -233,6 +244,8 @@ hw:0  hw:1
 
 - [alsa\_card](#alsa_card): For completing an ALSA card
 
+---
+
 ### charset
 
 > Complete a charset
@@ -248,6 +261,8 @@ options:
 ~ > example --charset=A<TAB>
 ANSI_X3.110-1983  ANSI_X3.4-1968    ARMSCII-8         ASMO_449
 ```
+
+---
 
 ### locale
 
@@ -266,6 +281,8 @@ C  C.UTF-8  de_DE  de_DE@euro  de_DE.iso88591  de_DE.iso885915@euro
 de_DE.UTF-8  deutsch  en_US  en_US.iso88591  en_US.UTF-8  german  POSIX
 ```
 
+---
+
 ### login\_shell
 
 > Complete a login shell
@@ -283,6 +300,8 @@ options:
 [...]
 ```
 
+---
+
 ### mountpoint
 
 > Complete a mountpoint
@@ -299,6 +318,8 @@ options:
 /  /boot  /home  /proc  /run  /sys  /tmp
 [...]
 ```
+
+---
 
 ### net\_interface
 
@@ -321,6 +342,8 @@ eno1  enp1s0  lo  wlo1  wlp2s0
 
 - [ip\_address](#ip_address): For completing an ip address
 
+---
+
 ### timezone
 
 > Complete a timezone
@@ -337,6 +360,8 @@ options:
 Belfast     Belgrade    Berlin      Bratislava
 Brussels    Bucharest   Budapest    Busingen
 ```
+
+---
 
 ### choices
 
@@ -370,6 +395,8 @@ options:
 ~ > example --choices-2=<TAB>
 Item 1  (Description 1)  Item 2  (Description 2)
 ```
+
+---
 
 ### command
 
@@ -410,6 +437,8 @@ base32    base64    basename  basenc    bash      bashbug
 
 - [commandline\_string](#commandline_string): For completing a command line as a string
 
+---
+
 ### command\_arg
 
 > Complete arguments of a command
@@ -442,6 +471,8 @@ base32    base64    basename  basenc    bash      bashbug
 
 - [commandline\_string](#commandline_string): For completing a command line as a string
 
+---
+
 ### commandline\_string
 
 > Complete a command line as a string
@@ -457,6 +488,8 @@ options:
 ~ > example --commandline='sudo ba<TAB>
 base32    base64    basename  basenc    bash      bashbug
 ```
+
+---
 
 ### date
 
@@ -492,6 +525,8 @@ Mo  Tu  We  Th  Fr  Sa  Su
 
 - [date\_format](#date_format): For completing a date format string
 
+---
+
 ### date\_format
 
 > Complete a date format string
@@ -524,6 +559,8 @@ e     -- day of month ( 1-31)
 
 - [date](#date): For completing a date
 
+---
+
 ### directory
 
 > Complete a directory
@@ -548,6 +585,8 @@ dir1/  dir2/
 **SEE ALSO**
 
 - [directory\_list](#directory_list): For completing a comma-separated list of directories
+
+---
 
 ### directory\_list
 
@@ -578,6 +617,8 @@ directory3  directory4
 
 - [file\_list](#file_list): For completing a comma-separated list of files
 
+---
+
 ### environment
 
 > Complete a shell environment variable name
@@ -594,6 +635,8 @@ options:
 XDG_RUNTIME_DIR  XDG_SEAT  XDG_SESSION_CLASS  XDG_SESSION_ID
 XDG_SESSION_TYPE XDG_VTNR
 ```
+
+---
 
 ### file
 
@@ -634,6 +677,8 @@ dir1/  dir2/  file.c  file.cpp
 
 - [mime\_file](#mime_file): For completing a file based on it's MIME-type
 
+---
+
 ### file\_list
 
 > Complete a comma-separated list of files
@@ -668,6 +713,8 @@ file3  file4
 
 - [directory\_list](#directory_list): For completing a comma-separated list of directories
 
+---
+
 ### filesystem\_type
 
 > Complete a filesystem type
@@ -685,6 +732,8 @@ adfs     autofs   bdev      bfs     binder     binfmt_misc  bpf
 cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
 [...]
 ```
+
+---
 
 ### float
 
@@ -705,6 +754,8 @@ options:
 ~ > example --float=<TAB>
 <NO OUTPUT>
 ```
+
+---
 
 ### gid
 
@@ -734,6 +785,8 @@ options:
 
 - [group](#group): For completing a group name
 
+---
+
 ### group
 
 > Complete a group
@@ -759,6 +812,8 @@ games                   git                     groups
 
 - [gid](#gid): For completing a group id
 
+---
+
 ### history
 
 > Complete based on a shell's history
@@ -778,6 +833,8 @@ options:
 foo@bar mymail@myprovider
 ```
 
+---
+
 ### hostname
 
 > Complete a hostname
@@ -793,6 +850,8 @@ options:
 ~ > example --hostname=<TAB>
 localhost
 ```
+
+---
 
 ### integer
 
@@ -817,6 +876,8 @@ options:
 **SEE ALSO**
 
 - [range](#range): For completing a range of integers
+
+---
 
 ### ip\_address
 
@@ -855,6 +916,8 @@ options:
 
 - [net\_interface](#net_interface): For completing a network interface
 
+---
+
 ### mime\_file
 
 > Complete a file based on it's MIME-type
@@ -873,6 +936,8 @@ options:
 ~ > example --image=<TAB>
 dir1/  dir2/  img.png  img.jpg
 ```
+
+---
 
 ### pid
 
@@ -896,6 +961,8 @@ options:
 
 - [process](#process): For completing a process name
 
+---
+
 ### process
 
 > Complete a process name
@@ -918,6 +985,8 @@ systemd-journald  systemd-logind  systemd-udevd
 
 - [pid](#pid): For completing a PID
 
+---
+
 ### range
 
 > Complete a range of integers
@@ -938,6 +1007,8 @@ options:
 1  3  5  7  9
 ```
 
+---
+
 ### service
 
 > Complete a SystemD service
@@ -954,6 +1025,8 @@ options:
 TODO
 [...]
 ```
+
+---
 
 ### signal
 
@@ -979,6 +1052,8 @@ ILL     -- Illegal instruction
 INT     -- Terminal interrupt signal
 [...]
 ```
+
+---
 
 ### uid
 
@@ -1009,6 +1084,8 @@ options:
 
 - [user](#user): For completing a user name
 
+---
+
 ### user
 
 > Complete a username
@@ -1031,6 +1108,8 @@ dhcpcd                  ftp                     git
 **SEE ALSO**
 
 - [uid](#uid): For completing a user id
+
+---
 
 ### value\_list
 
@@ -1070,6 +1149,8 @@ two  -- Description 2
 
 - [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
 
+---
+
 ### variable
 
 > Complete a shell variable name
@@ -1089,6 +1170,8 @@ HOME      HOSTNAME  HOSTTYPE
 **SEE ALSO**
 
 - [environment](#environment): For completing an environment variable
+
+---
 
 ### combine
 
@@ -1113,6 +1196,8 @@ alpm     avahi    bin               braph                   daemon
 root     rtkit    systemd-coredump  systemd-journal-remote  systemd-network
 [...]
 ```
+
+---
 
 ### key\_value\_list
 
@@ -1177,6 +1262,8 @@ dhcpcd                  git
 
 - [value\_list](#value_list): For completing a comma-separated list of values
 
+---
+
 ### list
 
 > Complete a comma-separated list of any completer
@@ -1212,6 +1299,8 @@ dhcpcd                  git
 
 - [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
 
+---
+
 ### none
 
 > No completion, but specifies that an argument is required
@@ -1232,6 +1321,8 @@ options:
 ~ > example --none=<TAB>
 <NO OUTPUT>
 ```
+
+---
 
 ### prefix
 
@@ -1256,6 +1347,8 @@ options:
 ~ > example --prefix=input:<TAB>
 ~ > example --prefix=input:file1.txt
 ```
+
+---
 
 ### exec
 
@@ -1294,6 +1387,8 @@ Item 1  (Description 1)  Item 2  (Description 2)
 
 - [exec\_fast](#exec_fast): Faster implementation of exec
 
+---
+
 ### exec\_fast
 
 > Complete by the output of a command or function (fast and unsafe)
@@ -1320,6 +1415,8 @@ options:
 1  -- one
 2  -- one
 ```
+
+---
 
 ### exec\_internal
 
@@ -1380,6 +1477,209 @@ append  -- Append data to a file
 read    -- Read data from a file
 write   -- Write data from a file
 ```
+
+### Options
+
+**--version**
+
+> Show program version
+
+---
+
+**--help**
+
+> Show program help
+
+---
+
+**--manual=[TOPIC]**
+
+> Show a manual for a help topic
+
+---
+
+**--input-type=TYPE** *(yaml, json, python, help, auto)*
+
+> Specify input file type. If "auto", input type is determined by the file extension
+
+For security reasons, reading python files must be explicitly enabled.
+
+This option defaults to `auto`.
+
+---
+
+**--abbreviate-commands=BOOL** *(True, False)*
+
+> Sets whether sub commands can be abbreviated
+
+This option defaults to `False`.
+
+---
+
+**--abbreviate-options=BOOL** *(True, False)*
+
+> Sets whether options can be abbreviated
+
+Currently only supported in Bash.
+
+This option defaults to `False`.
+
+---
+
+**--repeatable-options=BOOL** *(True, False)*
+
+> Sets whether options are suggested multiple times during completion
+
+This only overrides the `repeatable` parameter of options that don't have
+it explicitly set to `True` or `False`.
+
+If you wish to make all options repeatable regardless of how they are
+defined in the definition file, use `--disable=repeatable`.
+
+This option defaults to `False`.
+
+---
+
+**--inherit-options=BOOL** *(True, False)*
+
+> Sets whether parent options are visible to subcommands
+
+This option defaults to `False`.
+
+---
+
+**--option-stacking=BOOL** *(True, False)*
+
+> Sets whether short option stacking is allowed
+
+Enables or disables short option stacking, where multiple short options are
+combined in a single argument (e.g. `-fo` instead of `-f -o`).
+
+This option defaults to `True`.
+
+---
+
+**--disable=FEATURES** *(hidden, final, groups, repeatable, when)*
+
+> Disable features
+
+- hidden: Disable hidden options
+- final: Disable final options
+- groups: Disable option groups
+- repeatable: Make all options repeatable
+- when: Disable conditional options and positionals
+
+---
+
+**--vim-modeline=BOOL** *(True, False)*
+
+> Sets whether a vim modeline comment shall be appended to the generated code
+
+The modeline comment looks like this:
+
+  `# vim: ft=zsh ts=2 sts=2 sw=2 et`
+
+This option defaults to `True`.
+
+---
+
+**--bash-completions-version=VERSION**
+
+> Generate code for a specific bash-completions version
+
+Use a value greater or equal to `2.12` to generate code for the "new"
+version of bash-completions.
+
+This option defaults to `2.0`.
+
+---
+
+**--zsh-compdef=BOOL** *(True, False)*
+
+> Sets whether #compdef is used in zsh scripts
+
+Set this option to `False` if the generated script should be sourcable.
+
+This option defaults to `True`.
+
+---
+
+**--fish-fast=BOOL** *(True, False)*
+
+> Use faster commandline parsing for fish at the cost of correctness
+
+This option defaults to `False`.
+
+---
+
+**--fish-inline-conditions=BOOL** *(True, False)*
+
+> Don't store conditions in a variable
+
+This option defaults to `False`.
+
+---
+
+**--parser-variable=VARIABLE**
+
+> Specify the variable name of the ArgumentParser object (for --input-type=python)
+
+---
+
+**--include-file=FILE**
+
+> Include file in output
+
+---
+
+**--comment=COMMENT**
+
+> Add a comment to output
+
+---
+
+**--keep-comments=BOOL** *(True, False)*
+
+> Keep comments of helper functions used in the generated code
+
+This option defaults to `False`.
+
+---
+
+**--function-prefix=PREFIX**
+
+> Set the prefix for generated functions
+
+The placeholder `$PROG` will be replaced by the program name.
+
+This option defaults to `_$PROG`.
+
+---
+
+**--debug**
+
+> Enable debug mode
+
+Keep comments, generate shell code for debugging and print a full stack
+trace in case of an error.
+
+---
+
+**-o|--output=FILE**
+
+> Write output to destination file [default: stdout]
+
+---
+
+**-i|--install-system-wide**
+
+> Write output to the system-wide completions dir of shell
+
+---
+
+**-u|--uninstall-system-wide**
+
+> Uninstall the system-wide completion file for program
 
 ## When Conditionals
 
