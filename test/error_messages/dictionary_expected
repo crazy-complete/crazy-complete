@@ -195,6 +195,9 @@
 3_30_18-key-value-list-2-key-empty       | foo: -o: key_value_list: key: String cannot be empty
 3_30_19-key-value-list-key-with-space    | foo: -o: key_value_list: key: String cannot contain spaces
 3_30_20-key-value-list-2-desc-not-string | foo: -o: key_value_list: Parameter `description` has an invalid type. Expected types: string|none. Received: False (bool)
+3_31_00-ip-address-too-many-args         | foo: -o: ip_address: Too many arguments: ['wrong']
+3_31_01-ip-address-arg-wrong-type        | foo: -o: ip_address: Parameter `type` has an invalid type. Expected types: string. Received: False (bool)
+3_31_02-ip-address-arg-wrong-value       | foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Only one positional argument can be marked as repeatable

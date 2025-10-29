@@ -378,6 +378,17 @@ class BashCompleter(shell.ShellCompleter):
         prefix_func = ctxt.helpers.use_function('prefix')
         return BashCompletionFunc(ctxt, [prefix_func, prefix, func])
 
+    def ip_address(self, ctxt, _trace, type_='all'):
+        func = bash_versions.ip_addresses(ctxt)
+
+        if type_ == 'ipv6':
+            return BashCompletionFunc(ctxt, [func, '-6'])
+
+        if type_ == 'ipv4':
+            return BashCompletionFunc(ctxt, [func])
+
+        return BashCompletionFunc(ctxt, [func, '-a'])
+
     # =========================================================================
     # Bonus
     # =========================================================================

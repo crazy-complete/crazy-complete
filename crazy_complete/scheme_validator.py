@@ -462,6 +462,16 @@ def _check_date(_ctxt, arguments):
     _check_non_empty_string(format_, 'format')
 
 
+def _check_ip_address(_ctxt, arguments):
+    type_ = arguments.get_optional_arg('all')
+    arguments.require_no_more()
+    _check_type(type_, (str,), "type")
+
+    if type_.value not in ('ipv4', 'ipv6', 'all'):
+        msg = '%s: %s' % ('type', m.invalid_value('ipv4, ipv6, all'))
+        raise _error(msg, type_)
+
+
 _COMMANDS = {
     'alsa_card':          _check_void,
     'alsa_device':        _check_void,
@@ -488,6 +498,7 @@ _COMMANDS = {
     'history':            _check_history,
     'hostname':           _check_void,
     'integer':            _check_void,
+    'ip_address':         _check_ip_address,
     'key_value_list':     _check_key_value_list,
     'list':               _check_list,
     'locale':             _check_void,

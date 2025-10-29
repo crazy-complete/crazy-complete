@@ -65,6 +65,9 @@ cmdp.add_argument('--directory-list',   help='Complete a list of directories').c
 cmdp.add_argument('--filesystem-type',  help='Complete a filesystem type').complete('filesystem_type')
 cmdp.add_argument('--prefix',           help='Complete with a prefix').complete('prefix', 'prefix:', ['file'])
 cmdp.add_argument('--prefix-list',      help='Complete with a prefix').complete('prefix', 'prefix:', ['file_list'])
+cmdp.add_argument('--ip',               help='Complete an ip address').complete('ip_address')
+cmdp.add_argument('--ip-v4',            help='Complete an ipv4 address').complete('ip_address', 'ipv4')
+cmdp.add_argument('--ip-v6',            help='Complete an ipv6 address').complete('ip_address', 'ipv6')
 
 # =============================================================================
 # Command 'when'

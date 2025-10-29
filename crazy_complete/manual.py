@@ -1033,6 +1033,64 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
             'provide actual functionality.'],
   'output': '~ > example --integer=<TAB>\n<NO OUTPUT>\n',
   'short': 'Complete an integer'},
+ {'also': {'net_interface': 'For completing a network interface'},
+  'category': 'basic',
+  'command': 'ip_address',
+  'definition': 'prog: "example"\n'
+                'options:\n'
+                '  - option_strings: ["--ip-address"]\n'
+                '    complete: ["ip_address"]\n'
+                '  - option_strings: ["--ip-address-v4"]\n'
+                '    complete: ["ip_address", "ipv4"]\n'
+                '  - option_strings: ["--ip-address-v6"]\n'
+                '    complete: ["ip_address", "ipv6"]\n',
+  'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--ip-address\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mip_address\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--ip-address-v4\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mip_address\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mipv4\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--ip-address-v6\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mip_address\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mipv6\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n',
+  'implemented': None,
+  'long': 'By default, both IPv4 and IPv6 addresses are completed.\n'
+          '\n'
+          'To complete only IPv4 addresses, pass "ipv4" as argument.\n'
+          '\n'
+          'To complete only IPv6 addresses, pass "ipv6" as argument.\n',
+  'long_colored': 'By default, both IPv4 and IPv6 addresses are '
+                  'completed.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'To complete only IPv4 addresses, pass "ipv4" as '
+                  'argument.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'To complete only IPv6 addresses, pass "ipv6" as '
+                  'argument.\x1b[37m\x1b[39;49;00m\n',
+  'notes': [],
+  'output': '~ > example --ip-address=<TAB>\n'
+            '::1    10.0.0.71   127.0.0.1   fe80::f567:7a1a:3c98:808d\n'
+            '\n'
+            '~ > example --ip-address-v4=<TAB>\n'
+            '10.0.0.71   127.0.0.1\n'
+            '\n'
+            '~ > example --ip-address-v6=<TAB>\n'
+            '::1   fe80::f567:7a1a:3c98:808d\n',
+  'short': 'Complete a bound ip address'},
  {'also': {'list': 'For completing a comma-separated list of any completer',
            'value_list': 'For completing a comma-separated list of values'},
   'category': 'meta',
@@ -1369,7 +1427,7 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
             '/  /boot  /home  /proc  /run  /sys  /tmp\n'
             '[...]\n',
   'short': 'Complete a mountpoint'},
- {'also': None,
+ {'also': {'ip_address': 'For completing an ip address'},
   'category': 'bonus',
   'command': 'net_interface',
   'definition': 'prog: "example"\n'

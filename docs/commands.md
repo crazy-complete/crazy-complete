@@ -30,6 +30,7 @@
 | [history](#history)                        | Complete based on a shell's history            |
 | [hostname](#hostname)                      | Complete a hostname                            |
 | [integer](#integer)                        | Complete an integer                            |
+| [ip\_address](#ip_address)                 | Complete a bound ip address                    |
 | [mime\_file](#mime_file)                   | Complete a file based on it's MIME-type        |
 | [pid](#pid)                                | Complete a PID                                 |
 | [process](#process)                        | Complete a process name                        |
@@ -185,6 +186,10 @@ options:
 eno1  enp1s0  lo  wlo1  wlp2s0
 [...]
 ```
+
+**SEE ALSO**
+
+- [ip\_address](#ip_address): For completing an ip address
 
 ### timezone
 
@@ -682,6 +687,43 @@ options:
 **SEE ALSO**
 
 - [range](#range): For completing a range of integers
+
+### ip\_address
+
+> Complete a bound ip address
+
+By default, both IPv4 and IPv6 addresses are completed.
+
+To complete only IPv4 addresses, pass "ipv4" as argument.
+
+To complete only IPv6 addresses, pass "ipv6" as argument.
+
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--ip-address"]
+    complete: ["ip_address"]
+  - option_strings: ["--ip-address-v4"]
+    complete: ["ip_address", "ipv4"]
+  - option_strings: ["--ip-address-v6"]
+    complete: ["ip_address", "ipv6"]
+```
+
+```
+~ > example --ip-address=<TAB>
+::1    10.0.0.71   127.0.0.1   fe80::f567:7a1a:3c98:808d
+
+~ > example --ip-address-v4=<TAB>
+10.0.0.71   127.0.0.1
+
+~ > example --ip-address-v6=<TAB>
+::1   fe80::f567:7a1a:3c98:808d
+```
+
+**SEE ALSO**
+
+- [net\_interface](#net_interface): For completing a network interface
 
 ### mime\_file
 

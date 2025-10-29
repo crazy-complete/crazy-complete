@@ -83,3 +83,10 @@ def available_interfaces(ctxt):
         return '_comp_compgen_available_interfaces'
 
     return '_available_interfaces'
+
+
+def ip_addresses(ctxt):
+    if ctxt.config.bash_completions_version >= (2, 12):
+        return '_comp_compgen_ip_addresses'
+
+    return '_ip_addresses'

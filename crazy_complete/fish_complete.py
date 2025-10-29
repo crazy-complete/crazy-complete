@@ -521,6 +521,19 @@ class FishCompleter(shell.ShellCompleter):
         prefix_func = ctxt.helpers.use_function('prefix')
         return FishCompletionCommand(ctxt, [prefix_func, prefix, func])
 
+    def ip_address(self, ctxt, _trace, type_='all'):
+        func = '__fish_print_addresses'
+
+        if type_ == 'ipv6':
+            cmd = f"{func} | string match -e ':'"
+            return FishCompletionRawCommand(ctxt, cmd)
+
+        if type_ == 'ipv4':
+            cmd = f"{func} | string match -e '.'"
+            return FishCompletionRawCommand(ctxt, cmd)
+
+        return FishCompletionCommand(ctxt, [func])
+
     # =========================================================================
     # Bonus
     # =========================================================================

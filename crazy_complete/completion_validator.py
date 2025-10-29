@@ -432,6 +432,16 @@ def _validate_date(_ctxt, args):
     _validate_non_empty_string(format_, 'format')
 
 
+def _validate_ip_address(_ctxt, args):
+    type_ = args.get_optional_arg('all')
+    args.require_no_more()
+    _validate_type(type_, (str,), 'type')
+
+    if type_ not in ('ipv4', 'ipv6', 'all'):
+        msg = '%s: %s' % ('type', m.invalid_value('ipv4, ipv6, all'))
+        raise CrazyError(msg)
+
+
 # =============================================================================
 # Real validation functions
 # =============================================================================
@@ -463,6 +473,7 @@ _COMMANDS = {
     'history':            _validate_history,
     'hostname':           _validate_void,
     'integer':            _validate_void,
+    'ip_address':         _validate_ip_address,
     'key_value_list':     _validate_key_value_list,
     'list':               _validate_list,
     'locale':             _validate_void,
