@@ -261,9 +261,14 @@ class CommandLine:
         '''Gets a list of all final options.'''
 
         r = []
-        for option in self.options:
-            if option.final:
-                r.append(option)
+        cmdline = self
+
+        while cmdline:
+            for option in cmdline.options:
+                if option.final:
+                    r.append(option)
+            cmdline = cmdline.parent
+
         return r
 
     def get_final_option_strings(self):
