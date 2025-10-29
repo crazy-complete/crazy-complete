@@ -92,10 +92,18 @@ class ZshCompleteChoices(ZshCompletionBase):
         if self.trace and self.trace[-1] == 'combine':
             return self._dict_function()
 
-        items   = [str(item) for item in self.choices.keys()]
-        values  = [str(value) for value in self.choices.values()]
-        colon   = any(':' in s for s in items + values)
-        escaped = ['%s\\:%s' % (shell.escape(item), shell.escape(value)) for item, value in zip(items, values)]
+        str0 = lambda s: '' if s is None else str(s)
+        items = [str0(item) for item in self.choices.keys()]
+        descriptions = [str0(value) for value in self.choices.values()]
+        colon = any(':' in s for s in items + descriptions)
+        escaped = []
+
+        for item, desc in zip(items, descriptions):
+            val = shell.escape(escape_colon(item))
+            if desc:
+                val += '\\:%s' % shell.escape(desc)
+            escaped.append(val)
+
         action  = shell.escape('((%s))' % ' '.join(escaped))
         if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
             return action
