@@ -456,6 +456,10 @@ class ZshCompleter(shell.ShellCompleter):
     def locale(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_locales'])
 
+    def charset(self, ctxt, _trace):
+        func = ctxt.helpers.use_function('charset_list')
+        return ZshComplFunc(ctxt, [func], needs_braces=True)
+
     def alsa_card(self, ctxt, _trace):
         func = ctxt.helpers.use_function('alsa_complete_cards')
         return ZshComplFunc(ctxt, [func], needs_braces=True)

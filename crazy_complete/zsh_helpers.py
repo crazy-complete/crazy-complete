@@ -374,6 +374,11 @@ local items=($(command getent group | command awk -F: '{printf "%s:%s\n", $3, $1
 _describe 'groups' items
 ''')
 
+_CHARSET_LIST = helpers.ShellFunction('charset_list', r'''
+local items=($(command locale -m))
+_describe 'charsets' items
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -421,5 +426,6 @@ class ZshHelpers(helpers.GeneralHelpers):
         self.add_function(_MIME_FILE)
         self.add_function(_UID_LIST)
         self.add_function(_GID_LIST)
+        self.add_function(_CHARSET_LIST)
         self.add_function(_ALSA_COMPLETE_CARDS)
         self.add_function(_ALSA_COMPLETE_DEVICES)
