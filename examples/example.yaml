@@ -1,45 +1,101 @@
+# This file defines completions for an `example` program with subcommands.
+#
+# The `example start` subcommand works like sudo, it takes a command with
+# arguments.
+#
+# Options:
+#
+#   -h|--help:
+#     If this option is specified, no more options will be suggested.
+#
+#   -v|--verbose:
+#     This option may be specified multiple times.
+#
+#   --deprecated-option:
+#     This option will not be shown in the option suggestions.
+#
+#   --preserve-env:
+#     This option takes a comma-separated list of environment variables.
+#
+#   --foreground | --background:
+#     These options are mutually exclusive.
+#
+#   --pid-file:
+#     This option will only be suggested if --background is given.
+#
+#   -o|--options:
+#     This option takes a comma-separated list of key=value pairs.
+#
+#   --pager:
+#     This option takes an *optional* argument.
+#
+# Examples:
+#
+#   $ example start -vvv firefox http://example.com
+#   $ example start --background --pid-file foo.pid firefox
+#   $ example launch -o user=benny,group=benny firefox
+#   $ example view-log --pager
+#   $ example view-log --pager=less
+#
+# Note: For reasons of clarity, `help` parameter has been omitted.
+
 prog: "example"
-help: "Example program"
 options:
   - option_strings: ["-h", "--help"]
-    help: "show this help message and exit"
-
-  - option_strings: ["--version"]
-    help: "show program's version number and exit"
+    final: true # don't allow further options after this option
 
 ---
+
 prog: "example start"
-aliases: ["launch"]
-help: "Start a process"
+aliases: ["launch"] # Also allow "example launch"
 options:
-  - option_strings: ["-h", "--help"]
-    help: "show this help message and exit"
+  - option_strings: ["-v", "--verbose"]
+    repeatable: true # This option can appear more than once
 
-  - option_strings: ["--change-dir"]
-    metavar: "change_dir"
-    help: "Change to directory"
-    complete: ["directory", {"directory": "/tmp"}]
+  - option_strings: ["--deprecated-option"]
+    hidden: true # Since deprecated, make this option hidden
 
-  - option_strings: ["--mode", "-m"]
-    metavar: "mode"
-    help: "Specify mode"
-    complete: ["choices", ["auto", "manual", "debug"]]
+  - option_strings: ["--preserve-env"]
+    complete: ["list", ["environment"]] # Comma-separated list of env vars
+
+  - option_strings: ["--priority"]
+    complete: ["choices", ["low", "normal", "high", "realtime"]]
+    nosort: true # Do not sort choices alphabetically; keep order
+
+  # --foreground and --background are mutually exclusive
+  - option_strings: ['--foreground']
+    groups: ['start_mode']
+
+  - option_strings: ['--background']
+    groups: ['start_mode']
+
+  - option_strings: ['--pid-file']
+    complete: ['file']
+    when: 'has_option --background' # Only show this option if --background
+
+  # Comma-separated list of key=value Options, like `mount -o`
+  - option_strings: ['-o', '--options']
+    complete: ['key_value_list', ',', '=', [
+      ['lang',   'set language',  ['locale']],
+      ['user',   'set user',      ['user']],
+      ['group',  'set group',     ['group']],
+    ]]
 
 positionals:
   - number: 1
     metavar: "command"
-    help: "Specify a command that shall be run"
     complete: ["command"]
 
+  - number: 2
+    metavar: "argument"
+    repeatable: true
+    complete: ["command_arg"]
+
 ---
-prog: "example stop"
-aliases: ["kill"]
-help: "Stop a process"
+
+prog: "example view-log"
 options:
-  - option_strings: ["-h", "--help"]
-    help: "show this help message and exit"
-
-  - option_strings: ["--force", "-f"]
-    help: "Force stopping the process"
-
-
+  - option_strings: ["--pager"]
+    metavar: 'command'
+    complete: ["command"]
+    optional_arg: true # Allow --pager without argument
