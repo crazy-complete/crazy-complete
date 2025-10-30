@@ -73,3 +73,13 @@ def group_by(iterable, keyfunc):
             result[val] = [item]
 
     return result
+
+
+def numbers_are_contiguous(numbers):
+    '''Return True if the list of integers is contiguous (1,2,3,4)'''
+
+    if not numbers:
+        return False
+
+    sorted_nums = sorted(numbers)
+    return all(b - a == 1 for a, b in zip(sorted_nums, sorted_nums[1:]))

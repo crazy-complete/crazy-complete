@@ -1,29 +1,42 @@
-import re
+'''Module for creating Bash globs.'''
+
 from collections import defaultdict
 
-def tokenize(s):
-    """
-    Tokenize a string by splitting around non-alphanumeric characters,
-    but keep delimiters (like -, =, /, .).
-    """
-    tokens = re.split(r'([^\w])', s)
-    return [t for t in tokens if t != ""]
+from .algo import numbers_are_contiguous
+
 
 class TrieNode:
+    '''Trie class.'''
+
     def __init__(self):
         self.children = defaultdict(TrieNode)
         self.is_terminal = False
 
-def insert_trie(root, tokens):
-    node = root
-    for token in tokens:
-        node = node.children[token]
-    node.is_terminal = True
+    def insert(self, string):
+        node = self
+        for char in string:
+            node = node.children[char]
+        node.is_terminal = True
+
+
+def build_pattern(parts):
+    if len(parts) == 1:
+        return parts[0]
+
+    try:
+        ints = sorted(map(int, parts))
+        if numbers_are_contiguous(ints):
+            return f'[{ints[0]}-{ints[-1]}]'
+    except ValueError:
+        pass
+
+    return "@(" + "|".join(sorted(parts)) + ")"
+
 
 def trie_to_pattern(node):
-    """
+    '''
     Recursively convert the trie into a Bash extglob pattern.
-    """
+    '''
     if not node.children:
         return ""
 
@@ -39,31 +52,29 @@ def trie_to_pattern(node):
     if node.is_terminal:
         parts.append("")  # Represent the option to stop early
 
-    if len(parts) == 1:
-        return parts[0]
-    else:
-        return "@(" + "|".join(sorted(parts)) + ")"
+    return build_pattern(parts)
+
 
 def compact_glob_trie(strings):
-    """
+    '''
     Build a recursive glob pattern that matches all input strings.
-    """
+    '''
     strings = sorted(set(strings))
     if len(strings) == 1:
         return strings[0]
 
-    # Tokenize each string
-    token_lists = [tokenize(s) for s in strings]
-
     # Build Trie
     root = TrieNode()
-    for tokens in token_lists:
-        insert_trie(root, tokens)
+    for string in strings:
+        root.insert(string)
 
     # Convert Trie to pattern
     return trie_to_pattern(root)
 
+
 def make_pattern(strings):
+    '''Make a glob pattern that matches `strings`.'''
+
     candidate0 = '|'.join(strings)
     candidate1 = compact_glob_trie(strings)
 

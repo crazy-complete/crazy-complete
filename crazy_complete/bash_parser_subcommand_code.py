@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from . import utils
 from . import shell
+from . import bash_patterns
 from .str_utils import indent
 
 
@@ -74,7 +75,7 @@ def _make_switch_case(cmdline):
 
     r  = 'case "$arg" in\n'
     for command, aliases in subcommand_aliases.items():
-        r += '  %s) cmd+=":%s";;\n' % ('|'.join(aliases), command)
+        r += '  %s) cmd+=":%s";;\n' % (bash_patterns.make_pattern(aliases), command)
     r += '  *) cmd+=":$arg";;\n'
     r += 'esac'
     return r

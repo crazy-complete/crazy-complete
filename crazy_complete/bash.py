@@ -17,6 +17,7 @@ from . import bash_option_completion
 from . import bash_option_strings_completion
 from . import bash_positionals_completion
 from . import bash_versions
+from . import bash_patterns
 from .str_utils import indent
 from .bash_utils import VariableManager
 from . import generation
@@ -65,7 +66,7 @@ class BashCompletionGenerator:
         r += '  case "${POSITIONALS[%i]}" in\n' % (self.subcommands.get_positional_num() - 1)
         for subcommand in self.subcommands.subcommands:
             cmds = utils.get_all_command_variations(subcommand)
-            pattern = '|'.join(shell.escape(s) for s in cmds)
+            pattern = bash_patterns.make_pattern([shell.escape(s) for s in cmds])
             if utils.is_worth_a_function(subcommand):
                 if self.commandline.inherit_options:
                     r += '    %s) %s && return 0;;\n' % (pattern, self.ctxt.helpers.make_completion_funcname(subcommand))
