@@ -1,6 +1,7 @@
 '''This module contains code for completing arguments in Fish.'''
 
 from . import shell
+from .pattern import bash_glob_to_regex
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
 from .utils import (
@@ -175,12 +176,14 @@ class FishCompleteFile(FishCompletionBase):
         fuzzy = False
         directory = None
         extensions = None
+        ignore_globs = None
         self.args = []
 
         if opts:
             fuzzy = opts.get('fuzzy', False)
             directory = opts.get('directory', None)
             extensions = opts.get('extensions', None)
+            ignore_globs = opts.get('ignore_globs', None)
 
         if directory:
             self.args.extend(['-C', directory])
@@ -188,6 +191,12 @@ class FishCompleteFile(FishCompletionBase):
         if extensions:
             ctxt.helpers.use_function('filedir', 'regex')
             self.args.extend(['-r', _get_extension_regex(extensions, fuzzy)])
+
+        if ignore_globs:
+            ctxt.helpers.use_function('filedir', 'regex_ignore')
+            patterns = map(bash_glob_to_regex, ignore_globs)
+            patterns = [f'({p})' for p in patterns]
+            self.args.extend(['-i', '|'.join(patterns)])
 
     def get_args(self):
         if len(self.args) == 0:

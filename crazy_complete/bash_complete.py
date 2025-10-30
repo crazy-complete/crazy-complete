@@ -240,25 +240,35 @@ class BashCompleter(shell.ShellCompleter):
         fuzzy = False
         directory = None
         extensions = None
+        ignore_globs = None
 
         if opts:
             fuzzy = opts.get('fuzzy', False)
             directory = opts.get('directory', None)
             extensions = opts.get('extensions', None)
+            ignore_globs = opts.get('ignore_globs', None)
 
         args = [bash_versions.filedir(ctxt)]
 
         if extensions:
             args.append(make_file_extension_pattern(extensions, fuzzy))
 
+        if not directory and not ignore_globs:
+            return BashCompletionFunc(ctxt, args)
+
         if directory:
             cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
             cmd += '  %s\n' % ' '.join(shell.escape(a) for a in args)
             cmd += '  builtin popd >/dev/null\n'
             cmd += '}'
-            return BashCompletionCode(ctxt, cmd)
+        else:
+            cmd = ' '.join(shell.escape(a) for a in args)
 
-        return BashCompletionFunc(ctxt, args)
+        if ignore_globs:
+            func = ctxt.helpers.use_function('file_filter')
+            cmd += '\n%s %s' % (func, ' '.join(shell.escape(p) for p in ignore_globs))
+
+        return BashCompletionCode(ctxt, cmd)
 
     def mime_file(self, ctxt, _trace, pattern):
         func = ctxt.helpers.use_function('mime_file')

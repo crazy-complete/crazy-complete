@@ -3,6 +3,7 @@
 from types import NoneType
 
 from .errors import CrazyError, CrazyTypeError
+from .pattern import bash_glob_to_regex, bash_glob_to_zsh_glob
 from .type_utils import is_dict_type, is_list_type
 from .str_utils import (
     is_valid_extended_regex, contains_space, is_empty_or_whitespace
@@ -223,8 +224,10 @@ def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
     spec = {'directory': (False, (str,), _validate_non_empty_string)}
 
     if with_extensions:
-        spec['extensions'] = (False, (list,), None)
+        spec['extensions'] = (False, (list,), _validate_non_empty_list)
         spec['fuzzy'] = (False, (bool,), None)
+        spec['ignore_globs'] = (False, (list,), _validate_non_empty_list)
+
     if with_list_opts:
         spec['separator'] = (False, (str,), _validate_char)
         spec['duplicates'] = (False, (bool,), None)
@@ -232,14 +235,20 @@ def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
     _validate_dictionary(opts, spec)
 
     if 'extensions' in opts:
-        value = opts['extensions']
-
-        _validate_non_empty_list(value, 'extensions')
-
-        for i, subval in enumerate(value):
+        for i, subval in enumerate(opts['extensions']):
             _validate_type(subval, (str,), f'extensions[{i}]')
             _validate_non_empty_string(subval, f'extensions[{i}]')
             _validate_no_spaces(subval, f'extensions[{i}]')
+
+    if 'ignore_globs' in opts:
+        for i, subval in enumerate(opts['ignore_globs']):
+            _validate_type(subval, (str,), f'ignore_globs[{i}]')
+            _validate_non_empty_string(subval, f'ignore_globs[{i}]')
+            try:
+                bash_glob_to_regex(subval)
+                bash_glob_to_zsh_glob(subval)
+            except ValueError as e:
+                raise CrazyError('%s: %s' % (subval, e)) from e
 
 
 def _validate_file(ctxt, args):

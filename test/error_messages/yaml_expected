@@ -98,17 +98,27 @@
 3_15_01-file-unknown-key                 | line 4, column 25: Unknown parameter: wrong
 3_15_02-file-directory-wrong-type        | line 4, column 38: directory: Invalid type. Expected: string
 3_15_03-file-directory-empty             | line 4, column 38: directory: String cannot be empty
-3_15_04-file-directory-not-absolute      | line 4, column 38: directory: Not an absolute path
+3_15_04-file-directory-not-absolute      | No error
 3_15_05-file-extensions-wrong-type       | line 4, column 39: extensions: Invalid type. Expected: list
 3_15_06-file-extensions-empty            | line 4, column 39: extensions: List cannot be empty
 3_15_07-file-extension-empty             | line 4, column 40: extension: String cannot be empty
 3_15_08-file-extension-with-space        | line 4, column 40: extension: String cannot contain spaces
 3_15_09-file-too-many-args               | line 4, column 15: Too many arguments
+3_15_10-file-invalid-ignore-globs-1      | line 4, column 42: pattern: Extended glob of form *(...) not supported in zsh glob
+3_15_11-file-invalid-ignore-globs-2      | line 4, column 42: pattern: Extended glob of form +(...) not supported in zsh glob
+3_15_12-file-invalid-ignore-globs-3      | line 4, column 42: pattern: Extended glob of form ?(...) not supported in zsh glob
+3_15_13-file-invalid-ignore-globs-4      | line 4, column 42: pattern: Negated glob !(...) not supported in regex
+3_15_14-file-invalid-ignore-globs-5      | line 4, column 42: pattern: Unclosed extglob
+3_15_15-file-invalid-ignore-globs-6      | line 4, column 42: pattern: Unclosed character class
+3_15_16-file-invalid-ignore-globs-7      | line 4, column 42: pattern: Unclosed double quote
+3_15_17-file-invalid-ignore-globs-8      | line 4, column 42: pattern: Unclosed sinqle quote
+3_15_18-file-ignore-globs-invalid-type   | line 4, column 41: ignore_globs: Invalid type. Expected: list
+3_15_19-file-ignore-globs-invalid-empty  | line 4, column 41: ignore_globs: List cannot be empty
 3_16_00-directory-options-wrong-type     | line 4, column 29: Invalid type. Expected: dictionary
 3_16_01-directory-unknown-key            | line 4, column 30: Unknown parameter: wrong
 3_16_02-directory-directory-wrong-type   | line 4, column 43: directory: Invalid type. Expected: string
 3_16_03-directory-directory-empty        | line 4, column 43: directory: String cannot be empty
-3_16_04-directory-directory-not-absolute | line 4, column 43: directory: Not an absolute path
+3_16_04-directory-directory-not-absolute | No error
 3_16_05-directory-too-many-args          | line 4, column 15: Too many arguments
 3_17_00-range-missing-arg-1              | line 4, column 15: Missing required argument: start
 3_17_01-range-missing-arg-2              | line 4, column 15: Missing required argument: stop

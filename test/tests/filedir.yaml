@@ -31,6 +31,12 @@ options:
   - option_strings: ["--file-txt-fuzzy"]
     complete: ["file", {"directory": "%TEST_DIR%/test_data", "extensions": ["txt"], "fuzzy": true}]
 
+  - option_strings: ["--file-ignore-txt-cpp"]
+    complete: ["file", {"directory": "%TEST_DIR%/test_data", "ignore_globs": ["*.[tT][xX][tT]", "*.c++"]}]
+
+  - option_strings: ["--file-ignore-txt-cpp-2"]
+    complete: ["file", {"directory": "%TEST_DIR%/test_data", "ignore_globs": ["*.@([tT][xX][tT]|c++)"]}]
+
   # Relative
 
   - option_strings: ["--file-relative"]
@@ -58,3 +64,4 @@ options:
 
   - option_strings: ["--directory-list-colon"]
     complete: ["directory_list", {"directory": "%TEST_DIR%/test_data", "separator": ':'}]
+

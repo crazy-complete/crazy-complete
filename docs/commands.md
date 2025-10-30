@@ -484,6 +484,10 @@ directory3  directory4
 
 **SEE ALSO**
 
+- [list](#list): For completion a comma-separated list of any completer
+
+- [directory](#directory): For completing a directory
+
 - [file\_list](#file_list): For completing a comma-separated list of files
 
 ---
@@ -517,7 +521,9 @@ You can restrict completion to specific extensions by adding `{"extensions": [..
  
 You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
 Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
- 
+
+You can ignore files by adding a list of Bash globs using `{"ignore_globs": [...]}`
+
 **NOTE:** Restricting completion to specific file extensions only makes sense if the program being completed actually expects files of those types.
 On Unix-like systems, file extensions generally have no inherent meaning -- they are purely conventional and not required for determining file types.
 
@@ -527,10 +533,15 @@ prog: "example"
 options:
   - option_strings: ["--file"]
     complete: ["file"]
+
   - option_strings: ["--file-tmp"]
     complete: ["file", {"directory": "/tmp"}]
+
   - option_strings: ["--file-ext"]
     complete: ["file", {"extensions": ["c", "cpp"]}]
+
+  - option_strings: ["--file-ignore"]
+    complete: ["file", {"ignore_globs": ["*.[tT][xX][tT]", "*.c++"]}]
 ```
 
 ```
@@ -555,12 +566,14 @@ dir1/  dir2/  file.c  file.cpp
 This is an alias for `['list', ['file']]`.
 
 You can restrict completion to a specific directory by adding `{"directory": ...}`.
- 
+
 You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
- 
+
 You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
 Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
- 
+
+You can ignore files by adding a list of Bash globs using `{"ignore_globs": [...]}`
+
 By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
 
 The separator can be changed by adding `{"separator": ...}`
@@ -579,6 +592,10 @@ file3  file4
 ```
 
 **SEE ALSO**
+
+- [list](#list): For completing a comma-separted list using any completer
+
+- [file](#file): For completing a file
 
 - [directory\_list](#directory_list): For completing a comma-separated list of directories
 

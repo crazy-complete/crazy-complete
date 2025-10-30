@@ -5,6 +5,7 @@ from types import NoneType
 from .cli import ExtendedBool, is_extended_bool
 from .when import parse_when
 from .errors import CrazyError, CrazySchemaValidationError
+from .pattern import bash_glob_to_regex, bash_glob_to_zsh_glob
 from .value_with_trace import ValueWithTrace
 from .str_utils import (
     contains_space, is_empty_or_whitespace,
@@ -246,8 +247,9 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
     spec = {'directory': (False, (str,), _check_non_empty_string)}
 
     if with_extensions:
-        spec['extensions'] = (False, (list,), None)
+        spec['extensions'] = (False, (list,), _check_non_empty_list)
         spec['fuzzy'] = (False, (bool,), None)
+        spec['ignore_globs'] = (False, (list,), _check_non_empty_list)
 
     if with_list_opts:
         spec['separator'] = (False, (str,), _check_char)
@@ -256,12 +258,20 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
     _check_dictionary(options, spec)
 
     if _has_set(options, 'extensions'):
-        _check_non_empty_list(options.value['extensions'], 'extensions')
-
         for extension in options.value['extensions'].value:
             _check_type(extension, (str,), 'extension')
             _check_non_empty_string(extension,'extension')
             _check_no_spaces(extension, 'extension')
+
+    if _has_set(options, 'ignore_globs'):
+        for pattern in options.value['ignore_globs'].value:
+            _check_type(pattern, (str,), 'pattern')
+            _check_non_empty_string(pattern, 'pattern')
+            try:
+                bash_glob_to_regex(pattern.value)
+                bash_glob_to_zsh_glob(pattern.value)
+            except ValueError as e:
+                raise _error('%s: %s' % ('pattern', e), pattern) from e
 
 
 def _check_file(ctxt, arguments):

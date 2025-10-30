@@ -422,12 +422,18 @@ _FILEDIR = helpers.FishFunction('filedir', r'''
 #ifdef regex
 #   -r|--regex=PATTERN      Only list files matching pattern
 #endif
-
-#ifdef regex
-argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' 'r/regex=' -- $argv || return 1
-#else
-argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' -- $argv || return 1
+#ifdef regex_ignore
+#   -i|--ignore=PATTERN     Ignore files matching pattern
 #endif
+
+argparse --max-args 0 'd/description=' 'D/directories' 'C/cd=' \
+#ifdef regex
+    'r/regex=' \
+#endif
+#ifdef regex_ignore
+    'i/ignore=' \
+#endif
+    -- $argv || return 1
 
 set -l comp (get_completing_arg)
 set -l desc
@@ -455,6 +461,12 @@ if set -q files[1]
 
   if set -q _flag_regex[1]
     set files (printf '%s\n' $files | string match -rg "(.*/\$)|($_flag_regex[1])\$")
+  end
+#endif
+#ifdef regex_ignore
+
+  if set -q _flag_ignore[1]
+    set files (printf '%s\n' $files | string match -rv "(^|.*/)($_flag_ignore[1])\$")
   end
 #endif
 

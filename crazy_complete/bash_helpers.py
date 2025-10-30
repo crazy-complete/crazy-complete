@@ -507,6 +507,20 @@ while read -r line; do
 done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
 ''', ['dequote'])
 
+_FILE_FILTER = helpers.ShellFunction('file_filter', '''
+local pattern REPLY COMPREPLY_OLD=("${COMPREPLY[@]}")
+
+COMPREPLY=()
+
+for REPLY in "${COMPREPLY_OLD[@]}"; do
+  for pattern; do
+    [[ "${REPLY##*/}" == $pattern ]] && continue 2
+  done
+
+  COMPREPLY+=("$REPLY")
+done
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -567,6 +581,7 @@ class BashHelpers(helpers.GeneralHelpers):
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
         self.add_function(_KEY_VALUE_LIST)
+        self.add_function(_FILE_FILTER)
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)

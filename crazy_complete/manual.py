@@ -412,7 +412,9 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
   'notes': [],
   'output': '~ > example --directory=<TAB>\ndir1/  dir2/\n',
   'short': 'Complete a directory'},
- {'also': {'file_list': 'For completing a comma-separated list of files'},
+ {'also': {'directory': 'For completing a directory',
+           'file_list': 'For completing a comma-separated list of files',
+           'list': 'For completion a comma-separated list of any completer'},
   'category': 'basic',
   'command': 'directory_list',
   'definition': 'prog: "example"\n'
@@ -714,10 +716,16 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                 'options:\n'
                 '  - option_strings: ["--file"]\n'
                 '    complete: ["file"]\n'
+                '\n'
                 '  - option_strings: ["--file-tmp"]\n'
                 '    complete: ["file", {"directory": "/tmp"}]\n'
+                '\n'
                 '  - option_strings: ["--file-ext"]\n'
-                '    complete: ["file", {"extensions": ["c", "cpp"]}]\n',
+                '    complete: ["file", {"extensions": ["c", "cpp"]}]\n'
+                '\n'
+                '  - option_strings: ["--file-ignore"]\n'
+                '    complete: ["file", {"ignore_globs": ["*.[tT][xX][tT]", '
+                '"*.c++"]}]\n',
   'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
@@ -727,6 +735,7 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                         '\x1b[37m    '
                         '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mfile\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
                         '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--file-tmp\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
@@ -735,6 +744,7 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mfile\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
                         '\x1b[39;49;00m{\x1b[33m"\x1b[39;49;00m\x1b[33mdirectory\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33m/tmp\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m}]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
                         '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--file-ext\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
@@ -743,7 +753,17 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mfile\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
                         '\x1b[39;49;00m{\x1b[33m"\x1b[39;49;00m\x1b[33mextensions\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mc\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
-                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mcpp\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]}]\x1b[37m\x1b[39;49;00m\n',
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mcpp\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]}]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--file-ignore\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mfile\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m{\x1b[33m"\x1b[39;49;00m\x1b[33mignore_globs\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m*.[tT][xX][tT]\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33m*.c++\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]}]\x1b[37m\x1b[39;49;00m\n',
   'implemented': None,
   'long': 'You can restrict completion to a specific directory by adding '
           '`{"directory": ...}`.\n'
@@ -755,7 +775,10 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
           'true}`.\n'
           'Fuzzy means that the files do not have to end with the exact '
           'extension. For example `foo.txt.1`.\n'
-          ' \n'
+          '\n'
+          'You can ignore files by adding a list of Bash globs using '
+          '`{"ignore_globs": [...]}`\n'
+          '\n'
           '**NOTE:** Restricting completion to specific file extensions only '
           'makes sense if the program being completed actually expects files '
           'of those types.\n'
@@ -776,7 +799,11 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                   'Fuzzy means that the files do not have to end with the '
                   'exact extension. For example '
                   '\x1b[33m`foo.txt.1`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
-                  ' \n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'You can ignore files by adding a list of Bash globs using '
+                  '\x1b[33m`{"ignore_globs": '
+                  '[...]}`\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                  '\n'
                   '**NOTE:** Restricting completion to specific file '
                   'extensions only makes sense if the program being completed '
                   'actually expects files of those '
@@ -792,7 +819,9 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
             'dir1/  dir2/  file.c  file.cpp\n',
   'short': 'Complete a file'},
  {'also': {'directory_list': 'For completing a comma-separated list of '
-                             'directories'},
+                             'directories',
+           'file': 'For completing a file',
+           'list': 'For completing a comma-separted list using any completer'},
   'category': 'basic',
   'command': 'file_list',
   'definition': 'prog: "example"\n'
@@ -813,15 +842,18 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
           '\n'
           'You can restrict completion to a specific directory by adding '
           '`{"directory": ...}`.\n'
-          ' \n'
+          '\n'
           'You can restrict completion to specific extensions by adding '
           '`{"extensions": [...]}`.\n'
-          ' \n'
+          '\n'
           'You can make matching extensions *fuzzy* by adding `{"fuzzy": '
           'true}`.\n'
           'Fuzzy means that the files do not have to end with the exact '
           'extension. For example `foo.txt.1`.\n'
-          ' \n'
+          '\n'
+          'You can ignore files by adding a list of Bash globs using '
+          '`{"ignore_globs": [...]}`\n'
+          '\n'
           'By default, duplicate values are not offered for completion. This '
           'can be changed by adding `{"duplicates": true}`.\n'
           '\n'
@@ -832,18 +864,22 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                   'You can restrict completion to a specific directory by '
                   'adding \x1b[33m`{"directory": '
                   '...}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
-                  ' \x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
                   'You can restrict completion to specific extensions by '
                   'adding \x1b[33m`{"extensions": '
                   '[...]}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
-                  ' \x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
                   'You can make matching extensions *fuzzy* by adding '
                   '\x1b[33m`{"fuzzy": '
                   'true}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
                   'Fuzzy means that the files do not have to end with the '
                   'exact extension. For example '
                   '\x1b[33m`foo.txt.1`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
-                  ' \x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'You can ignore files by adding a list of Bash globs using '
+                  '\x1b[33m`{"ignore_globs": '
+                  '[...]}`\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
                   'By default, duplicate values are not offered for '
                   'completion. This can be changed by adding '
                   '\x1b[33m`{"duplicates": '

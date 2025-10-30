@@ -1,6 +1,7 @@
 '''This module contains code for completing arguments in Zsh.'''
 
 from . import shell
+from .pattern import bash_glob_to_zsh_glob
 from .str_utils import join_with_wrap, indent
 from .zsh_utils import escape_colon, escape_square_brackets, make_file_extension_pattern
 from .type_utils import is_dict_type
@@ -309,16 +310,22 @@ class ZshCompleter(shell.ShellCompleter):
         fuzzy = False
         directory = None
         extensions = None
+        ignore_globs = None
 
         if opts:
             fuzzy = opts.get('fuzzy', False)
             directory = opts.get('directory', None)
             extensions = opts.get('extensions', None)
+            ignore_globs = opts.get('ignore_globs', None)
 
         args = []
 
         if extensions:
             args.extend(['-g', make_file_extension_pattern(extensions, fuzzy)])
+
+        if ignore_globs:
+            patterns = map(bash_glob_to_zsh_glob, ignore_globs)
+            args.extend(['-F', '(%s)' % ' '.join(patterns)])
 
         if not directory:
             return ZshComplFunc(ctxt, ['_files'] + args)

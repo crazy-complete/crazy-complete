@@ -2076,3 +2076,43 @@ zsh_expected: |
   archive.tar.gz      file0.txt           image0.jpg
   bin/                file1.TXT           image1.JPG
   directory/          file3.tXt           image2.jPg
+---
+number: 134
+definition_file: "filedir"
+description: "Check --file-ignore-txt-cpp"
+send: "crazy-complete-test --file-ignore-txt-cpp "
+bash_expected: |
+  > crazy-complete-test --file-ignore-txt-cpp
+  README.md         directory         image0.jpg
+  archive.tar.gz    file with spaces  image1.JPG
+  bin               file4.txt.1       image2.jPg
+  > crazy-complete-test --file-ignore-txt-cpp
+fish_expected: |
+  > crazy-complete-test --file-ignore-txt-cpp
+  archive.tar.gz  directory/        file4.txt.1  image1.JPG  README.md
+  bin/            file with spaces  image0.jpg   image2.jPg
+zsh_expected: |
+  > crazy-complete-test --file-ignore-txt-cpp
+  README.md           directory/          image0.jpg
+  archive.tar.gz      file\ with\ spaces  image1.JPG
+  bin/                file4.txt.1         image2.jPg
+---
+number: 135
+definition_file: "filedir"
+description: "Check --file-ignore-txt-cpp-2"
+send: "crazy-complete-test --file-ignore-txt-cpp-2 "
+bash_expected: |
+  > crazy-complete-test --file-ignore-txt-cpp-2
+  README.md         directory         image0.jpg
+  archive.tar.gz    file with spaces  image1.JPG
+  bin               file4.txt.1       image2.jPg
+  > crazy-complete-test --file-ignore-txt-cpp-2
+fish_expected: |
+  > crazy-complete-test --file-ignore-txt-cpp-2
+  archive.tar.gz  directory/        file4.txt.1  image1.JPG  README.md
+  bin/            file with spaces  image0.jpg   image2.jPg
+zsh_expected: |
+  > crazy-complete-test --file-ignore-txt-cpp-2
+  README.md           directory/          image0.jpg
+  archive.tar.gz      file\ with\ spaces  image1.JPG
+  bin/                file4.txt.1         image2.jPg
