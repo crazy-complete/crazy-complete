@@ -221,6 +221,7 @@ def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
     _validate_type(opts, (dict,), 'options')
 
     spec = {'directory': (False, (str,), _validate_non_empty_string)}
+
     if with_extensions:
         spec['extensions'] = (False, (list,), None)
         spec['fuzzy'] = (False, (bool,), None)
@@ -229,11 +230,6 @@ def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
         spec['duplicates'] = (False, (bool,), None)
 
     _validate_dictionary(opts, spec)
-
-    if 'directory' in opts:
-        if not opts['directory'].startswith('/'):
-            msg = '%s: %s' % ('directory', m.not_an_absolute_path())
-            raise CrazyError(msg)
 
     if 'extensions' in opts:
         value = opts['extensions']

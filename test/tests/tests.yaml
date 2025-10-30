@@ -2038,3 +2038,41 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test
   3  1  2
+---
+number: 132
+definition_file: "filedir"
+description: "Check --directory-relative"
+send: "crazy-complete-test --directory-relative "
+bash_expected: |
+  > crazy-complete-test --directory-relative
+  bin        directory
+  > crazy-complete-test --directory-relative
+fish_expected: |
+  > crazy-complete-test --directory-relative
+  bin/  directory/
+zsh_expected: |
+  > crazy-complete-test --directory-relative
+  bin/        directory/
+---
+number: 133
+definition_file: "filedir"
+description: "Check --file-relative"
+send: "crazy-complete-test --file-relative "
+bash_expected: |
+  > crazy-complete-test --file-relative
+  README.md         file with spaces  file4.txt.1       source.c++
+  archive.tar.gz    file0.txt         image0.jpg
+  bin               file1.TXT         image1.JPG
+  directory         file3.tXt         image2.jPg
+  > crazy-complete-test --file-relative
+fish_expected: |
+  > crazy-complete-test --file-relative
+  archive.tar.gz  file with spaces  file3.tXt    image1.JPG  source.c++
+  bin/            file0.txt         file4.txt.1  image2.jPg
+  directory/      file1.TXT         image0.jpg   README.md
+zsh_expected: |
+  > crazy-complete-test --file-relative
+  README.md           file\ with\ spaces  file4.txt.1         source.c++
+  archive.tar.gz      file0.txt           image0.jpg
+  bin/                file1.TXT           image1.JPG
+  directory/          file3.tXt           image2.jPg

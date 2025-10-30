@@ -255,11 +255,6 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
 
     _check_dictionary(options, spec)
 
-    if _has_set(options, 'directory'):
-        if not options.value['directory'].value.startswith('/'):
-            msg = '%s: %s' % ('directory', m.not_an_absolute_path())
-            raise _error(msg, options.value['directory'])
-
     if _has_set(options, 'extensions'):
         _check_non_empty_list(options.value['extensions'], 'extensions')
 

@@ -432,7 +432,7 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
   'long': "This is an alias for `['list', ['directory']]`.\n"
           '\n'
           'You can restrict completion to a specific directory by adding '
-          '`{"directory": ...}`. Directory has to be an absolute path.\n'
+          '`{"directory": ...}`.\n'
           ' \n'
           'The separator can be changed by adding `{"separator": ...}`\n'
           ' \n'
@@ -442,9 +442,8 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                   "['directory']]`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n"
                   '\x1b[37m\x1b[39;49;00m\n'
                   'You can restrict completion to a specific directory by '
-                  'adding \x1b[33m`{"directory": ...}`\x1b[39;49;00m. '
-                  'Directory has to be an absolute '
-                  'path.\x1b[37m\x1b[39;49;00m\n'
+                  'adding \x1b[33m`{"directory": '
+                  '...}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
                   ' \x1b[37m\x1b[39;49;00m\n'
                   'The separator can be changed by adding '
                   '\x1b[33m`{"separator": '
@@ -747,7 +746,7 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mcpp\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]}]\x1b[37m\x1b[39;49;00m\n',
   'implemented': None,
   'long': 'You can restrict completion to a specific directory by adding '
-          '`{"directory": ...}`. Directory has to be an absolute path.\n'
+          '`{"directory": ...}`.\n'
           ' \n'
           'You can restrict completion to specific extensions by adding '
           '`{"extensions": [...]}`.\n'
@@ -764,9 +763,8 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
           'meaning -- they are purely conventional and not required for '
           'determining file types.\n',
   'long_colored': 'You can restrict completion to a specific directory by '
-                  'adding \x1b[33m`{"directory": ...}`\x1b[39;49;00m. '
-                  'Directory has to be an absolute '
-                  'path.\x1b[37m\x1b[39;49;00m\n'
+                  'adding \x1b[33m`{"directory": '
+                  '...}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
                   ' \x1b[37m\x1b[39;49;00m\n'
                   'You can restrict completion to specific extensions by '
                   'adding \x1b[33m`{"extensions": '

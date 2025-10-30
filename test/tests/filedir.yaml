@@ -7,6 +7,11 @@ options:
   - option_strings: ["--directory"]
     complete: ["directory", {"directory": "%TEST_DIR%/test_data"}]
 
+  # Relative
+
+  - option_strings: ["--directory-relative"]
+    complete: ["directory", {"directory": "test_data"}]
+
   # ===========================================================================
   # file
   # ===========================================================================
@@ -25,6 +30,11 @@ options:
 
   - option_strings: ["--file-txt-fuzzy"]
     complete: ["file", {"directory": "%TEST_DIR%/test_data", "extensions": ["txt"], "fuzzy": true}]
+
+  # Relative
+
+  - option_strings: ["--file-relative"]
+    complete: ["file", {"directory": "test_data"}]
 
   # ===========================================================================
   # file_list

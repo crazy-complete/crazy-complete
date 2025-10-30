@@ -299,7 +299,11 @@ class ZshCompleter(shell.ShellCompleter):
         if not directory:
             return ZshComplFunc(ctxt, ['_directories'])
 
-        return ZshComplFunc(ctxt, ['_directories', '-W', directory])
+        if directory.startswith('/'):
+            return ZshComplFunc(ctxt, ['_directories', '-W', directory])
+
+        func = ctxt.helpers.use_function('path_files_relative')
+        return ZshComplFunc(ctxt, [func, directory, '-/'], needs_braces=True)
 
     def file(self, ctxt, _trace, opts=None):
         fuzzy = False
@@ -313,13 +317,17 @@ class ZshCompleter(shell.ShellCompleter):
 
         args = []
 
-        if directory:
-            args.extend(['-W', directory])
-
         if extensions:
             args.extend(['-g', make_file_extension_pattern(extensions, fuzzy)])
 
-        return ZshComplFunc(ctxt, ['_files'] + args)
+        if not directory:
+            return ZshComplFunc(ctxt, ['_files'] + args)
+
+        if directory.startswith('/'):
+            return ZshComplFunc(ctxt, ['_files', '-W', directory, *args])
+
+        func = ctxt.helpers.use_function('path_files_relative')
+        return ZshComplFunc(ctxt, [func, directory, *args], needs_braces=True)
 
     def mime_file(self, ctxt, _trace, pattern):
         func = ctxt.helpers.use_function('mime_file')

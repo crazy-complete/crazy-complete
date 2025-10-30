@@ -379,6 +379,11 @@ local items=($(command locale -m))
 _describe 'charsets' items
 ''')
 
+_PATH_FILES_RELATIVE = helpers.ShellFunction('path_files_relative', r'''
+local DIR="$1"; shift
+_path_files -W "$PWD/$DIR" "$@"
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -423,6 +428,7 @@ class ZshHelpers(helpers.GeneralHelpers):
         self.add_function(_EXEC)
         self.add_function(_PREFIX)
         self.add_function(_HISTORY)
+        self.add_function(_PATH_FILES_RELATIVE)
         self.add_function(_MIME_FILE)
         self.add_function(_UID_LIST)
         self.add_function(_GID_LIST)

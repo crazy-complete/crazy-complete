@@ -594,7 +594,7 @@ dir1/  dir2/
 
 This is an alias for `['list', ['directory']]`.
 
-You can restrict completion to a specific directory by adding `{"directory": ...}`. Directory has to be an absolute path.
+You can restrict completion to a specific directory by adding `{"directory": ...}`.
  
 The separator can be changed by adding `{"separator": ...}`
  
@@ -642,7 +642,7 @@ XDG_SESSION_TYPE XDG_VTNR
 
 > Complete a file
 
-You can restrict completion to a specific directory by adding `{"directory": ...}`. Directory has to be an absolute path.
+You can restrict completion to a specific directory by adding `{"directory": ...}`.
  
 You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
  
