@@ -39,27 +39,46 @@
 #
 # Note: For reasons of clarity, `help` parameter has been omitted.
 
-prog: "example"
+# Defines can be handy if completers are reused or to keep the definition clean
+
+prog: '%defines%'
+
+complete_priority: ['choices', {
+  'low':      'Run with lowest priority, background tasks only',
+  'normal':   'Standard scheduling priority for regular tasks',
+  'high':     'Higher priority for time-sensitive operations',
+  'realtime': 'Real-time scheduling, may affect system responsiveness'
+}]
+
+complete_options: ['key_value_list', ',', '=', [
+  ['lang',   'set language',  ['locale']],
+  ['user',   'set user',      ['user']],
+  ['group',  'set group',     ['group']],
+]]
+
+---
+
+prog: 'example'
 options:
-  - option_strings: ["-h", "--help"]
+  - option_strings: ['-h', '--help']
     final: true # don't allow further options after this option
 
 ---
 
-prog: "example start"
-aliases: ["launch"] # Also allow "example launch"
+prog: 'example start'
+aliases: ['launch'] # Also allow 'example launch'
 options:
-  - option_strings: ["-v", "--verbose"]
+  - option_strings: ['-v', '--verbose']
     repeatable: true # This option can appear more than once
 
-  - option_strings: ["--deprecated-option"]
+  - option_strings: ['--deprecated-option']
     hidden: true # Since deprecated, make this option hidden
 
-  - option_strings: ["--preserve-env"]
-    complete: ["list", ["environment"]] # Comma-separated list of env vars
+  - option_strings: ['--preserve-env']
+    complete: ['list', ['environment']] # Comma-separated list of env vars
 
-  - option_strings: ["--priority"]
-    complete: ["choices", ["low", "normal", "high", "realtime"]]
+  - option_strings: ['--priority']
+    complete: 'complete_priority' # see %defines%
     nosort: true # Do not sort choices alphabetically; keep order
 
   # --foreground and --background are mutually exclusive
@@ -75,27 +94,23 @@ options:
 
   # Comma-separated list of key=value Options, like `mount -o`
   - option_strings: ['-o', '--options']
-    complete: ['key_value_list', ',', '=', [
-      ['lang',   'set language',  ['locale']],
-      ['user',   'set user',      ['user']],
-      ['group',  'set group',     ['group']],
-    ]]
+    complete: 'complete_options' # see %defines%
 
 positionals:
   - number: 1
-    metavar: "command"
-    complete: ["command"]
+    metavar: 'command'
+    complete: ['command']
 
   - number: 2
-    metavar: "argument"
+    metavar: 'argument'
     repeatable: true
-    complete: ["command_arg"]
+    complete: ['command_arg']
 
 ---
 
-prog: "example view-log"
+prog: 'example view-log'
 options:
-  - option_strings: ["--pager"]
+  - option_strings: ['--pager']
     metavar: 'command'
-    complete: ["command"]
+    complete: ['command']
     optional_arg: true # Allow --pager without argument

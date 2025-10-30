@@ -110,9 +110,54 @@ def _get_commandline_by_path(root, path):
     return current
 
 
+def replace_defines_in_documents(documents):
+    '''Replaces defines in a list of documents.
+
+    Exmaple:
+        prog: '%defines%'
+        my_completer: ['choices', ['foo', 'bar']]
+        ---
+        prog: 'example'
+        options:
+          - option_strings: ['-o']
+            complete: 'my_completer'
+    '''
+
+    defines = None
+
+    for document in documents:
+        if not isinstance(document, dict):
+            continue
+
+        if 'prog' in document and document['prog'] == '%defines%':
+            defines = document
+            break
+
+    if defines is None:
+        return documents
+
+    documents.remove(defines)
+    defines.pop('prog')
+
+    def replace_defines(obj):
+        if isinstance(obj, str):
+            return defines.get(obj, obj)
+        if isinstance(obj, list):
+            return [replace_defines(sub) for sub in obj]
+        if isinstance(obj, dict):
+            return {key: replace_defines(val) for key, val in obj.items()}
+        return obj
+
+    new = []
+    for document in documents:
+        new.append(replace_defines(document))
+    return new
+
+
 def dictionaries_to_commandline(dictionaries):
     '''Convert a list of dictionaries to a cli.CommandLine object.'''
 
+    dictionaries = replace_defines_in_documents(dictionaries)
     compat.fix_commandline_dictionaries(dictionaries)
 
     root = CommandLine('root')

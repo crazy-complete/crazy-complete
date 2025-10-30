@@ -168,6 +168,52 @@ def commandline_to_yaml(commandline):
     return '\n---\n'.join(r)
 
 
+def replace_defines_in_documents(documents):
+    '''Replaces defines in a list of documents.
+
+    Exmaple:
+        prog: '%defines%'
+        my_completer: ['choices', ['foo', 'bar']]
+        ---
+        prog: 'example'
+        options:
+          - option_strings: ['-o']
+            complete: 'my_completer'
+    '''
+        
+    defines = None
+
+    for document in documents:
+        if not isinstance(document.value, dict):
+            continue
+
+        if 'prog' in document.value and document.value['prog'].value == '%defines%':
+            defines = document
+            break
+
+    if defines is None:
+        return documents
+
+    documents.remove(defines)
+    defines.value.pop('prog')
+
+    def replace_defines(obj):
+        if isinstance(obj.value, str):
+            return defines.value.get(obj.value, obj)
+        if isinstance(obj.value, list):
+            obj.value = [replace_defines(sub) for sub in obj.value]
+            return obj
+        if isinstance(obj.value, dict):
+            obj.value = {key: replace_defines(val) for key, val in obj.value.items()}
+            return obj
+        return obj
+
+    new = []
+    for document in documents:
+        new.append(replace_defines(document))
+    return new
+
+
 def load_from_file(file):
     '''Load a YAML file and turn it into a cli.CommandLine object.'''
 
@@ -183,6 +229,7 @@ def load_from_file(file):
     # Validate YAML...
     parser = ExtendedYAMLParser()
     parsed = parser.parse(content)
+    parsed = replace_defines_in_documents(parsed)
     scheme_validator.validate(parsed)
 
     # Finally convert the config structure to CommandLine objects

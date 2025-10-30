@@ -123,6 +123,17 @@ _example_start__--preserve-env() {
   _parameters -g '*export*'
 }
 
+_example_start__--priority() {
+  local items=(
+    low:'Run with lowest priority, background tasks only'
+    normal:'Standard scheduling priority for regular tasks'
+    high:'Higher priority for time-sensitive operations'
+    realtime:'Real-time scheduling, may affect system responsiveness'
+  )
+
+  _describe -- '' items
+}
+
 _example_start__-o() {
   _values -s , -S = '' \
     lang'[set language]':::_locales \
@@ -155,7 +166,7 @@ _example_start() {
   local -a args=(
     '*'{-v,--verbose}
     '(--preserve-env)'--preserve-env=:' ':'_sequence _example_start__--preserve-env'
-    '(--priority)'--priority=:' ':'(low normal high realtime)'
+    '(--priority)'--priority=:' ':_example_start__--priority
     '(--background --foreground)'--foreground
     '(--foreground --background)'--background
     '(--options -o)'{-o+,--options=}:' ':'{_example_start__-o}'

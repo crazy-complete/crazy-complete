@@ -369,6 +369,14 @@ function _example_start__-o0
     group 'set group' __fish_complete_groups
 end
 
+function _example_start__--priority
+  printf '%s\t%s\n' \
+    low 'Run with lowest priority, background tasks only' \
+    normal 'Standard scheduling priority for regular tasks' \
+    high 'Higher priority for time-sensitive operations' \
+    realtime 'Real-time scheduling, may affect system responsiveness'
+end
+
 function _example_start__argument
   set -l opts -v,--verbose,--deprecated-option,--preserve-env=,--priority=,--foreground,--background,--pid-file=,-o=,--options=,-h,--help
   set -l pos (_example__query "$opts" positional_pos 2)
@@ -407,7 +415,7 @@ set -l C009 "$query '$opts' num_of_positionals -ge 2 && $query '$opts' positiona
 complete -c $prog -n $C000 -s v -l verbose -f
 complete -c $prog -n $C001 -l deprecated-option -f
 complete -c $prog -n $C002 -l preserve-env -x -a '(_example__list , _example_start__--preserve-env)'
-complete -c $prog -n $C003 -l priority -kx -a 'low normal high realtime'
+complete -c $prog -n $C003 -l priority -kx -a '(_example_start__--priority)'
 complete -c $prog -n $C004 -l foreground -f
 complete -c $prog -n $C005 -l background -f
 complete -c $prog -n $C006 -l pid-file -Fr
