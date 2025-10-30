@@ -1,6 +1,9 @@
 '''This module contains functions for transforming bash glob patterns.'''
 
 
+from .string_stream import StringStream
+
+
 class PatternBase:
     '''Base class for glob patterns.'''
 
@@ -173,24 +176,12 @@ EXTGLOB_TOKENS = ('@(', '*(', '+(', '?(', '!(', '+(')
 EXTGLOB_TOKENS_PRE = ('@', '*', '+', '?', '!', '+')
 
 
-class GlobLexer:
+class GlobLexer(StringStream):
     '''Class for splitting a pattern into tokens.'''
 
     def __init__(self, pattern):
-        self.pattern = pattern
-        self.i = 0
+        super().__init__(pattern)
         self.tokens = []
-
-    def peek(self, seek=0):
-        try:
-            return self.pattern[self.i + seek]
-        except IndexError:
-            return None
-
-    def get(self):
-        c = self.pattern[self.i]
-        self.i += 1
-        return c
 
     def parse(self):
         tokens = []
@@ -210,37 +201,11 @@ class GlobLexer:
         if c in ('[', ']', ')', '?', '!', '*', '|'):
             return c
 
-        literal = ''
-
         if c == '"':
-            while True:
-                try:
-                    c = self.get()
-                except IndexError:
-                    raise ValueError("Unclosed sinqle quote") from None
-
-                if c == '\\':
-                    try:
-                        literal += self.get()
-                    except IndexError:
-                        raise ValueError("Missing character after backslash") from None
-
-                if c == '"':
-                    return Literal(literal)
-
-                literal += c
+            return Literal(self.parse_shell_double_quote(in_quotes=True))
 
         if c == "'":
-            while True:
-                try:
-                    c = self.get()
-                except IndexError:
-                    raise ValueError("Unclosed double quote") from None
-
-                if c == "'":
-                    return Literal(literal)
-
-                literal += c
+            return Literal(self.parse_shell_single_quote(in_quotes=True))
 
         literal = c
         while True:
@@ -358,8 +323,12 @@ def bash_glob_to_zsh_glob(pattern):
     return tokens.to_zsh_glob()
 
 
-if __name__ == '__main__':
-    def test(num, bash_pattern, expected_regex, expected_zsh_glob):
+def test():
+    '''Tests.'''
+
+    def case(num, bash_pattern, expected_regex, expected_zsh_glob):
+        '''A test case.'''
+
         try:
             regex_result = bash_glob_to_regex(bash_pattern)
         except ValueError:
@@ -383,75 +352,75 @@ if __name__ == '__main__':
             raise Exception('Test failed')
 
     # Literals
-    test(0,  r'a',                   r'a',                  r'a')
-    test(1,  r'abc',                 r'abc',                r'abc')
-    test(3,  r'"abc"',               r'abc',                r'abc')
-    test(4,  r"'abc'",               r'abc',                r'abc')
-    test(5,  r"'a'b'c'",             r'abc',                r'abc')
-    test(6,  r'.',                   r'\.',                 r'.')
-    test(7,  r'+',                   r'\+',                 r'+')
-    test(8,  r'@',                   r'@',                  r'@')
-    test(9,  r'"["',                 r'\[',                 r"'['")
-    test(10, r"'['",                 r'\[',                 r"'['")
-    test(11, r'"]"',                 r'\]',                 r"']'")
-    test(12, r"']'",                 r'\]',                 r"']'")
-    test(13, r"'*'",                 r'\*',                 r"'*'")
-    test(14, r"'?'",                 r'\?',                 r"'?'")
+    case(0,  r'a',                   r'a',                  r'a')
+    case(1,  r'abc',                 r'abc',                r'abc')
+    case(3,  r'"abc"',               r'abc',                r'abc')
+    case(4,  r"'abc'",               r'abc',                r'abc')
+    case(5,  r"'a'b'c'",             r'abc',                r'abc')
+    case(6,  r'.',                   r'\.',                 r'.')
+    case(7,  r'+',                   r'\+',                 r'+')
+    case(8,  r'@',                   r'@',                  r'@')
+    case(9,  r'"["',                 r'\[',                 r"'['")
+    case(10, r"'['",                 r'\[',                 r"'['")
+    case(11, r'"]"',                 r'\]',                 r"']'")
+    case(12, r"']'",                 r'\]',                 r"']'")
+    case(13, r"'*'",                 r'\*',                 r"'*'")
+    case(14, r"'?'",                 r'\?',                 r"'?'")
 
     # Simple globbing
-    test(15, r'*',                   r'.*',                 r'*')
-    test(16, r'?',                   r'.',                  r'?')
-    test(17, r'???',                 r'...',                r'???')
+    case(15, r'*',                   r'.*',                 r'*')
+    case(16, r'?',                   r'.',                  r'?')
+    case(17, r'???',                 r'...',                r'???')
 
     # Literals + simple globbing
-    test(18, r'*abc*',               r'.*abc.*',            r'*abc*')
-    test(19, r'*.*',                 r'.*\..*',             r'*.*')
-    test(20, r'*+*',                 r'.*\+.*',             r'*+*')
+    case(18, r'*abc*',               r'.*abc.*',            r'*abc*')
+    case(19, r'*.*',                 r'.*\..*',             r'*.*')
+    case(20, r'*+*',                 r'.*\+.*',             r'*+*')
 
     # Character classes
-    test(21, r'[abc]',               r'[abc]',              r'[abc]')
-    test(22, r'[.]',                 r'[\.]',               r'[.]')
-    test(23, r'[+]',                 r'[+]',                r'[+]')
-    test(24, r'[}]',                 r'[}]',                r'[}]')
-    test(25, r'[{]',                 r'[{]',                r'[{]')
-    test(26, r'[*]',                 r'[*]',                r'[*]')
-    test(27, r'[(]',                 r'[(]',                r'[(]')
-    test(28, r'[)]',                 r'[)]',                r'[)]')
-    test(29, r'["["]',               r'[\[]',               r"['[']")
-    test(30, r'["]"]',               r'[\]]',               r"[']']")
+    case(21, r'[abc]',               r'[abc]',              r'[abc]')
+    case(22, r'[.]',                 r'[\.]',               r'[.]')
+    case(23, r'[+]',                 r'[+]',                r'[+]')
+    case(24, r'[}]',                 r'[}]',                r'[}]')
+    case(25, r'[{]',                 r'[{]',                r'[{]')
+    case(26, r'[*]',                 r'[*]',                r'[*]')
+    case(27, r'[(]',                 r'[(]',                r'[(]')
+    case(28, r'[)]',                 r'[)]',                r'[)]')
+    case(29, r'["["]',               r'[\[]',               r"['[']")
+    case(30, r'["]"]',               r'[\]]',               r"[']']")
 
     # Extglob @
-    test(31, r'@(foo)',              r'(foo)',              r'(foo)')
-    test(32, r'@(foo|bar)',          r'(foo|bar)',          r'(foo|bar)')
-    test(33, r'@(|foo)',             r'(|foo)',             r'(|foo)')
+    case(31, r'@(foo)',              r'(foo)',              r'(foo)')
+    case(32, r'@(foo|bar)',          r'(foo|bar)',          r'(foo|bar)')
+    case(33, r'@(|foo)',             r'(|foo)',             r'(|foo)')
 
     # Extglob *
-    test(34, r'*(foo|bar)',          r'(foo|bar)*',         ValueError)
-    test(35, r'*(foo)',              r'(foo)*',             ValueError)
-    test(36, r'*(|foo)',             r'(|foo)*',            ValueError)
+    case(34, r'*(foo|bar)',          r'(foo|bar)*',         ValueError)
+    case(35, r'*(foo)',              r'(foo)*',             ValueError)
+    case(36, r'*(|foo)',             r'(|foo)*',            ValueError)
 
     # Extglob +
-    test(37, r'+(foo|bar)',          r'(foo|bar)+',         ValueError)
-    test(38, r'+(foo)',              r'(foo)+',             ValueError)
-    test(39, r'+(|foo)',             r'(|foo)+',            ValueError)
+    case(37, r'+(foo|bar)',          r'(foo|bar)+',         ValueError)
+    case(38, r'+(foo)',              r'(foo)+',             ValueError)
+    case(39, r'+(|foo)',             r'(|foo)+',            ValueError)
 
     # Extglob ?
-    test(40, r'?(foo|bar)',          r'(foo|bar)?',         ValueError)
-    test(41, r'?(foo)',              r'(foo)?',             ValueError)
-    test(42, r'?(|foo)',             r'(|foo)?',            ValueError)
+    case(40, r'?(foo|bar)',          r'(foo|bar)?',         ValueError)
+    case(41, r'?(foo)',              r'(foo)?',             ValueError)
+    case(42, r'?(|foo)',             r'(|foo)?',            ValueError)
 
     # Extglob !
-    test(43, r'!(foo|bar)',          ValueError,            ValueError)
+    case(43, r'!(foo|bar)',          ValueError,            ValueError)
 
     # Nested
-    test(44, r'@([abc]|foo)',        r'([abc]|foo)',        r'([abc]|foo)')
-    test(45, r'@(@(foo|bar))',       r'((foo|bar))',        r'((foo|bar))')
-    test(46, r'@(@("foo"|bar))',     r'((foo|bar))',        r'((foo|bar))')
-    test(47, r'@(?|bar)',            r'(.|bar)',            r'(?|bar)')
-    test(48, r'@(*baz|bar)',         r'(.*baz|bar)',        r'(*baz|bar)')
+    case(44, r'@([abc]|foo)',        r'([abc]|foo)',        r'([abc]|foo)')
+    case(45, r'@(@(foo|bar))',       r'((foo|bar))',        r'((foo|bar))')
+    case(46, r'@(@("foo"|bar))',     r'((foo|bar))',        r'((foo|bar))')
+    case(47, r'@(?|bar)',            r'(.|bar)',            r'(?|bar)')
+    case(48, r'@(*baz|bar)',         r'(.*baz|bar)',        r'(*baz|bar)')
 
     # Syntax errors
-    test(70, r'@(foo',               ValueError,            ValueError)
-    test(71, r'[abc',                ValueError,            ValueError)
-    test(71, r'"abc',                ValueError,            ValueError)
-    test(71, r"'abc",                ValueError,            ValueError)
+    case(70, r'@(foo',               ValueError,            ValueError)
+    case(71, r'[abc',                ValueError,            ValueError)
+    case(71, r'"abc',                ValueError,            ValueError)
+    case(71, r"'abc",                ValueError,            ValueError)

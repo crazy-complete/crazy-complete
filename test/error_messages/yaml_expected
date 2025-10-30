@@ -110,8 +110,8 @@
 3_15_13-file-invalid-ignore-globs-4      | line 4, column 42: pattern: Negated glob !(...) not supported in regex
 3_15_14-file-invalid-ignore-globs-5      | line 4, column 42: pattern: Unclosed extglob
 3_15_15-file-invalid-ignore-globs-6      | line 4, column 42: pattern: Unclosed character class
-3_15_16-file-invalid-ignore-globs-7      | line 4, column 42: pattern: Unclosed double quote
-3_15_17-file-invalid-ignore-globs-8      | line 4, column 42: pattern: Unclosed sinqle quote
+3_15_16-file-invalid-ignore-globs-7      | line 4, column 42: pattern: Unclosed single quote
+3_15_17-file-invalid-ignore-globs-8      | line 4, column 42: pattern: Unclosed double quote
 3_15_18-file-ignore-globs-invalid-type   | line 4, column 41: ignore_globs: Invalid type. Expected: list
 3_15_19-file-ignore-globs-invalid-empty  | line 4, column 41: ignore_globs: List cannot be empty
 3_16_00-directory-options-wrong-type     | line 4, column 29: Invalid type. Expected: dictionary

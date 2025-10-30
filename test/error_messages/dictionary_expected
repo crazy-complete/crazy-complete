@@ -110,8 +110,8 @@
 3_15_13-file-invalid-ignore-globs-4      | foo: -o: file: !(foo|bar): Negated glob !(...) not supported in regex
 3_15_14-file-invalid-ignore-globs-5      | foo: -o: file: @(foo|bar: Unclosed extglob
 3_15_15-file-invalid-ignore-globs-6      | foo: -o: file: [abc: Unclosed character class
-3_15_16-file-invalid-ignore-globs-7      | foo: -o: file: 'abc: Unclosed double quote
-3_15_17-file-invalid-ignore-globs-8      | foo: -o: file: "abc: Unclosed sinqle quote
+3_15_16-file-invalid-ignore-globs-7      | foo: -o: file: 'abc: Unclosed single quote
+3_15_17-file-invalid-ignore-globs-8      | foo: -o: file: "abc: Unclosed double quote
 3_15_18-file-ignore-globs-invalid-type   | foo: -o: file: Parameter `ignore_globs` has an invalid type. Expected types: list. Received: False (bool)
 3_15_19-file-ignore-globs-invalid-empty  | foo: -o: file: ignore_globs: List cannot be empty
 3_16_00-directory-options-wrong-type     | foo: -o: directory: Parameter `options` has an invalid type. Expected types: dictionary. Received: False (bool)
