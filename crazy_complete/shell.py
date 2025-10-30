@@ -61,12 +61,6 @@ def escape(string, escape_empty_string=True):
     return "'%s'" % string.replace("'", '\'"\'"\'')
 
 
-def unescape(string):
-    '''Unescapes a string.'''
-
-    return ''.join(shlex.split(string, posix=True))
-
-
 class ShellCompleter:
     '''Base class for argument completion.'''
 
