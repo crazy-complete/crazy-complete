@@ -1,5 +1,7 @@
 '''Classes for including functions in the generation process.'''
 
+import re
+
 from . import cli
 from . import shell
 from . import preprocessor
@@ -7,6 +9,13 @@ from .str_utils import (indent, strip_comments, strip_double_empty_lines)
 
 
 # pylint: disable=too-few-public-methods
+
+
+def replace_function_name(search, replace, s):
+    '''Safely replace a function name in code'''
+
+    pattern = f'\\b{search}\\b'
+    return re.sub(pattern, replace, s)
 
 
 class FunctionBase:
@@ -186,7 +195,8 @@ class GeneralHelpers:
             code = function.get_code(realname, self.global_defines | defines)
 
             for dep_func in function.dependencies:
-                code = code.replace(dep_func, self.get_real_function_name(dep_func))
+                real_func = self.get_real_function_name(dep_func)
+                code = replace_function_name(dep_func, real_func, code)
 
             code = code.replace('%PREFIX%', self.function_prefix)
 
