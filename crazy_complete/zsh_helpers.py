@@ -210,9 +210,10 @@ HAVING_OPTIONS=()
 OPTION_VALUES=()
 INCOMPLETE_OPTION=''
 
+local args=("${(Q)@}")
 local argi=2 # argi[1] is program name
-for ((; argi <= $#; ++argi)); do
-  local arg="${@[$argi]}"
+for ((; argi <= ${#args[@]}; ++argi)); do
+  local arg="${args[$argi]}"
   local have_trailing_arg=$(test $argi -lt $# && echo true || echo false)
 
   case "$arg" in
@@ -227,7 +228,7 @@ for ((; argi <= $#; ++argi)); do
       if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
         if $have_trailing_arg; then
           HAVING_OPTIONS+=("$arg")
-          OPTION_VALUES+=("${@[$((++argi))]}")
+          OPTION_VALUES+=("${args[$((++argi))]}")
 #ifdef with_incomplete
         else
           INCOMPLETE_OPTION="$arg"
@@ -251,7 +252,7 @@ for ((; argi <= $#; ++argi)); do
       elif __zsh_query_contains "$arg" "${old_opts_with_arg[@]}"; then
         if $have_trailing_arg; then
           HAVING_OPTIONS+=("$arg")
-          OPTION_VALUES+=("${@[$((++argi))]}")
+          OPTION_VALUES+=("${args[$((++argi))]}")
 #ifdef with_incomplete
         else
           INCOMPLETE_OPTION="$arg"
@@ -280,7 +281,7 @@ for ((; argi <= $#; ++argi)); do
             OPTION_VALUES+=("$trailing_chars")
           elif $have_trailing_arg; then
             HAVING_OPTIONS+=("$option")
-            OPTION_VALUES+=("${@[$((++argi))]}")
+            OPTION_VALUES+=("${args[$((++argi))]}")
 #ifdef with_incomplete
           else
             INCOMPLETE_OPTION="$option"
