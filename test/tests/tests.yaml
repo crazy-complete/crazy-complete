@@ -2116,3 +2116,63 @@ zsh_expected: |
   README.md           directory/          image0.jpg
   archive.tar.gz      file\ with\ spaces  image1.JPG
   bin/                file4.txt.1         image2.jPg
+---
+number: 136
+definition_file: "when"
+description: "Check with no options"
+send: "crazy-complete-test --"
+bash_expected: |
+  > crazy-complete-test --
+  --directories  --files        --if-not-1     --option-1     --option-2
+  > crazy-complete-test --
+fish_expected: |
+  > crazy-complete-test --
+  --directories  --files  --if-not-1  --option-1  --option-2
+zsh_expected: |
+  > crazy-complete-test --
+  --directories  --files        --if-not-1     --option-1     --option-2
+---
+number: 137
+definition_file: "when"
+description: "Check with no --option-1"
+send: "crazy-complete-test --option-1 --"
+bash_expected: |
+  > crazy-complete-test --option-1 --
+  --directories  --files        --if-1-or-2    --option-2
+  > crazy-complete-test --option-1 --
+fish_expected: |
+  > crazy-complete-test --option-1 --
+  --directories  --files  --if-1-or-2  --option-2
+zsh_expected: |
+  > crazy-complete-test --option-1 --
+  --directories  --files        --if-1-or-2    --option-2
+---
+number: 138
+definition_file: "when"
+description: "Check with no --option-2"
+send: "crazy-complete-test --option-2 --"
+bash_expected: |
+  > crazy-complete-test --option-2 --
+  --directories  --files        --if-1-or-2    --if-not-1     --option-1
+  > crazy-complete-test --option-2 --
+fish_expected: |
+  > crazy-complete-test --option-2 --
+  --directories  --files  --if-1-or-2  --if-not-1  --option-1
+zsh_expected: |
+  > crazy-complete-test --option-2 --
+  --directories  --files        --if-1-or-2    --if-not-1     --option-1
+---
+number: 139
+definition_file: "when"
+description: "Check with no --option-1 and --option-2"
+send: "crazy-complete-test --option-1 --option-2 --"
+bash_expected: |
+  > crazy-complete-test --option-1 --option-2 --
+  --directories  --files        --if-1-and-2   --if-1-or-2
+  > crazy-complete-test --option-1 --option-2 --
+fish_expected: |
+  > crazy-complete-test --option-1 --option-2 --
+  --directories  --files  --if-1-and-2  --if-1-or-2
+zsh_expected: |
+  > crazy-complete-test --option-1 --option-2 --
+  --directories  --files        --if-1-and-2   --if-1-or-2

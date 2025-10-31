@@ -251,15 +251,15 @@ class GlobParser:
         if token == '!':
             negated = True
         elif token == ']':
-            raise Exception('Empty character class')
+            raise ValueError('Empty character class')
         else:
             chars += str(token)
 
         while True:
             try:
                 token = self.get()
-            except IndexError:
-                raise ValueError('Unclosed character class')
+            except IndexError as e:
+                raise ValueError('Unclosed character class') from e
 
             if token == ']':
                 return CharClass(chars, negated)
@@ -343,13 +343,13 @@ def test():
             print('Test %d (regex):' % num)
             print('Having:   %s' % regex_result)
             print('Expected: %s' % expected_regex)
-            raise Exception('Test failed')
+            raise AssertionError('Test failed')
 
         if zsh_glob_result != expected_zsh_glob:
             print('Test %d (zsh glob):' % num)
             print('Having:   %s' % zsh_glob_result)
             print('Expected: %s' % expected_zsh_glob)
-            raise Exception('Test failed')
+            raise AssertionError('Test failed')
 
     # Literals
     case(0,  r'a',                   r'a',                  r'a')

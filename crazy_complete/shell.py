@@ -1,7 +1,6 @@
 '''Shell utility functions.'''
 
 import re
-import shlex
 
 from . import utils
 

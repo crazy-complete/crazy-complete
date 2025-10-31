@@ -1,7 +1,6 @@
 '''Functions for parsing the `when` attribute.'''
 
-import shlex
-
+from . import shell_parser
 from .errors import CrazyError
 
 
@@ -41,21 +40,39 @@ class HasOption:
             raise CrazyError('HasOption: Empty options')
 
 
+def replace_commands(obj):
+    '''Replaced `shell_parser.Command` objects by condition objects.'''
+
+    if isinstance(obj, shell_parser.And):
+        obj.left  = replace_commands(obj.left)
+        obj.right = replace_commands(obj.right)
+        return obj
+
+    if isinstance(obj, shell_parser.Or):
+        obj.left  = replace_commands(obj.left)
+        obj.right = replace_commands(obj.right)
+        return obj
+
+    if isinstance(obj, shell_parser.Not):
+        obj.expr = replace_commands(obj.expr)
+        return obj
+
+    if isinstance(obj, shell_parser.Command):
+        cmd, *args = obj.args
+
+        if cmd == 'option_is':
+            return OptionIs(args)
+
+        if cmd == 'has_option':
+            return HasOption(args)
+
+        raise CrazyError("Invalid command: %r" % cmd)
+
+    raise AssertionError("Not reached")
+
+
 def parse_when(s):
     '''Parse `when` string and return an object.'''
 
-    split = shlex.split(s)
-
-    if not split:
-        raise CrazyError("parse_when: Empty arguments")
-
-    cmd = split[0]
-    del split[0]
-
-    if cmd == 'option_is':
-        return OptionIs(split)
-
-    if cmd == 'has_option':
-        return HasOption(split)
-
-    raise CrazyError("Invalid command: %r" % cmd)
+    obj = shell_parser.parse(s)
+    return replace_commands(obj)

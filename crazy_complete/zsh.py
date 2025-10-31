@@ -11,6 +11,7 @@ from . import utils
 from . import zsh_complete
 from . import zsh_helpers
 from . import zsh_utils
+from . import zsh_when
 from . import zsh_wrapper
 from .str_utils import indent
 
@@ -28,13 +29,6 @@ class ZshQuery:
     def use(self, define=None):
         self.used = True
         return self.ctxt.helpers.use_function('query', define)
-
-    def use_when(self, when):
-        if 'option_is' in when:
-            self.use('option_is')
-        if 'has_option' in when:
-            self.use('has_option')
-        return self.use()
 
 
 class ZshCompletionFunction:
@@ -212,8 +206,8 @@ class ZshCompletionFunction:
                     ' '.join(shell.escape(o) for o in arg.option.option_strings))
 
             if arg.when:
-                func = self.query.use_when(arg.when)
-                r += '%s %s &&\\\n' % (func, arg.when)
+                when_cmd = zsh_when.generate_when_conditions(self.query, arg.when)
+                r += '%s &&\\\n' % when_cmd
 
             r += '  args+=(%s)\n' % arg.option_spec
 

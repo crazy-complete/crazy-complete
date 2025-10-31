@@ -36,7 +36,7 @@ class StringStream:
         '''Parse a single-quoted shell string.'''
 
         if not in_quotes:
-            assert (self.get() == "'")
+            assert self.get() == "'"
 
         string = ''
 
@@ -55,7 +55,7 @@ class StringStream:
         '''Parse a double-quoted shell string.'''
 
         if not in_quotes:
-            assert (self.get() == '"')
+            assert self.get() == '"'
 
         string = ''
 

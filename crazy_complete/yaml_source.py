@@ -180,7 +180,7 @@ def replace_defines_in_documents(documents):
           - option_strings: ['-o']
             complete: 'my_completer'
     '''
-        
+
     defines = None
 
     for document in documents:

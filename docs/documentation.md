@@ -117,6 +117,8 @@ positionals:
 
 Aliases / defines can be handy if completers are reused of to keep the defintion file clean.
 
+**NOTE:** Every defined string is replaced throughout the YAML document, regardless of its context.
+
 ```yaml
 prog: '%defines%'
 complete_bool: ['choices', ['true', 'false']]
@@ -1719,7 +1721,7 @@ trace in case of an error.
 ## When Conditionals
 
 Options and Positional Arguments can include a `when` attribute that defines
-a *single* condition under which the option (or positional argument) should be
+a condition under which the option (or positional argument) should be
 activated.
 
 ### has\_option
@@ -1760,6 +1762,30 @@ options:
 
   - option_strings: ["--foo", "--bar", "--baz"]
     complete: ["none"]
+[...]
+```
+
+### Multiple conditions
+
+> Multiple conditions can be combined using the logical operators `&&` (**AND**) and `||` (**OR**).
+
+> Expressions can be grouped using parentheses `(` and `)` to control evaluation order.
+
+> The negation operator `!` is also supported for logical **NOT** expressions.
+
+**Example:**
+
+```yaml
+# This activates --conditional if --foo is given but --bar is not given.
+
+[...]
+options:
+  - option_strings: ["--conditional"]
+    when: "has_option --foo && ! has_option --bar"
+
+  - option_strings: ["--foo"]
+
+  - option_strings: ["--bar"]
 [...]
 ```
 

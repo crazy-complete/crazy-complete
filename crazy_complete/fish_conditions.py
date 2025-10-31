@@ -1,6 +1,7 @@
 '''Conditions for Fish.'''
 
 from . import when
+from . import shell_parser
 from .errors import InternalError
 from .type_utils import is_list_type
 
@@ -17,7 +18,58 @@ class Condition:
         raise NotImplementedError
 
 
+class And(Condition):
+    '''Logical and.'''
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def query_code(self, ctxt):
+        left = self.left.query_code(ctxt)
+        right = self.right.query_code(ctxt)
+        return f'begin {left} && {right}; end'
+
+    def unsafe_code(self, ctxt):
+        left = self.left.unsafe_code(ctxt)
+        right = self.right.unsafe_code(ctxt)
+        return f'begin {left} && {right}; end'
+
+
+class Or(Condition):
+    '''Logical or.'''
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def query_code(self, ctxt):
+        left = self.left.query_code(ctxt)
+        right = self.right.query_code(ctxt)
+        return f'begin {left} || {right}; end'
+
+    def unsafe_code(self, ctxt):
+        left = self.left.unsafe_code(ctxt)
+        right = self.right.unsafe_code(ctxt)
+        return f'begin {left} || {right}; end'
+
+
+class Not(Condition):
+    '''Logical not.'''
+
+    def __init__(self, conditional):
+        self.conditional = conditional
+
+    def query_code(self, ctxt):
+        return 'not %s' % self.conditional.query_code(ctxt)
+
+    def unsafe_code(self, ctxt):
+        return 'not %s' % self.conditional.unsafe_code(ctxt)
+
+
 class HasOption(Condition):
+    '''Checks if an option is present on command line.'''
+
     def __init__(self, option_strings):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
@@ -45,6 +97,8 @@ class HasOption(Condition):
 
 
 class HasHiddenOption(Condition):
+    '''Checks if an incomplete option is present on command line.'''
+
     def __init__(self, option_strings):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
@@ -63,6 +117,8 @@ class HasHiddenOption(Condition):
 
 
 class OptionIs(Condition):
+    '''Checks if an option has a specific value.'''
+
     def __init__(self, option_strings, values):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
@@ -85,6 +141,8 @@ class OptionIs(Condition):
 
 
 class PositionalNum(Condition):
+    '''Check the number of positionals.'''
+
     TEST_OPERATORS = {
         '==': '-eq',
         '!=': '-ne',
@@ -117,6 +175,8 @@ class PositionalNum(Condition):
 
 
 class PositionalContains(Condition):
+    '''Checks if a positional contains a specific value.'''
+
     def __init__(self, number, values):
         if not isinstance(number, int):
             raise InternalError(f'number: Invalid type: {number}')
@@ -139,18 +199,35 @@ class PositionalContains(Condition):
         return r
 
 
-class Not(Condition):
-    def __init__(self, conditional):
-        self.conditional = conditional
+def replace_commands(obj):
+    '''Replace shell_parser/when objects by own condition objects.'''
 
-    def query_code(self, ctxt):
-        return 'not %s' % self.conditional.query_code(ctxt)
+    if isinstance(obj, shell_parser.And):
+        left  = replace_commands(obj.left)
+        right = replace_commands(obj.right)
+        return And(left, right)
 
-    def unsafe_code(self, ctxt):
-        return 'not %s' % self.conditional.unsafe_code(ctxt)
+    if isinstance(obj, shell_parser.Or):
+        left  = replace_commands(obj.left)
+        right = replace_commands(obj.right)
+        return Or(left, right)
+
+    if isinstance(obj, shell_parser.Not):
+        expr = replace_commands(obj.expr)
+        return Not(expr)
+
+    if isinstance(obj, when.OptionIs):
+        return OptionIs(obj.options, obj.values)
+
+    if isinstance(obj, when.HasOption):
+        return HasOption(obj.options)
+
+    raise AssertionError("Not reached")
 
 
 class Conditions(Condition):
+    '''Holds a list of conditions.'''
+
     def __init__(self):
         self.conditions = []
 
@@ -165,11 +242,12 @@ class Conditions(Condition):
                 positional_contains.append(condition)
             elif isinstance(condition, PositionalNum):
                 positional_num.append(condition)
-            elif isinstance(condition, HasOption):
+            elif isinstance(condition, (HasHiddenOption, HasOption)):
                 has_option.append(condition)
             else:
                 other.append(condition)
 
+        # positional_num is fastest, followed by positional_contains
         r = []
         r.extend(positional_num)
         r.extend(positional_contains)
@@ -190,20 +268,21 @@ class Conditions(Condition):
         return '"%s"' % ' && '.join(r)
 
     def add(self, condition):
+        '''Add a condition.'''
+
         self.conditions.append(condition)
 
     def extend(self, conditions):
+        '''Add many conditions.'''
+
         self.conditions.extend(conditions)
 
     def add_when(self, obj):
+        '''Add when objects.'''
+
         if obj is None:
             return
 
-        if isinstance(obj, when.OptionIs):
-            condition = OptionIs(obj.options, obj.values)
-        elif isinstance(obj, when.HasOption):
-            condition = HasOption(obj.options)
-        else:
-            raise AssertionError(f"Should not be reached: {obj}")
+        condition = replace_commands(obj)
 
         self.conditions.append(condition)

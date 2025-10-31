@@ -4,6 +4,19 @@ options:
 
   - option_strings: ['--directories']
 
+  - option_strings: ['--option-1']
+
+  - option_strings: ['--option-2']
+
+  - option_strings: ['--if-1-and-2']
+    when: 'has_option --option-1 && has_option --option-2'
+
+  - option_strings: ['--if-1-or-2']
+    when: 'has_option --option-1 || has_option --option-2'
+
+  - option_strings: ['--if-not-1']
+    when: '! has_option --option-1'
+
   - option_strings: ['--complete']
     complete: ['choices', ['file1', 'file2', 'file3']]
     when: 'has_option --files'
