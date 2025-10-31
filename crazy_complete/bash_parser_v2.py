@@ -25,13 +25,13 @@ __append_to_array() {
 }
 
 for ((argi=1; argi < cword; ++argi)); do
-  arg="${words[argi]}"
+  arg="${words_dequoted[argi]}"
 
   case "$arg" in
     --)
       END_OF_OPTIONS=1
 #ifdef positionals
-      POSITIONALS+=("${words[@]:$((++argi))}")
+      POSITIONALS+=("${words_dequoted[@]:$((++argi))}")
 #endif
       return;;
 #ifdef long_options
@@ -42,7 +42,7 @@ for ((argi=1; argi < cword; ++argi)); do
     --*)
       if __find_option "$cmd" "$arg"; then
         if [[ "$ARGS" == 1 ]]
-        then __append_to_array "$VAR" "${words[++argi]}"
+        then __append_to_array "$VAR" "${words_dequoted[++argi]}"
         else __append_to_array "$VAR" "_OPT_ISSET_"
         fi
       fi;;
@@ -60,7 +60,7 @@ for ((argi=1; argi < cword; ++argi)); do
 
       if __find_option "$cmd" "$arg"; then
         if [[ "$ARGS" == 1 ]]
-        then __append_to_array "$VAR" "${words[++argi]}"
+        then __append_to_array "$VAR" "${words_dequoted[++argi]}"
         else __append_to_array "$VAR" "_OPT_ISSET_"
         fi
 
@@ -77,7 +77,7 @@ for ((argi=1; argi < cword; ++argi)); do
           if [[ "$ARGS" == 1 ]]; then
             if [[ -n "$trailing_chars" ]]
             then __append_to_array "$VAR" "$trailing_chars"
-            else __append_to_array "$VAR" "${words[++argi]}"
+            else __append_to_array "$VAR" "${words_dequoted[++argi]}"
             fi
             break;
 #ifdef short_optionals
@@ -106,9 +106,9 @@ done
 #ifdef positionals
 
 for ((; argi <= cword; ++argi)); do
-  case "${words[argi]}" in
+  case "${words_dequoted[argi]}" in
     -?*);;
-    *) POSITIONALS+=("${words[argi]}");;
+    *) POSITIONALS+=("${words_dequoted[argi]}");;
   esac
 done
 #endif'''

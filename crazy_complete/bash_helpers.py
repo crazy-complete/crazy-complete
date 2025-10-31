@@ -57,6 +57,17 @@ ___BREAK_POS=$___break_pos
 ___IN_QUOTES=$___in_quotes
 ''')
 
+_DEQUOTE_WORDS = helpers.ShellFunction('dequote_words', r'''
+local word dequoted break_pos in_quotes
+
+words_dequoted=()
+
+for word in "${words[@]}"; do
+  dequote "$word" dequoted break_pos in_quotes
+  words_dequoted+=("$dequoted")
+done
+''', ['dequote'])
+
 _PARSE_LINE = helpers.ShellFunction('parse_line', r'''
 local -n out="$1"
 local in="$2" len=${#2} i=0 word='' active=0
@@ -570,6 +581,7 @@ class BashHelpers(helpers.GeneralHelpers):
         super().__init__(config, function_prefix, helpers.ShellFunction)
         self.add_function(_VALUES)
         self.add_function(_DEQUOTE)
+        self.add_function(_DEQUOTE_WORDS)
         self.add_function(_PREFIX)
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
         self.add_function(_ARRAY_CONTAINS)

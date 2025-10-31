@@ -130,8 +130,9 @@ class BashCompletionGenerator:
 
         if self.commandline.parent is None:
             # The root parser makes those variables local and sets up the completion.
-            r  = 'local cur prev words cword split\n'
-            r += '%s -n =: || return' % bash_versions.init_completion(self.ctxt)
+            r  = 'local cur prev words cword split words_dequoted\n'
+            r += '%s -n =: || return\n' % bash_versions.init_completion(self.ctxt)
+            r += self.ctxt.helpers.use_function('dequote_words')
             code['init_completion'] = r
 
             v1 = bash_parser.generate(self.commandline, self.variable_manager)

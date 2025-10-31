@@ -14,12 +14,12 @@ END_OF_OPTIONS=0
 local cmd="root" argi arg i char trailing_chars
 
 for ((argi=1; argi < cword; ++argi)); do
-  arg="${words[argi]}"
+  arg="${words_dequoted[argi]}"
 
   case "$arg" in
     --)
       END_OF_OPTIONS=1
-      POSITIONALS+=("${words[@]:$((++argi))}")
+      POSITIONALS+=("${words_dequoted[@]:$((++argi))}")
       return;;
     -?*) # ignore '-'
 %LONG_OPTION_CASES%
@@ -36,9 +36,9 @@ for ((argi=1; argi < cword; ++argi)); do
 done
 
 for ((; argi <= cword; ++argi)); do
-  case "${words[argi]}" in
+  case "${words_dequoted[argi]}" in
     -?*);;
-    *) POSITIONALS+=("${words[argi]}");;
+    *) POSITIONALS+=("${words_dequoted[argi]}");;
   esac
 done'''
 
@@ -107,7 +107,7 @@ def _make_long_option_case(long_options, option, variable):
         r += '  continue;;'
     elif option.complete:
         r += '%s)\n'                        % CasePatterns.for_long_without_arg(long_options)
-        r += '  %s+=("${words[++argi]}")\n' % variable
+        r += '  %s+=("${words_dequoted[++argi]}")\n' % variable
         r += '  continue;;\n'
         r += '%s)\n'                        % CasePatterns.for_long_with_arg(long_options)
         r += '  %s+=("${arg#*=}")\n'        % variable
@@ -133,8 +133,8 @@ def _make_short_option_case(short_options, option, variable):
     elif option.complete:
         r += '%s)\n' % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
-        r += '  then %s+=("$trailing_chars")\n'   % variable
-        r += '  else %s+=("${words[++argi]}")\n'  % variable
+        r += '  then %s+=("$trailing_chars")\n'            % variable
+        r += '  else %s+=("${words_dequoted[++argi]}")\n'  % variable
         r += '  fi\n'
         r += '  continue 2;;'
     else:
