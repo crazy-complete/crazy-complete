@@ -2,6 +2,7 @@
 
 import os
 import sys
+import shlex
 import argparse
 
 from .errors import CrazyError
@@ -238,6 +239,34 @@ def try_print_manual(args):
     sys.exit(0)
 
 
+def try_batch(args):
+    '''Do batch processing.'''
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--batch')
+    opts, _ = parser.parse_known_args(args)
+
+    if not opts.batch:
+        return
+
+    with open(opts.batch, 'r', encoding='utf-8') as fh:
+        content = fh.read()
+
+    for line in content.split('\n'):
+        line = line.strip()
+
+        if not line or line.startswith('#'):
+            continue
+
+        utils.print_err('Running:', line)
+
+        app = Application()
+        app.parse_args(shlex.split(line))
+        app.run()
+
+    sys.exit(0)
+
+
 def generate(opts):
     '''Generate output file as specified in `opts`.'''
 
@@ -299,6 +328,7 @@ class Application:
             - argparse.ArgumentError
         '''
         try_print_manual(args)
+        try_batch(args)
         self.options = _crazy_complete_argument_parser.parse_args(args)
 
     def run(self):

@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import json
+import shlex
 import yaml
 import queue
 import argparse
@@ -181,9 +182,10 @@ class Tests:
             if not os.path.isdir(TEMP_DIR):
                 raise NotADirectoryError(TEMP_DIR) from None
 
-        print_err('Generating completion files ...')
-        for file, args in self.definition_files.items():
+        batch_file = '%s/%s' % (TEMP_DIR, 'batch.txt')
+        batch_commands = []
 
+        for file, args in self.definition_files.items():
             definition_file = args['definition_file']
             temp_definition_file = f'{TEMP_DIR}/{definition_file}'
 
@@ -195,13 +197,22 @@ class Tests:
                 fh.write(content)
 
             for shell in SHELLS:
-                cmd =  [CRAZY_COMPLETE, '--debug', '--zsh-compdef=False']
+                cmd =  ['--debug', '--zsh-compdef=False']
                 for arg in args['args']:
                     cmd += [arg.replace('$shell', shell)]
                 cmd += ['-o', f'{COMPLETIONS_OUTDIR}/{file}.{shell}']
                 cmd += [shell, temp_definition_file]
-                print_err('Running', ' '.join(cmd))
-                run(cmd)
+                cmd = ' '.join(shlex.quote(arg) for arg in cmd)
+                batch_commands.append(cmd)
+
+        with open(batch_file, 'w', encoding='utf-8') as fh:
+            print_err("Writing batch file '%s' ..." % batch_file)
+            fh.write('\n'.join(batch_commands))
+
+        print_err('Running batch file ...')
+        args = [CRAZY_COMPLETE, '--batch', batch_file]
+        subprocess.run(args, check=True)
+        print_err('Finished running batch file ...')
 
 def tests_worker_thread(thread_id, shell, input_queue, result_queue):
     if opts.driver == 'tmux':
