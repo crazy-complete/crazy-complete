@@ -58,7 +58,7 @@ def make_option_spec(
         not_options = ['- *']
 
     if not_options:
-        result.append(shell.escape('(%s)' % ' '.join(algo.uniq(not_options))))
+        result.append(shell.quote('(%s)' % ' '.join(algo.uniq(not_options))))
 
     # Repeatable option =======================================================
     if repeatable:
@@ -79,14 +79,14 @@ def make_option_spec(
 
     # Description =============================================================
     if description is not None:
-        result.append(shell.escape('[%s]' % escape_colon(escape_square_brackets(description))))
+        result.append(shell.quote('[%s]' % escape_colon(escape_square_brackets(description))))
 
     # Complete ================================================================
     if complete:
         if metavar is None:
             metavar = ' '
 
-        result.append(':%s:%s' % (shell.escape(escape_colon(metavar)), action))
+        result.append(':%s:%s' % (shell.quote(escape_colon(metavar)), action))
 
     return ''.join(result)
 
@@ -110,7 +110,7 @@ def make_positional_spec(
     else:
         num_spec = str(number)
 
-    desc_spec = shell.escape(escape_colon(description))
+    desc_spec = shell.quote(escape_colon(description))
 
     if action == '_normal':
         return f'{num_spec}::{desc_spec}:{action}'

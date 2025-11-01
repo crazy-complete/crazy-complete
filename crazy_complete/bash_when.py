@@ -50,7 +50,7 @@ class ConditionGenerator:
             for value in obj.values:
                 value_equals.append('[[ "${%s[-1]}" == %s ]]' % (
                     self.variable_manager.capture_variable(o),
-                    shell.escape(value)
+                    shell.quote(value)
                 ))
 
             if len(value_equals) == 1:

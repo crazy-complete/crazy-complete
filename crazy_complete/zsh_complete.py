@@ -41,12 +41,12 @@ class ZshComplFunc(ZshCompletionBase):
         if len(self.args) == 1:
             cmd = self.args[0]
         else:
-            cmd = ' '.join(shell.escape(arg) for arg in self.args)
+            cmd = ' '.join(shell.quote(arg) for arg in self.args)
 
         if self.needs_braces:
-            cmd = shell.escape('{%s}' % cmd)
+            cmd = shell.quote('{%s}' % cmd)
         else:
-            cmd = shell.escape(cmd)
+            cmd = shell.quote(cmd)
 
         return escape_colon(cmd)
 
@@ -54,7 +54,7 @@ class ZshComplFunc(ZshCompletionBase):
         if len(self.args) == 1:
             return self.args[0]
 
-        code = ' '.join(shell.escape(arg) for arg in self.args)
+        code = ' '.join(shell.quote(arg) for arg in self.args)
         funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
         return funcname
 
@@ -68,20 +68,20 @@ class ZshCompleteChoices(ZshCompletionBase):
         self.choices = choices
 
     def _list_action_string(self):
-        items   = [str(item) for item in self.choices]
-        escaped = [shell.escape(escape_colon(item)) for item in items]
-        action  = shell.escape('(%s)' % ' '.join(escaped))
+        items  = [str(item) for item in self.choices]
+        quoted = [shell.quote(escape_colon(item)) for item in items]
+        action = shell.quote('(%s)' % ' '.join(quoted))
         if len(action) <= CHOICES_INLINE_THRESHOLD:
             return action
 
         return self._list_function()
 
     def _list_function(self):
-        metavar = shell.escape(self.ctxt.option.metavar or '')
-        escaped = [shell.escape(escape_colon(c)) for c in self.choices]
+        metavar = shell.quote(self.ctxt.option.metavar or '')
+        quoted = [shell.quote(escape_colon(c)) for c in self.choices]
 
         code  = 'local items=(\n'
-        code += indent(join_with_wrap(' ', '\n', 78, escaped), 2)
+        code += indent(join_with_wrap(' ', '\n', 78, quoted), 2)
         code += '\n)\n\n'
         code += f'_describe -- {metavar} items'
 
@@ -97,28 +97,28 @@ class ZshCompleteChoices(ZshCompletionBase):
         items = [str0(item) for item in self.choices.keys()]
         descriptions = [str0(value) for value in self.choices.values()]
         colon = any(':' in s for s in items + descriptions)
-        escaped = []
+        quoted = []
 
         for item, desc in zip(items, descriptions):
-            val = shell.escape(escape_colon(item))
+            val = shell.quote(escape_colon(item))
             if desc:
-                val += '\\:%s' % shell.escape(desc)
-            escaped.append(val)
+                val += '\\:%s' % shell.quote(desc)
+            quoted.append(val)
 
-        action  = shell.escape('((%s))' % ' '.join(escaped))
+        action  = shell.quote('((%s))' % ' '.join(quoted))
         if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
             return action
 
         return self._dict_function()
 
     def _dict_function(self):
-        metavar  = shell.escape(self.ctxt.option.metavar or '')
+        metavar  = shell.quote(self.ctxt.option.metavar or '')
 
         code  = 'local items=(\n'
         for item, desc in self.choices.items():
-            item = shell.escape(escape_colon(str(item)))
+            item = shell.quote(escape_colon(str(item)))
             if desc:
-                desc = shell.escape(str(desc))
+                desc = shell.quote(str(desc))
                 code += f'  {item}:{desc}\n'
             else:
                 code += f'  {item}\n'
@@ -157,15 +157,15 @@ class ZshCompleteCommand(ZshCompletionBase):
             prepend = opts.get('path_prepend', None)
 
         if path:
-            self.code = 'local -x PATH=%s' % shell.escape(path)
+            self.code = 'local -x PATH=%s' % shell.quote(path)
         elif append and prepend:
-            append = shell.escape(append)
-            prepend = shell.escape(prepend)
+            append = shell.quote(append)
+            prepend = shell.quote(prepend)
             self.code = 'local -x PATH=%s:"$PATH":%s' % (prepend, append)
         elif append:
-            self.code = 'local -x PATH="$PATH":%s' % shell.escape(append)
+            self.code = 'local -x PATH="$PATH":%s' % shell.quote(append)
         elif prepend:
-            self.code = 'local -x PATH=%s:"$PATH"' % shell.escape(prepend)
+            self.code = 'local -x PATH=%s:"$PATH"' % shell.quote(prepend)
 
     def get_action_string(self):
         if not self.code:
@@ -222,7 +222,7 @@ class ZshKeyValueList(ZshComplFunc):
             key = escape_colon(key)
 
             if desc:
-                desc = shell.escape('[%s]' % escape_square_brackets(desc))
+                desc = shell.quote('[%s]' % escape_square_brackets(desc))
             else:
                 desc = ''
 
@@ -236,9 +236,9 @@ class ZshKeyValueList(ZshComplFunc):
                 spec.append('%s%s:::%s' % (key, desc, action))
 
         code = '_values -s %s -S %s %s \\\n%s' % (
-            shell.escape(pair_separator),
-            shell.escape(value_separator),
-            shell.escape(ctxt.option.metavar or ''),
+            shell.quote(pair_separator),
+            shell.quote(value_separator),
+            shell.quote(ctxt.option.metavar or ''),
             indent(' \\\n'.join(spec), 2)
         )
 
@@ -251,7 +251,7 @@ class ZshCompleteCombine(ZshCompletionBase):
     '''Combine multiple completers into one.'''
 
     def __init__(self, ctxt, trace, completer, commands):
-        # metavar = shell.escape(ctxt.option.metavar or '')
+        # metavar = shell.quote(ctxt.option.metavar or '')
         trace.append('combine')
 
         completions = []
@@ -270,7 +270,7 @@ class ZshCompleteCombine(ZshCompletionBase):
         return self.func
 
     def get_action_string(self):
-        return shell.escape('{%s}' % self.func)
+        return shell.quote('{%s}' % self.func)
 
 
 class ZshCompleter(shell.ShellCompleter):

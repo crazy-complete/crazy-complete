@@ -143,7 +143,7 @@ def _make_cmd_plus_option_switch_code(commandline, variable_manager, omit_cmd_ch
         return _make_option_switch_code(option_cases)
 
     command = get_subcommand_path(commandline)
-    command = shell.escape(command)
+    command = shell.quote(command)
     if commandline.inherit_options:
         command += '*'
 

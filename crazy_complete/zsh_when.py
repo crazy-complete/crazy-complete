@@ -42,12 +42,12 @@ class ConditionGenerator:
     def _gen_option_is(self, obj):
         func = self.query.use('option_is')
         args = [func, 'option_is', *obj.options, '--', *obj.values]
-        return ' '.join(shell.escape(a) for a in args)
+        return ' '.join(shell.quote(a) for a in args)
 
     def _gen_has_option(self, obj):
         func = self.query.use('has_option')
         args = [func, 'has_option', *obj.options]
-        return ' '.join(shell.escape(a) for a in args)
+        return ' '.join(shell.quote(a) for a in args)
 
 
 def generate_when_conditions(query, when_):

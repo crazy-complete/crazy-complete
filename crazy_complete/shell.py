@@ -27,35 +27,42 @@ def make_identifier(string):
     return string
 
 
-def needs_escape(string):
-    '''Return if string needs escaping.'''
+def needs_quote(string):
+    '''Return if string needs quoting.'''
 
     return not re.fullmatch('[a-zA-Z0-9_@%+=:,./-]+', string)
 
 
-def escape(string, escape_empty_string=True):
-    '''Escapes special characters in a string for safe usage in shell commands or scripts.
+def quote(string, quote_empty_string=True):
+    '''Quotes a string for safe usage in shell commands or scripts.
 
     Args:
-        string (str): The input string to be escaped.
-        escape_empty_string (bool, optional): Determines whether to escape an empty string or not.
+        string (str):
+            The input string to be quoted.
+
+        quote_empty_string (bool, optional):
+            Determines whether to quote an empty string or not.
             Defaults to True.
 
     Returns:
-        str: The escaped string.
+        str: The quoted string.
     '''
 
-    if not string and not escape_empty_string:
+    if not string and not quote_empty_string:
         return ''
 
-    if not needs_escape(string):
+    if not needs_quote(string):
         return string
 
     if "'" not in string:
         return "'%s'" % string
 
     if '"' not in string:
-        return '"%s"' % string.replace('\\', '\\\\').replace('$', '\\$').replace('`', '\\`')
+        s = string
+        s = s.replace('\\', '\\\\')
+        s = s.replace('$', '\\$')
+        s = s.replace('`', '\\`')
+        return '"%s"' % s
 
     return "'%s'" % string.replace("'", '\'"\'"\'')
 

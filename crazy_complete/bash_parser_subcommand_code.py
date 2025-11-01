@@ -51,9 +51,9 @@ def make_subcommand_switch_code(commandline):
     r  = 'case "$cmd|${#POSITIONALS[@]}" in\n'
     for case in cases:
         if '\n' not in case[1]:
-            r += '  %s) %s;;\n' % (shell.escape(case[0]), case[1])
+            r += '  %s) %s;;\n' % (shell.quote(case[0]), case[1])
         else:
-            r += '  %s)\n%s;;\n' % (shell.escape(case[0]), indent(case[1], 4))
+            r += '  %s)\n%s;;\n' % (shell.quote(case[0]), indent(case[1], 4))
     r += 'esac'
 
     return r

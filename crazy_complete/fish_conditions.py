@@ -28,9 +28,9 @@ def make_condition_command(prefix, args):
     We have to ensure proper escaping inside the double quotes.
     '''
 
-    args_escaped = [shell.escape(arg) for arg in args]
-    args_escaped = [escape_in_double(arg) for arg in args_escaped]
-    return '%s %s' % (prefix, ' '.join(args_escaped))
+    args_quoted = [shell.quote(arg) for arg in args]
+    args_quoted = [escape_in_double(arg) for arg in args_quoted]
+    return '%s %s' % (prefix, ' '.join(args_quoted))
 
 
 def make_query(args):

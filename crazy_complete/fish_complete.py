@@ -67,10 +67,10 @@ class FishCompletionCommand(FishCompletionBase):
         self.args = args
 
     def get_code(self):
-        return ' '.join(shell.escape(arg) for arg in self.args)
+        return ' '.join(shell.quote(arg) for arg in self.args)
 
     def get_args(self):
-        command = ' '.join(shell.escape(arg) for arg in self.args)
+        command = ' '.join(shell.quote(arg) for arg in self.args)
         return ['-f', '-a', '(%s)' % command]
 
     def get_function(self):
@@ -103,20 +103,20 @@ class FishCompleteChoices(FishCompletionBase):
 
     @staticmethod
     def _get_inline_for_list(choices):
-        return ' '.join(shell.escape(str(c)) for c in choices)
+        return ' '.join(shell.quote(str(c)) for c in choices)
 
     @staticmethod
     def _get_inline_for_dict(choices):
         str0 = lambda o: str(o) if o is not None else ''
         stringified = {str(item): str0(desc) for item, desc in choices.items()}
-        r = ['%s\\t%s' % (shell.escape(item), shell.escape(desc)) for item, desc in stringified.items()]
+        r = ['%s\\t%s' % (shell.quote(item), shell.quote(desc)) for item, desc in stringified.items()]
         return ' '.join(r)
 
     @staticmethod
     def _get_code_for_list(choices):
         code = "printf '%s\\n' \\\n"
-        escaped = [shell.escape(str(item)) for item in choices]
-        code += indent(join_with_wrap(' ', ' \\\n', 80, escaped), 2)
+        quoted = [shell.quote(str(item)) for item in choices]
+        code += indent(join_with_wrap(' ', ' \\\n', 80, quoted), 2)
         return code.rstrip(' \\\n')
 
     @staticmethod
@@ -125,7 +125,7 @@ class FishCompleteChoices(FishCompletionBase):
         for item, desc in choices.items():
             if desc is None:
                 desc = ''
-            code += '  %s %s \\\n' % (shell.escape(str(item)), shell.escape(str(desc)))
+            code += '  %s %s \\\n' % (shell.quote(str(item)), shell.quote(str(desc)))
         return code.rstrip(' \\\n')
 
     def get_args(self):
@@ -249,12 +249,12 @@ class FishCompleteValueList(FishCompletionCommand):
         if is_dict_type(values):
             code = "printf '%s\\t%s\\n' \\\n"
             for item, desc in values.items():
-                code += '  %s %s \\\n' % (shell.escape(item), shell.escape(desc))
+                code += '  %s %s \\\n' % (shell.quote(item), shell.quote(desc))
             code = code.rstrip(' \\\n')
         else:
             code = "printf '%s\\n' \\\n"
             for value in values:
-                code += '  %s \\\n' % shell.escape(value)
+                code += '  %s \\\n' % shell.quote(value)
             code = code.rstrip(' \\\n')
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
@@ -272,7 +272,7 @@ class FishCompletKeyValueList(FishCompletionCommand):
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         trace.append('key_value_list')
         args = []
-        e = shell.escape
+        q = shell.quote
 
         for key, desc, complete in key_value_list_normalize_values(values):
             if not complete:
@@ -283,12 +283,12 @@ class FishCompletKeyValueList(FishCompletionCommand):
                 obj = completer.complete_from_def(ctxt, trace, complete)
                 func = obj.get_function()
 
-            args.append('%s %s %s' % (e(key), e(desc or ''), e(func)))
+            args.append('%s %s %s' % (q(key), q(desc or ''), q(func)))
 
         code = '%s %s %s \\\n%s' % (
             ctxt.helpers.use_function('key_value_list'),
-            shell.escape(pair_separator),
-            shell.escape(value_separator),
+            shell.quote(pair_separator),
+            shell.quote(value_separator),
             indent(' \\\n'.join(args), 2)
         )
 
@@ -311,7 +311,7 @@ class FishCompleteCommand(FishCompletionBase):
             append = opts.get('path_append', None)
             prepend = opts.get('path_prepend', None)
 
-        mkpath = lambda path: ' '.join(shell.escape(p) for p in path.split(':'))
+        mkpath = lambda path: ' '.join(shell.quote(p) for p in path.split(':'))
 
         if path:
             code = 'set -lx PATH %s' % mkpath(path)
@@ -381,10 +381,10 @@ class FishCompleteCommandArg(FishCompletionBase):
             ctxt.helpers.use_function('query', 'old_options')
 
         opts = get_query_option_strings(ctxt.option.parent, with_parent_options=True)
-        opts = shell.escape(opts)
+        opts = shell.quote(opts)
         command_pos = ctxt.option.get_positional_num() - 1
 
-        r =  'set -l opts %s\n' % shell.escape(opts)
+        r =  'set -l opts %s\n' % shell.quote(opts)
         r += 'set -l pos (%s "$opts" positional_pos %d)\n' % (query, command_pos)
         r += 'set -l cmdline (commandline -poc | string escape) (commandline -ct)\n'
         r += 'complete -C -- "$cmdline[$pos..]"'

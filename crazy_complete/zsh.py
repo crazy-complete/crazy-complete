@@ -110,7 +110,7 @@ class ZshCompletionFunction:
         self.code['3-options']     = self._generate_option_parsing()
 
         if self.query.used:
-            r  = 'local opts=%s\n' % shell.escape(utils.get_query_option_strings(self.commandline))
+            r  = 'local opts=%s\n' % shell.quote(utils.get_query_option_strings(self.commandline))
             r += "local HAVING_OPTIONS=() OPTION_VALUES=() POSITIONALS=() INCOMPLETE_OPTION=''\n"
             r += '%s init "$opts" "${words[@]}"' % self.query.use()
             self.code['0-init'] = r
@@ -125,7 +125,7 @@ class ZshCompletionFunction:
                 set_cmds.append('IFS=$"\\n" %s=($(%s get_option %s))' % (
                     option.capture,
                     self.query.use('get_option'),
-                    ' '.join(shell.escape(s) for s in option.option_strings)))
+                    ' '.join(shell.quote(s) for s in option.option_strings)))
 
         if local_vars:
             r  = 'local %s' % ' '.join(f'{s}=()' for s in local_vars)
@@ -147,7 +147,7 @@ class ZshCompletionFunction:
         for subcommand in self.subcommands.subcommands:
             sub_funcname = self.ctxt.helpers.make_completion_funcname(subcommand)
             cmds = utils.get_all_command_variations(subcommand)
-            pattern = '|'.join(shell.escape(s) for s in cmds)
+            pattern = '|'.join(shell.quote(s) for s in cmds)
             r += f'  {pattern}) {sub_funcname}; return $?;;\n'
         r += 'esac'
 
@@ -203,7 +203,7 @@ class ZshCompletionFunction:
                 func = self.query.use('has_option')
                 func = self.query.use('with_incomplete')
                 r += '%s has_option WITH_INCOMPLETE %s &&\\\n' % (func,
-                    ' '.join(shell.escape(o) for o in arg.option.option_strings))
+                    ' '.join(shell.quote(o) for o in arg.option.option_strings))
 
             if arg.when:
                 when_cmd = zsh_when.generate_when_conditions(self.query, arg.when)

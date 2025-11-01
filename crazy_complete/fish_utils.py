@@ -70,7 +70,7 @@ class FishString:
         '''
         if self.raw:
             return self.string
-        return shell.escape(self.string)
+        return shell.quote(self.string)
 
     def __str__(self):
         return self.string

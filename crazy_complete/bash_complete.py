@@ -73,7 +73,7 @@ class BashCompletionFunc(BashCompletionBase):
         if append:
             r.append('local COMPREPLY_OLD=("${COMPREPLY[@]}")')
 
-        r.append(' '.join(shell.escape(arg) for arg in self.args))
+        r.append(' '.join(shell.quote(arg) for arg in self.args))
 
         if append:
             r.append('COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}")')
@@ -95,17 +95,17 @@ class CompgenW(BashCompletionBase):
         self.values = [str(value) for value in values]
 
     def get_code(self, append=False):
-        needs_escape = any(filter(shell.needs_escape, self.values))
+        needs_quote = any(filter(shell.needs_quote, self.values))
 
-        if not needs_escape:
+        if not needs_quote:
             return 'COMPREPLY%s=($(compgen -W %s -- "$cur"))' % (
                 ('+' if append else ''),
-                shell.escape(' '.join(self.values)))
+                shell.quote(' '.join(self.values)))
 
         return ('%s %s-- %s' % (
             self.ctxt.helpers.use_function('values'),
             ('-a ' if append else ''),
-            ' '.join(shell.escape(s) for s in self.values)))
+            ' '.join(shell.quote(s) for s in self.values)))
 
     def get_function(self):
         return self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
@@ -168,13 +168,13 @@ class BashCompleteKeyValueList(BashCompletionCode):
                 obj = completer.complete_from_def(ctxt, trace, complete)
                 funcs[key] = obj.get_function()
 
-        e = shell.escape
-        args = ' \\\n'.join('%s %s' % (e(k), e(f)) for k, f in funcs.items())
+        q = shell.quote
+        args = ' \\\n'.join('%s %s' % (q(k), q(f)) for k, f in funcs.items())
 
         code = '%s %s %s \\\n%s' % (
             ctxt.helpers.use_function('key_value_list'),
-            shell.escape(pair_separator),
-            shell.escape(value_separator),
+            shell.quote(pair_separator),
+            shell.quote(value_separator),
             indent(args, 2)
         )
 
@@ -211,15 +211,15 @@ class BashCompleter(shell.ShellCompleter):
             prepend = opts.get('path_prepend', None)
 
         if path:
-            code = 'local -x PATH=%s' % shell.escape(path)
+            code = 'local -x PATH=%s' % shell.quote(path)
         elif append and prepend:
-            append = shell.escape(append)
-            prepend = shell.escape(prepend)
+            append = shell.quote(append)
+            prepend = shell.quote(prepend)
             code = 'local -x PATH=%s:"$PATH":%s' % (prepend, append)
         elif append:
-            code = 'local -x PATH="$PATH":%s' % shell.escape(append)
+            code = 'local -x PATH="$PATH":%s' % shell.quote(append)
         elif prepend:
-            code = 'local -x PATH=%s:"$PATH"' % shell.escape(prepend)
+            code = 'local -x PATH=%s:"$PATH"' % shell.quote(prepend)
 
         return BashCompletionCompgen(ctxt, '-A command', code=code)
 
@@ -228,7 +228,7 @@ class BashCompleter(shell.ShellCompleter):
         filedir = bash_versions.filedir(ctxt)
 
         if directory:
-            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
+            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.quote(directory)
             cmd += '  %s -d\n' % filedir
             cmd += '  builtin popd >/dev/null\n'
             cmd += '}'
@@ -257,16 +257,16 @@ class BashCompleter(shell.ShellCompleter):
             return BashCompletionFunc(ctxt, args)
 
         if directory:
-            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.escape(directory)
-            cmd += '  %s\n' % ' '.join(shell.escape(a) for a in args)
+            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.quote(directory)
+            cmd += '  %s\n' % ' '.join(shell.quote(a) for a in args)
             cmd += '  builtin popd >/dev/null\n'
             cmd += '}'
         else:
-            cmd = ' '.join(shell.escape(a) for a in args)
+            cmd = ' '.join(shell.quote(a) for a in args)
 
         if ignore_globs:
             func = ctxt.helpers.use_function('file_filter')
-            cmd += '\n%s %s' % (func, ' '.join(shell.escape(p) for p in ignore_globs))
+            cmd += '\n%s %s' % (func, ' '.join(shell.quote(p) for p in ignore_globs))
 
         return BashCompletionCode(ctxt, cmd)
 
@@ -347,10 +347,10 @@ class BashCompleter(shell.ShellCompleter):
         dup_arg = ' -d' if duplicates else ''
 
         r =  'local cur_old="$cur"\n'
-        r += 'cur="${cur##*%s}"\n' % shell.escape(separator)
+        r += 'cur="${cur##*%s}"\n' % shell.quote(separator)
         r += '%s\n' % code
         r += 'cur="$cur_old"\n'
-        r += '%s%s %s "${COMPREPLY[@]}"' % (func, dup_arg, shell.escape(separator))
+        r += '%s%s %s "${COMPREPLY[@]}"' % (func, dup_arg, shell.quote(separator))
         return BashCompletionCode(ctxt, r)
 
     def history(self, ctxt, _trace, pattern):

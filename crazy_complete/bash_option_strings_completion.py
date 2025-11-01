@@ -19,7 +19,7 @@ def _make_option_strings(options):
                 r.append(f'{option_string}=')
             else:
                 r.append(option_string)
-    return ' '.join(shell.escape(option_string) for option_string in r)
+    return ' '.join(shell.quote(option_string) for option_string in r)
 
 
 def _get_option_full_condition(option):
