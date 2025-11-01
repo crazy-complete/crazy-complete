@@ -1,9 +1,43 @@
 '''Conditions for Fish.'''
 
+import re
+
 from . import when
-from . import shell_parser
+from . import shell
 from .errors import InternalError
 from .type_utils import is_list_type
+
+
+def escape_in_double(string):
+    '''Escape special characters in a double quoted string.'''
+
+    return re.sub(r'(["$`\\])', r'\\\1', string)
+
+
+def make_condition_command(prefix, args):
+    '''Make a condition command.
+
+    In our completion scripts, we use the variables $query and $opts.
+
+    We generate code like this:
+
+        complete -n "$query '$opts' has_option --foo"
+
+    This function generates such a condition command.
+
+    We have to ensure proper escaping inside the double quotes.
+    '''
+
+    args_escaped = [shell.escape(arg) for arg in args]
+    args_escaped = [escape_in_double(arg) for arg in args_escaped]
+    return '%s %s' % (prefix, ' '.join(args_escaped))
+
+
+def make_query(args):
+    '''Make a query command.'''
+
+    return make_condition_command("$query '$opts'", args)
+
 
 
 class Condition:
@@ -16,42 +50,6 @@ class Condition:
     def unsafe_code(self, ctxt):
         '''Returns code using Fish's internal functions.'''
         raise NotImplementedError
-
-
-class And(Condition):
-    '''Logical and.'''
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def query_code(self, ctxt):
-        left = self.left.query_code(ctxt)
-        right = self.right.query_code(ctxt)
-        return f'begin {left} && {right}; end'
-
-    def unsafe_code(self, ctxt):
-        left = self.left.unsafe_code(ctxt)
-        right = self.right.unsafe_code(ctxt)
-        return f'begin {left} && {right}; end'
-
-
-class Or(Condition):
-    '''Logical or.'''
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def query_code(self, ctxt):
-        left = self.left.query_code(ctxt)
-        right = self.right.query_code(ctxt)
-        return f'begin {left} || {right}; end'
-
-    def unsafe_code(self, ctxt):
-        left = self.left.unsafe_code(ctxt)
-        right = self.right.unsafe_code(ctxt)
-        return f'begin {left} || {right}; end'
 
 
 class Not(Condition):
@@ -78,22 +76,20 @@ class HasOption(Condition):
 
     def query_code(self, ctxt):
         ctxt.helpers.use_function('query', 'has_option')
-        options = ' '.join(self.option_strings)
-        r = "$query '$opts' has_option %s" % options
-        return r
+        return make_query(['has_option'] + self.option_strings)
 
     def unsafe_code(self, _ctxt):
-        r = "__fish_seen_argument"
+        args = []
 
         for opt in self.option_strings:
             if opt.startswith('--'):
-                r += ' -l %s' % opt.lstrip('-')
+                args += ['-l', opt.lstrip('-')]
             elif len(opt) == 2:
-                r += ' -s %s' % opt[1]
+                args += ['-s', opt[1]]
             else:
-                r += ' -o %s' % opt.lstrip('-')
+                args += ['-o', opt.lstrip('-')]
 
-        return r
+        return make_condition_command('__fish_seen_argument', args)
 
 
 class HasHiddenOption(Condition):
@@ -108,9 +104,8 @@ class HasHiddenOption(Condition):
     def query_code(self, ctxt):
         ctxt.helpers.use_function('query', 'has_option')
         ctxt.helpers.use_function('query', 'with_incomplete')
-        options = ' '.join(self.option_strings)
-        r = "$query '$opts' has_option WITH_INCOMPLETE %s" % options
-        return r
+        options = self.option_strings
+        return make_query(['has_option', 'WITH_INCOMPLETE'] + options)
 
     def unsafe_code(self, ctxt):
         return self.query_code(ctxt)
@@ -131,10 +126,9 @@ class OptionIs(Condition):
 
     def query_code(self, ctxt):
         ctxt.helpers.use_function('query', 'option_is')
-        options = ' '.join(self.option_strings)
-        values = ' '.join(self.values)
-        r = "$query '$opts' option_is %s -- %s" % (options, values)
-        return r
+        options = self.option_strings
+        values = self.values
+        return make_query(['option_is', *options, '--', *values])
 
     def unsafe_code(self, ctxt):
         return self.query_code(ctxt)
@@ -165,8 +159,7 @@ class PositionalNum(Condition):
     def query_code(self, ctxt):
         ctxt.helpers.use_function('query', 'num_of_positionals')
         op = self.TEST_OPERATORS[self.operator]
-        r = "$query '$opts' num_of_positionals %s %d" % (op, self.number - 1)
-        return r
+        return make_query(['num_of_positionals', op, str(self.number - 1)])
 
     def unsafe_code(self, _ctxt):
         op = self.TEST_OPERATORS[self.operator]
@@ -189,40 +182,34 @@ class PositionalContains(Condition):
 
     def query_code(self, ctxt):
         ctxt.helpers.use_function('query', 'positional_contains')
-        values = ' '.join(self.values)
-        r = "$query '$opts' positional_contains %d %s" % (self.number, values)
-        return r
+        values = self.values
+        number = str(self.number)
+        return make_query(['positional_contains', number, *values])
 
     def unsafe_code(self, _ctxt):
-        values = ' '.join(self.values)
-        r = "__fish_seen_subcommand_from %s" % values
-        return r
+        values = self.values
+        return make_condition_command('__fish_seen_subcommand_from', values)
 
 
-def replace_commands(obj):
-    '''Replace shell_parser/when objects by own condition objects.'''
+def replace_commands(tokens):
+    '''Replace when objects by own condition objects.'''
 
-    if isinstance(obj, shell_parser.And):
-        left  = replace_commands(obj.left)
-        right = replace_commands(obj.right)
-        return And(left, right)
+    r = []
 
-    if isinstance(obj, shell_parser.Or):
-        left  = replace_commands(obj.left)
-        right = replace_commands(obj.right)
-        return Or(left, right)
+    for obj in tokens:
+        if isinstance(obj, when.OptionIs):
+            r.append(OptionIs(obj.options, obj.values))
 
-    if isinstance(obj, shell_parser.Not):
-        expr = replace_commands(obj.expr)
-        return Not(expr)
+        elif isinstance(obj, when.HasOption):
+            r.append(HasOption(obj.options))
 
-    if isinstance(obj, when.OptionIs):
-        return OptionIs(obj.options, obj.values)
+        elif isinstance(obj, str):
+            r.append(obj)
 
-    if isinstance(obj, when.HasOption):
-        return HasOption(obj.options)
+        else:
+            raise AssertionError("Not reached")
 
-    raise AssertionError("Not reached")
+    return r
 
 
 class Conditions(Condition):
@@ -230,6 +217,7 @@ class Conditions(Condition):
 
     def __init__(self):
         self.conditions = []
+        self.when = None
 
     def _optimized_conditions(self):
         positional_contains = []
@@ -255,17 +243,49 @@ class Conditions(Condition):
         r.extend(other)
         return r
 
+    def _get_tokens(self):
+        r = []
+
+        for condition in self._optimized_conditions():
+            r.append(condition)
+            r.append('&&')
+
+        if self.when:
+            if r and when.needs_braces(self.when):
+                r += ['(', *self.when, ')']
+            else:
+                r += self.when
+
+        if r and r[-1] == '&&':
+            r.pop(-1)
+
+        return r
+
     def query_code(self, ctxt):
         r = []
-        for cond in self._optimized_conditions():
-            r.append(cond.query_code(ctxt))
-        return '"%s"' % ' && '.join(r)
+        for obj in self._get_tokens():
+            if obj == '(':
+                r.append('begin')
+            elif obj == ')':
+                r.append(';end')
+            elif obj in ('!', '&&', '||'):
+                r.append(obj)
+            else:
+                r.append(obj.query_code(ctxt))
+        return '"%s"' % ' '.join(r)
 
     def unsafe_code(self, ctxt):
         r = []
-        for cond in self._optimized_conditions():
-            r.append(cond.unsafe_code(ctxt))
-        return '"%s"' % ' && '.join(r)
+        for obj in self._get_tokens():
+            if obj == '(':
+                r.append('begin')
+            elif obj == ')':
+                r.append(';end')
+            elif obj in ('!', '&&', '||'):
+                r.append(obj)
+            else:
+                r.append(obj.unsafe_code(ctxt))
+        return '"%s"' % ' '.join(r)
 
     def add(self, condition):
         '''Add a condition.'''
@@ -277,12 +297,10 @@ class Conditions(Condition):
 
         self.conditions.extend(conditions)
 
-    def add_when(self, obj):
+    def add_when(self, tokens):
         '''Add when objects.'''
 
-        if obj is None:
+        if not tokens:
             return
 
-        condition = replace_commands(obj)
-
-        self.conditions.append(condition)
+        self.when = replace_commands(tokens)

@@ -40,39 +40,40 @@ class HasOption:
             raise CrazyError('HasOption: Empty options')
 
 
-def replace_commands(obj):
+def replace_commands(tokens):
     '''Replaced `shell_parser.Command` objects by condition objects.'''
 
-    if isinstance(obj, shell_parser.And):
-        obj.left  = replace_commands(obj.left)
-        obj.right = replace_commands(obj.right)
-        return obj
+    r = []
 
-    if isinstance(obj, shell_parser.Or):
-        obj.left  = replace_commands(obj.left)
-        obj.right = replace_commands(obj.right)
-        return obj
+    for token in tokens:
+        if isinstance(token, shell_parser.Command):
+            cmd, *args = token.args
 
-    if isinstance(obj, shell_parser.Not):
-        obj.expr = replace_commands(obj.expr)
-        return obj
+            if cmd == 'option_is':
+                r.append(OptionIs(args))
+            elif cmd == 'has_option':
+                r.append(HasOption(args))
+            else:
+                raise CrazyError("when: Invalid command: %r" % cmd)
+        else:
+            r.append(token)
 
-    if isinstance(obj, shell_parser.Command):
-        cmd, *args = obj.args
+    return r
 
-        if cmd == 'option_is':
-            return OptionIs(args)
 
-        if cmd == 'has_option':
-            return HasOption(args)
+def needs_braces(tokens):
+    '''Check if we need braces around our tokens.
 
-        raise CrazyError("Invalid command: %r" % cmd)
-
-    raise AssertionError("Not reached")
+    We don't need braces if:
+        - We only have one token (single command)
+        - We only have two tokens (negated single command)
+        - We don't have an OR inside the tokens
+    '''
+    return len(tokens) > 2 and '||' in tokens
 
 
 def parse_when(s):
     '''Parse `when` string and return an object.'''
 
-    obj = shell_parser.parse(s)
-    return replace_commands(obj)
+    tokens = shell_parser.parse(s)
+    return replace_commands(tokens)

@@ -2,7 +2,6 @@
 
 from . import when
 from . import shell
-from . import shell_parser
 
 
 class ConditionGenerator:
@@ -12,30 +11,34 @@ class ConditionGenerator:
         self.commandline = commandline
         self.variable_manager = variable_manager
 
-    def generate(self, obj):
-        '''Turn object into condition code.'''
+    def generate(self, tokens):
+        '''Turn tokens/objects into condition code.'''
 
-        if isinstance(obj, when.OptionIs):
-            return self._gen_option_is(obj)
+        r = []
 
-        if isinstance(obj, when.HasOption):
-            return self._gen_has_option(obj)
+        for obj in tokens:
+            if isinstance(obj, when.OptionIs):
+                r.append(self._gen_option_is(obj))
 
-        if isinstance(obj, shell_parser.And):
-            left = self.generate(obj.left)
-            right = self.generate(obj.right)
-            return f'{{ {left} && {right}; }}'
+            elif isinstance(obj, when.HasOption):
+                r.append(self._gen_has_option(obj))
 
-        if isinstance(obj, shell_parser.Or):
-            left = self.generate(obj.left)
-            right = self.generate(obj.right)
-            return f'{{ {left} || {right}; }}'
+            elif obj in ('&&', '||', '!'):
+                r.append(obj)
 
-        if isinstance(obj, shell_parser.Not):
-            expr = self.generate(obj.expr)
-            return f'! {expr}'
+            elif obj == '(':
+                r.append('{')
 
-        raise AssertionError("Not reached")
+            elif obj == ')':
+                r.append(';}')
+
+            else:
+                raise AssertionError("Not reached")
+
+        if when.needs_braces(tokens):
+            return '{ %s; }' % ' '.join(r)
+
+        return ' '.join(r)
 
     def _gen_option_is(self, obj):
         conditions = []
@@ -78,6 +81,6 @@ class ConditionGenerator:
 def generate_when_conditions(commandline, variable_manager, when_):
     '''Generate when condition code.'''
 
-    parsed = when.parse_when(when_)
+    tokens = when.parse_when(when_)
     generator = ConditionGenerator(commandline, variable_manager)
-    return generator.generate(parsed)
+    return generator.generate(tokens)

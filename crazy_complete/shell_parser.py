@@ -26,38 +26,6 @@ class Command:
         return f'Command({self.args!r})'
 
 
-class And:
-    '''And operator.'''
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def __repr__(self):
-        return f"And({self.left!r}, {self.right!r})"
-
-
-class Or:
-    '''Or operator.'''
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def __repr__(self):
-        return f"Or({self.left!r}, {self.right!r})"
-
-
-class Not:
-    '''Not operator.'''
-
-    def __init__(self, expr):
-        self.expr = expr
-
-    def __repr__(self):
-        return f"Not({self.expr!r})"
-
-
 class Lexer(StringStream):
     def parse(self):
         tokens = []
@@ -84,13 +52,13 @@ class Lexer(StringStream):
 
         if c == '&':
             if not self.peek(1) == '&':
-                raise ValueError('Single "&" found')
+                raise ValueError('Single `&` found')
             self.advance(2)
             return '&&'
 
         if c == '|':
             if not self.peek(1) == '|':
-                raise ValueError('Single "|" found')
+                raise ValueError('Single `|` found')
             self.advance(2)
             return '||'
 
@@ -113,7 +81,7 @@ class Lexer(StringStream):
 
 
 def make_commands(tokens):
-    '''Pre-parse tokens.
+    '''Parse tokens.
     
     Input:
         [Literal("foo"), Literal("bar"), '&&' Literal("baz")]
@@ -140,75 +108,38 @@ def make_commands(tokens):
     return new_tokens
 
 
-def parse_tokens(tokens):
-    '''Parse tokens and return And/Or/Not/Command objects.'''
+def check_syntax(tokens):
+    '''Checks tokens for syntax errors.'''
 
-    tokens = list(tokens)
-    pos = 0
+    last = None
+    parentheses = 0
 
-    def peek():
-        return tokens[pos] if pos < len(tokens) else None
+    for token in tokens:
+        if token == '(':
+            parentheses += 1
+            if last not in (None, '&&', '||', '!', '('):
+                raise ValueError("Unexpected `(`")
 
-    def consume(expected=None):
-        nonlocal pos
-        tok = peek()
-        if expected is not None and tok != expected:
-            raise SyntaxError(f"Expected {expected!r}, but found {tok!r}")
-        if tok is None:
-            raise SyntaxError("Unexpected end of input")
-        pos += 1
-        return tok
+        elif token == ')':
+            parentheses -= 1
+            if parentheses < 0 or last in (None, '(', '&&', '||', '!'):
+                raise ValueError("Unexpected `)`")
 
-    # Grammar:
-    # expr      := or_expr
-    # or_expr   := and_expr { "||" and_expr }
-    # and_expr  := not_expr { "&&" not_expr }
-    # not_expr  := "!" not_expr | primary
-    # primary   := COMMAND_OBJ | "(" expr ")"
+        elif token in ('&&', '||'):
+            if last in (None, '(', '&&', '||', '!'):
+                raise ValueError(f"Unexpected `{token}`")
 
-    def parse_expr():
-        return parse_or()
+        elif token == '!':
+            if last not in (None, '(', '&&', '||', '!'):
+                raise ValueError("Unexpected `!`")
 
-    def parse_or():
-        left = parse_and()
-        while peek() == "||":
-            consume("||")
-            right = parse_and()
-            left = Or(left, right)
-        return left
+        last = token
 
-    def parse_and():
-        left = parse_not()
-        while peek() == "&&":
-            consume("&&")
-            right = parse_not()
-            left = And(left, right)
-        return left
+    if parentheses > 0:
+        raise ValueError("Unclosed `(`")
 
-    def parse_not():
-        if peek() == "!":
-            consume("!")
-            return Not(parse_not())
-        return parse_primary()
-
-    def parse_primary():
-        tok = peek()
-        if tok == "(":
-            consume("(")
-            expr = parse_expr()
-            consume(")")
-            return expr
-
-        if tok is None:
-            raise SyntaxError("Unexpected end of input")
-        if not isinstance(tok, str):
-            return consume()
-        raise SyntaxError(f"Unexpected token: {tok!r}")
-
-    result = parse_expr()
-    if peek() is not None:
-        raise SyntaxError(f"Unexpected token after expression: {peek()!r}")
-    return result
+    if last is None:
+        raise ValueError("No command found")
 
 
 def parse(string):
@@ -216,4 +147,5 @@ def parse(string):
 
     lex_tokens = Lexer(string).parse()
     tokens = make_commands(lex_tokens)
-    return parse_tokens(tokens)
+    check_syntax(tokens)
+    return tokens

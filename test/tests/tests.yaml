@@ -960,59 +960,59 @@ zsh_expected: |
 ---
 number: 62
 definition_file: "when"
-description: "Check --complete with --files"
-send: "crazy-complete-test --files --complete "
+description: "Check multiple-when --complete with --files"
+send: "crazy-complete-test multiple-when --files --complete "
 bash_expected: |
-  > crazy-complete-test --files --complete
+  > crazy-complete-test multiple-when --files --complete
   file1  file2  file3
-  > crazy-complete-test --files --complete file
+  > crazy-complete-test multiple-when --files --complete file
 fish_expected: |
-  > crazy-complete-test --files --complete file
+  > crazy-complete-test multiple-when --files --complete file
   file1  file2  file3
 zsh_expected: |
-  > crazy-complete-test --files --complete file
+  > crazy-complete-test multiple-when --files --complete file
 ---
 number: 63
 definition_file: "when"
-description: "Check --complete with --directories"
-send: "crazy-complete-test --directories --complete "
+description: "Check multiple-when --complete with --directories"
+send: "crazy-complete-test multiple-when --directories --complete "
 bash_expected: |
-  > crazy-complete-test --directories --complete
+  > crazy-complete-test multiple-when --directories --complete
   dir1  dir2  dir3
-  > crazy-complete-test --directories --complete dir
+  > crazy-complete-test multiple-when --directories --complete dir
 fish_expected: |
-  > crazy-complete-test --directories --complete dir
+  > crazy-complete-test multiple-when --directories --complete dir
   dir1  dir2  dir3
 zsh_expected: |
-  > crazy-complete-test --directories --complete dir
+  > crazy-complete-test multiple-when --directories --complete dir
 ---
 number: 64
 definition_file: "when"
-description: "Check positional with --files"
-send: "crazy-complete-test --files "
+description: "Check multiple-when positional with --files"
+send: "crazy-complete-test multiple-when --files "
 bash_expected: |
-  > crazy-complete-test --files
+  > crazy-complete-test multiple-when --files
   file1  file2  file3
-  > crazy-complete-test --files file
+  > crazy-complete-test multiple-when --files file
 fish_expected: |
-  > crazy-complete-test --files file
+  > crazy-complete-test multiple-when --files file
   file1  file2  file3
 zsh_expected: |
-  > crazy-complete-test --files file
+  > crazy-complete-test multiple-when --files file
 ---
 number: 65
 definition_file: "when"
-description: "Check positional with --directories"
-send: "crazy-complete-test --directories "
+description: "Check multiple-when positional with --directories"
+send: "crazy-complete-test multiple-when --directories "
 bash_expected: |
-  > crazy-complete-test --directories
+  > crazy-complete-test multiple-when --directories
   dir1  dir2  dir3
-  > crazy-complete-test --directories dir
+  > crazy-complete-test multiple-when --directories dir
 fish_expected: |
-  > crazy-complete-test --directories dir
+  > crazy-complete-test multiple-when --directories dir
   dir1  dir2  dir3
 zsh_expected: |
-  > crazy-complete-test --directories dir
+  > crazy-complete-test multiple-when --directories dir
 ---
 number: 66
 definition_file: "groups"
@@ -2123,14 +2123,16 @@ description: "Check with no options"
 send: "crazy-complete-test --"
 bash_expected: |
   > crazy-complete-test --
-  --directories  --files        --if-not-1     --option-1     --option-2
+  --if-not-1           --option-1
+  --if-not-1-or-not-2  --option-2
   > crazy-complete-test --
 fish_expected: |
   > crazy-complete-test --
-  --directories  --files  --if-not-1  --option-1  --option-2
+  --if-not-1  --if-not-1-or-not-2  --option-1  --option-2
 zsh_expected: |
   > crazy-complete-test --
-  --directories  --files        --if-not-1     --option-1     --option-2
+  --if-not-1           --option-1
+  --if-not-1-or-not-2  --option-2
 ---
 number: 137
 definition_file: "when"
@@ -2138,14 +2140,14 @@ description: "Check with no --option-1"
 send: "crazy-complete-test --option-1 --"
 bash_expected: |
   > crazy-complete-test --option-1 --
-  --directories  --files        --if-1-or-2    --option-2
+  --if-1-or-2  --option-2
   > crazy-complete-test --option-1 --
 fish_expected: |
   > crazy-complete-test --option-1 --
-  --directories  --files  --if-1-or-2  --option-2
+  --if-1-or-2  --option-2
 zsh_expected: |
   > crazy-complete-test --option-1 --
-  --directories  --files        --if-1-or-2    --option-2
+  --if-1-or-2  --option-2
 ---
 number: 138
 definition_file: "when"
@@ -2153,14 +2155,14 @@ description: "Check with no --option-2"
 send: "crazy-complete-test --option-2 --"
 bash_expected: |
   > crazy-complete-test --option-2 --
-  --directories  --files        --if-1-or-2    --if-not-1     --option-1
+  --if-1-or-2  --if-not-1   --option-1
   > crazy-complete-test --option-2 --
 fish_expected: |
   > crazy-complete-test --option-2 --
-  --directories  --files  --if-1-or-2  --if-not-1  --option-1
+  --if-1-or-2  --if-not-1  --option-1
 zsh_expected: |
   > crazy-complete-test --option-2 --
-  --directories  --files        --if-1-or-2    --if-not-1     --option-1
+  --if-1-or-2  --if-not-1   --option-1
 ---
 number: 139
 definition_file: "when"
@@ -2168,11 +2170,54 @@ description: "Check with no --option-1 and --option-2"
 send: "crazy-complete-test --option-1 --option-2 --"
 bash_expected: |
   > crazy-complete-test --option-1 --option-2 --
-  --directories  --files        --if-1-and-2   --if-1-or-2
-  > crazy-complete-test --option-1 --option-2 --
+  --if-1-and-2  --if-1-or-2
+  > crazy-complete-test --option-1 --option-2 --if-1-
 fish_expected: |
-  > crazy-complete-test --option-1 --option-2 --
-  --directories  --files  --if-1-and-2  --if-1-or-2
+  > crazy-complete-test --option-1 --option-2 --if-1-
+  --if-1-and-2  --if-1-or-2
 zsh_expected: |
-  > crazy-complete-test --option-1 --option-2 --
-  --directories  --files        --if-1-and-2   --if-1-or-2
+  > crazy-complete-test --option-1 --option-2 --if-1--2
+---
+number: 140
+definition_file: "when"
+description: "Check special-values without options"
+send: "crazy-complete-test special-values --"
+bash_expected: |
+  > crazy-complete-test special-values --arg=
+fish_expected: |
+  > crazy-complete-test special-values --arg
+zsh_expected: |
+  > crazy-complete-test special-values --arg=
+---
+number: 141
+definition_file: "when"
+description: "Check special-values with --arg='foo bar'"
+send: "crazy-complete-test special-values --arg='foo bar' --"
+bash_expected: |
+  > crazy-complete-test special-values --arg='foo bar' --if-arg-is-foo-bar
+fish_expected: |
+  > crazy-complete-test special-values --arg='foo bar' --if-arg-is-foo-bar
+zsh_expected: |
+  > crazy-complete-test special-values --arg='foo bar' --if-arg-is-foo-bar
+---
+number: 142
+definition_file: "when"
+description: "Check special-values with --arg='\"'"
+send: "crazy-complete-test special-values --arg='\"' --"
+bash_expected: |
+  > crazy-complete-test special-values --arg='"' --if-arg-is-double-quote
+fish_expected: |
+  > crazy-complete-test special-values --arg='"' --if-arg-is-double-quote
+zsh_expected: |
+  > crazy-complete-test special-values --arg='"' --if-arg-is-double-quote
+---
+number: 143
+definition_file: "when"
+description: "Check special-values with --arg=\"'\""
+send: "crazy-complete-test special-values --arg=\"'\" --"
+bash_expected: |
+  > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote
+fish_expected: |
+  > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote
+zsh_expected: |
+  > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote

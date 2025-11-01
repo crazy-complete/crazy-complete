@@ -1,9 +1,5 @@
-prog: crazy-complete-test
+prog: "crazy-complete-test"
 options:
-  - option_strings: ['--files']
-
-  - option_strings: ['--directories']
-
   - option_strings: ['--option-1']
 
   - option_strings: ['--option-2']
@@ -16,6 +12,17 @@ options:
 
   - option_strings: ['--if-not-1']
     when: '! has_option --option-1'
+
+  - option_strings: ['--if-not-1-or-not-2']
+    when: '! (has_option --option-1 || has_option --option-2)'
+
+---
+
+prog: "crazy-complete-test multiple-when"
+options:
+  - option_strings: ['--files']
+
+  - option_strings: ['--directories']
 
   - option_strings: ['--complete']
     complete: ['choices', ['file1', 'file2', 'file3']]
@@ -33,3 +40,20 @@ positionals:
   - number: 1
     complete: ['choices', ['dir1', 'dir2', 'dir3']]
     when: 'has_option --directories'
+
+---
+
+prog: "crazy-complete-test special-values"
+options:
+  - option_strings: ['--arg']
+    complete: ['none']
+
+  - option_strings: ['--if-arg-is-foo-bar']
+    when: 'option_is --arg -- "foo bar"'
+
+  - option_strings: ['--if-arg-is-single-quote']
+    when: "option_is --arg -- \"'\""
+
+  - option_strings: ['--if-arg-is-double-quote']
+    when: "option_is --arg -- '\"'"
+
