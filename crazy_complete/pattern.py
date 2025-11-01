@@ -247,7 +247,11 @@ class GlobParser:
         chars = ''
         negated = False
 
-        token = self.get()
+        try:
+            token = self.get()
+        except IndexError as e:
+            raise ValueError('Unclosed character class') from e
+
         if token == '!':
             negated = True
         elif token == ']':
