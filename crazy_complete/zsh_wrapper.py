@@ -2,6 +2,7 @@
 
 from . import algo
 from . import preprocessor
+from .str_utils import replace_many
 
 _CODE = r'''
 %WRAPPER_FUNC%() {
@@ -115,6 +116,8 @@ def _make_short_opts_arg_regex(flag_opts, arg_opts, arg_type):
 
 
 def generate_wrapper(ctxt, commandline):
+    '''Generate code for wrapping a foreign command.'''
+
     completion_funcname = ctxt.helpers.make_completion_funcname(commandline)
     wrapper_funcname = ctxt.helpers.make_completion_funcname(commandline, '__wrapper')
 
@@ -143,28 +146,41 @@ def generate_wrapper(ctxt, commandline):
             long_opts_flag.extend(option.get_old_option_strings())
             short_opts_flag.extend(o.lstrip('-') for o in option.get_short_option_strings())
 
-    long_opts_flag_pattern = _make_long_opts_pattern(long_opts_flag, None)
-    long_opts_arg_pattern1 = _make_long_opts_pattern(long_opts_arg, 'arg')
-    long_opts_arg_pattern2 = _make_long_opts_pattern(long_opts_arg, None)
-    long_opts_optional_pattern = _make_long_opts_pattern(long_opts_optional, 'optional')
-
-    short_opts_flag_regex = _make_short_opts_flag_regex(short_opts_flag)
-    short_opts_arg_regex1 = _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, None)
-    short_opts_arg_regex2 = _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, 'arg')
-    short_opts_optional_regex = _make_short_opts_arg_regex(short_opts_flag, short_opts_optional, 'optional')
-
     s = _CODE.strip()
-    s = s.replace('%ORIGINAL_COMPLETION_FUNC%', completion_funcname)
-    s = s.replace('%WRAPPER_FUNC%', wrapper_funcname)
-    s = s.replace('%WRAPS%', commandline.wraps)
-    s = s.replace('%LONG_OPTS_FLAG_PATTERN%', long_opts_flag_pattern)
-    s = s.replace('%LONG_OPTS_ARG_PATTERN1%', long_opts_arg_pattern1)
-    s = s.replace('%LONG_OPTS_ARG_PATTERN2%', long_opts_arg_pattern2)
-    s = s.replace('%LONG_OPTS_OPTIONAL_PATTERN%', long_opts_optional_pattern)
-    s = s.replace('%SHORT_OPTS_ARG_REGEX1%', short_opts_arg_regex1)
-    s = s.replace('%SHORT_OPTS_ARG_REGEX2%', short_opts_arg_regex2)
-    s = s.replace('%SHORT_OPTS_FLAG_REGEX%', short_opts_flag_regex)
-    s = s.replace('%SHORT_OPTS_OPTIONAL_REGEX%', short_opts_optional_regex)
+    s = replace_many(s, [
+        ('%ORIGINAL_COMPLETION_FUNC%',
+         completion_funcname),
+
+        ('%WRAPPER_FUNC%',
+         wrapper_funcname),
+
+        ('%WRAPS%',
+         commandline.wraps),
+
+        ('%LONG_OPTS_FLAG_PATTERN%',
+         _make_long_opts_pattern(long_opts_flag, None)),
+
+        ('%LONG_OPTS_ARG_PATTERN1%',
+         _make_long_opts_pattern(long_opts_arg, 'arg')),
+
+        ('%LONG_OPTS_ARG_PATTERN2%',
+         _make_long_opts_pattern(long_opts_arg, None)),
+
+        ('%LONG_OPTS_OPTIONAL_PATTERN%',
+         _make_long_opts_pattern(long_opts_optional, 'optional')),
+
+        ('%SHORT_OPTS_FLAG_REGEX%',
+         _make_short_opts_flag_regex(short_opts_flag)),
+
+        ('%SHORT_OPTS_ARG_REGEX1%',
+         _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, None)),
+
+        ('%SHORT_OPTS_ARG_REGEX2%',
+         _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, 'arg')),
+
+        ('%SHORT_OPTS_OPTIONAL_REGEX%',
+         _make_short_opts_arg_regex(short_opts_flag, short_opts_optional, 'optional'))
+    ])
 
     defines = []
     if long_opts_flag:

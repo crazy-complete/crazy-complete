@@ -35,6 +35,8 @@ class VariableManager:
         return var
 
     def capture_variable(self, option):
+        '''Return the variable assigned to an option, creating it if necessary.'''
+
         if option.capture is None:
             option.capture = self.make_variable(option)
         return option.capture

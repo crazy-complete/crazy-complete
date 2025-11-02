@@ -152,3 +152,17 @@ def strip_double_empty_lines(string):
     '''Collapse triple newlines into double newlines.'''
 
     return string.replace('\n\n\n', '\n\n')
+
+
+def replace_many(string, replacements):
+    '''
+    Replace multiple substrings in `string` according to a list
+    of (search, replace) tuples.
+    '''
+
+    s = string
+
+    for search, replace in replacements:
+        s = s.replace(search, replace)
+
+    return s

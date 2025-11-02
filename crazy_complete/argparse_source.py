@@ -97,6 +97,9 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
         CommandLine: A CommandLine object representing the converted parser.
     '''
 
+    # pylint: disable=too-many-locals
+    # pylint: disable=too-many-branches
+
     if not description:
         description = parser.description
 

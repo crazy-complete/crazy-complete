@@ -3,8 +3,6 @@
 from collections import OrderedDict
 
 from . import config as config_
-from . import generation_notice
-from . import modeline
 from . import shell
 from . import algo
 from . import utils
@@ -20,6 +18,7 @@ from . import bash_versions
 from . import bash_patterns
 from .str_utils import indent
 from .bash_utils import VariableManager
+from .output import Output
 from . import generation
 
 
@@ -203,22 +202,20 @@ def generate_completion(commandline, config=None):
 
     completion_func, wrapper_code = generate_wrapper(ctxt, commandline)
 
-    output = []
-    output += [generation_notice.GENERATION_NOTICE]
-    if config.comments:
-        output += [config.get_comments_as_string()]
-    output += config.get_included_files_content()
-    output += helpers.get_used_functions_code()
-    output += [generator.result for generator in result if generator.result]
+    output = Output(config, helpers)
+    output.add_generation_notice()
+    output.add_comments()
+    output.add_included_files()
+    output.add_helper_functions_code()
+    output.extend(generator.result for generator in result if generator.result)
 
     if wrapper_code:
-        output += [wrapper_code]
+        output.add(wrapper_code)
 
-    output += ['complete -F %s %s' % (
+    output.add('complete -F %s %s' % (
         completion_func, ' '.join([commandline.prog] + commandline.aliases)
-    )]
+    ))
 
-    if config.vim_modeline:
-        output += [modeline.get_vim_modeline('sh')]
+    output.add_vim_modeline('sh')
 
-    return '\n\n'.join(output)
+    return output.get()

@@ -186,6 +186,8 @@ class BashCompleter(shell.ShellCompleter):
 
     # pylint: disable=missing-function-docstring
     # pylint: disable=too-many-public-methods
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
 
     def none(self, ctxt, _trace, *_):
         return BashCompletionCode(ctxt, '')

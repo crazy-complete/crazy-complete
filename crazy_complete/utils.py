@@ -191,6 +191,8 @@ def get_all_command_variations(commandline):
 def get_defined_option_types(commandline):
     '''Return a tuple of defined option types.'''
 
+    # pylint: disable=too-many-branches
+
     short_required = False
     short_optional = False
     short_flag     = False

@@ -109,7 +109,8 @@ class FishCompleteChoices(FishCompletionBase):
     def _get_inline_for_dict(choices):
         str0 = lambda o: str(o) if o is not None else ''
         stringified = {str(item): str0(desc) for item, desc in choices.items()}
-        r = ['%s\\t%s' % (shell.quote(item), shell.quote(desc)) for item, desc in stringified.items()]
+        q = shell.quote
+        r = ['%s\\t%s' % (q(item), q(desc)) for item, desc in stringified.items()]
         return ' '.join(r)
 
     @staticmethod
@@ -408,6 +409,8 @@ class FishCompleter(shell.ShellCompleter):
 
     # pylint: disable=missing-function-docstring
     # pylint: disable=too-many-public-methods
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
 
     def none(self, ctxt, _trace, *_):
         return FishCompleteNone(ctxt)

@@ -1,12 +1,11 @@
 '''Code for generating a fish auto completion file.'''
 
 from . import config as config_
-from . import generation_notice
-from . import modeline
 from . import utils
 from . import algo
 from . import fish_complete
 from . import fish_helpers
+from .output import Output
 from .fish_utils import FishCompleteCommand, VariableManager
 from .fish_conditions import (
     Conditions, Not,
@@ -260,55 +259,44 @@ def generate_completion(commandline, config=None):
         if types.old:
             ctxt.helpers.use_function('query', 'old_options')
 
-    output = []
+    output = Output(config, helpers)
+    output.add_generation_notice()
+    output.add_comments()
+    output.add_included_files()
+    output.add_helper_functions_code()
 
-    output.append(generation_notice.GENERATION_NOTICE)
-    output.append('')
+    with output.add_as_block() as block:
+        block.add("set -l prog '%s'" % commandline.prog)
 
-    if config.comments:
-        output += [config.get_comments_as_string()]
-        output.append('')
+        if helpers.is_used('query'):
+            block.add("set -l query '%s'" % helpers.use_function('query'))
 
-    for code in config.get_included_files_content():
-        output.append(code)
-        output.append('')
-
-    for code in helpers.get_used_functions_code():
-        output.append(code)
-        output.append('')
-
-    output.append("set -l prog '%s'" % commandline.prog)
-    if helpers.is_used('query'):
-        output.append("set -l query '%s'" % helpers.use_function('query'))
-
-    output.append('')
-    output.append('# Delete existing completions')
-    output.append('complete -c $prog -e')
-    output.append('')
-    output.append('# Generally disable file completion')
-    output.append('complete -c $prog -x')
+        block.add('')
+        block.add('# Delete existing completions')
+        block.add('complete -c $prog -e')
+        block.add('')
+        block.add('# Generally disable file completion')
+        block.add('complete -c $prog -x')
 
     if result.commandline.wraps:
-        output.append('')
-        output.append('# Wrap command')
-        output.append('complete -c $prog -w %s' % result.commandline.wraps)
+        with output.add_as_block() as block:
+            block.add('# Wrap command')
+            block.add('complete -c $prog -w %s' % result.commandline.wraps)
 
     for generator in result.get_all():
         if generator.lines:
-            output.append('')
-            output.append(generator.command_comment)
-            output.append(generator.options_for_query)
-            output.extend(generator.conditions.get_lines())
-            output.extend(generator.lines)
+            with output.add_as_block() as block:
+                block.add(generator.command_comment)
+                block.add(generator.options_for_query)
+                block.extend(generator.conditions.get_lines())
+                block.extend(generator.lines)
 
     if commandline.aliases:
-        output.append('')
-        for alias in commandline.aliases:
-            output.append('complete -c %s -e' % alias)
-            output.append('complete -c %s -w %s' % (alias, commandline.prog))
+        with output.add_as_block() as block:
+            for alias in commandline.aliases:
+                block.add('complete -c %s -e' % alias)
+                block.add('complete -c %s -w %s' % (alias, commandline.prog))
 
-    if config.vim_modeline:
-        output.append('')
-        output.append(modeline.get_vim_modeline('fish'))
+    output.add_vim_modeline('fish')
 
-    return '\n'.join(output)
+    return output.get()

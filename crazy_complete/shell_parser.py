@@ -3,6 +3,9 @@
 from .string_stream import StringStream
 
 
+# pylint: disable=too-few-public-methods
+
+
 class Literal:
     '''Represents a literal string.'''
 
@@ -27,16 +30,20 @@ class Command:
 
 
 class Lexer(StringStream):
+    '''Lexer class.'''
+
     def parse(self):
+        '''Split string into tokens (e.g. logical operators) and literals.'''
+
         tokens = []
         while True:
-            token = self.parse_token()
+            token = self._parse_token()
             if token is not None:
                 tokens.append(token)
             else:
                 return tokens
 
-    def parse_token(self):
+    def _parse_token(self):
         c = self.peek()
 
         if c is None:
@@ -48,7 +55,7 @@ class Lexer(StringStream):
 
         if c.isspace():
             self.advance(1)
-            return self.parse_token()
+            return self._parse_token()
 
         if c == '&':
             if not self.peek(1) == '&':
@@ -62,6 +69,9 @@ class Lexer(StringStream):
             self.advance(2)
             return '||'
 
+        return self._parse_literal()
+
+    def _parse_literal(self):
         literal = ''
 
         while True:

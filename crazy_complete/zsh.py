@@ -4,8 +4,6 @@ from collections import namedtuple, OrderedDict
 
 from . import config as config_
 from . import generation
-from . import generation_notice
-from . import modeline
 from . import shell
 from . import utils
 from . import zsh_complete
@@ -13,6 +11,7 @@ from . import zsh_helpers
 from . import zsh_utils
 from . import zsh_when
 from . import zsh_wrapper
+from .output import Output
 from .str_utils import indent
 
 
@@ -22,13 +21,17 @@ Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
 class ZshQuery:
     '''Helper class for using the `query` function.'''
 
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, ctxt):
         self.ctxt = ctxt
         self.used = False
 
-    def use(self, define=None):
+    def use(self, command=None):
+        '''Return the function name of query and use a command.'''
+
         self.used = True
-        return self.ctxt.helpers.use_function('query', define)
+        return self.ctxt.helpers.use_function('query', command)
 
 
 class ZshCompletionFunction:
@@ -263,39 +266,34 @@ def generate_completion(commandline, config=None):
         if types.old:
             ctxt.helpers.use_function('query', 'old_options')
 
-    output = []
+    output = Output(config, helpers)
 
     if config.zsh_compdef:
-        output += ['#compdef %s' % all_progs]
+        output.add('#compdef %s' % all_progs)
 
-    output.append(generation_notice.GENERATION_NOTICE)
-
-    if config.comments:
-        output += [config.get_comments_as_string()]
-
-    output.extend(config.get_included_files_content())
+    output.add_generation_notice()
+    output.add_comments()
+    output.add_included_files()
 
     completion_func, wrapper_code = zsh_wrapper.generate_wrapper(ctxt, commandline)
 
-    for code in helpers.get_used_functions_code():
-        output.append(code)
+    output.add_helper_functions_code()
 
-    output += [function.get_code() for function in functions]
+    output.extend(function.get_code() for function in functions)
 
     zstyles = []
     commandline.visit_commandlines(lambda c: get_zstyles(c, zstyles))
     if zstyles:
-        output.append('\n'.join(zstyles))
+        output.add('\n'.join(zstyles))
 
     if wrapper_code:
-        output.append(wrapper_code)
+        output.add(wrapper_code)
 
     if config.zsh_compdef:
-        output += ['%s "$@"' % completion_func]
+        output.add('%s "$@"' % completion_func)
     else:
-        output += ['compdef %s %s' % (completion_func, all_progs)]
+        output.add('compdef %s %s' % (completion_func, all_progs))
 
-    if config.vim_modeline:
-        output += [modeline.get_vim_modeline('zsh')]
+    output.add_vim_modeline('zsh')
 
-    return '\n\n'.join(output)
+    return output.get()

@@ -1,4 +1,4 @@
-'''Code for maintaining backward compatibility with previous versions of crazy-complete.'''
+'''Code for maintaining backward compatibility with previous versions.'''
 
 from . import utils
 
@@ -14,7 +14,9 @@ def fix_option_dictionary(dictionary):
 
     if 'group' in dictionary:
         if 'groups' in dictionary:
-            utils.warn('Both `group` and `groups` found. `group` is deprecated. Removing `group` in favour of `groups`')
+            msg = ('Both `group` and `groups` found. `group` is deprecated. '
+                   'Removing `group` in favour of `groups`')
+            utils.warn(msg)
             dictionary.pop('group')
         else:
             utils.warn('`group` is deprecated. Please use `groups` instead')
