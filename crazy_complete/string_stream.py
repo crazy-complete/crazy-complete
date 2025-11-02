@@ -6,6 +6,7 @@ class StringStream:
     def __init__(self, string):
         self.s = string
         self.i = 0
+        self.l = len(string)
 
     def peek(self, seek=0):
         '''Return character at current position + seek without advancing.'''
@@ -26,6 +27,11 @@ class StringStream:
         c = self.s[self.i]
         self.i += 1
         return c
+
+    def have(self):
+        '''Return True if iterator is not at its end.'''
+
+        return self.i < self.l
 
     def advance(self, length):
         '''Advance the stream by a given length.'''

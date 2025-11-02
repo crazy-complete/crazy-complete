@@ -44,11 +44,9 @@ class ZshComplFunc(ZshCompletionBase):
             cmd = ' '.join(shell.quote(arg) for arg in self.args)
 
         if self.needs_braces:
-            cmd = shell.quote('{%s}' % cmd)
-        else:
-            cmd = shell.quote(cmd)
+            return shell.quote('{%s}' % cmd)
 
-        return escape_colon(cmd)
+        return shell.quote(cmd)
 
     def get_function(self):
         if len(self.args) == 1:
@@ -69,7 +67,7 @@ class ZshCompleteChoices(ZshCompletionBase):
 
     def _list_action_string(self):
         items  = [str(item) for item in self.choices]
-        quoted = [shell.quote(escape_colon(item)) for item in items]
+        quoted = [shell.quote(item) for item in items]
         action = shell.quote('(%s)' % ' '.join(quoted))
         if len(action) <= CHOICES_INLINE_THRESHOLD:
             return action
@@ -102,12 +100,12 @@ class ZshCompleteChoices(ZshCompletionBase):
         quoted = []
 
         for item, desc in zip(items, descriptions):
-            val = shell.quote(escape_colon(item))
+            val = shell.quote(item)
             if desc:
-                val += '\\:%s' % shell.quote(desc)
+                val += ':%s' % shell.quote(desc)
             quoted.append(val)
 
-        action  = shell.quote('((%s))' % ' '.join(quoted))
+        action = shell.quote('((%s))' % ' '.join(quoted))
         if not colon and len(action) <= CHOICES_INLINE_THRESHOLD:
             return action
 
@@ -116,7 +114,7 @@ class ZshCompleteChoices(ZshCompletionBase):
     def _dict_function(self):
         metavar  = shell.quote(self.ctxt.option.metavar or '')
 
-        code  = 'local items=(\n'
+        code = 'local items=(\n'
         for item, desc in self.choices.items():
             item = shell.quote(escape_colon(str(item)))
             if desc:

@@ -2,6 +2,7 @@
 
 from . import algo
 from . import shell
+from . import string_stream
 
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-arguments
@@ -18,6 +19,31 @@ def escape_square_brackets(s):
     '''Escape square brackets with backslash.'''
 
     return s.replace('[', '\\[').replace(']', '\\]')
+
+
+def escape_colon_in_quoted_string(s):
+    '''Escape a colon in a single/double quoted string.'''
+
+    if ':' not in s:
+        return s
+
+    ss = string_stream.StringStream(s)
+    result = ''
+
+    while ss.have():
+        c = ss.get()
+        if c == "'":
+            sub = ss.parse_shell_single_quote(in_quotes=True)
+            result += "'%s'" % sub.replace(':', r'\:')
+        elif c == '"':
+            sub = ss.parse_shell_double_quote(in_quotes=True)
+            result += '"%s"' % sub.replace(':', r'\\:')
+        elif c == ':':
+            result += r'\\:'
+        else:
+            result += c
+
+    return result
 
 
 def make_option_spec(
@@ -86,6 +112,7 @@ def make_option_spec(
         if metavar is None:
             metavar = ' '
 
+        action = escape_colon_in_quoted_string(action)
         result.append(':%s:%s' % (shell.quote(escape_colon(metavar)), action))
 
     return ''.join(result)
@@ -115,7 +142,8 @@ def make_positional_spec(
     if action == '_normal':
         return f'{num_spec}::{desc_spec}:{action}'
 
-    return f'{num_spec}:{desc_spec}:{action}'
+    action_escaped = escape_colon_in_quoted_string(action)
+    return f'{num_spec}:{desc_spec}:{action_escaped}'
 
 
 def make_file_extension_pattern(extensions, fuzzy):
@@ -137,3 +165,22 @@ def make_file_extension_pattern(extensions, fuzzy):
         pattern += '*'
 
     return pattern
+
+
+def test():
+    '''Tests.'''
+
+    cases = [
+        (0,  r'foo',         r'foo'),
+        (1,  r':',           r'\\:'),
+        (2,  r'":"',         r'"\\:"'),
+        (3,  r"':'",         r"'\:'"),
+    ]
+
+    for num, instring, expected in cases:
+        result = escape_colon_in_quoted_string(instring)
+        if result != expected:
+            print(f"Test {num} failed:")
+            print(f"Having:   {result}")
+            print(f"Expected: {expected}")
+            raise AssertionError("Test failed")
