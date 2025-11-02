@@ -258,7 +258,7 @@ def try_batch(args):
         if not line or line.startswith('#'):
             continue
 
-        utils.print_err('Running:', line)
+        utils.print_err('Running:', sys.argv[0], line)
 
         app = Application()
         app.parse_args(shlex.split(line))
