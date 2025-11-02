@@ -321,25 +321,9 @@ class Config:
         '''Add comments to the generated output.'''
 
         assert hasattr(comments, '__iter__') and not isinstance(comments, str), \
-            f"Config.include_many_comments: comments: expected iterable, got `{comments}`"
+            f"Config.add_many_comments: comments: expected iterable, got `{comments}`"
 
         self.comments.extend(comments)
-
-    def get_included_files_content(self):
-        '''Return a list of contents of all included files.'''
-
-        content = []
-
-        for file in self.include_files:
-            with open(file, 'r', encoding='utf-8') as fh:
-                content.append(fh.read().strip())
-
-        return content
-
-    def get_comments_as_string(self):
-        '''Return a string of all comments.'''
-
-        return '\n'.join(f'# {c}' for c in self.comments)
 
     def disable_hidden(self, disable):
         '''Disable hidden options.

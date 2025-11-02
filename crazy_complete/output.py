@@ -55,11 +55,13 @@ class Output:
     def add_comments(self):
         '''Add additioanl comments.'''
         if self.config.comments:
-            self.add(self.config.get_comments_as_string())
+            self.add('\n'.join(f'# {c}' for c in self.config.comments))
 
     def add_included_files(self):
         '''Add included files.'''
-        self.output.extend(self.config.get_included_files_content())
+        for file in self.config.include_files:
+            with open(file, 'r', encoding='utf-8') as fh:
+                self.add(fh.read().strip())
 
     def add_helper_functions_code(self):
         '''Add helper functions.'''
