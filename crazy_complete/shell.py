@@ -55,16 +55,17 @@ def quote(string, quote_empty_string=True):
         return string
 
     if "'" not in string:
-        return "'%s'" % string
+        return f"'{string}'"
 
     if '"' not in string:
         s = string
         s = s.replace('\\', '\\\\')
         s = s.replace('$', '\\$')
         s = s.replace('`', '\\`')
-        return '"%s"' % s
+        return f'"{s}"'
 
-    return "'%s'" % string.replace("'", '\'"\'"\'')
+    s = string.replace("'", '\'"\'"\'')
+    return f"'{s}'"
 
 
 class ShellCompleter:

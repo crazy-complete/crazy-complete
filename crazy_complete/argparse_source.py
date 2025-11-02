@@ -13,6 +13,7 @@ from .cli import CommandLine, MutuallyExclusiveGroup
 
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access
+# pylint: disable=redefined-builtin
 
 
 def range_to_complete(r):
@@ -219,6 +220,8 @@ def load_from_file(file, parser_variable=None, parser_blacklist=()):
     Load a Python file, search for the ArgumentParser object and convert
     it to a CommandLine object.
     '''
+
+    # pylint: disable=broad-exception-caught
 
     try:
         module = file_loader.import_file(file)

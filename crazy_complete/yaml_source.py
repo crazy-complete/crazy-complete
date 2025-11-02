@@ -16,96 +16,65 @@ from .cli import ExtendedBool
 # pylint: disable=redefined-builtin
 
 
+_INHERIT = ExtendedBool.INHERIT
+
+
 def option_to_yaml(dictionary):
     '''Convert an option dictionary to YAML.'''
 
-    option_strings  = dictionary['option_strings']
-    metavar         = dictionary.get('metavar',         None)
-    help            = dictionary.get('help',            None)
-    optional_arg    = dictionary.get('optional_arg',    False)
-    groups          = dictionary.get('groups',          None)
-    repeatable      = dictionary.get('repeatable',      ExtendedBool.INHERIT)
-    final           = dictionary.get('final',           False)
-    hidden          = dictionary.get('hidden',          False)
-    complete        = dictionary.get('complete',        None)
-    nosort          = dictionary.get('nosort',          None)
-    when            = dictionary.get('when',            None)
-    capture         = dictionary.get('capture',         None)
+    option_strings = dictionary['option_strings']
 
-    r = '- option_strings: %s\n' % json.dumps(option_strings)
+    fields = [
+        # name,             default,    include-if
+        ('metavar',         None,       lambda v: v is not None),
+        ('help',            None,       lambda v: v is not None),
+        ('optional_arg',    False,      lambda v: v is True),
+        ('groups',          None,       lambda v: v is not None),
+        ('repeatable',      _INHERIT,   lambda v: v != _INHERIT),
+        ('final',           False,      lambda v: v is True),
+        ('hidden',          False,      lambda v: v is True),
+        ('complete',        None,       lambda v: v is not None),
+        ('nosort',          None,       lambda v: v is True),
+        ('when',            None,       lambda v: v is not None),
+        ('capture',         None,       lambda v: v is not None),
+    ]
 
-    if metavar is not None:
-        r += '  metavar: %s\n' % json.dumps(metavar)
+    r = [f'- option_strings: {json.dumps(option_strings)}']
 
-    if help is not None:
-        r += '  help: %s\n' % json.dumps(help)
+    for name, default, include_if in fields:
+        value = dictionary.get(name, default)
 
-    if optional_arg is True:
-        r += '  optional_arg: %s\n' % json.dumps(optional_arg)
+        if include_if(value):
+            r.append(f'  {name}: {json.dumps(value)}')
 
-    if groups is not None:
-        r += '  groups: %s\n' % json.dumps(groups)
-
-    if repeatable != ExtendedBool.INHERIT:
-        r += '  repeatable: %s\n' % json.dumps(repeatable)
-
-    if final is not False:
-        r += '  final: %s\n' % json.dumps(final)
-
-    if hidden is not False:
-        r += '  hidden: %s\n' % json.dumps(hidden)
-
-    if complete is not None:
-        r += '  complete: %s\n' % json.dumps(complete)
-
-    if nosort is True:
-        r += '  nosort: %s\n' % json.dumps(nosort)
-
-    if when is not None:
-        r += '  when: %s\n' % json.dumps(when)
-
-    if capture is not None:
-        r += '  capture: %s\n' % json.dumps(capture)
-
-    return r.rstrip()
+    return '\n'.join(r)
 
 
 def positional_to_yaml(dictionary):
     '''Convert a positional dictionary to YAML.'''
 
-    number     = dictionary['number']
-    metavar    = dictionary.get('metavar',    None)
-    help       = dictionary.get('help',       None)
-    repeatable = dictionary.get('repeatable', False)
-    complete   = dictionary.get('complete',   None)
-    nosort     = dictionary.get('nosort',     None)
-    when       = dictionary.get('when',       None)
-    capture    = dictionary.get('capture',    None)
+    number = dictionary['number']
 
-    r = '- number: %d\n' % number
+    fields = [
+        # name,             default,    include-if
+        ('metavar',         None,       lambda v: v is not None),
+        ('help',            None,       lambda v: v is not None),
+        ('repeatable',      False,      lambda v: v is True),
+        ('complete',        None,       lambda v: v is not None),
+        ('nosort',          None,       lambda v: v is True),
+        ('when',            None,       lambda v: v is not None),
+        ('capture',         None,       lambda v: v is not None),
+    ]
 
-    if metavar is not None:
-        r += '  metavar: %s\n' % json.dumps(metavar)
+    r = [f'- number: {number}']
 
-    if help is not None:
-        r += '  help: %s\n' % json.dumps(help)
+    for name, default, include_if in fields:
+        value = dictionary.get(name, default)
 
-    if repeatable is not False:
-        r += '  repeatable: %s\n' % json.dumps(repeatable)
+        if include_if(value):
+            r.append(f'  {name}: {json.dumps(value)}')
 
-    if complete is not None:
-        r += '  complete: %s\n' % json.dumps(complete)
-
-    if nosort is True:
-        r += '  nosort: %s\n' % json.dumps(nosort)
-
-    if when is not None:
-        r += '  when: %s\n' % json.dumps(when)
-
-    if capture is not None:
-        r += '  capture: %s\n' % json.dumps(capture)
-
-    return r.rstrip()
+    return '\n'.join(r)
 
 
 def to_yaml(dictionary):
@@ -171,7 +140,7 @@ def commandline_to_yaml(commandline):
 def replace_defines_in_documents(documents):
     '''Replaces defines in a list of documents.
 
-    Exmaple:
+    Example:
         prog: '%defines%'
         my_completer: ['choices', ['foo', 'bar']]
         ---

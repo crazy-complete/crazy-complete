@@ -133,7 +133,7 @@ class BashCompletionCompgen(BashCompletionBase):
 
 
 class BashCompleteCombine(BashCompletionBase):
-    '''Used for combining multiple complete commands.'''
+    '''Used for combining multiple completion commands.'''
 
     def __init__(self, ctxt, trace, completer, commands):
         self.ctxt = ctxt

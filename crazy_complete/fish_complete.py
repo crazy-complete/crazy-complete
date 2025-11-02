@@ -107,7 +107,9 @@ class FishCompleteChoices(FishCompletionBase):
 
     @staticmethod
     def _get_inline_for_dict(choices):
-        str0 = lambda o: str(o) if o is not None else ''
+        def str0(s):
+            return str(s) if s is not None else ''
+
         stringified = {str(item): str0(desc) for item, desc in choices.items()}
         q = shell.quote
         r = ['%s\\t%s' % (q(item), q(desc)) for item, desc in stringified.items()]
@@ -312,7 +314,8 @@ class FishCompleteCommand(FishCompletionBase):
             append = opts.get('path_append', None)
             prepend = opts.get('path_prepend', None)
 
-        mkpath = lambda path: ' '.join(shell.quote(p) for p in path.split(':'))
+        def mkpath(path):
+            return ' '.join(shell.quote(p) for p in path.split(':'))
 
         if path:
             code = 'set -lx PATH %s' % mkpath(path)

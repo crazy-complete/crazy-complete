@@ -123,7 +123,7 @@ def _validate_non_empty_dict(value, parameter):
 
 def _validate_char(string, parameter):
     if len(string) != 1:
-        msg = '%s: %s' % (parameter, m.single_charater_expected())
+        msg = '%s: %s' % (parameter, m.single_character_expected())
         raise CrazyError(msg)
 
 

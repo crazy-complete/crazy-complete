@@ -76,7 +76,7 @@ def group_by(iterable, keyfunc):
 
 
 def numbers_are_contiguous(numbers):
-    '''Return True if the list of integers is contiguous (1,2,3,4)'''
+    '''Return True if the list of integers is contiguous (1, 2, 3, 4, ...)'''
 
     if not numbers:
         return False

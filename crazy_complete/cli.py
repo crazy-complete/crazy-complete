@@ -3,6 +3,7 @@
 from collections import OrderedDict
 from types import NoneType
 
+from .type_utils import validate_type
 from .errors import CrazyError, CrazyTypeError
 from .str_utils import (
     contains_space, is_valid_option_string,
@@ -72,20 +73,11 @@ class CommandLine:
         if aliases is None:
             aliases = []
 
-        if not isinstance(prog, str):
-            raise CrazyTypeError('prog', 'str', prog)
-
-        if not isinstance(parent, (CommandLine, NoneType)):
-            raise CrazyTypeError('parent', 'CommandLine|None', parent)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
-
-        if not isinstance(aliases, list):
-            raise CrazyTypeError('aliases', 'list', aliases)
-
-        if not isinstance(wraps, (str, NoneType)):
-            raise CrazyTypeError('wraps', 'str', wraps)
+        validate_type(prog, (str,), 'prog')
+        validate_type(parent, (CommandLine, NoneType), 'parent')
+        validate_type(help, (str, NoneType), 'help')
+        validate_type(aliases, (list,), 'aliases')
+        validate_type(wraps, (str, NoneType), 'wraps')
 
         if wraps is not None:
             if is_empty_or_whitespace(wraps):
@@ -507,32 +499,15 @@ class Positional:
                 Specifies the variable name for capturing
         '''
 
-        if not isinstance(parent, (CommandLine, NoneType)):
-            raise CrazyTypeError('parent', 'CommandLine|None', parent)
-
-        if not isinstance(number, int):
-            raise CrazyTypeError('number', 'int', number)
-
-        if not isinstance(metavar, (str, NoneType)):
-            raise CrazyTypeError('metavar', 'str|None', metavar)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
-
-        if not isinstance(complete, (list, tuple, NoneType)):
-            raise CrazyTypeError('complete', 'list|None', complete)
-
-        if not isinstance(repeatable, bool):
-            raise CrazyTypeError('repeatable', 'bool', repeatable)
-
-        if not isinstance(nosort, bool):
-            raise CrazyTypeError('nosort', 'bool', nosort)
-
-        if not isinstance(when, (str, NoneType)):
-            raise CrazyTypeError('when', 'str|None', when)
-
-        if not isinstance(capture, (str, NoneType)):
-            raise CrazyTypeError('capture', 'str|None', capture)
+        validate_type(parent, (CommandLine, NoneType), 'parent')
+        validate_type(number, (int,), 'number')
+        validate_type(metavar, (str, NoneType), 'metavar')
+        validate_type(help, (str, NoneType), 'help')
+        validate_type(complete, (list, tuple, NoneType), 'complete')
+        validate_type(repeatable, (bool,), 'repeatable')
+        validate_type(nosort, (bool,), 'nosort')
+        validate_type(when, (str, NoneType), 'when')
+        validate_type(capture, (str, NoneType), 'capture')
 
         if capture is not None and not is_valid_variable_name(capture):
             raise CrazyError(f"Invalid variable name: {capture!r}")
@@ -662,49 +637,28 @@ class Option:
             Option: The newly added Option object.
         '''
 
-        if not isinstance(parent, (CommandLine, NoneType)):
-            raise CrazyTypeError('parent', 'CommandLine|None', parent)
-
-        if not isinstance(option_strings, list):
-            raise CrazyTypeError('option_strings', 'list', option_strings)
-
-        if not isinstance(metavar, (str, NoneType)):
-            raise CrazyTypeError('metavar', 'str|None', metavar)
-
-        if not isinstance(help, (str, NoneType)):
-            raise CrazyTypeError('help', 'str|None', help)
-
-        if not isinstance(complete, (list, tuple, NoneType)):
-            raise CrazyTypeError('complete', 'list|None', complete)
-
-        if not isinstance(groups, (list, NoneType)):
-            raise CrazyTypeError('groups', 'list|None', groups)
+        validate_type(parent, (CommandLine, NoneType), 'parent')
+        validate_type(option_strings, (list,), 'option_strings')
+        validate_type(metavar, (str, NoneType), 'metavar')
+        validate_type(help, (str, NoneType), 'help')
+        validate_type(complete, (list, tuple, NoneType), 'complete')
+        validate_type(groups, (list, NoneType), 'groups')
 
         if groups is not None:
             for index, group in enumerate(groups):
                 if not isinstance(group, str):
                     raise CrazyTypeError(f'groups[{index}]', 'str', group)
 
-        if not isinstance(optional_arg, bool):
-            raise CrazyTypeError('optional_arg', 'bool', optional_arg)
+        validate_type(optional_arg, (bool,), 'optional_arg')
 
         if not is_extended_bool(repeatable):
             raise CrazyTypeError('repeatable', 'ExtendedBool', repeatable)
 
-        if not isinstance(final, bool):
-            raise CrazyTypeError('final', 'bool', final)
-
-        if not isinstance(hidden, bool):
-            raise CrazyTypeError('hidden', 'bool', hidden)
-
-        if not isinstance(nosort, bool):
-            raise CrazyTypeError('nosort', 'bool', nosort)
-
-        if not isinstance(when, (str, NoneType)):
-            raise CrazyTypeError('when', 'str|None', when)
-
-        if not isinstance(capture, (str, NoneType)):
-            raise CrazyTypeError('capture', 'str|None', capture)
+        validate_type(final, (bool,), 'final')
+        validate_type(hidden, (bool,), 'hidden')
+        validate_type(nosort, (bool,), 'nosort')
+        validate_type(when, (str, NoneType), 'when')
+        validate_type(capture, (str, NoneType), 'capture')
 
         if not option_strings:
             raise CrazyError('Empty option strings')

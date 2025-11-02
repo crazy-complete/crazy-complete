@@ -12,7 +12,7 @@ class PatternBase:
         raise NotImplementedError
 
     def to_zsh_glob(self):
-        '''Make a zsh glob.'''
+        '''Make a Zsh glob.'''
         raise NotImplementedError
 
 
@@ -185,6 +185,7 @@ class GlobLexer(StringStream):
         self.tokens = []
 
     def parse(self):
+        '''Split string into tokens.'''
         tokens = []
 
         while True:

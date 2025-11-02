@@ -118,7 +118,7 @@ def _check_regex(value, parameter):
 
 def _check_char(value, parameter):
     if len(value.value) != 1:
-        raise _error('%s: %s' % (parameter, m.single_charater_expected()), value)
+        raise _error('%s: %s' % (parameter, m.single_character_expected()), value)
 
 
 def _check_variable_name(value, parameter):

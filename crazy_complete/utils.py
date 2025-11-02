@@ -273,7 +273,7 @@ def get_query_option_strings(commandline, with_parent_options=True):
 def is_worth_a_function(commandline):
     '''Check if a commandline "is worth a function".
 
-    This means that a commandline has on of:
+    This means that a commandline has one of:
         - Subcommands
         - Positionals (that have meaningful completion)
         - Options (that aren't --help or --version)

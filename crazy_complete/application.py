@@ -87,7 +87,7 @@ p.add_argument('--inherit-options', metavar='BOOL', default=False, type=boolean,
 ).complete('choices', ('True', 'False'))
 
 p.add_argument('--option-stacking', metavar='BOOL', default=True, type=boolean,
-    help='Sets wether short option stacking is allowed'
+    help='Sets whether short option stacking is allowed'
 ).complete('choices', ('True', 'False'))
 
 p.add_argument('--disable', metavar='FEATURES', default=[], type=feature_list,

@@ -93,7 +93,9 @@ class ZshCompleteChoices(ZshCompletionBase):
         if self.trace and self.trace[-1] == 'combine':
             return self._dict_function()
 
-        str0 = lambda s: '' if s is None else str(s)
+        def str0(s):
+            return str(s) if s is not None else ''
+
         items = [str0(item) for item in self.choices.keys()]
         descriptions = [str0(value) for value in self.choices.values()]
         colon = any(':' in s for s in items + descriptions)

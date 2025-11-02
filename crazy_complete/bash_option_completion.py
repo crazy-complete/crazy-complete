@@ -166,6 +166,9 @@ def _get_master_completion_obj(options, abbreviations, generator):
 
 
 class _Info:
+
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, options, abbreviations, commandline, ctxt):
         self.commandline    = commandline
         self.ctxt           = ctxt
@@ -290,12 +293,14 @@ def _get_cur_completion(info):
 def _get_dispatcher(info):
     r = []
 
-    if info.short_required or info.long_required or info.old_required:
-        r += [_get_prev_completion(info)]
+    required = info.short_required or info.long_required or info.old_required
+    optional = info.short_optional or info.long_optional or info.old_optional
 
-    if info.short_required or info.long_required or info.old_required or \
-       info.short_optional or info.long_optional or info.old_optional:
-        r += [_get_cur_completion(info)]
+    if required:
+        r.append(_get_prev_completion(info))
+
+    if required or optional:
+        r.append(_get_cur_completion(info))
 
     return '\n\n'.join(r)
 

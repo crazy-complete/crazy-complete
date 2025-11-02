@@ -54,7 +54,7 @@ def replace_commands(tokens):
             elif cmd == 'has_option':
                 r.append(HasOption(args))
             else:
-                raise CrazyError("when: Invalid command: %r" % cmd)
+                raise CrazyError(f"Invalid command: {cmd!r}")
         else:
             r.append(token)
 

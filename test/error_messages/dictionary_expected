@@ -22,7 +22,7 @@
 051-inherit-options-wrong-value          | Parameter `inherit_options` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
 060-options-wrong-type                   | Parameter `options` has an invalid type. Expected types: list. Received: False (bool)
 070-positionals-wrong-type               | Parameter `positionals` has an invalid type. Expected types: list. Received: False (bool)
-080-wraps-wrong-type                     | Parameter `wraps` has an invalid type. Expected types: str. Received: False (bool)
+080-wraps-wrong-type                     | Parameter `wraps` has an invalid type. Expected types: str|None. Received: False (bool)
 081-wraps-empty                          | wraps is empty
 082-wraps-in-subcommand                  | foo bar: Parameter `wraps` not allowed in subcommand
 ======= Directory "02-option" =======
@@ -43,7 +43,7 @@
 161-repeatable-wrong-value               | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
 180-final-wrong-type                     | Parameter `final` has an invalid type. Expected types: bool. Received: 'wrong' (str)
 190-hidden-wrong-type                    | Parameter `hidden` has an invalid type. Expected types: bool. Received: 'wrong' (str)
-200-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: False (bool)
+200-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|tuple|None. Received: False (bool)
 210-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
 211-when-wrong-value                     | foo: -o: when: invalid: Invalid command: 'invalid'
 220-metavar-but-no-complete              | Option ['-o'] has metavar set, but has no complete
@@ -59,7 +59,7 @@
 210-metavar-wrong-type                   | Parameter `metavar` has an invalid type. Expected types: str|None. Received: False (bool)
 220-help-wrong-type                      | Parameter `metavar` has an invalid type. Expected types: str|None. Received: False (bool)
 230-repeatable-wrong-type                | Parameter `repeatable` has an invalid type. Expected types: bool. Received: 'wrong' (str)
-240-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|None. Received: 'wrong' (str)
+240-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|tuple|None. Received: 'wrong' (str)
 250-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
 251-when-wrong-value                     | foo: 1: None: when: invalid: Invalid command: 'invalid'
 260-capture-wrong-type                   | Parameter `capture` has an invalid type. Expected types: str|None. Received: False (bool)

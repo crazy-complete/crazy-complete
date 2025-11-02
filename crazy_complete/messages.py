@@ -68,7 +68,7 @@ def integer_cannot_be_zero():
 
 def integer_must_be_greater_than_zero():
     if LANG == 'de':
-        return 'Ganzzahl muss größser als Null sein'
+        return 'Ganzzahl muss größer als Null sein'
     return 'Integer must be greater than zero'
 
 
@@ -144,7 +144,7 @@ def parameter_not_allowed_in_subcommand(parameter):
     return f'Parameter `{parameter}` not allowed in subcommand'
 
 
-def single_charater_expected():
+def single_character_expected():
     if LANG == 'de':
         return 'Ungültige Länge. Einzelner Buchstabe erwartet'
     return 'Invalid length. Single character expected'
