@@ -89,10 +89,14 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
     Args:
         parser (argparse.ArgumentParser):
             The ArgumentParser object to convert.
+
         prog (str, optional):
-            The name of the program.  Defaults to the program name of the parser.
+            The name of the program.
+            Defaults to the program name of the parser.
+
         description (str, optional):
-            The description of the program.  Defaults to the description of the parser.
+            The description of the program.
+            Defaults to the description of the parser.
 
     Returns:
         CommandLine: A CommandLine object representing the converted parser.
@@ -187,7 +191,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
 
 
 def find_objects_by_type(module, types):
-    '''Search for objects in the specified module that match the given types.'''
+    '''Search a module for objects of a specific type.'''
 
     r = []
 

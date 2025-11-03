@@ -1,4 +1,4 @@
-'''Code for generating a fish auto completion file.'''
+'''Code for generating a Fish auto completion file.'''
 
 from . import config as config_
 from . import utils
@@ -15,6 +15,13 @@ from . import generation
 
 
 class FishCompletionDefinition:
+    '''Class holding a completion definition.'''
+
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+    # pylint: disable=too-few-public-methods
+
     def __init__(
           self,
           ctxt,
@@ -27,12 +34,14 @@ class FishCompletionDefinition:
           keep_order=False,        # Do not sort completion suggestions
           completion_obj=None
         ):
+
         if short_options is None:
             short_options = []
         if long_options is None:
             long_options = []
         if old_options is None:
             old_options = []
+
         self.ctxt = ctxt
         self.short_options = short_options
         self.long_options = long_options
@@ -45,6 +54,8 @@ class FishCompletionDefinition:
         self.conditions = Conditions()
 
     def get_complete_cmd(self, ctxt, unsafe=False):
+        '''Return a `complete` command for current definition.'''
+
         cmd = FishCompleteCommand()
         cmd.set_command('$prog', raw=True)
 
@@ -90,6 +101,10 @@ def _get_positional_contains(option):
 
 
 class FishCompletionGenerator:
+    '''Class for generating completions.'''
+
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, ctxt, commandline, parent=None):
         self.parent = parent
         self.children = []
@@ -120,7 +135,7 @@ class FishCompletionGenerator:
             if isinstance(definition.completion_obj, fish_complete.FishCompleteCommandArg):
                 cmdline = self
                 while cmdline:
-                    cmdline.fix_command_arg(definition.positional)
+                    cmdline._fix_command_arg(definition.positional)
                     cmdline = cmdline.parent
 
         for definition in self.complete_definitions:
@@ -132,7 +147,7 @@ class FishCompletionGenerator:
 
             self.lines.append(cmd.get())
 
-    def fix_command_arg(self, positional):
+    def _fix_command_arg(self, positional):
         for definition in self.complete_definitions:
             if not (definition.short_options or definition.long_options or definition.old_options):
                 continue
@@ -140,11 +155,15 @@ class FishCompletionGenerator:
             definition.conditions.add(Not(PositionalNum('>=', positional)))
 
     def visit(self, callback):
+        '''Execute callback for generator objects.'''
+
         callback(self)
         for child in self.children:
             callback(child)
 
     def get_all(self):
+        '''Return all generator objects.'''
+
         r = []
         self.visit(r.append)
         return r
@@ -159,13 +178,13 @@ class FishCompletionGenerator:
 
         definition = FishCompletionDefinition(
             self.ctxt,
-            short_options       = option.get_short_option_strings(),
-            long_options        = option.get_long_option_strings(),
-            old_options         = option.get_old_option_strings(),
-            requires_argument   = (option.complete and not option.optional_arg),
-            keep_order          = option.nosort,
-            description         = option.help,
-            completion_obj      = completion_obj)
+            short_options     = option.get_short_option_strings(),
+            long_options      = option.get_long_option_strings(),
+            old_options       = option.get_old_option_strings(),
+            requires_argument = option.has_required_arg(),
+            keep_order        = option.nosort,
+            description       = option.help,
+            completion_obj    = completion_obj)
 
         not_has_options = []
 
@@ -206,11 +225,11 @@ class FishCompletionGenerator:
 
         definition = FishCompletionDefinition(
             self.ctxt,
-            positional          = option.get_positional_num(),
-            requires_argument   = True,
-            keep_order          = option.nosort,
-            description         = option.help,
-            completion_obj      = completion_obj
+            positional        = option.get_positional_num(),
+            requires_argument = True,
+            keep_order        = option.nosort,
+            description       = option.help,
+            completion_obj    = completion_obj
         )
 
         definition.conditions.add_when(option.when_parsed)

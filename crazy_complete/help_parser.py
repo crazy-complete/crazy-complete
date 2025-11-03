@@ -25,8 +25,9 @@ class CharStream:
 
     def peek(self, relative_pos = 0):
         """
-        Returns the character at the current position plus an optional relative offset
-        without advancing the stream. Returns None if the position is out of bounds.
+        Returns the character at the current position plus an optional relative
+        offset without advancing the stream. Returns None if the position is
+        out of bounds.
         """
         try:
             return self.string[self.pos + relative_pos]
@@ -35,8 +36,8 @@ class CharStream:
 
     def peek_str(self, length):
         """
-        Returns a substring of the specified length starting from the current position
-        without advancing the stream.
+        Returns a substring of the specified length starting from the current
+        position without advancing the stream.
         """
         return self.string[self.pos:self.pos + length]
 
@@ -147,8 +148,8 @@ def parse_quoted_string(stream):
         'foo bar'
         "foo bar"
 
-    Since it is unlikely that we encounter escape sequences in a description string
-    of an option, we don't process any escape sequences.
+    Since it is unlikely that we encounter escape sequences in a description
+    string of an option, we don't process any escape sequences.
     '''
     quote = stream.peek()
     if quote not in ('"', "'"):

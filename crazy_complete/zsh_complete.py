@@ -3,16 +3,18 @@
 from . import shell
 from .pattern import bash_glob_to_zsh_glob
 from .str_utils import join_with_wrap, indent
-from .zsh_utils import escape_colon, escape_square_brackets, make_file_extension_pattern
+from .zsh_utils import (
+    escape_colon, escape_square_brackets, make_file_extension_pattern
+)
 from .type_utils import is_dict_type
 from .utils import key_value_list_normalize_values
 
 
 CHOICES_INLINE_THRESHOLD = 80
-# The `choices` command can in Zsh be expressed inline in an optspec, like this:
+# The `choices` command can in Zsh be expressed inline in an optspec, like:
 #   (foo bar baz)
 # or:
-#   (foo\:"Foo value" bar\:"Bar value" baz\:"Baz value)
+#   (foo:"Foo value" bar:"Bar value" baz:"Baz value)
 #
 # This variable defines how big this string can get before a function
 # is used instead.
@@ -27,6 +29,7 @@ class ZshCompletionBase:
 
     def get_function(self):
         '''Return a function that can be used in e.g. `_sequence`.'''
+        raise NotImplementedError
 
 
 class ZshComplFunc(ZshCompletionBase):
@@ -44,7 +47,7 @@ class ZshComplFunc(ZshCompletionBase):
             cmd = ' '.join(shell.quote(arg) for arg in self.args)
 
         if self.needs_braces:
-            return shell.quote('{%s}' % cmd)
+            return shell.quote(f'{{{cmd}}}')
 
         return shell.quote(cmd)
 
@@ -66,7 +69,7 @@ class ZshCompleteChoices(ZshCompletionBase):
         self.choices = choices
 
     def _list_action_string(self):
-        items  = [str(item) for item in self.choices]
+        items = [str(item) for item in self.choices]
         quoted = [shell.quote(item) for item in items]
         action = shell.quote('(%s)' % ' '.join(quoted))
         if len(action) <= CHOICES_INLINE_THRESHOLD:
@@ -78,7 +81,7 @@ class ZshCompleteChoices(ZshCompletionBase):
         metavar = shell.quote(self.ctxt.option.metavar or '')
         quoted = [shell.quote(escape_colon(c)) for c in self.choices]
 
-        code  = 'local items=(\n'
+        code = 'local items=(\n'
         code += indent(join_with_wrap(' ', '\n', 78, quoted), 2)
         code += '\n)\n\n'
         code += f'_describe -- {metavar} items'
@@ -112,7 +115,7 @@ class ZshCompleteChoices(ZshCompletionBase):
         return self._dict_function()
 
     def _dict_function(self):
-        metavar  = shell.quote(self.ctxt.option.metavar or '')
+        metavar = shell.quote(self.ctxt.option.metavar or '')
 
         code = 'local items=(\n'
         for item, desc in self.choices.items():
@@ -214,6 +217,9 @@ class ZshCompleteRange(ZshCompletionBase):
 class ZshKeyValueList(ZshComplFunc):
     '''Used for completing a list of key-value pairs.'''
 
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         trace.append('key_value_list')
         spec = []
@@ -227,13 +233,13 @@ class ZshKeyValueList(ZshComplFunc):
                 desc = ''
 
             if not complete:
-                spec.append('%s%s' % (key, desc))
+                spec.append(f'{key}{desc}')
             elif complete[0] == 'none':
-                spec.append('%s%s:::' % (key, desc))
+                spec.append(f'{key}{desc}:::')
             else:
                 compl_obj = completer.complete_from_def(ctxt, trace, complete)
                 action = compl_obj.get_action_string()
-                spec.append('%s%s:::%s' % (key, desc, action))
+                spec.append(f'{key}{desc}:::{action}')
 
         code = '_values -s %s -S %s %s \\\n%s' % (
             shell.quote(pair_separator),
@@ -251,7 +257,6 @@ class ZshCompleteCombine(ZshCompletionBase):
     '''Combine multiple completers into one.'''
 
     def __init__(self, ctxt, trace, completer, commands):
-        # metavar = shell.quote(ctxt.option.metavar or '')
         trace.append('combine')
 
         completions = []
@@ -259,10 +264,8 @@ class ZshCompleteCombine(ZshCompletionBase):
             compl_obj = completer.complete_from_def(ctxt, trace, command_args)
             completions.append(compl_obj.get_action_string())
 
-        code  = '_alternative \\\n'
-        for completion in completions:
-            code += '  %s \\\n' % completion
-        code = code.rstrip(' \\\n')
+        code = '_alternative \\\n'
+        code += indent(' \\\n'.join(completions), 2)
 
         self.func = ctxt.helpers.add_dynamic_func(ctxt, code)
 
@@ -378,7 +381,7 @@ class ZshCompleter(shell.ShellCompleter):
         return ZshComplFunc(ctxt, [command], needs_braces=True)
 
     def value_list(self, ctxt, _trace, opts):
-        desc   = ctxt.option.metavar or ''
+        desc = ctxt.option.metavar or ''
         values = opts['values']
         separator = opts.get('separator', ',')
         duplicates = opts.get('duplicates', False)

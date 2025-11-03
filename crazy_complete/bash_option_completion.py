@@ -1,5 +1,6 @@
 '''Module for option completion in Bash.'''
 
+from . import cli
 from . import algo
 from . import utils
 from . import bash_when
@@ -11,6 +12,9 @@ from .str_utils import indent
 class MasterCompletionFunction:
     '''Class for generating a master completion function.'''
 
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, options, abbreviations, generator):
         self.abbreviations = abbreviations
         self.complete = generator._complete_option
@@ -18,8 +22,8 @@ class MasterCompletionFunction:
         self.optionals = False
         self.code = []
 
-        optional_arg = list(filter(lambda o: o.complete and o.optional_arg is True, options))
-        required_arg = list(filter(lambda o: o.complete and o.optional_arg is False, options))
+        optional_arg = list(filter(cli.Option.has_optional_arg, options))
+        required_arg = list(filter(cli.Option.has_required_arg, options))
 
         self._add_options(required_arg)
 
@@ -99,8 +103,8 @@ class MasterCompletionFunctionNoWhen:
         self.optionals = False
         self.code = []
 
-        optional_arg = list(filter(lambda o: o.complete and o.optional_arg is True, options))
-        required_arg = list(filter(lambda o: o.complete and o.optional_arg is False, options))
+        optional_arg = list(filter(cli.Option.has_optional_arg, options))
+        required_arg = list(filter(cli.Option.has_required_arg, options))
 
         self._add_options(required_arg)
 
@@ -114,6 +118,7 @@ class MasterCompletionFunctionNoWhen:
 
     @staticmethod
     def accept(options):
+        '''Return True if none of the options have the when attribute set.'''
         return not any(option.when for option in options)
 
     def _get_all_option_strings(self, option):
@@ -168,6 +173,7 @@ def _get_master_completion_obj(options, abbreviations, generator):
 class _Info:
 
     # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-few-public-methods
 
     def __init__(self, options, abbreviations, commandline, ctxt):
         self.commandline    = commandline
@@ -195,9 +201,9 @@ class _Info:
         for option in all_options:
             short_opts = ''.join(o.lstrip('-') for o in option.get_short_option_strings())
 
-            if option.complete and option.optional_arg is False:
+            if option.has_required_arg():
                 self.short_required_args += short_opts
-            elif option.complete and option.optional_arg is True:
+            elif option.has_optional_arg():
                 self.short_optional_args += short_opts
             elif option.complete is None:
                 self.short_no_args += short_opts
@@ -210,21 +216,21 @@ class _Info:
     def _collect_options_info(self, options):
         for option in options:
             if option.get_long_option_strings():
-                if option.complete and option.optional_arg is True:
+                if option.has_optional_arg():
                     self.long_optional = True
-                elif option.complete:
+                elif option.has_required_arg():
                     self.long_required = True
 
             if option.get_old_option_strings():
-                if option.complete and option.optional_arg is True:
+                if option.has_optional_arg():
                     self.old_optional = True
-                elif option.complete:
+                elif option.has_required_arg():
                     self.old_required = True
 
             if option.get_short_option_strings():
-                if option.complete and option.optional_arg is True:
+                if option.has_optional_arg():
                     self.short_optional = True
-                elif option.complete:
+                elif option.has_required_arg():
                     self.short_required = True
 
 
@@ -306,6 +312,8 @@ def _get_dispatcher(info):
 
 
 def generate_option_completion(self):
+    '''Generate code for completing options.'''
+
     options = self.commandline.get_options(only_with_arguments=True)
     abbreviations = utils.get_option_abbreviator(self.commandline)
 

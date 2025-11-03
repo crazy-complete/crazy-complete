@@ -272,6 +272,9 @@ class FishCompleteValueList(FishCompletionCommand):
 class FishCompletKeyValueList(FishCompletionCommand):
     '''Used for completing a list of key-value pairs.'''
 
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         trace.append('key_value_list')
         args = []
@@ -301,6 +304,8 @@ class FishCompletKeyValueList(FishCompletionCommand):
 
 
 class FishCompleteCommand(FishCompletionBase):
+    '''Complete a command from $PATH.'''
+
     def __init__(self, ctxt, opts):
         super().__init__(ctxt)
 
@@ -454,9 +459,9 @@ class FishCompleter(shell.ShellCompleter):
 
     def range(self, ctxt, _trace, start, stop, step=1):
         if step == 1:
-            return FishCompletionCommand(ctxt, ['command', 'seq', str(start), str(stop)])
+            return FishCompletionCommand(ctxt, ['seq', str(start), str(stop)])
 
-        return FishCompletionCommand(ctxt, ['command', 'seq', str(start), str(step), str(stop)])
+        return FishCompletionCommand(ctxt, ['seq', str(start), str(step), str(stop)])
 
     def service(self, ctxt, _trace):
         return FishCompletionCommand(ctxt, ["__fish_systemctl_services"])

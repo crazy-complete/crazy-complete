@@ -15,8 +15,10 @@ from . import utils
 from . import config
 from . import paths
 
-# The import of `argparse_mod` only modifies the classes provided by the argparse
-# module. We use the dummy function to silence warnings about the unused import.
+
+# The import of `argparse_mod` only modifies the classes provided by the
+# argparse module. We use the dummy function to silence warnings about the
+# unused import.
 argparse_mod.dummy()
 
 
@@ -47,50 +49,63 @@ def feature_list(string):
     return features
 
 
-p = argparse.ArgumentParser('crazy-complete',
+p = argparse.ArgumentParser(
+    'crazy-complete',
     description='Generate shell auto completion files for all major shells',
     exit_on_error=False)
 
-p.add_argument('shell', choices=('bash', 'fish', 'zsh', 'json', 'yaml'),
+p.add_argument(
+    'shell', choices=('bash', 'fish', 'zsh', 'json', 'yaml'),
     help='Specify the shell type for the completion script')
 
-p.add_argument('definition_file',
+p.add_argument(
+    'definition_file',
     help='The file containing the command line definitions'
 ).complete('file')
 
-p.add_argument('--version', action='version', version='%(prog)s 0.3.6',
+p.add_argument(
+    '--version', action='version', version='%(prog)s 0.3.6',
     help='Show program version')
 
-p.add_argument('--manual', metavar='TOPIC', nargs='?',
+p.add_argument(
+    '--manual', metavar='TOPIC', nargs='?',
     help='Show manual for topic')
 
-p.add_argument('--parser-variable', default=None,
+p.add_argument(
+    '--parser-variable', default=None,
     help='Specify the variable name of the ArgumentParser object (for --input-type=python)')
 
-p.add_argument('--input-type', choices=('yaml', 'json', 'python', 'help', 'auto'), default='auto',
+p.add_argument(
+    '--input-type', choices=('yaml', 'json', 'python', 'help', 'auto'), default='auto',
     help='Specify input file type')
 
-p.add_argument('--abbreviate-commands', metavar='BOOL', default=False, type=boolean,
+p.add_argument(
+    '--abbreviate-commands', metavar='BOOL', default=False, type=boolean,
     help='Sets whether commands can be abbreviated'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--abbreviate-options', metavar='BOOL', default=False, type=boolean,
+p.add_argument(
+    '--abbreviate-options', metavar='BOOL', default=False, type=boolean,
     help='Sets whether options can be abbreviated'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--repeatable-options', metavar='BOOL', default=False, type=boolean,
+p.add_argument(
+    '--repeatable-options', metavar='BOOL', default=False, type=boolean,
     help='Sets whether options are suggested multiple times during completion'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--inherit-options', metavar='BOOL', default=False, type=boolean,
+p.add_argument(
+    '--inherit-options', metavar='BOOL', default=False, type=boolean,
     help='Sets whether parent options are visible to subcommands'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--option-stacking', metavar='BOOL', default=True, type=boolean,
+p.add_argument(
+    '--option-stacking', metavar='BOOL', default=True, type=boolean,
     help='Sets whether short option stacking is allowed'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--disable', metavar='FEATURES', default=[], type=feature_list,
+p.add_argument(
+    '--disable', metavar='FEATURES', default=[], type=feature_list,
     help='Disable features (hidden,final,groups,repeatable,when)'
 ).complete('value_list', {'values': {
     'hidden':     'Disable hidden options',
@@ -100,53 +115,66 @@ p.add_argument('--disable', metavar='FEATURES', default=[], type=feature_list,
     'when':       'Disable conditional options and positionals',
 }})
 
-p.add_argument('--vim-modeline', metavar='BOOL', default=True, type=boolean,
+p.add_argument(
+    '--vim-modeline', metavar='BOOL', default=True, type=boolean,
     help='Sets whether a vim modeline comment shall be appended to the generated code'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--bash-completions-version', metavar='VERSION', default=(2,), type=version,
+p.add_argument(
+    '--bash-completions-version', metavar='VERSION', default=(2,), type=version,
     help='Generate code for a specific bash-completions version'
 )
 
-p.add_argument('--zsh-compdef', metavar='BOOL', default=True, type=boolean,
+p.add_argument(
+    '--zsh-compdef', metavar='BOOL', default=True, type=boolean,
     help='Sets whether #compdef is used in zsh scripts'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--fish-fast', metavar='BOOL', default=False, type=boolean,
+p.add_argument(
+    '--fish-fast', metavar='BOOL', default=False, type=boolean,
     help='Use faster commandline parsing at the cost of correctness'
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--fish-inline-conditions', metavar='BOOL', default=False, type=boolean,
+p.add_argument(
+    '--fish-inline-conditions', metavar='BOOL', default=False, type=boolean,
     help="Don't store conditions in a variable"
 ).complete('choices', ('True', 'False'))
 
-p.add_argument('--include-file', metavar='FILE', action='append',
+p.add_argument(
+    '--include-file', metavar='FILE', action='append',
     help='Include file in output'
 ).complete('file')
 
-p.add_argument('--comment', metavar='COMMENT', action='append',
+p.add_argument(
+    '--comment', metavar='COMMENT', action='append',
     help='Add a comment to output'
 )
 
-p.add_argument('--debug', action='store_true', default=False,
+p.add_argument(
+    '--debug', action='store_true', default=False,
     help='Enable debug mode')
 
-p.add_argument('--keep-comments', action='store_true', default=False,
+p.add_argument(
+    '--keep-comments', action='store_true', default=False,
     help='Keep comments in generated output')
 
-p.add_argument('--function-prefix', metavar='PREFIX', default='_$PROG',
+p.add_argument(
+    '--function-prefix', metavar='PREFIX', default='_$PROG',
     help='Set the prefix used for generated functions')
 
 grp = p.add_mutually_exclusive_group()
 
-grp.add_argument('-o', '--output', metavar='FILE', default=None, dest='output_file',
+grp.add_argument(
+    '-o', '--output', metavar='FILE', default=None, dest='output_file',
     help='Write output to destination file [default: stdout]'
 ).complete('file')
 
-grp.add_argument('-i', '--install-system-wide', default=False, action='store_true',
+grp.add_argument(
+    '-i', '--install-system-wide', default=False, action='store_true',
     help='Write output to the system-wide completions dir of shell')
 
-grp.add_argument('-u', '--uninstall-system-wide', default=False, action='store_true',
+grp.add_argument(
+    '-u', '--uninstall-system-wide', default=False, action='store_true',
     help='Uninstall the system-wide completion file for program')
 
 # We use a unique object name for avoiding name clashes when
@@ -171,19 +199,32 @@ def load_definition_file(opts):
     if opts.input_type == 'auto':
         basename = os.path.basename(opts.definition_file)
         extension = os.path.splitext(basename)[1].lower().strip('.')
+
         if extension == 'json':
             return json_source.load_from_file(opts.definition_file)
+
         if extension in ('yaml', 'yml'):
             return yaml_source.load_from_file(opts.definition_file)
+
         if extension == 'py':
-            raise CrazyError('Reading Python files must be enabled by --input-type=python')
+            msg = 'Reading Python files must be enabled by --input-type=python'
+            raise CrazyError(msg)
+
         if extension == '':
-            raise CrazyError('File has no extension. Please supply --input-type=json|yaml|help|python')
-        raise CrazyError(f'Unknown file extension `{extension}`. Please supply --input-type=json|yaml|help|python')
+            msg = ('File has no extension. '
+                   'Please supply --input-type=json|yaml|help|python')
+            raise CrazyError(msg)
+
+        msg = (f'Unknown file extension `{extension}`. '
+               'Please supply --input-type=json|yaml|help|python')
+        raise CrazyError(msg)
+
     if opts.input_type == 'json':
         return json_source.load_from_file(opts.definition_file)
+
     if opts.input_type == 'yaml':
         return yaml_source.load_from_file(opts.definition_file)
+
     if opts.input_type == 'python':
         return argparse_source.load_from_file(opts.definition_file,
             opts.parser_variable,

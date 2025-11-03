@@ -6,7 +6,9 @@ from . import utils
 from . import shell
 from . import bash_patterns
 from .str_utils import indent
-from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
+from .bash_parser_subcommand_code import (
+    make_subcommand_switch_code, get_subcommand_path
+)
 from .preprocessor import preprocess
 
 _PARSER_CODE = '''\
@@ -167,7 +169,9 @@ def _make_option_switch_code(option_cases):
 
 
 def generate(commandline, variable_manager):
-    find_option_code       = _make_find_option_code(commandline, variable_manager)
+    '''Generate code for parsing the command line.'''
+
+    find_option_code = _make_find_option_code(commandline, variable_manager)
     subcommand_switch_code = make_subcommand_switch_code(commandline)
 
     defines = []

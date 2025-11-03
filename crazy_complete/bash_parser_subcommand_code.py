@@ -9,6 +9,7 @@ from .str_utils import indent
 
 
 def get_subcommand_path(commandline):
+    '''Return the path for `commandline`.'''
     commandlines = commandline.get_parents(include_self=True)[1:]
     prognames = ['root'] + [c.prog for c in commandlines]
     return ':'.join(prognames)
@@ -18,11 +19,11 @@ def make_subcommand_switch_code(commandline):
     '''
     Generate Bash code that tracks and updates the current subcommand path.
 
-    This function walks through all known command lines (starting from the given
-    top-level `commandline`) and generates conditional Bash code that appends
-    the currently matched subcommand to the `cmd` variable. This allows the
-    generated completion script to keep track of the full subcommand hierarchy
-    as the user types.
+    This function walks through all known command lines (starting from the
+    given top-level `commandline`) and generates conditional Bash code that
+    appends the currently matched subcommand to the `cmd` variable. This
+    allows the generated completion script to keep track of the full
+    subcommand hierarchy as the user types.
 
     While tracking, all variations of a subcommand are considered, including
     defined aliases and any supported abbreviations. This ensures that the

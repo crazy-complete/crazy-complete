@@ -25,6 +25,8 @@ _error = CrazySchemaValidationError
 class Context:
     '''Class for providing context to validation.'''
 
+    # pylint: disable=too-few-public-methods
+
     TYPE_OPTION = 0
     TYPE_POSITIONAL = 1
 
@@ -556,8 +558,8 @@ def _check_positionals_repeatable(definition_tree, definition):
         if repeatable: # TRANSLATION
             if repeatable_number is not None and repeatable_number != positional_number:
                 raise _error('Only one positional argument can be marked as repeatable', positional)
-            else:
-                repeatable_number = positional_number
+
+            repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:
             raise _error('A positional argument cannot follow a repeatable positional argument', positional)
 
@@ -695,12 +697,14 @@ def _check_definition(ctxt, definition):
             _check_positional(ctxt, positional)
 
 
-class DefinitionTree:
+class _DefinitionTree:
     def __init__(self, prog):
         self.prog = prog
         self.subcommands = {}
 
     def add_definition(self, definition):
+        '''Add a definition to the tree.'''
+
         commands = definition.value['prog'].value.split(' ')
         subcommand = commands.pop(-1)
 
@@ -719,9 +723,11 @@ class DefinitionTree:
             msg = m.multiple_definition_of_program(prog)
             raise _error(msg, definition)
 
-        node.subcommands[subcommand] = DefinitionTree(subcommand)
+        node.subcommands[subcommand] = _DefinitionTree(subcommand)
 
     def get_definition(self, prog):
+        '''Get definition by prog.'''
+
         commands = prog.split(' ')
         node = self
 
@@ -732,7 +738,9 @@ class DefinitionTree:
 
     @staticmethod
     def make_tree(definition_list):
-        root = DefinitionTree('<root>')
+        '''Make a tree out of a list of definitions.'''
+
+        root = _DefinitionTree('<root>')
 
         for definition in definition_list:
             root.add_definition(definition)
@@ -749,7 +757,7 @@ def validate(definition_list):
         context.definition = definition
         _check_definition(context, definition)
 
-    tree = DefinitionTree.make_tree(definition_list)
+    tree = _DefinitionTree.make_tree(definition_list)
 
     if len(tree.subcommands) == 0:
         msg = m.no_programs_defined()

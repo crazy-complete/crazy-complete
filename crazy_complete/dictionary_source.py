@@ -11,6 +11,9 @@ from .str_utils import validate_prog
 from . import compat
 
 
+_INHERIT = ExtendedBool.INHERIT
+
+
 def _validate_keys(dictionary, allowed_keys):
     for key in dictionary.keys():
         if key not in allowed_keys:
@@ -39,9 +42,9 @@ def dictionary_to_commandline(dictionary, prog=None):
         help                = dictionary.get('help', None),
         aliases             = dictionary.get('aliases', []),
         wraps               = dictionary.get('wraps', None),
-        abbreviate_commands = dictionary.get('abbreviate_commands', ExtendedBool.INHERIT),
-        abbreviate_options  = dictionary.get('abbreviate_options', ExtendedBool.INHERIT),
-        inherit_options     = dictionary.get('inherit_options', ExtendedBool.INHERIT))
+        abbreviate_commands = dictionary.get('abbreviate_commands', _INHERIT),
+        abbreviate_options  = dictionary.get('abbreviate_options', _INHERIT),
+        inherit_options     = dictionary.get('inherit_options', _INHERIT))
 
     for option in options:
         _validate_keys(option,
@@ -51,17 +54,17 @@ def dictionary_to_commandline(dictionary, prog=None):
 
         commandline.add_option(
             option.get('option_strings',  None),
-            metavar         = option.get('metavar',         None),
-            help            = option.get('help',            None),
-            optional_arg    = option.get('optional_arg',    False),
-            groups          = option.get('groups',          None),
-            repeatable      = option.get('repeatable',      ExtendedBool.INHERIT),
-            final           = option.get('final',           False),
-            hidden          = option.get('hidden',          False),
-            complete        = option.get('complete',        None),
-            nosort          = option.get('nosort',          False),
-            when            = option.get('when',            None),
-            capture         = option.get('capture',         None))
+            metavar       = option.get('metavar',         None),
+            help          = option.get('help',            None),
+            optional_arg  = option.get('optional_arg',    False),
+            groups        = option.get('groups',          None),
+            repeatable    = option.get('repeatable',      _INHERIT),
+            final         = option.get('final',           False),
+            hidden        = option.get('hidden',          False),
+            complete      = option.get('complete',        None),
+            nosort        = option.get('nosort',          False),
+            when          = option.get('when',            None),
+            capture       = option.get('capture',         None))
 
     for positional in positionals:
         _validate_keys(positional,

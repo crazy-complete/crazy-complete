@@ -1,9 +1,11 @@
 '''YAML Parser with column and line information.'''
 
 import yaml
-from yaml.events import (StreamStartEvent, DocumentStartEvent, DocumentEndEvent,
-                         MappingStartEvent, SequenceStartEvent, ScalarEvent,
-                         MappingEndEvent, SequenceEndEvent, AliasEvent)
+from yaml.events import (StreamStartEvent,
+                         DocumentStartEvent, DocumentEndEvent,
+                         MappingStartEvent, MappingEndEvent,
+                         SequenceStartEvent, SequenceEndEvent,
+                         ScalarEvent, AliasEvent)
 
 from .value_with_trace import ValueWithTrace
 from .errors import CrazySchemaValidationError

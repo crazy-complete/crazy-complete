@@ -35,14 +35,17 @@ class GeneralAbbreviationGenerator:
         '''Initialize the GeneralAbbreviationGenerator instance.
 
         Args:
-            min_abbreviated_length (int): The minimum length of an abbreviation.
-            words (iterable of str): The list of words from which to generate abbreviations.
-        '''
-        assert isinstance(min_abbreviated_length, int), \
-            "GeneralAbbreviationGenerator: min_abbreviated_length: expected int, got %r" % min_abbreviated_length
+            min_abbreviated_length (int):
+                The minimum length of an abbreviation.
 
-        assert is_list_type(words), \
-            "GeneralAbbreviationGenerator: words: expected iterable, got %r" % words
+            words (iterable of str):
+                The list of words from which to generate abbreviations.
+        '''
+
+        assert isinstance(min_abbreviated_length, int)
+        assert is_list_type(words)
+
+        # pylint: disable=cell-var-from-loop
 
         self.min_abbreviated_length = min_abbreviated_length
         self.abbreviations = {}
@@ -75,8 +78,7 @@ class GeneralAbbreviationGenerator:
             list: A list of abbreviations for the given word.
         '''
 
-        assert isinstance(word, str), \
-            "GeneralAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
+        assert isinstance(word, str)
 
         return self.abbreviations[word]
 
@@ -84,14 +86,14 @@ class GeneralAbbreviationGenerator:
         '''Get the list of abbreviations for multiple words.
 
         Args:
-            words (iterable of str): The words for which to retrieve abbreviations.
+            words (iterable of str):
+                The words for which to retrieve abbreviations.
 
         Returns:
             list: A list of abbreviations for the given words.
         '''
 
-        assert is_list_type(words), \
-            "GeneralAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
+        assert is_list_type(words)
 
         r = []
         for word in words:
@@ -103,8 +105,7 @@ class OptionAbbreviationGenerator(GeneralAbbreviationGenerator):
     '''AbbreviationGenerator for abbreviating long and old-style options.'''
 
     def __init__(self, words):
-        assert is_list_type(words), \
-            "OptionAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
+        assert is_list_type(words)
 
         words = list(words)
 
@@ -138,16 +139,14 @@ class DummyAbbreviationGenerator:
     def get_abbreviations(self, word):
         '''Don't abbreviate, just return the input.'''
 
-        assert isinstance(word, str), \
-            "DummyAbbreviationGenerator.get_abbreviations: word: expected str, got %r" % word
+        assert isinstance(word, str)
 
         return [word]
 
     def get_many_abbreviations(self, words):
         '''Don't abbreviate, just return the input.'''
 
-        assert is_list_type(words), \
-            "DummyAbbreviationGenerator.get_many_abbreviations: words: expected iterable, got %r" % words
+        assert is_list_type(words)
 
         return words
 
@@ -213,26 +212,26 @@ def get_defined_option_types(commandline):
 
         for option in cmdline.options:
             if option.get_long_option_strings():
-                if option.complete and option.optional_arg is True:
-                    long_optional = True
-                elif option.complete:
+                if option.has_required_arg():
                     long_required = True
+                elif option.has_optional_arg():
+                    long_optional = True
                 else:
                     long_flag = True
 
             if option.get_old_option_strings():
-                if option.complete and option.optional_arg is True:
-                    old_optional = True
-                elif option.complete:
+                if option.has_required_arg():
                     old_required = True
+                elif option.has_optional_arg():
+                    old_optional = True
                 else:
                     old_flag = True
 
             if option.get_short_option_strings():
-                if option.complete and option.optional_arg is True:
-                    short_optional = True
-                elif option.complete:
+                if option.has_required_arg():
                     short_required = True
+                elif option.has_optional_arg():
+                    short_optional = True
                 else:
                     short_flag = True
 
@@ -260,10 +259,10 @@ def get_query_option_strings(commandline, with_parent_options=True):
     r = []
 
     for option in commandline.get_options(with_parent_options=with_parent_options):
-        if option.complete and option.optional_arg is True:
-            r.extend('%s=?' % s for s in option.option_strings)
-        elif option.complete:
+        if option.has_required_arg():
             r.extend('%s=' % s for s in option.option_strings)
+        elif option.has_optional_arg():
+            r.extend('%s=?' % s for s in option.option_strings)
         else:
             r.extend(option.option_strings)
 

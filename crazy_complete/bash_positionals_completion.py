@@ -4,11 +4,13 @@ from . import algo
 from . import bash_when
 from .str_utils import indent
 
+
 def _make_block(code):
-    if code:
-        return '{\n%s\n  return 0;\n}' % indent(code, 2)
-    else:
+    if not code:
         return '{\n  return 0;\n}'
+
+    return '{\n%s\n  return 0;\n}' % indent(code, 2)
+
 
 def _generate_subcommand_positional(generator):
     cmds = generator.subcommands.get_choices().keys()
@@ -17,11 +19,13 @@ def _generate_subcommand_positional(generator):
         generator.subcommands.get_positional_num(),
         _make_block(complete))
 
+
 def _get_positional_condition(positional):
     operator = '=='
     if positional.repeatable:
         operator = '>='
     return '${#POSITIONALS[@]} %s %s' % (operator, positional.get_positional_num())
+
 
 def _generate_positionals_with_when(generator):
     code = []
@@ -40,6 +44,7 @@ def _generate_positionals_with_when(generator):
 
     return '\n\n'.join(code)
 
+
 def _generate_positionals_without_when(generator):
     code = []
 
@@ -57,7 +62,10 @@ def _generate_positionals_without_when(generator):
 
     return '\n\n'.join(code)
 
+
 def generate(generator):
+    '''Generate code for completing positionals.'''
+
     code = []
 
     has_when = any(p.when for p in generator.positionals)

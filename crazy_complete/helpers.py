@@ -84,7 +84,7 @@ def make_completion_funcname_for_context(ctxt, prefix):
 
         return '%s__%s' % (funcname, identifier)
 
-    raise AssertionError('make_completion_funcname_for_context: Should not be reached')
+    raise AssertionError('Should not be reached')
 
 
 class GeneralHelpers:
@@ -147,8 +147,7 @@ class GeneralHelpers:
     def add_function(self, function):
         '''Add a function to the function repository.'''
 
-        assert isinstance(function, FunctionBase), \
-            "GeneralHelpers.add_function: function: expected FunctionBase, got %r" % function
+        assert isinstance(function, FunctionBase)
 
         self.functions[function.funcname] = function
 
@@ -219,23 +218,26 @@ class GeneralHelpers:
         '''Generates a function name for auto-completing a program or subcommand.
 
         Args:
-            cmdline (CommandLine): The CommandLine instance representing the program or subcommand.
-            suffix (str): The suffix that shall be appended to the result.
+            cmdline (CommandLine):
+                The CommandLine instance representing the program or subcommand.
+
+            suffix (str):
+                The suffix that shall be appended to the result.
 
         Returns:
             str: The generated function name for auto-completion.
 
-        This function is used to generate a unique function name for auto-completing
-        a program or subcommand in the specified shell. It concatenates the names of
-        all parent commandlines, including the current commandline, and converts them
-        into a valid function name format.
+        This function is used to generate a unique function name for
+        auto-completing a program or subcommand in the specified shell.
+        It concatenates the names of all parent commandlines, including the
+        current commandline, and converts them into a valid function name
+        format.
 
         Example:
             For a program with the name 'my_program' and a subcommand with the name 'subcommand',
             the generated function name is '_my_program_subcommand'.
         '''
-        assert isinstance(commandline, cli.CommandLine), \
-            "make_completion_funcname: cmdline: expected CommandLine, got %r" % commandline
+        assert isinstance(commandline, cli.CommandLine)
 
         commandlines = commandline.get_parents(include_self=True)
         prognames = [cmdline.prog for cmdline in commandlines]

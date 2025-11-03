@@ -5,7 +5,9 @@ from collections import namedtuple
 from . import utils
 from .str_utils import indent
 from .bash_utils import CasePatterns
-from .bash_parser_subcommand_code import make_subcommand_switch_code, get_subcommand_path
+from .bash_parser_subcommand_code import (
+    make_subcommand_switch_code, get_subcommand_path
+)
 
 _PARSER_CODE = '''\
 POSITIONALS=()
@@ -46,15 +48,17 @@ _OPT_ISSET = '_OPT_ISSET_'
 
 
 def generate(commandline, variable_manager):
+    '''Generate code for parsing the command line.'''
+
     commandlines           = list(reversed(commandline.get_all_commandlines()))
     subcommand_switch_code = make_subcommand_switch_code(commandline)
     long_option_cases      = []
     short_option_cases     = []
 
-    for commandline in commandlines:
-        option_cases = _generate_option_cases(commandline, variable_manager)
-        command = get_subcommand_path(commandline)
-        if commandline.inherit_options:
+    for cmdline in commandlines:
+        option_cases = _generate_option_cases(cmdline, variable_manager)
+        command = get_subcommand_path(cmdline)
+        if cmdline.inherit_options:
             command += '*'
 
         if option_cases.long_options:
@@ -78,17 +82,20 @@ def generate(commandline, variable_manager):
     s = _PARSER_CODE
 
     if long_option_cases:
-        s = s.replace('%LONG_OPTION_CASES%', indent('\n\n'.join(long_option_cases), 6))
+        s = s.replace('%LONG_OPTION_CASES%',
+                      indent('\n\n'.join(long_option_cases), 6))
     else:
         s = s.replace('%LONG_OPTION_CASES%\n', '')
 
     if short_option_cases:
-        s = s.replace('%SHORT_OPTION_CASES%', indent('\n\n'.join(short_option_cases), 8))
+        s = s.replace('%SHORT_OPTION_CASES%',
+                      indent('\n\n'.join(short_option_cases), 8))
     else:
         s = s.replace('%SHORT_OPTION_CASES%\n', '')
 
     if subcommand_switch_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_switch_code, 6))
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%',
+                      indent(subcommand_switch_code, 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 
@@ -98,18 +105,18 @@ def generate(commandline, variable_manager):
 def _make_long_option_case(long_options, option, variable):
     r = ''
 
-    if option.complete and option.optional_arg is True:
-        r += '%s)\n'                        % CasePatterns.for_long_without_arg(long_options)
-        r += '  %s+=(%s);\n'                % (variable, _OPT_ISSET)
+    if option.has_optional_arg():
+        r += '%s)\n'         % CasePatterns.for_long_without_arg(long_options)
+        r += '  %s+=(%s);\n' % (variable, _OPT_ISSET)
         r += '  continue;;\n'
-        r += '%s)\n'                        % CasePatterns.for_long_with_arg(long_options)
-        r += '  %s+=("${arg#*=}")\n'        % variable
+        r += '%s)\n'         % CasePatterns.for_long_with_arg(long_options)
+        r += '  %s+=("${arg#*=}")\n' % variable
         r += '  continue;;'
-    elif option.complete:
-        r += '%s)\n'                        % CasePatterns.for_long_without_arg(long_options)
+    elif option.has_required_arg():
+        r += '%s)\n'         % CasePatterns.for_long_without_arg(long_options)
         r += '  %s+=("${words_dequoted[++argi]}")\n' % variable
         r += '  continue;;\n'
-        r += '%s)\n'                        % CasePatterns.for_long_with_arg(long_options)
+        r += '%s)\n'         % CasePatterns.for_long_with_arg(long_options)
         r += '  %s+=("${arg#*=}")\n'        % variable
         r += '  continue;;'
     else:
@@ -123,14 +130,14 @@ def _make_long_option_case(long_options, option, variable):
 def _make_short_option_case(short_options, option, variable):
     r = ''
 
-    if option.complete and option.optional_arg is True:
+    if option.has_optional_arg():
         r += '%s)\n' % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
         r += '  then %s+=("$trailing_chars")\n' % variable
         r += '  else %s+=(%s)\n'                % (variable, _OPT_ISSET)
         r += '  fi\n'
         r += '  continue 2;;'
-    elif option.complete:
+    elif option.has_required_arg():
         r += '%s)\n' % CasePatterns.for_short(short_options)
         r += '  if [[ -n "$trailing_chars" ]]\n'
         r += '  then %s+=("$trailing_chars")\n'            % variable

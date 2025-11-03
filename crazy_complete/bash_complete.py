@@ -156,6 +156,9 @@ class BashCompleteCombine(BashCompletionBase):
 class BashCompleteKeyValueList(BashCompletionCode):
     '''Used for completing a list of key-value pairs.'''
 
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         funcs = {}
 

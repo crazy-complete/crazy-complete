@@ -23,6 +23,11 @@ from . import generation
 
 
 class BashCompletionGenerator:
+    '''Class for generating completions.'''
+
+    # pylint: disable=too-few-public-methods
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, ctxt, commandline):
         self.commandline = commandline
         self.ctxt        = ctxt
@@ -152,7 +157,7 @@ class BashCompletionGenerator:
         self.result = r
 
 
-def generate_wrapper(ctxt, commandline):
+def _generate_wrapper(ctxt, commandline):
     completion_funcname = ctxt.helpers.make_completion_funcname(commandline)
     wrapper_funcname = ctxt.helpers.make_completion_funcname(commandline, '__wrapper')
 
@@ -200,7 +205,7 @@ def generate_completion(commandline, config=None):
 
     result = generation.visit_commandlines(BashCompletionGenerator, ctxt, commandline)
 
-    completion_func, wrapper_code = generate_wrapper(ctxt, commandline)
+    completion_func, wrapper_code = _generate_wrapper(ctxt, commandline)
 
     output = Output(config, helpers)
     output.add_generation_notice()

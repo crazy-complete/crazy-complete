@@ -5,7 +5,7 @@ from . import shell
 
 
 class FishString:
-    '''A utility class for handling command-line strings that may or may not require escaping.
+    '''A utility class for command-line strings that may require escaping.
 
     When building command-line commands, it's important to ensure that strings
     are properly escaped to prevent shell injection vulnerabilities or
@@ -80,7 +80,7 @@ class FishString:
 
 
 def make_fish_string(s, raw):
-    '''Make a fish string.'''
+    '''Make a Fish string.'''
 
     if s is not None:
         return FishString(s, raw)
@@ -105,7 +105,7 @@ class FishCompleteCommand:
 
     def set_command(self, command, raw=False):
         '''Set the command (-c|--command).'''
-        self.command = make_fish_string(command, raw)
+        self.command = FishString(command, raw)
 
     def set_description(self, description, raw=False):
         '''Set the description (-d|--description).'''
@@ -113,15 +113,15 @@ class FishCompleteCommand:
 
     def add_short_options(self, opts, raw=False):
         '''Add short options (-s|--short-option).'''
-        self.short_options.extend(make_fish_string(o.lstrip('-'), raw) for o in opts)
+        self.short_options.extend(FishString(o.lstrip('-'), raw) for o in opts)
 
     def add_long_options(self, opts, raw=False):
         '''Add long options (-l|--long-option).'''
-        self.long_options.extend(make_fish_string(o.lstrip('-'), raw) for o in opts)
+        self.long_options.extend(FishString(o.lstrip('-'), raw) for o in opts)
 
     def add_old_options(self, opts, raw=False):
         '''Add old options (-o|--old-option).'''
-        self.old_options.extend(make_fish_string(o.lstrip('-'), raw) for o in opts)
+        self.old_options.extend(FishString(o.lstrip('-'), raw) for o in opts)
 
     def set_condition(self, condition, raw=False):
         '''Set the condition (-n|--condition).'''

@@ -191,6 +191,7 @@ class CommandLine:
                 self.options[key][1].append(option)
 
         def get(self):
+            '''Return the result.'''
             r = []
             for _, options in self.options.values():
                 for option in options:
@@ -211,11 +212,8 @@ class CommandLine:
             list: A list of Option objects
         '''
 
-        assert isinstance(with_parent_options, bool), \
-            "CommandLine.get_options: with_parent_options: expected bool, got %r" % with_parent_options
-
-        assert isinstance(only_with_arguments, bool), \
-            "CommandLine.get_options: only_with_arguments: expected bool, got %r" % only_with_arguments
+        assert isinstance(with_parent_options, bool)
+        assert isinstance(only_with_arguments, bool)
 
         getter = CommandLine.OptionsGetter(self,
             with_parent_options=with_parent_options,
@@ -236,15 +234,16 @@ class CommandLine:
             list: A list of option strings
         '''
 
-        assert isinstance(with_parent_options, bool), \
-            "CommandLine.get_option_strings: with_parent_options: expected bool, got %r" % with_parent_options
-
-        assert isinstance(only_with_arguments, bool), \
-            "CommandLine.get_option_strings: only_with_arguments: expected bool, got %r" % only_with_arguments
+        assert isinstance(with_parent_options, bool)
+        assert isinstance(only_with_arguments, bool)
 
         option_strings = []
 
-        for o in self.get_options(with_parent_options=with_parent_options, only_with_arguments=only_with_arguments):
+        options = self.get_options(
+            with_parent_options=with_parent_options,
+            only_with_arguments=only_with_arguments)
+
+        for o in options:
             option_strings.extend(o.option_strings)
 
         return option_strings
@@ -305,8 +304,7 @@ class CommandLine:
             list: A list of parent CommandLine objects.
         '''
 
-        assert isinstance(include_self, bool), \
-            "CommandLine.get_parents: include_self: expected bool, got %r" % include_self
+        assert isinstance(include_self, bool)
 
         parents = []
 
@@ -450,8 +448,19 @@ class CommandLine:
         )
 
     def __repr__(self):
-        return '{\nprog: %r,\nhelp: %r,\nabbreviate_commands: %r,\noptions: %r,\npositionals: %r,\nsubcommands: %r}' % (
-            self.prog, self.help, self.abbreviate_commands, self.options, self.positionals, self.subcommands)
+        r = '{'
+        r += f'\nprog: {self.prog!r},'
+        r += f'\naliases: {self.aliases!r},'
+        r += f'\nwraps: {self.wraps!r},'
+        r += f'\nhelp: {self.help!r},'
+        r += f'\nabbreviate_commands: {self.abbreviate_commands!r},'
+        r += f'\nabbreviate_options: {self.abbreviate_options!r},'
+        r += f'\ninherit_options: {self.inherit_options!r},'
+        r += f'\noptions: {self.options!r},'
+        r += f'\npositionals: {self.positionals!r},'
+        r += f'\nsubcommands: {self.subcommands!r},'
+        r += '\n}'
+        return r
 
 
 class Positional:
@@ -573,8 +582,25 @@ class Positional:
         )
 
 
+def is_short_option_string(string):
+    '''Return True if string is a short option string.'''
+    return len(string) == 2
+
+
+def is_long_option_string(string):
+    '''Return True if string is a long option string.'''
+    return string.startswith('--')
+
+
+def is_old_option_string(string):
+    '''Return True if string is an old option string.'''
+    return not string.startswith('--') and len(string) > 2
+
+
 class Option:
     '''Class representing a command line option.'''
+
+    # pylint: disable=too-many-locals
 
     def __init__(
             self,
@@ -714,7 +740,7 @@ class Option:
             list: A list of short option strings ("-o").
         '''
 
-        return [o for o in self.option_strings if o.startswith('-') and len(o) == 2]
+        return list(filter(is_short_option_string, self.option_strings))
 
     def get_long_option_strings(self):
         '''Returns the long option strings associated with the Option object.
@@ -723,7 +749,7 @@ class Option:
             list: A list of long option strings ("--option").
         '''
 
-        return [o for o in self.option_strings if o.startswith('--')]
+        return list(filter(is_long_option_string, self.option_strings))
 
     def get_old_option_strings(self):
         '''Returns the old-style option strings associated with the Option object.
@@ -732,7 +758,7 @@ class Option:
             list: A list of old-style option strings ("-option").
         '''
 
-        return [o for o in self.option_strings if o.startswith('-') and not o.startswith('--') and len(o) > 2]
+        return list(filter(is_old_option_string, self.option_strings))
 
     def get_conflicting_options(self):
         '''Returns a list of conflicting options within the same mutually exclusive groups.
@@ -764,6 +790,16 @@ class Option:
         for option in self.get_conflicting_options():
             r.extend(option.get_option_strings())
         return r
+
+    def has_required_arg(self):
+        '''Return True if the option takes a required argument.'''
+
+        return self.complete is not None and self.optional_arg is False
+
+    def has_optional_arg(self):
+        '''Return True if the option takes an optional argument.'''
+
+        return self.complete is not None and self.optional_arg is True
 
     def __eq__(self, other):
         return (
@@ -853,11 +889,8 @@ class MutuallyExclusiveGroup:
     '''Helper class for adding mutually exclusive options.'''
 
     def __init__(self, parent, group):
-        assert isinstance(parent, CommandLine), \
-            "MutuallyExclusiveGroup: parent: expected CommandLine, got %r" % parent
-
-        assert isinstance(group, str), \
-            "MutuallyExclusiveGroup: group: expected str, got %r" % group
+        assert isinstance(parent, CommandLine)
+        assert isinstance(group, str)
 
         self.parent = parent
         self.group = group

@@ -249,6 +249,7 @@ class GlobParser:
         return self.i < len(self.tokens)
 
     def parse(self):
+        '''Parse tokens and return a PatternList object.'''
         root = PatternList()
         while self.have():
             root.append(self._parse_token())

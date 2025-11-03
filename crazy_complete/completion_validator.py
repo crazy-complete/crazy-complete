@@ -19,6 +19,8 @@ from . import messages as m
 class Context:
     '''Class for providing context to validation.'''
 
+    # pylint: disable=too-few-public-methods
+
     TYPE_OPTION = 0
     TYPE_POSITIONAL = 1
 
@@ -215,7 +217,7 @@ def _validate_command(_ctxt, args):
         raise CrazyError('path_append/path_prepend cannot be used with path')
 
 
-def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
+def _validate_filedir(_ctxt, args, with_file_opts=False, with_list_opts=False):
     opts = args.get_optional_arg({})
     args.require_no_more()
 
@@ -223,7 +225,7 @@ def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
 
     spec = {'directory': (False, (str,), _validate_non_empty_string)}
 
-    if with_extensions:
+    if with_file_opts:
         spec['extensions'] = (False, (list,), _validate_non_empty_list)
         spec['fuzzy'] = (False, (bool,), None)
         spec['ignore_globs'] = (False, (list,), _validate_non_empty_list)
@@ -252,7 +254,7 @@ def _validate_filedir(_ctxt, args, with_extensions=False, with_list_opts=False):
 
 
 def _validate_file(ctxt, args):
-    _validate_filedir(ctxt, args, with_extensions=True)
+    _validate_filedir(ctxt, args, with_file_opts=True)
 
 
 def _validate_directory(ctxt, args):
@@ -260,7 +262,7 @@ def _validate_directory(ctxt, args):
 
 
 def _validate_file_list(ctxt, args):
-    _validate_filedir(ctxt, args, with_extensions=True, with_list_opts=True)
+    _validate_filedir(ctxt, args, with_file_opts=True, with_list_opts=True)
 
 
 def _validate_directory_list(ctxt, args):
@@ -535,8 +537,8 @@ def validate_positionals_repeatable(cmdline):
         if repeatable:
             if repeatable_number is not None and repeatable_number != positional_number:
                 raise CrazyError('Only one positional argument can be marked as repeatable')
-            else:
-                repeatable_number = positional_number
+
+            repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:
             raise CrazyError('A positional argument cannot follow a repeatable positional argument')
 

@@ -84,9 +84,9 @@ def to_yaml(dictionary):
     aliases             = dictionary.get('aliases',             None)
     help                = dictionary.get('help',                None)
     wraps               = dictionary.get('wraps',               None)
-    abbreviate_commands = dictionary.get('abbreviate_commands', ExtendedBool.INHERIT)
-    abbreviate_options  = dictionary.get('abbreviate_options',  ExtendedBool.INHERIT)
-    inherit_options     = dictionary.get('inherit_options',     ExtendedBool.INHERIT)
+    abbreviate_commands = dictionary.get('abbreviate_commands', _INHERIT)
+    abbreviate_options  = dictionary.get('abbreviate_options',  _INHERIT)
+    inherit_options     = dictionary.get('inherit_options',     _INHERIT)
     options             = dictionary.get('options',             None)
     positionals         = dictionary.get('positionals',         None)
 

@@ -2,6 +2,7 @@
 
 import re
 
+from . import cli
 from . import when
 from . import shell
 from .errors import InternalError
@@ -82,9 +83,9 @@ class HasOption(Condition):
         args = []
 
         for opt in self.option_strings:
-            if opt.startswith('--'):
+            if cli.is_long_option_string(opt):
                 args += ['-l', opt.lstrip('-')]
-            elif len(opt) == 2:
+            elif cli.is_short_option_string(opt):
                 args += ['-s', opt[1]]
             else:
                 args += ['-o', opt.lstrip('-')]

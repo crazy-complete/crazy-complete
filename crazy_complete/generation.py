@@ -45,17 +45,17 @@ def _apply_config(commandline, config):
     it will be overridden by the corresponding setting from the config object.
 
     Args:
-        commandline (CommandLine): The command line object to apply the configuration to.
-        config (Config): The configuration object containing the settings to apply.
+        commandline (CommandLine):
+            The command line object to apply the configuration to.
+
+        config (Config):
+            The configuration object containing the settings to apply.
 
     Returns:
         None
     '''
-    assert isinstance(commandline, cli.CommandLine), \
-        "commandline_apply_config: commandline: expected CommandLine, got %r" % commandline
-
-    assert isinstance(config, _config.Config), \
-        "commandline_apply_config: config: expected Config, got %r" % config
+    assert isinstance(commandline, cli.CommandLine)
+    assert isinstance(config, _config.Config)
 
     if commandline.abbreviate_commands == cli.ExtendedBool.INHERIT:
         commandline.abbreviate_commands = config.abbreviate_commands

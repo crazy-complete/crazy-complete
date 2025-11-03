@@ -8,18 +8,22 @@ from .algo import numbers_are_contiguous
 class TrieNode:
     '''Trie class.'''
 
+    # pylint: disable=too-few-public-methods
+
     def __init__(self):
         self.children = defaultdict(TrieNode)
         self.is_terminal = False
 
     def insert(self, string):
+        '''Insert string into trie.'''
+
         node = self
         for char in string:
             node = node.children[char]
         node.is_terminal = True
 
 
-def build_pattern(parts):
+def _build_pattern(parts):
     if len(parts) == 1:
         return parts[0]
 
@@ -52,7 +56,7 @@ def trie_to_pattern(node):
     if node.is_terminal:
         parts.append("")  # Represent the option to stop early
 
-    return build_pattern(parts)
+    return _build_pattern(parts)
 
 
 def compact_glob_trie(strings):

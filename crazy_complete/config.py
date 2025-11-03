@@ -1,13 +1,17 @@
 '''This module contains the configuration class.'''
 
+from .type_utils import is_list_type
+
 
 def _assert_is_bool(obj, func, param):
-    if not isinstance(obj, bool):
-        raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")
+    if isinstance(obj, bool):
+        return
+
+    raise AssertionError(f"Config.{func}: {param}: expected bool, got `{obj}`")
 
 
 class Config:
-    '''Class representing configuration settings for command line completion.'''
+    '''Configuration settings for command line completion.'''
 
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-public-methods
@@ -46,8 +50,7 @@ class Config:
             This defaults to `_$PROG`
         '''
 
-        assert isinstance(prefix, str), \
-            f"Config.set_function_prefix: prefix: expected str, got `{prefix}`"
+        assert isinstance(prefix, str)
 
         self.function_prefix = prefix
 
@@ -213,7 +216,7 @@ class Config:
         self.option_stacking = enable
 
     def set_vim_modeline(self, enable):
-        '''Sets whether a vim modeline comment shall be appended to the generated code.
+        '''Sets whether a vim modeline comment shall be appended to the code.
 
         The modeline comment looks like this:
 
@@ -243,17 +246,17 @@ class Config:
             This defaults to (2,).
         '''
 
-        assert isinstance(version, tuple), \
-            "Config.set_bash_completions_version(): version: expected tuple"
+        assert isinstance(version, tuple)
 
         self.bash_completions_version = version
 
     def set_zsh_compdef(self, enable):
-        '''Sets whether a `#compdef` comment is written at the top of the generated
-        zsh script.
+        '''Sets whether a `#compdef` comment is written at the top of the
+        generated zsh script.
 
         The `#compdef` directive is used by Zsh to automatically associate the
-        generated completion file with a command, enabling autoload functionality.
+        generated completion file with a command, enabling autoload
+        functionality.
 
         If you plan to load the Zsh completion file manually by sourcing it,
         omitting this line may be necessary.
@@ -312,16 +315,14 @@ class Config:
     def include_many_files(self, files):
         '''Add files which should be included to the generated code.'''
 
-        assert hasattr(files, '__iter__') and not isinstance(files, str), \
-            f"Config.include_many_files: files: expected iterable, got `{files}`"
+        assert is_list_type(files)
 
         self.include_files.extend(files)
 
     def add_comments(self, comments):
         '''Add comments to the generated output.'''
 
-        assert hasattr(comments, '__iter__') and not isinstance(comments, str), \
-            f"Config.add_many_comments: comments: expected iterable, got `{comments}`"
+        assert is_list_type(comments)
 
         self.comments.extend(comments)
 

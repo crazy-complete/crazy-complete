@@ -10,10 +10,12 @@ def make_identifier(string):
 
     This function replaces any dashes '-' with underscores '_',
     removes any characters that are not letters, digits, or underscores,
-    and ensures that consecutive underscores are replaced with a single underscore.
+    and ensures that consecutive underscores are replaced with a single
+    underscore.
 
     Args:
-        string (str): The input string to be converted into a valid shell identifier.
+        string (str):
+            The input string to be converted into a valid shell identifier.
 
     Returns:
         str: The modified string that is a valid shell identifier.

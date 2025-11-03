@@ -1,5 +1,6 @@
 '''Code for generating wrapper.'''
 
+from . import cli
 from . import algo
 from . import preprocessor
 from .str_utils import replace_many
@@ -70,7 +71,7 @@ def _make_long_opts_pattern(opts, arg_type):
     if not opts:
         return ''
 
-    long, old = algo.partition(opts, lambda o: o.startswith('--'))
+    long, old = algo.partition(opts, cli.is_long_option_string)
 
     old = [o.lstrip('-') for o in old]
     long = [o.lstrip('-') for o in long]
@@ -118,8 +119,9 @@ def _make_short_opts_arg_regex(flag_opts, arg_opts, arg_type):
 def generate_wrapper(ctxt, commandline):
     '''Generate code for wrapping a foreign command.'''
 
-    completion_funcname = ctxt.helpers.make_completion_funcname(commandline)
-    wrapper_funcname = ctxt.helpers.make_completion_funcname(commandline, '__wrapper')
+    make_completion_funcname = ctxt.helpers.make_completion_funcname
+    completion_funcname = make_completion_funcname(commandline)
+    wrapper_funcname = make_completion_funcname(commandline, '__wrapper')
 
     if not commandline.wraps:
         return (completion_funcname, None)
@@ -133,18 +135,20 @@ def generate_wrapper(ctxt, commandline):
     short_opts_optional = []
 
     for option in commandline.get_options():
-        if option.complete and option.optional_arg is False:
-            long_opts_arg.extend(option.get_long_option_strings())
-            long_opts_arg.extend(option.get_old_option_strings())
-            short_opts_arg.extend(o.lstrip('-') for o in option.get_short_option_strings())
-        elif option.complete:
-            long_opts_optional.extend(option.get_long_option_strings())
-            long_opts_optional.extend(option.get_old_option_strings())
-            short_opts_optional.extend(o.lstrip('-') for o in option.get_short_option_strings())
+        if option.has_required_arg():
+            long_opts_arg += option.get_long_option_strings()
+            long_opts_arg += option.get_old_option_strings()
+            short_opts_arg += option.get_short_option_strings()
+        elif option.has_optional_arg():
+            long_opts_optional += option.get_long_option_strings()
+            long_opts_optional += option.get_old_option_strings()
+            short_opts_optional += option.get_short_option_strings()
         else:
-            long_opts_flag.extend(option.get_long_option_strings())
-            long_opts_flag.extend(option.get_old_option_strings())
-            short_opts_flag.extend(o.lstrip('-') for o in option.get_short_option_strings())
+            long_opts_flag += option.get_long_option_strings()
+            long_opts_flag += option.get_old_option_strings()
+            short_opts_flag += option.get_short_option_strings()
+
+    short_opts_flag = ''.join(o[1] for o in short_opts_flag)
 
     s = _CODE.strip()
     s = replace_many(s, [
