@@ -273,6 +273,10 @@ class Conditions(Condition):
                 r.append(obj)
             else:
                 r.append(obj.query_code(ctxt))
+
+        if not r:
+            return None
+
         return '"%s"' % ' '.join(r)
 
     def unsafe_code(self, ctxt):
@@ -286,6 +290,10 @@ class Conditions(Condition):
                 r.append(obj)
             else:
                 r.append(obj.unsafe_code(ctxt))
+
+        if not r:
+            return None
+
         return '"%s"' % ' '.join(r)
 
     def add(self, condition):
