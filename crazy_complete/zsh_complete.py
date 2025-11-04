@@ -79,9 +79,10 @@ class ZshCompleteChoices(ZshCompletionBase):
     def _list_function(self):
         metavar = shell.quote(self.ctxt.option.metavar or '')
         quoted = [shell.quote(escape_colon(c)) for c in self.choices]
+        line_length = self.ctxt.config.line_length - 2
 
         code = 'local items=(\n'
-        code += indent(join_with_wrap(' ', '\n', 78, quoted), 2)
+        code += indent(join_with_wrap(' ', '\n', line_length, quoted), 2)
         code += '\n)\n\n'
         code += f'_describe -- {metavar} items'
 

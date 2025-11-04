@@ -99,31 +99,28 @@ class FishCompleteChoices(FishCompletionBase):
         super().__init__(ctxt)
         self.choices = choices
 
-    @staticmethod
-    def _get_inline_for_list(choices):
-        return ' '.join(shell.quote(str(c)) for c in choices)
+    def _get_inline_for_list(self):
+        return ' '.join(shell.quote(str(c)) for c in self.choices)
 
-    @staticmethod
-    def _get_inline_for_dict(choices):
+    def _get_inline_for_dict(self):
         def str0(s):
             return str(s) if s is not None else ''
 
-        stringified = {str(item): str0(desc) for item, desc in choices.items()}
+        stringified = {str(item): str0(desc) for item, desc in self.choices.items()}
         q = shell.quote
         r = ['%s\\t%s' % (q(item), q(desc)) for item, desc in stringified.items()]
         return ' '.join(r)
 
-    @staticmethod
-    def _get_code_for_list(choices):
+    def _get_code_for_list(self):
         code = "printf '%s\\n' \\\n"
-        quoted = [shell.quote(str(item)) for item in choices]
-        code += indent(join_with_wrap(' ', ' \\\n', 80, quoted), 2)
+        quoted = [shell.quote(str(item)) for item in self.choices]
+        line_length = self.ctxt.config.line_length - 2
+        code += indent(join_with_wrap(' ', ' \\\n', line_length, quoted), 2)
         return code.rstrip(' \\\n')
 
-    @staticmethod
-    def _get_code_for_dict(choices):
+    def _get_code_for_dict(self):
         code = "printf '%s\\t%s\\n' \\\n"
-        for item, desc in choices.items():
+        for item, desc in self.choices.items():
             if desc is None:
                 desc = ''
             code += '  %s %s \\\n' % (shell.quote(str(item)), shell.quote(str(desc)))
@@ -131,9 +128,9 @@ class FishCompleteChoices(FishCompletionBase):
 
     def get_args(self):
         if is_dict_type(self.choices):
-            arg = self._get_inline_for_dict(self.choices)
+            arg = self._get_inline_for_dict()
         else:
-            arg = self._get_inline_for_list(self.choices)
+            arg = self._get_inline_for_list()
 
         if len(arg) <= CHOICES_INLINE_THRESHOLD:
             return ['-f', '-a', arg]
@@ -143,8 +140,8 @@ class FishCompleteChoices(FishCompletionBase):
 
     def get_code(self):
         if is_dict_type(self.choices):
-            return self._get_code_for_dict(self.choices)
-        return self._get_code_for_list(self.choices)
+            return self._get_code_for_dict()
+        return self._get_code_for_list()
 
 
 def _get_extension_regex(extensions, fuzzy):

@@ -159,6 +159,11 @@ p.add_argument(
     help='Keep comments in generated output')
 
 p.add_argument(
+    '--max-line-length', default=80, type=int,
+    help='Set the maximum line length of the generated output'
+)
+
+p.add_argument(
     '--function-prefix', metavar='PREFIX', default='_$PROG',
     help='Set the prefix used for generated functions')
 
@@ -251,6 +256,7 @@ def _get_config_from_options(opts):
     conf.include_many_files(opts.include_file or [])
     conf.set_keep_comments(opts.keep_comments)
     conf.add_comments(opts.comment or [])
+    conf.set_line_length(opts.max_line_length)
 
     for feature in opts.disable:
         if feature == 'hidden':

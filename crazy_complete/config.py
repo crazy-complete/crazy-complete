@@ -1,5 +1,7 @@
 '''This module contains the configuration class.'''
 
+import sys
+
 from .type_utils import is_list_type
 
 
@@ -28,6 +30,7 @@ class Config:
         self.include_files          = []
         self.comments               = []
         self.keep_comments          = False
+        self.line_length            = 80
         self.bash_completions_version = (2,)
         self.zsh_compdef            = True
         self.fish_fast              = False
@@ -289,6 +292,22 @@ class Config:
         _assert_is_bool(enable, "set_keep_comments", "enable")
 
         self.keep_comments = enable
+
+    def set_line_length(self, length):
+        '''Sets the maximum line length of the generated code.
+
+        Args:
+            length (int):
+                The maximum line length. If zero or negative, maximum line
+                length is selected.
+
+        Notes:
+            This defaults to `80`.
+        '''
+
+        assert isinstance(length, int)
+
+        self.line_length = length if length > 0 else sys.maxsize
 
     def set_fish_fast(self, enable):
         '''Use faster conditions at the cost of correctness.'''
