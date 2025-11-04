@@ -32,6 +32,7 @@ class Command:
     def __init__(self, dictionary):
         self.command = None
         self.category = None
+        self.synopsis = None
         self.short = None
         self.long = None
         self.notes = []
@@ -44,6 +45,9 @@ class Command:
             if key == 'command':
                 assert isinstance(value, str), key
                 self.command = value
+            elif key == 'synopsis':
+                assert isinstance(value, str), key
+                self.synopsis = value
             elif key == 'short':
                 assert isinstance(value, str), key
                 self.short = value
@@ -90,6 +94,9 @@ class Command:
             raise Exception(f"No definition: {self.command}")
 
         yaml.safe_load(self.definition)
+
+        if self.synopsis is None:
+            self.synopsis = f'["{self.command}"]'
 
         if self.output is None:
             raise Exception(f"No output: {self.command}")
