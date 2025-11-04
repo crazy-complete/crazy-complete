@@ -36,6 +36,12 @@ def get_lang():
 LANG = get_lang()
 
 
+def command_arg_without_command():
+    if LANG == 'de':
+        return 'Vervollständiger `command_arg` benötigt einen vorher definierten `command` Vervollständiger'
+    return 'Completer `command_arg` requires a previously defined `command` completer'
+
+
 def completer_not_allowed_in(completer, completer2):
     if LANG == 'de':
         return f'Vervollständiger `{completer}` nicht in `{completer2}` erlaubt'
@@ -78,7 +84,13 @@ def invalid_type_expected_types(types):
     return f'Invalid type. Expected: {types}'
 
 
-def invalid_value(values):
+def invalid_value():
+    if LANG == 'de':
+        return 'Ungültiger Wert'
+    return 'Invalid value'
+
+
+def invalid_value_expected_values(values):
     if LANG == 'de':
         return f'Ungültiger Wert. Erwartet: {values}'
     return f'Invalid value. Expected: {values}'
@@ -94,6 +106,12 @@ def list_must_contain_at_least_two_items():
     if LANG == 'de':
         return 'Liste muss mindestens zwei Elemente enthalten'
     return 'List must contain at least two items'
+
+
+def list_must_contain_exact_three_items():
+    if LANG == 'de':
+        return 'Liste muss exakt 3 Elemente enthalten'
+    return 'List must contain exactly three items'
 
 
 def missing_arg():
@@ -112,6 +130,12 @@ def multiple_definition_of_program(program):
     if LANG == 'de':
         return f'Mehrfache Definition des Programms `{program}`'
     return f'Multiple definition of program `{program}`'
+
+
+def mutually_exclusive_parameters(parameters):
+    if LANG == 'de':
+        return f'Parameter schließen sich gegenseitig aus: {parameters}'
+    return f'Parameters are mutually exclusive: {parameters}'
 
 
 def no_programs_defined():
@@ -144,6 +168,24 @@ def parameter_not_allowed_in_subcommand(parameter):
     return f'Parameter `{parameter}` not allowed in subcommand'
 
 
+def parameter_requires_parameter(parameter1, parameter2):
+    if LANG == 'de':
+        return f'Parameter `{parameter1}` benötigt `{parameter2}`'
+    return f'Parameter `{parameter1}` requires `{parameter2}`'
+
+
+def positional_argument_after_repeatable():
+    if LANG == 'de':
+        return 'Positionsargument nach einem wiederholbaren Positionsargument gefunden'
+    return 'Positional argument found after a repeatable positional argument'
+
+
+def repeatable_with_subcommands():
+    if LANG == 'de':
+        return 'Wiederholbare Positionsargumente dürfen nicht zusammen mit Unterkommandos definiert werden'
+    return 'Repeatable positional arguments cannot be used together with subcommands'
+
+
 def single_character_expected():
     if LANG == 'de':
         return 'Ungültige Länge. Einzelner Buchstabe erwartet'
@@ -172,6 +214,12 @@ def too_many_programs_defined():
     if LANG == 'de':
         return 'Zu viele Programme definiert'
     return 'Too many programs defined'
+
+
+def too_many_repeatable_positionals():
+    if LANG == 'de':
+        return 'Zu viele wiederholbare Positionsargumente'
+    return 'Too many repeatable positionals'
 
 
 def unknown_completer():

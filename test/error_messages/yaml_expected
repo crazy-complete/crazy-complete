@@ -30,9 +30,9 @@
 101-option-strings-wrong-type            | line 3, column 21: option_strings: Invalid type. Expected: list
 102-option-strings-is-empty              | line 3, column 21: option_strings: List cannot be empty
 103-option-string-wrong-type             | line 3, column 22: option_string: Invalid type. Expected: string
-104-option-string-is-double-dash         | line 3, column 22: Invalid option string
-105-option-string-with-space             | line 3, column 22: Invalid option string
-106-option-string-with-comma             | line 3, column 22: Invalid option string
+104-option-string-is-double-dash         | line 3, column 22: Invalid value
+105-option-string-with-space             | line 3, column 22: Invalid value
+106-option-string-with-comma             | line 3, column 22: Invalid value
 110-metavar-wrong-type                   | line 4, column 14: metavar: Invalid type. Expected: string|none
 120-help-wrong-type                      | line 4, column 11: help: Invalid type. Expected: string|none
 130-optional-arg-wrong-type              | line 4, column 19: optional_arg: Invalid type. Expected: boolean|none
@@ -46,11 +46,11 @@
 200-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected: list|none
 210-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected: string|none
 211-when-wrong-value                     | line 4, column 11: when: Invalid command: 'invalid'
-220-metavar-but-no-complete              | line 3, column 5: metavar is set but complete is missing
-230-optional-arg-but-no-complete         | line 3, column 5: optional_arg is set but complete is missing
+220-metavar-but-no-complete              | line 3, column 5: Parameter `metavar` requires `complete`
+230-optional-arg-but-no-complete         | line 3, column 5: Parameter `optional_arg` requires `complete`
 240-capture-wrong-type                   | line 4, column 14: capture: Invalid type. Expected: string|none
-241-capture-empty                        | line 4, column 14: Invalid variable name
-242-capture-wrong-value                  | line 4, column 14: Invalid variable name
+241-capture-empty                        | line 4, column 14: capture: Not a valid variable name
+242-capture-wrong-value                  | line 4, column 14: capture: Not a valid variable name
 ======= Directory "03-positional" =======
 200-no-number                            | line 3, column 5: Missing required argument: number
 201-number-wrong-type                    | line 3, column 13: number: Invalid type. Expected: integer
@@ -159,7 +159,7 @@
 3_23_01-history-too-many-arguments       | line 4, column 15: Too many arguments
 3_23_02-history-pattern-wrong-type       | line 4, column 27: pattern: Invalid type. Expected: string
 3_23_03-history-pattern-wrong-regex      | line 4, column 27: pattern: Not an extended regular expression
-3_24_00-command-arg-without-command      | line 3, column 5: The `command_arg` completer requires a previous `command` completer
+3_24_00-command-arg-without-command      | line 3, column 5: Completer `command_arg` requires a previously defined `command` completer
 3_24_01-command-arg-non-repeatable       | line 6, column 5: Completer `command_arg` requires `repeatable=true`
 3_25_00-mime-file-missing-arg            | line 4, column 15: Missing required argument: pattern
 3_25_01-mime-file-too-many-arguments     | line 4, column 15: Too many arguments
@@ -200,7 +200,7 @@
 3_30_13-key-value-list-1-key-with-space  | line 4, column 46: key: String cannot contain spaces
 3_30_14-key-value-list-1-complete-wrong-type | line 4, column 59: Invalid type. Expected: list|none
 3_30_15-key-value-list-2-def-not-list    | line 4, column 45: Invalid type. Expected: list
-3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: Completion definition must have 3 fields
+3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: List must contain exactly three items
 3_30_17-key-value-list-2-key-not-string  | line 4, column 46: Invalid type. Expected: string
 3_30_18-key-value-list-2-key-empty       | line 4, column 46: key: String cannot be empty
 3_30_19-key-value-list-key-with-space    | line 4, column 46: key: String cannot contain spaces
@@ -210,7 +210,7 @@
 3_31_02-ip-address-arg-wrong-value       | line 4, column 30: type: Invalid value. Expected: ipv4, ipv6, all
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected: dictionary
-001-multiple-repeatable-positionals      | line 6, column 5: Only one positional argument can be marked as repeatable
-002-positional-after-repeatable          | line 6, column 5: A positional argument cannot follow a repeatable positional argument
-003-positional-after-repeatable          | line 3, column 5: A positional argument cannot follow a repeatable positional argument
-004-repeatable-and-subcommands           | line 1, column 1: Repeatable positionals and subcommands cannot be used together
+001-multiple-repeatable-positionals      | line 6, column 5: Too many repeatable positionals
+002-positional-after-repeatable          | line 6, column 5: Positional argument found after a repeatable positional argument
+003-positional-after-repeatable          | line 3, column 5: Positional argument found after a repeatable positional argument
+004-repeatable-and-subcommands           | line 1, column 1: Repeatable positional arguments cannot be used together with subcommands

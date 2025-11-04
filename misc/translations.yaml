@@ -4,6 +4,8 @@ too_many_programs_defined:            []
 multiple_definition_of_program:       ['program']
 missing_definition_of_program:        ['program']
 parameter_not_allowed_in_subcommand:  ['parameter']
+mutually_exclusive_parameters:        ['parameters']
+parameter_requires_parameter:         ['parameter1', 'parameter2']
 unknown_parameter:                    []
 unknown_completer:                    []
 missing_arg:                          []
@@ -15,15 +17,21 @@ single_character_expected:            []
 dict_cannot_be_empty:                 []
 list_cannot_be_empty:                 []
 list_must_contain_at_least_two_items: []
+list_must_contain_exact_three_items:  []
 string_cannot_be_empty:               []
 string_cannot_contain_space:          []
 integer_must_be_greater_than_zero:    []
 integer_cannot_be_zero:               []
 invalid_type_expected_types:          ['types']
-invalid_value:                        ['values']
+invalid_value_expected_values:        ['values']
+invalid_value:                        []
 completer_not_allowed_in:             ['completer', 'completer2']
 completer_not_allowed_in_option:      ['completer']
 completer_requires_repeatable:        ['completer']
+too_many_repeatable_positionals:      []
+positional_argument_after_repeatable: []
+repeatable_with_subcommands:          []
+command_arg_without_command:          []
 
 ---
 
@@ -35,6 +43,8 @@ missing_definition_of_program:        "Missing definition of program `{program}`
 parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` not allowed in subcommand"
 unknown_parameter:                    "Unknown parameter"
 unknown_completer:                    "Unknown completer"
+mutually_exclusive_parameters:        "Parameters are mutually exclusive: {parameters}"
+parameter_requires_parameter:         "Parameter `{parameter1}` requires `{parameter2}`"
 missing_arg:                          "Missing required argument"
 too_many_arguments:                   "Too many arguments"
 not_an_extended_regex:                "Not an extended regular expression"
@@ -44,15 +54,21 @@ single_character_expected:            "Invalid length. Single character expected
 dict_cannot_be_empty:                 "Dictionary cannot be empty"
 list_cannot_be_empty:                 "List cannot be empty"
 list_must_contain_at_least_two_items: "List must contain at least two items"
+list_must_contain_exact_three_items:  "List must contain exactly three items"
 string_cannot_be_empty:               "String cannot be empty"
 string_cannot_contain_space:          "String cannot contain spaces"
 integer_must_be_greater_than_zero:    "Integer must be greater than zero"
 integer_cannot_be_zero:               "Integer cannot be zero"
 invalid_type_expected_types:          "Invalid type. Expected: {types}"
-invalid_value:                        "Invalid value. Expected: {values}"
+invalid_value_expected_values:        "Invalid value. Expected: {values}"
+invalid_value:                        "Invalid value"
 completer_not_allowed_in:             "Completer `{completer}` not allowed in `{completer2}`"
 completer_not_allowed_in_option:      "Completer `{completer}` not allowed inside an option"
 completer_requires_repeatable:        "Completer `{completer}` requires `repeatable=true`"
+too_many_repeatable_positionals:      "Too many repeatable positionals"
+positional_argument_after_repeatable: "Positional argument found after a repeatable positional argument"
+repeatable_with_subcommands:          "Repeatable positional arguments cannot be used together with subcommands"
+command_arg_without_command:          "Completer `command_arg` requires a previously defined `command` completer"
 
 ---
 
@@ -64,6 +80,8 @@ missing_definition_of_program:        "Fehlende Definition des Programms `{progr
 parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` ist nicht erlaub einem Unterkommando"
 unknown_parameter:                    "Unbekannter Parameter"
 unknown_completer:                    "Unbekannter Vervollständiger"
+mutually_exclusive_parameters:        "Parameter schließen sich gegenseitig aus: {parameters}"
+parameter_requires_parameter:         "Parameter `{parameter1}` benötigt `{parameter2}`"
 missing_arg:                          "Fehlendes benötigtes Argument"
 too_many_arguments:                   "Zu viele Argumente"
 not_an_extended_regex:                "Ungültiger regulärer Ausdruck"
@@ -72,13 +90,19 @@ not_a_variable_name:                  "Ungültiger Variablenname"
 dict_cannot_be_empty:                 "Dictionary darf nicht leer sein"
 list_cannot_be_empty:                 "Liste darf nicht leer sein"
 list_must_contain_at_least_two_items: "Liste muss mindestens zwei Elemente enthalten"
+list_must_contain_exact_three_items:  "Liste muss exakt 3 Elemente enthalten"
 single_character_expected:            "Ungültige Länge. Einzelner Buchstabe erwartet"
 string_cannot_be_empty:               "Zeichenkette darf nicht leer sein"
 string_cannot_contain_space:          "Zeichenkette darf keine Leerzeichen enthalten"
 integer_must_be_greater_than_zero:    "Ganzzahl muss größer als Null sein"
 integer_cannot_be_zero:               "Ganzzahl darf nicht Null sein"
 invalid_type_expected_types:          "Ungültiger Typ. Erwartet: {types}"
-invalid_value:                        "Ungültiger Wert. Erwartet: {values}"
+invalid_value_expected_values:        "Ungültiger Wert. Erwartet: {values}"
+invalid_value:                        "Ungültiger Wert"
 completer_not_allowed_in:             "Vervollständiger `{completer}` nicht in `{completer2}` erlaubt"
 completer_not_allowed_in_option:      "Vervollständiger `{completer}` nicht erlaubt in einer Option"
 completer_requires_repeatable:        "Vervollständiger `{completer}` benötigt `repeatable=True`"
+too_many_repeatable_positionals:      "Zu viele wiederholbare Positionsargumente"
+positional_argument_after_repeatable: "Positionsargument nach einem wiederholbaren Positionsargument gefunden"
+repeatable_with_subcommands:          "Wiederholbare Positionsargumente dürfen nicht zusammen mit Unterkommandos definiert werden"
+command_arg_without_command:          "Vervollständiger `command_arg` benötigt einen vorher definierten `command` Vervollständiger"

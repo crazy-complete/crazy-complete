@@ -73,7 +73,8 @@ class Arguments:
 
 
 def _has_set(dictionary, key):
-    return (key in dictionary.value and dictionary.value[key].value is not None)
+    return (key in dictionary.value and
+            dictionary.value[key].value is not None)
 
 
 def _check_type(value, types, parameter_name=None):
@@ -151,7 +152,7 @@ def _check_non_empty_dict(value, parameter):
 def _check_extended_bool(value, parameter):
     if not is_extended_bool(value.value):
         expected = 'true, false or `%s`' % ExtendedBool.INHERIT
-        msg = '%s: %s' % (parameter, m.invalid_value(expected))
+        msg = '%s: %s' % (parameter, m.invalid_value_expected_values(expected))
         raise _error(msg, value)
 
 
@@ -209,8 +210,13 @@ def _check_command(_ctxt, arguments):
     append = opts.value.get('path_append', None)
     prepend = opts.value.get('path_prepend', None)
 
-    if path and (append or prepend):  # TRANSLATION
-        raise _error('path_append/path_prepend cannot be used with path', opts)
+    if path and append:
+        msg = m.mutually_exclusive_parameters('path, path_append')
+        raise _error(msg, opts)
+
+    if path and prepend:
+        msg = m.mutually_exclusive_parameters('path, path_prepend')
+        raise _error(msg, opts)
 
 
 def _check_command_arg(ctxt, arguments):
@@ -236,19 +242,20 @@ def _check_command_arg(ctxt, arguments):
             positional.value['number'].value + 1 == ctxt.positional.value['number'].value
         )
 
-    positionals = ctxt.definition.value['positionals'].value  # TRANSLATION
+    positionals = ctxt.definition.value['positionals'].value
     if not any(filter(command_is_previous_to_command_arg, positionals)):
-        raise _error('The `command_arg` completer requires a previous `command` completer', ctxt.positional)
+        msg = m.command_arg_without_command()
+        raise _error(msg, ctxt.positional)
 
 
-def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False):
+def _check_filedir(_ctxt, arguments, with_file_opts=False, with_list_opts=False):
     options = arguments.get_optional_arg({})
     _check_type(options, (dict,))
     arguments.require_no_more()
 
     spec = {'directory': (False, (str,), _check_non_empty_string)}
 
-    if with_extensions:
+    if with_file_opts:
         spec['extensions'] = (False, (list,), _check_non_empty_list)
         spec['fuzzy'] = (False, (bool,), None)
         spec['ignore_globs'] = (False, (list,), _check_non_empty_list)
@@ -277,7 +284,7 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
 
 
 def _check_file(ctxt, arguments):
-    _check_filedir(ctxt, arguments, with_extensions=True)
+    _check_filedir(ctxt, arguments, with_file_opts=True)
 
 
 def _check_directory(ctxt, arguments):
@@ -285,7 +292,7 @@ def _check_directory(ctxt, arguments):
 
 
 def _check_file_list(ctxt, arguments):
-    _check_filedir(ctxt, arguments, with_extensions=True, with_list_opts=True)
+    _check_filedir(ctxt, arguments, with_file_opts=True, with_list_opts=True)
 
 
 def _check_directory_list(ctxt, arguments):
@@ -301,8 +308,8 @@ def _check_mime_file(_ctxt, arguments):
 
 def _check_range(_ctxt, arguments):
     start = arguments.get_required_arg("start")
-    stop  = arguments.get_required_arg("stop")
-    step  = arguments.get_optional_arg(1)
+    stop = arguments.get_required_arg("stop")
+    step = arguments.get_optional_arg(1)
     arguments.require_no_more()
 
     _check_type(start, (int,), "start")
@@ -373,8 +380,9 @@ def _check_key_value_list(ctxt, arguments):
     for compldef in values.value:
         _check_type(compldef, (list,))
 
-        if len(compldef.value) != 3:  # TRANSLATION
-            raise _error('Completion definition must have 3 fields', compldef)
+        if len(compldef.value) != 3:
+            msg = m.list_must_contain_exact_three_items()
+            raise _error(msg, compldef)
 
     for compldef in values.value:
         key = compldef.value[0]
@@ -460,7 +468,7 @@ def _check_ip_address(_ctxt, arguments):
     _check_type(type_, (str,), "type")
 
     if type_.value not in ('ipv4', 'ipv6', 'all'):
-        msg = '%s: %s' % ('type', m.invalid_value('ipv4, ipv6, all'))
+        msg = '%s: %s' % ('type', m.invalid_value_expected_values('ipv4, ipv6, all'))
         raise _error(msg, type_)
 
 
@@ -540,17 +548,20 @@ def _check_positionals_repeatable(definition_tree, definition):
 
         positional_number = positional.value['number'].value
 
-        if repeatable:  # TRANSLATION
+        if repeatable:
             if repeatable_number is not None and repeatable_number != positional_number:
-                raise _error('Only one positional argument can be marked as repeatable', positional)
+                msg = m.too_many_repeatable_positionals()
+                raise _error(msg, positional)
 
             repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:
-            raise _error('A positional argument cannot follow a repeatable positional argument', positional)
+            msg = m.positional_argument_after_repeatable()
+            raise _error(msg, positional)
 
     node = definition_tree.get_definition(definition.value['prog'].value)
     if repeatable_number is not None and len(node.subcommands) > 0:
-        raise _error('Repeatable positionals and subcommands cannot be used together', definition)
+        msg = m.repeatable_with_subcommands()
+        raise _error(msg, definition)
 
 
 def _check_option(ctxt, option):
@@ -580,16 +591,20 @@ def _check_option(ctxt, option):
         _check_type(option_string, (str,), "option_string")
 
         if not is_valid_option_string(option_string.value):
-            raise _error('Invalid option string', option_string)
+            msg = m.invalid_value()
+            raise _error(msg, option_string)
 
     if _has_set(option, 'metavar') and not _has_set(option, 'complete'):
-        raise _error('metavar is set but complete is missing', option)
+        msg = m.parameter_requires_parameter('metavar', 'complete')
+        raise _error(msg, option)
 
     if _has_set(option, 'optional_arg') and not _has_set(option, 'complete'):
-        raise _error('optional_arg is set but complete is missing', option)
+        msg = m.parameter_requires_parameter('optional_arg', 'complete')
+        raise _error(msg, option)
 
     if _has_set(option, 'group') and _has_set(option, 'groups'):
-        raise _error('Both `groups` and `group` are set', option)
+        msg = m.mutually_exclusive_parameters('groups, group')
+        raise _error(msg, option)
 
     if _has_set(option, 'groups'):
         for group in option.value['groups'].value:
@@ -605,8 +620,7 @@ def _check_option(ctxt, option):
         _check_when(option.value['when'])
 
     if _has_set(option, 'capture'):
-        if not is_valid_variable_name(option.value['capture'].value):
-            raise _error('Invalid variable name', option.value['capture'])
+        _check_variable_name(option.value['capture'], 'capture')
 
 
 def _check_positional(ctxt, positional):

@@ -175,7 +175,8 @@ def _validate_command_arg(ctxt, args):
         )
 
     if not any(filter(command_is_previous_to_command_arg, ctxt.cmdline.positionals)):
-        raise CrazyError('The `command_arg` completer requires a previous `command` completer')
+        msg = m.command_arg_without_command()
+        raise CrazyError(msg)
 
 
 def _validate_void(_ctxt, args):
@@ -213,8 +214,13 @@ def _validate_command(_ctxt, args):
     append = opts.get('path_append', None)
     prepend = opts.get('path_prepend', None)
 
-    if path and (append or prepend):
-        raise CrazyError('path_append/path_prepend cannot be used with path')
+    if path and append:
+        msg = m.mutually_exclusive_parameters('path, path_append')
+        raise CrazyError(msg)
+
+    if path and prepend:
+        msg = m.mutually_exclusive_parameters('path, path_prepend')
+        raise CrazyError(msg)
 
 
 def _validate_filedir(_ctxt, args, with_file_opts=False, with_list_opts=False):
@@ -345,11 +351,11 @@ def _validate_key_value_list(ctxt, args):
     _validate_non_empty_list(values, 'values')
 
     for compldef in values:
-        if not is_list_type(compldef):
-            raise CrazyError(f'Completion definition not a list: {compldef}')
+        _validate_type(compldef, (list,), 'defintion')
 
         if len(compldef) != 3:
-            raise CrazyError(f'Completion definition must have 3 fields: {compldef}')
+            msg = m.list_must_contain_exact_three_items()
+            raise CrazyError(f'{msg}: {compldef}')
 
     for key, description, complete in values:
         _validate_type(key, (str,), 'key')
@@ -430,7 +436,7 @@ def _validate_ip_address(_ctxt, args):
     _validate_type(type_, (str,), 'type')
 
     if type_ not in ('ipv4', 'ipv6', 'all'):
-        msg = '%s: %s' % ('type', m.invalid_value('ipv4, ipv6, all'))
+        msg = '%s: %s' % ('type', m.invalid_value_expected_values('ipv4, ipv6, all'))
         raise CrazyError(msg)
 
 
@@ -521,14 +527,17 @@ def validate_positionals_repeatable(cmdline):
 
         if repeatable:
             if repeatable_number is not None and repeatable_number != positional_number:
-                raise CrazyError('Only one positional argument can be marked as repeatable')
+                msg = m.too_many_repeatable_positionals()
+                raise CrazyError(msg)
 
             repeatable_number = positional_number
         elif repeatable_number is not None and positional_number > repeatable_number:
-            raise CrazyError('A positional argument cannot follow a repeatable positional argument')
+            msg = m.positional_argument_after_repeatable()
+            raise CrazyError(msg)
 
     if cmdline.get_subcommands() and repeatable_number is not None:
-        raise CrazyError('Repeatable positionals and subcommands cannot be used together')
+        msg = m.repeatable_with_subcommands()
+        raise CrazyError(msg)
 
 
 def validate_wraps(cmdline):

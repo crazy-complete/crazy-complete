@@ -159,7 +159,7 @@
 3_23_01-history-too-many-arguments       | foo: -o: history: Too many arguments: ['wrong']
 3_23_02-history-pattern-wrong-type       | foo: -o: history: Parameter `pattern` has an invalid type. Expected types: string. Received: False (bool)
 3_23_03-history-pattern-wrong-regex      | foo: -o: history: pattern: Not an extended regular expression
-3_24_00-command-arg-without-command      | foo: positional 1 (unnamed): command_arg: The `command_arg` completer requires a previous `command` completer
+3_24_00-command-arg-without-command      | foo: positional 1 (unnamed): command_arg: Completer `command_arg` requires a previously defined `command` completer
 3_24_01-command-arg-non-repeatable       | foo: positional 2 (unnamed): command_arg: Completer `command_arg` requires `repeatable=true`
 3_25_00-mime-file-missing-arg            | foo: -o: mime_file: Missing required argument: pattern
 3_25_01-mime-file-too-many-arguments     | foo: -o: mime_file: Too many arguments: ['wrong']
@@ -199,8 +199,8 @@
 3_30_12-key-value-list-1-key-empty       | foo: -o: key_value_list: key: String cannot be empty
 3_30_13-key-value-list-1-key-with-space  | foo: -o: key_value_list: key: String cannot contain spaces
 3_30_14-key-value-list-1-complete-wrong-type | foo: -o: key_value_list: Parameter `completer` has an invalid type. Expected types: list|none. Received: False (bool)
-3_30_15-key-value-list-2-def-not-list    | foo: -o: key_value_list: Completion definition not a list: False
-3_30_16-key-value-list-2-def-invalid-length | foo: -o: key_value_list: Completion definition must have 3 fields: ['key', None]
+3_30_15-key-value-list-2-def-not-list    | foo: -o: key_value_list: Parameter `defintion` has an invalid type. Expected types: list. Received: False (bool)
+3_30_16-key-value-list-2-def-invalid-length | foo: -o: key_value_list: List must contain exactly three items: ['key', None]
 3_30_17-key-value-list-2-key-not-string  | foo: -o: key_value_list: Parameter `key` has an invalid type. Expected types: string. Received: False (bool)
 3_30_18-key-value-list-2-key-empty       | foo: -o: key_value_list: key: String cannot be empty
 3_30_19-key-value-list-key-with-space    | foo: -o: key_value_list: key: String cannot contain spaces
@@ -210,7 +210,7 @@
 3_31_02-ip-address-arg-wrong-value       | foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
-001-multiple-repeatable-positionals      | foo: Only one positional argument can be marked as repeatable
-002-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
-003-positional-after-repeatable          | foo: A positional argument cannot follow a repeatable positional argument
-004-repeatable-and-subcommands           | foo: Repeatable positionals and subcommands cannot be used together
+001-multiple-repeatable-positionals      | foo: Too many repeatable positionals
+002-positional-after-repeatable          | foo: Positional argument found after a repeatable positional argument
+003-positional-after-repeatable          | foo: Positional argument found after a repeatable positional argument
+004-repeatable-and-subcommands           | foo: Repeatable positional arguments cannot be used together with subcommands
