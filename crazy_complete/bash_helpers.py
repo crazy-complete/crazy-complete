@@ -228,8 +228,10 @@ return 1
 ''')
 
 _VALUE_LIST = ShellFunction('value_list', r'''
+#ifdef duplicates
 local duplicates=0
 [[ "$1" == '-d' ]] && { duplicates=1; shift; }
+#endif
 local separator="$1"; shift
 
 compopt -o nospace
@@ -246,6 +248,7 @@ local value having_value having_values=() remaining_values=()
 
 IFS="$separator" read -r -a having_values <<< "$cur_unquoted"
 
+#ifdef duplicates
 if (( duplicates )); then
   remaining_values=("$@")
 else
@@ -255,6 +258,13 @@ else
     fi
   done
 fi
+#else
+for value; do
+  if ! array_contains "$value" "${having_values[@]}"; then
+    remaining_values+=("$value")
+  fi
+done
+#endif
 
 COMPREPLY=()
 

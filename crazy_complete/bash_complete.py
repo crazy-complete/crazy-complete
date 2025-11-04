@@ -330,6 +330,7 @@ class BashCompleter(shell.ShellCompleter):
 
         args = [ctxt.helpers.use_function('value_list')]
         if duplicates:
+            ctxt.helpers.use_function('value_list', 'duplicates')
             args.append('-d')
         args.append(separator)
 
@@ -349,7 +350,11 @@ class BashCompleter(shell.ShellCompleter):
         code = obj.get_code()
 
         func = ctxt.helpers.use_function('value_list')
-        dup_arg = ' -d' if duplicates else ''
+
+        dup_arg = ''
+        if duplicates:
+            ctxt.helpers.use_function('value_list', 'duplicates')
+            dup_arg = ' -d'
 
         r = 'local cur_old="$cur"\n'
         r += 'cur="${cur##*%s}"\n' % shell.quote(separator)
