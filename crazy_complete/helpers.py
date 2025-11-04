@@ -100,7 +100,7 @@ class GeneralHelpers:
 
         # Builtin functins
         self.functions = {}
-        self.used_functions = {} # funcname:set(defines)
+        self.used_functions = {}  # funcname:set(defines)
         self.global_defines = set()
 
         # Set debug mode

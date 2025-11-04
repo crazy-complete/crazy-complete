@@ -26,8 +26,11 @@ class ValueWithTrace:
     def from_yaml_event(value, source, event):
         '''Constructs a `ValueWithTrace` from a YAML event object.'''
 
-        return ValueWithTrace(value, source,
-            event.start_mark.line + 1, event.start_mark.column + 1)
+        return ValueWithTrace(
+            value,
+            source,
+            event.start_mark.line + 1,
+            event.start_mark.column + 1)
 
     def get_position_string(self):
         '''Return a string describing the position of the value.'''

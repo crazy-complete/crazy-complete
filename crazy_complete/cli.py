@@ -215,9 +215,11 @@ class CommandLine:
         assert isinstance(with_parent_options, bool)
         assert isinstance(only_with_arguments, bool)
 
-        getter = CommandLine.OptionsGetter(self,
+        getter = CommandLine.OptionsGetter(
+            self,
             with_parent_options=with_parent_options,
             only_with_arguments=only_with_arguments)
+
         return getter.get()
 
     def get_option_strings(self, with_parent_options=False, only_with_arguments=False):
@@ -385,7 +387,7 @@ class CommandLine:
         return result
 
     def copy(self):
-        '''Make a copy of the current CommandLine object, including sub-objects.'''
+        '''Make a deep copy of the current CommandLine object.'''
 
         copy = CommandLine(
             self.prog,
@@ -535,8 +537,8 @@ class Positional:
         self.capture = capture
 
     def get_positional_index(self):
-        '''Returns the index of the current positional argument within the current
-        commandline, including parent commandlines.
+        '''Returns the index of the current positional argument within the
+        current commandline, including parent commandlines.
 
         Returns:
             int: The index of the positional argument.
@@ -642,7 +644,8 @@ class Option:
                 Specifies if option's argument is optional.
 
             groups (list of str):
-                Specify to which mutually exclusive groups this option belongs to.
+                Specify to which mutually exclusive groups this option
+                belongs to.
 
             repeatable (ExtendedBool):
                 Specifies if the option can be repeated.
@@ -734,7 +737,7 @@ class Option:
         return delimiter.join(sorted(self.option_strings))
 
     def get_short_option_strings(self):
-        '''Returns the short option strings associated with the Option object.
+        '''Returns the short option strings associated with the object.
 
         Returns:
             list: A list of short option strings ("-o").
@@ -743,7 +746,7 @@ class Option:
         return list(filter(is_short_option_string, self.option_strings))
 
     def get_long_option_strings(self):
-        '''Returns the long option strings associated with the Option object.
+        '''Returns the long option strings associated with the object.
 
         Returns:
             list: A list of long option strings ("--option").
@@ -752,7 +755,7 @@ class Option:
         return list(filter(is_long_option_string, self.option_strings))
 
     def get_old_option_strings(self):
-        '''Returns the old-style option strings associated with the Option object.
+        '''Returns the old-style option strings associated with the object.
 
         Returns:
             list: A list of old-style option strings ("-option").
@@ -761,7 +764,8 @@ class Option:
         return list(filter(is_old_option_string, self.option_strings))
 
     def get_conflicting_options(self):
-        '''Returns a list of conflicting options within the same mutually exclusive groups.
+        '''Returns a list of conflicting options within the same mutually
+        exclusive groups.
 
         Returns:
             list: A list of Option objects representing conflicting options.

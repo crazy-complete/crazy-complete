@@ -73,7 +73,7 @@ class BashCompletionFunc(BashCompletionBase):
         if append:
             r.append('local COMPREPLY_OLD=("${COMPREPLY[@]}")')
 
-        r.append(' '.join(shell.quote(arg) for arg in self.args))
+        r.append(shell.join_quoted(self.args))
 
         if append:
             r.append('COMPREPLY=("${COMPREPLY_OLD[@]}" "${COMPREPLY[@]}")')
@@ -105,7 +105,7 @@ class CompgenW(BashCompletionBase):
         return ('%s %s-- %s' % (
             self.ctxt.helpers.use_function('values'),
             ('-a ' if append else ''),
-            ' '.join(shell.quote(s) for s in self.values)))
+            shell.join_quoted(self.values)))
 
     def get_function(self):
         return self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
@@ -159,7 +159,8 @@ class BashCompleteKeyValueList(BashCompletionCode):
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
-    def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
+    def __init__(self, ctxt, trace, completer,
+                 pair_separator, value_separator, values):
         funcs = {}
 
         for key, _desc, complete in key_value_list_normalize_values(values):
@@ -233,11 +234,11 @@ class BashCompleter(shell.ShellCompleter):
         filedir = bash_versions.filedir(ctxt)
 
         if directory:
-            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.quote(directory)
-            cmd += '  %s -d\n' % filedir
-            cmd += '  builtin popd >/dev/null\n'
-            cmd += '}'
-            return BashCompletionCode(ctxt, cmd)
+            r = 'builtin pushd %s &>/dev/null && {\n' % shell.quote(directory)
+            r += '  %s -d\n' % filedir
+            r += '  builtin popd >/dev/null\n'
+            r += '}'
+            return BashCompletionCode(ctxt, r)
 
         return BashCompletionFunc(ctxt, [filedir, '-d'])
 
@@ -262,18 +263,18 @@ class BashCompleter(shell.ShellCompleter):
             return BashCompletionFunc(ctxt, args)
 
         if directory:
-            cmd =  'builtin pushd %s &>/dev/null && {\n' % shell.quote(directory)
-            cmd += '  %s\n' % ' '.join(shell.quote(a) for a in args)
-            cmd += '  builtin popd >/dev/null\n'
-            cmd += '}'
+            r = 'builtin pushd %s &>/dev/null && {\n' % shell.quote(directory)
+            r += '  %s\n' % shell.join_quoted(args)
+            r += '  builtin popd >/dev/null\n'
+            r += '}'
         else:
-            cmd = ' '.join(shell.quote(a) for a in args)
+            r = shell.join_quoted(args)
 
         if ignore_globs:
             func = ctxt.helpers.use_function('file_filter')
-            cmd += '\n%s %s' % (func, ' '.join(shell.quote(p) for p in ignore_globs))
+            r += '\n%s %s' % (func, shell.join_quoted(ignore_globs))
 
-        return BashCompletionCode(ctxt, cmd)
+        return BashCompletionCode(ctxt, r)
 
     def mime_file(self, ctxt, _trace, pattern):
         func = ctxt.helpers.use_function('mime_file')
@@ -351,7 +352,7 @@ class BashCompleter(shell.ShellCompleter):
         func = ctxt.helpers.use_function('value_list')
         dup_arg = ' -d' if duplicates else ''
 
-        r =  'local cur_old="$cur"\n'
+        r = 'local cur_old="$cur"\n'
         r += 'cur="${cur##*%s}"\n' % shell.quote(separator)
         r += '%s\n' % code
         r += 'cur="$cur_old"\n'

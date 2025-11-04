@@ -303,7 +303,7 @@ def parse_options_with_description(stream):
     if not options:
         return None
 
-    #if s.peek() == '\n' or s.peek_str(2) in ('  ', ' \n'):
+    # if s.peek() == '\n' or s.peek_str(2) in ('  ', ' \n'):
     if stream.peek() in (' ', '\t', '\n'):
         description = parse_description(stream)
 

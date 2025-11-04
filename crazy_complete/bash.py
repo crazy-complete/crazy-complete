@@ -38,9 +38,10 @@ class BashCompletionGenerator:
         self.variable_manager = VariableManager('OPT_')
         self._generate()
 
-    def _complete_option(self, option, append=True):
+    def _complete_option(self, option, append=False):
         context = self.ctxt.get_option_context(self.commandline, option)
-        code = self.completer.complete(context, [], *option.complete).get_code(append)
+        obj = self.completer.complete(context, [], *option.complete)
+        code = obj.get_code(append)
         if code and option.nosort:
             code += '\ncompopt -o nosort'
         return code
@@ -57,7 +58,7 @@ class BashCompletionGenerator:
         if local_vars:
             r += 'local -a %s\n' % ' '.join(algo.uniq(local_vars))
 
-        r +=  '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
+        r += '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
         return r
 
     def _generate_positionals_completion(self):

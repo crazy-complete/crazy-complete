@@ -209,7 +209,7 @@ def _check_command(_ctxt, arguments):
     append = opts.value.get('path_append', None)
     prepend = opts.value.get('path_prepend', None)
 
-    if path and (append or prepend): # TRANSLATION
+    if path and (append or prepend):  # TRANSLATION
         raise _error('path_append/path_prepend cannot be used with path', opts)
 
 
@@ -236,7 +236,7 @@ def _check_command_arg(ctxt, arguments):
             positional.value['number'].value + 1 == ctxt.positional.value['number'].value
         )
 
-    positionals = ctxt.definition.value['positionals'].value # TRANSLATION
+    positionals = ctxt.definition.value['positionals'].value  # TRANSLATION
     if not any(filter(command_is_previous_to_command_arg, positionals)):
         raise _error('The `command_arg` completer requires a previous `command` completer', ctxt.positional)
 
@@ -262,7 +262,7 @@ def _check_filedir(_ctxt, arguments, with_extensions=False, with_list_opts=False
     if _has_set(options, 'extensions'):
         for extension in options.value['extensions'].value:
             _check_type(extension, (str,), 'extension')
-            _check_non_empty_string(extension,'extension')
+            _check_non_empty_string(extension, 'extension')
             _check_no_spaces(extension, 'extension')
 
     if _has_set(options, 'ignore_globs'):
@@ -388,7 +388,7 @@ def _check_key_value_list(ctxt, arguments):
         for compldef in values.value:
             _check_type(compldef, (list,))
 
-            if len(compldef.value) != 3: # TRANSLATION
+            if len(compldef.value) != 3:  # TRANSLATION
                 raise _error('Completion definition must have 3 fields', compldef)
 
         for compldef in values.value:
@@ -555,7 +555,7 @@ def _check_positionals_repeatable(definition_tree, definition):
 
         positional_number = positional.value['number'].value
 
-        if repeatable: # TRANSLATION
+        if repeatable:  # TRANSLATION
             if repeatable_number is not None and repeatable_number != positional_number:
                 raise _error('Only one positional argument can be marked as repeatable', positional)
 

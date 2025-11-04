@@ -128,12 +128,11 @@ def _make_find_option_code(commandline, variable_manager):
         for cmdline in cmdlines:
             code += [_make_cmd_plus_option_switch_code(cmdline, variable_manager)]
 
-    c =  '__find_option() {\n'
-    c += '%s\n' % indent('\n'.join(filter(None, code)), 2)
-    c += '  return 1\n'
-    c += '}'
-
-    return c
+    r = '__find_option() {\n'
+    r += '%s\n' % indent('\n'.join(filter(None, code)), 2)
+    r += '  return 1\n'
+    r += '}'
+    return r
 
 
 def _make_cmd_plus_option_switch_code(commandline, variable_manager, omit_cmd_check=False):
@@ -149,23 +148,21 @@ def _make_cmd_plus_option_switch_code(commandline, variable_manager, omit_cmd_ch
     if commandline.inherit_options:
         command += '*'
 
-    c  = f'case "$1" in {command})\n'
-    c += '%s\n' % indent(_make_option_switch_code(option_cases), 2)
-    c += 'esac'
-    return c
+    r = f'case "$1" in {command})\n'
+    r += '%s\n' % indent(_make_option_switch_code(option_cases), 2)
+    r += 'esac'
+    return r
 
 
 def _make_option_switch_code(option_cases):
-    c  = 'case "$2" in\n'
+    r = 'case "$2" in\n'
 
     for case in option_cases:
-        c += '  %s)'        % bash_patterns.make_pattern(case.option_strings)
-        c += ' VAR=%s;'     % case.variable
-        c += ' ARGS=%s;'    % case.args
-        c += ' return;;\n'
+        pattern = bash_patterns.make_pattern(case.option_strings)
+        r += f'  {pattern}) VAR={case.variable}; ARGS={case.args}; return;;\n'
 
-    c += 'esac'
-    return c
+    r += 'esac'
+    return r
 
 
 def generate(commandline, variable_manager):
@@ -190,7 +187,8 @@ def generate(commandline, variable_manager):
     s = preprocess(_PARSER_CODE, defines)
 
     if subcommand_switch_code:
-        s = s.replace('%SUBCOMMAND_SWITCH_CODE%', indent(subcommand_switch_code, 6))
+        s = s.replace('%SUBCOMMAND_SWITCH_CODE%',
+                      indent(subcommand_switch_code, 6))
     else:
         s = s.replace('%SUBCOMMAND_SWITCH_CODE%\n', '')
 
@@ -209,19 +207,23 @@ def _generate_option_cases(commandline, variable_manager):
     option_cases = []
 
     for option in options:
-        long_options  = abbreviations.get_many_abbreviations(option.get_long_option_strings())
-        long_options += abbreviations.get_many_abbreviations(option.get_old_option_strings())
-        short_options = option.get_short_option_strings()
+        option_strings = option.get_short_option_strings()
+
+        option_strings += abbreviations.get_many_abbreviations(
+                option.get_long_option_strings())
+
+        option_strings += abbreviations.get_many_abbreviations(
+                option.get_old_option_strings())
 
         value_variable = variable_manager.capture_variable(option)
 
-        if option.complete and option.optional_arg is True:
+        if option.has_optional_arg():
             args = "'?'"
-        elif option.complete:
+        elif option.has_required_arg():
             args = '1'
         else:
             args = '0'
 
-        option_cases.append(OptionCase(short_options + long_options, value_variable, args))
+        option_cases.append(OptionCase(option_strings, value_variable, args))
 
     return option_cases

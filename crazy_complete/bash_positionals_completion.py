@@ -12,6 +12,13 @@ def _make_block(code):
     return '{\n%s\n  return 0;\n}' % indent(code, 2)
 
 
+def _is_not_command_arg(positional):
+    return (
+        not positional.complete or
+        positional.complete[0] != 'command_arg'
+    )
+
+
 def _generate_subcommand_positional(generator):
     cmds = generator.subcommands.get_choices().keys()
     complete = generator.completer.choices(generator.ctxt, [], cmds).get_code()
@@ -21,24 +28,26 @@ def _generate_subcommand_positional(generator):
 
 
 def _get_positional_condition(positional):
-    operator = '=='
+    op = '=='
     if positional.repeatable:
-        operator = '>='
-    return '${#POSITIONALS[@]} %s %s' % (operator, positional.get_positional_num())
+        op = '>='
+    return '${#POSITIONALS[@]} %s %s' % (op, positional.get_positional_num())
 
 
 def _generate_positionals_with_when(generator):
     code = []
 
-    no_command_arg = lambda p: not p.complete or p.complete[0] != 'command_arg'
-    positionals = [p for p in generator.positionals if no_command_arg(p)]
+    positionals = filter(_is_not_command_arg, generator.positionals)
 
     for positional in positionals:
         condition = _get_positional_condition(positional)
         r = '(( %s )) && ' % condition
         if positional.when:
-            r += '%s && ' % bash_when.generate_when_conditions(generator.commandline, generator.variable_manager, positional.when)
-        r += '%s' % _make_block(generator._complete_option(positional, False))
+            r += '%s && ' % bash_when.generate_when_conditions(
+                generator.commandline,
+                generator.variable_manager,
+                positional.when)
+        r += '%s' % _make_block(generator._complete_option(positional))
 
         code.append(r)
 
@@ -48,15 +57,14 @@ def _generate_positionals_with_when(generator):
 def _generate_positionals_without_when(generator):
     code = []
 
-    no_command_arg = lambda p: not p.complete or p.complete[0] != 'command_arg'
-    positionals = [p for p in generator.positionals if no_command_arg(p)]
+    positionals = filter(_is_not_command_arg, generator.positionals)
 
-    keyfunc = lambda p: generator._complete_option(p, False)
-    grouped_by_complete = algo.group_by(positionals, keyfunc)
+    grouped_by_complete = algo.group_by(
+        positionals, generator._complete_option)
 
     for complete, positionals in grouped_by_complete.items():
         conditions = [_get_positional_condition(p) for p in positionals]
-        r =  '(( %s )) && ' % ' || '.join(conditions)
+        r = '(( %s )) && ' % ' || '.join(conditions)
         r += '%s' % _make_block(complete)
         code.append(r)
 

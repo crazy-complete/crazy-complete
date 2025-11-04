@@ -44,7 +44,7 @@ class ZshComplFunc(ZshCompletionBase):
         if len(self.args) == 1:
             cmd = self.args[0]
         else:
-            cmd = ' '.join(shell.quote(arg) for arg in self.args)
+            cmd = shell.join_quoted(self.args)
 
         if self.needs_braces:
             return shell.quote(f'{{{cmd}}}')
@@ -55,7 +55,7 @@ class ZshComplFunc(ZshCompletionBase):
         if len(self.args) == 1:
             return self.args[0]
 
-        code = ' '.join(shell.quote(arg) for arg in self.args)
+        code = shell.join_quoted(self.args)
         funcname = self.ctxt.helpers.add_dynamic_func(self.ctxt, code)
         return funcname
 

@@ -9,16 +9,40 @@ from . import bash_patterns
 from .str_utils import indent
 
 
-class MasterCompletionFunction:
+class MasterCompletionFunctionBase:
+    '''Base class for generating master completion functions.'''
+
+    def __init__(self, options, abbreviations, generator):
+        self.options = options
+        self.abbreviations = abbreviations
+        self.generator = generator
+        self.complete = generator._complete_option
+
+    def get(self, funcname):
+        '''Get the function code.'''
+        raise NotImplementedError
+
+    def get_all_option_strings(self, option):
+        '''Return all possible option strings for option.'''
+        opts = option.get_short_option_strings()
+
+        opts += self.abbreviations.get_many_abbreviations(
+                option.get_long_option_strings())
+
+        opts += self.abbreviations.get_many_abbreviations(
+                option.get_old_option_strings())
+
+        return opts
+
+
+class MasterCompletionFunction(MasterCompletionFunctionBase):
     '''Class for generating a master completion function.'''
 
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
 
     def __init__(self, options, abbreviations, generator):
-        self.abbreviations = abbreviations
-        self.complete = generator._complete_option
-        self.generator = generator
+        super().__init__(options, abbreviations, generator)
         self.optionals = False
         self.code = []
 
@@ -32,25 +56,18 @@ class MasterCompletionFunction:
             self.code.append('[[ "$mode" == WITH_OPTIONAL ]] || return 1')
             self._add_options(optional_arg)
 
-    def _get_all_option_strings(self, option):
-        opts = []
-        opts.extend(self.abbreviations.get_many_abbreviations(option.get_long_option_strings()))
-        opts.extend(self.abbreviations.get_many_abbreviations(option.get_old_option_strings()))
-        opts.extend(option.get_short_option_strings())
-        return opts
-
     def _add_options(self, options):
         with_when, without_when = algo.partition(options, lambda o: o.when)
         self._add_options_with_when(with_when)
         self._add_options_without_when(without_when)
 
     def _add_options_without_when(self, options):
-        options_group_by_complete = algo.group_by(options, lambda o: self.complete(o, False))
+        options_group_by_complete = algo.group_by(options, self.complete)
 
         if options_group_by_complete:
             r = 'case "$opt" in\n'
             for complete, options in options_group_by_complete.items():
-                opts = algo.flatten([self._get_all_option_strings(o) for o in options])
+                opts = algo.flatten(map(self.get_all_option_strings, options))
                 r += '  %s)\n' % bash_patterns.make_pattern(opts)
                 if complete:
                     r += '%s\n' % indent(complete, 4)
@@ -60,8 +77,8 @@ class MasterCompletionFunction:
 
     def _add_options_with_when(self, options):
         for option in options:
-            opts = self._get_all_option_strings(option)
-            completion_code = self.complete(option, False)
+            opts = self.get_all_option_strings(option)
+            completion_code = self.complete(option)
             cond = bash_when.generate_when_conditions(
                 self.generator.commandline,
                 self.generator.variable_manager,
@@ -93,13 +110,11 @@ class MasterCompletionFunction:
         return None
 
 
-class MasterCompletionFunctionNoWhen:
+class MasterCompletionFunctionNoWhen(MasterCompletionFunctionBase):
     '''Class for generating a master completion function.'''
 
     def __init__(self, options, abbreviations, generator):
-        self.abbreviations = abbreviations
-        self.complete = generator._complete_option
-        self.generator = generator
+        super().__init__(options, abbreviations, generator)
         self.optionals = False
         self.code = []
 
@@ -121,20 +136,13 @@ class MasterCompletionFunctionNoWhen:
         '''Return True if none of the options have the when attribute set.'''
         return not any(option.when for option in options)
 
-    def _get_all_option_strings(self, option):
-        opts = []
-        opts.extend(self.abbreviations.get_many_abbreviations(option.get_long_option_strings()))
-        opts.extend(self.abbreviations.get_many_abbreviations(option.get_old_option_strings()))
-        opts.extend(option.get_short_option_strings())
-        return opts
-
     def _add_options(self, options):
-        options_group_by_complete = algo.group_by(options, lambda o: self.complete(o, False))
+        options_group_by_complete = algo.group_by(options, self.complete)
 
         if options_group_by_complete:
             r = 'case "$opt" in\n'
             for complete, options in options_group_by_complete.items():
-                opts = algo.flatten([self._get_all_option_strings(o) for o in options])
+                opts = algo.flatten(map(self.get_all_option_strings, options))
                 if complete:
                     r += '  %s)\n' % bash_patterns.make_pattern(opts)
                     r += '%s;;\n' % indent(complete, 4)
@@ -178,12 +186,12 @@ class _Info:
     def __init__(self, options, abbreviations, commandline, ctxt):
         self.commandline    = commandline
         self.ctxt           = ctxt
-        self.short_required = False # Short with required argument
-        self.short_optional = False # Short with optional argument
-        self.long_required  = False # Long with required argument
-        self.long_optional  = False # Long with optional argument
-        self.old_required   = False # Old-Style with required argument
-        self.old_optional   = False # Old-Style with optional argument
+        self.short_required = False  # Short with required argument
+        self.short_optional = False  # Short with optional argument
+        self.long_required  = False  # Long with required argument
+        self.long_optional  = False  # Long with optional argument
+        self.old_required   = False  # Old-Style with required argument
+        self.old_optional   = False  # Old-Style with optional argument
 
         self._collect_options_info(options)
 
@@ -235,7 +243,7 @@ class _Info:
 
 
 def _get_prev_completion(info):
-    r =  'case "$prev" in\n'
+    r = 'case "$prev" in\n'
 
     if info.long_required:
         r += '  --*) __complete_option "$prev" "$cur" WITHOUT_OPTIONAL && return 0;;\n'
@@ -257,7 +265,7 @@ def _get_prev_completion(info):
 
 
 def _get_cur_completion(info):
-    r =  'case "$cur" in\n'
+    r = 'case "$cur" in\n'
 
     if info.long_required or info.long_optional:
         r += '  --*=*)\n'

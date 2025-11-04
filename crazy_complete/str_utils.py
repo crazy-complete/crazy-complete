@@ -79,9 +79,10 @@ def indent(string, num_spaces):
     assert isinstance(num_spaces, int), \
         f"indent: num_spaces: expected int, got {num_spaces!r}"
 
+    spaces = ' ' * num_spaces
     lines = string.split('\n')
-    indented_lines = [((' ' * num_spaces) + line) if line.strip() else line for line in lines]
-    return '\n'.join(indented_lines)
+    lines = [(spaces + line) if line.strip() else line for line in lines]
+    return '\n'.join(lines)
 
 
 def join_with_wrap(primary_sep, secondary_sep, max_line_length, items):
@@ -100,18 +101,18 @@ def join_with_wrap(primary_sep, secondary_sep, max_line_length, items):
         str: Joined string with line wrapping
     '''
     lines = []
-    current_line = ""
+    line = ""
 
     for item in items:
-        candidate = (current_line + primary_sep + item) if current_line else item
-        if len(candidate) > max_line_length and current_line:
-            lines.append(current_line)
-            current_line = item
+        candidate = (line + primary_sep + item) if line else item
+        if len(candidate) > max_line_length and line:
+            lines.append(line)
+            line = item
         else:
-            current_line = candidate
+            line = candidate
 
-    if current_line:
-        lines.append(current_line)
+    if line:
+        lines.append(line)
 
     return secondary_sep.join(lines)
 

@@ -35,7 +35,10 @@ def import_file(file):
     if filename.lower().endswith('.py'):
         module_name = filename[:-3]
     else:
-        temp = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.py')
+        temp = tempfile.NamedTemporaryFile(mode='w',
+                                           encoding='utf-8',
+                                           suffix='.py')
+
         with open(file, 'r', encoding='utf-8') as fh:
             temp.file.write(fh.read())
             temp.flush()

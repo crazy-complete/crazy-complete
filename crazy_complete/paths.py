@@ -33,7 +33,8 @@ def _pkg_config(args):
     if result.returncode == 0:
         return result.stdout.strip()
 
-    raise Exception('Command `%s` failed: %s' % (' '.join(command), result.stderr.strip()))
+    raise Exception('Command `%s` failed: %s' % (
+        ' '.join(command), result.stderr.strip()))
 
 
 def get_bash_completion_file(program_name):

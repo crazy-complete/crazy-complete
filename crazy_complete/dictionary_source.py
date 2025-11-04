@@ -54,17 +54,17 @@ def dictionary_to_commandline(dictionary, prog=None):
 
         commandline.add_option(
             option.get('option_strings',  None),
-            metavar       = option.get('metavar',         None),
-            help          = option.get('help',            None),
-            optional_arg  = option.get('optional_arg',    False),
-            groups        = option.get('groups',          None),
-            repeatable    = option.get('repeatable',      _INHERIT),
-            final         = option.get('final',           False),
-            hidden        = option.get('hidden',          False),
-            complete      = option.get('complete',        None),
-            nosort        = option.get('nosort',          False),
-            when          = option.get('when',            None),
-            capture       = option.get('capture',         None))
+            metavar       = option.get('metavar',      None),
+            help          = option.get('help',         None),
+            optional_arg  = option.get('optional_arg', False),
+            groups        = option.get('groups',       None),
+            repeatable    = option.get('repeatable',   _INHERIT),
+            final         = option.get('final',        False),
+            hidden        = option.get('hidden',       False),
+            complete      = option.get('complete',     None),
+            nosort        = option.get('nosort',       False),
+            when          = option.get('when',         None),
+            capture       = option.get('capture',      None))
 
     for positional in positionals:
         _validate_keys(positional,
@@ -312,5 +312,8 @@ def commandline_to_dictionaries(commandline):
     '''Convert a cli.CommandLine object to dictionaries.'''
 
     dictionaries = []
-    commandline.visit_commandlines(lambda c: dictionaries.append(commandline_to_dictionary(c)))
+
+    commandline.visit_commandlines(
+        lambda c: dictionaries.append(commandline_to_dictionary(c)))
+
     return dictionaries

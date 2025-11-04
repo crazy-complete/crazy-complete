@@ -1,16 +1,20 @@
 '''This module contains helper functions for Fish.'''
 
-from . import helpers
+from .helpers import GeneralHelpers, FishFunction
 
-_QUERY = helpers.FishFunction('query', r'''
+_QUERY = FishFunction('query', r'''
 # ===========================================================================
 #
-# This function implements the parsing of options and positionals in the Fish shell.
+# This function implements the parsing of options and positionals in the
+# Fish shell.
 #
 # Usage: query <OPTIONS> <COMMAND> [ARGS...]
 #
-# The first argument is a comma-separated list of options that the parser should know about.
-# Short options (-o), long options (--option), and old-style options (-option) are supported.
+# The first argument is a comma-separated list of options that the parser
+# should know about.
+#
+# Short options (-o), long options (--option), and old-style options (-option)
+# are supported.
 #
 # If an option takes an argument, it is suffixed by '='.
 # If an option takes an optional argument, it is suffixed by '=?'.
@@ -36,12 +40,12 @@ _QUERY = helpers.FishFunction('query', r'''
 #     Checks if any option in OPTIONS has a value of VALUES.
 #
 #   num_of_positionals [<OPERATOR> <NUMBER>]
-#     Checks the number of positional arguments.
-#     If no arguments are provided, print the total count of positional arguments.
+#     If no arguments are provided, print the count of positional arguments.
 #     If two arguments are provided, the first argument should be one of
 #     the comparison operators: '-lt', '-le', '-eq', '-ne', '-gt', '-ge'.
 #     Returns 0 if the count of positional arguments matches the
-#     specified NUMBER according to the comparison operator, otherwise returns 1.
+#     specified NUMBER according to the comparison operator, otherwise
+#     returns 1.
 #
 # ===========================================================================
 
@@ -154,7 +158,7 @@ else
       case '--'
         set -a positionals $cmdline[$(math $argi + 1)..]
 #ifdef positionals_positions
-        set -a positionals_positions (command seq (math $argi + 1) $cmdline_count)
+        set -a positionals_positions (seq (math $argi + 1) $cmdline_count)
 #endif
         break
       case '--*=*'
@@ -288,8 +292,8 @@ switch $cmd
       for option in $argv
         if test 2 -eq (string length -- $option)
           set option (string sub -l 1 -s 2 -- $option)
-          string match -q -r -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
-          string match -q -r -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
+          string match -rq -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
+          string match -rq -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
         else
           string match -q -r -- "^$option\$"       $tokens[-2] && return 0
           string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
@@ -370,7 +374,7 @@ switch $cmd
 end
 ''')
 
-_GET_COMPLETING_ARG = helpers.FishFunction('get_completing_arg', r'''
+_GET_COMPLETING_ARG = FishFunction('get_completing_arg', r'''
 set -l arg (commandline -ct | string unescape)
 
 switch $arg
@@ -412,7 +416,7 @@ else
 end
 ''')
 
-_FILEDIR = helpers.FishFunction('filedir', r'''
+_FILEDIR = FishFunction('filedir', r'''
 # Function for completing files or directories
 #
 # Options:
@@ -474,7 +478,7 @@ if set -q files[1]
 end
 ''', ['get_completing_arg'])
 
-_LIST = helpers.FishFunction('list', r'''
+_LIST = FishFunction('list', r'''
 set -l duplicates false
 
 if test $argv[1] = '-d'
@@ -510,7 +514,7 @@ set -l having_values (string split -- $separator $comp)
 set -l remaining_values_idxs
 
 if $duplicates
-  set remaining_values_idxs (command seq 1 (count $values))
+  set remaining_values_idxs (seq 1 (count $values))
 else
   set i 1
   for value in $values
@@ -540,7 +544,7 @@ switch $comp
 end
 ''', ['get_completing_arg'])
 
-_PREFIX = helpers.FishFunction('prefix', r'''
+_PREFIX = FishFunction('prefix', r'''
 set -l comp (get_completing_arg)
 set -l prefix_escaped (string escape --style=regex -- $argv[1])
 if string match -qr -- $prefix_escaped $comp
@@ -552,7 +556,7 @@ else
 end
 ''', ['get_completing_arg'])
 
-_KEY_VALUE_LIST = helpers.FishFunction('key_value_list', r'''
+_KEY_VALUE_LIST = FishFunction('key_value_list', r'''
 set -l sep1 $argv[1]
 set -l sep2 $argv[2]
 set -l value
@@ -561,7 +565,7 @@ set -l descriptions
 set -l functions
 set -l i
 
-for i in (command seq 3 3 (count $argv))
+for i in (seq 3 3 (count $argv))
   set -a keys $argv[$i]
   set -a descriptions $argv[(math $i + 1)]
   set -a functions $argv[(math $i + 2)]
@@ -570,7 +574,7 @@ end
 set -l comp (get_completing_arg)
 
 if test -z "$comp" || test (string sub -s -1 -l 1 -- $comp) = $sep1
-  for i in (command seq 1 (count $keys))
+  for i in (seq 1 (count $keys))
     if test "$functions[$i]" = false
       printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
     else
@@ -582,7 +586,7 @@ end
 
 function %PREFIX%__call_func_for_key -S
   set -l i
-  for i in (command seq 1 (count $keys))
+  for i in (seq 1 (count $keys))
     if test $keys[$i] = $argv[1]
       set -g __fish_stripprefix "^.*"(string escape --style=regex -- $sep2)
       $functions[$i]
@@ -610,7 +614,7 @@ switch $pair
     set -l key_len (string length -- $split[1])
     set comp (string sub -e -$key_len -- $comp)
 
-    for i in (command seq 1 (count $keys))
+    for i in (seq 1 (count $keys))
       if test "$functions[$i]" = false
         printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
       else
@@ -620,11 +624,11 @@ switch $pair
 end
 ''', ['get_completing_arg'])
 
-_HISTORY = helpers.FishFunction('history', r'''
+_HISTORY = FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
 ''')
 
-_MIME_FILE = helpers.FishFunction('mime_file', r'''
+_MIME_FILE = FishFunction('mime_file', r'''
 set -l i_opt
 
 set -l comp (get_completing_arg)
@@ -650,7 +654,7 @@ command file -L $i_opt -- "$comp"* 2>/dev/null | while read line
 end
 ''', ['get_completing_arg'])
 
-_SUBSTRACT_PREFIX_SUFFIX = helpers.FishFunction('subtract_prefix_suffix', r'''
+_SUBSTRACT_PREFIX_SUFFIX = FishFunction('subtract_prefix_suffix', r'''
 set -l s1 $argv[1]
 set -l s2 $argv[2]
 
@@ -683,7 +687,7 @@ end
 echo $s1
 ''')
 
-_COMMANDLINE_STRING = helpers.FishFunction('commandline_string', r'''
+_COMMANDLINE_STRING = FishFunction('commandline_string', r'''
 set -l line
 set -l comp (get_completing_arg)
 
@@ -693,7 +697,7 @@ complete -C "$comp" | while read line
   printf '%s\t%s\n' "$comp2$split[1]" "$split[2]"
 end''', ['subtract_prefix_suffix', 'get_completing_arg'])
 
-_DATE_FORMAT = helpers.FishFunction('date_format', r'''
+_DATE_FORMAT = FishFunction('date_format', r'''
 set -l comp (get_completing_arg)
 
 if test "$(string sub -s -1 -l 1 -- $comp)" = '%'
@@ -745,7 +749,7 @@ end
 # Bonus
 # =============================================================================
 
-_TIMEZONE_LIST = helpers.FishFunction('timezone_list', r'''
+_TIMEZONE_LIST = FishFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null
   command find /usr/share/zoneinfo -type f |\
   command sed 's|/usr/share/zoneinfo/||g'  |\
@@ -753,7 +757,7 @@ if ! command timedatectl list-timezones 2>/dev/null
 end
 ''')
 
-_ALSA_LIST_CARDS = helpers.FishFunction('alsa_list_cards', r'''
+_ALSA_LIST_CARDS = FishFunction('alsa_list_cards', r'''
 set -l card
 
 for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
@@ -766,7 +770,7 @@ for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
 end
 ''')
 
-_ALSA_LIST_DEVICES = helpers.FishFunction('alsa_list_devices', r'''
+_ALSA_LIST_DEVICES = FishFunction('alsa_list_devices', r'''
 set -l card
 
 for card in (command aplay -l | string match -r '^card [0-9]+: [^,]+')
@@ -780,11 +784,11 @@ end
 ''')
 
 
-class FishHelpers(helpers.GeneralHelpers):
+class FishHelpers(GeneralHelpers):
     '''Class holding helper functions for Fish.'''
 
     def __init__(self, config, function_prefix):
-        super().__init__(config, function_prefix, helpers.FishFunction)
+        super().__init__(config, function_prefix, FishFunction)
         self.add_function(_QUERY)
         self.add_function(_GET_COMPLETING_ARG)
         self.add_function(_FILEDIR)

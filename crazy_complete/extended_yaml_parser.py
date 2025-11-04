@@ -25,7 +25,8 @@ class ExtendedYAMLParser:
 
     def parse(self, stream):
         """
-        Parses the given YAML stream in a SAX-like way and reconstructs the structure.
+        Parses the given YAML stream in a SAX-like way and reconstructs the
+        structure.
 
         Raises:
             - yaml.parser.ParserError
@@ -50,7 +51,8 @@ class ExtendedYAMLParser:
 
     def handle_event(self, event):
         """
-        Handle each YAML parsing event and construct the corresponding data structure.
+        Handle each YAML parsing event and construct the corresponding data
+        structure.
         """
         if isinstance(event, StreamStartEvent):
             pass

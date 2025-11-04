@@ -35,7 +35,7 @@ class VariableManager:
         return var
 
     def capture_variable(self, option):
-        '''Return the variable assigned to an option, creating it if necessary.'''
+        '''Return the capture variable of an option, creating it if necessary.'''
 
         if option.capture is None:
             option.capture = self.make_variable(option)
@@ -52,13 +52,13 @@ class CasePatterns:
 
     @staticmethod
     def for_long_without_arg(option_strings):
-        '''Return a case pattern for long options that don't take an argument.'''
+        '''Return a case pattern for long options without arguments.'''
 
         return '|'.join(option_strings)
 
     @staticmethod
     def for_long_with_arg(option_strings):
-        '''Return a case pattern for long options that take an argument.'''
+        '''Return a case pattern for long options with arguments.'''
 
         return '|'.join(f'{o}=*' for o in option_strings)
 
@@ -70,7 +70,7 @@ class CasePatterns:
 
     @staticmethod
     def for_old_without_arg(option_strings):
-        '''Return a case pattern for old options that don't take an argument.'''
+        '''Return a case pattern for old options without arguments.'''
 
         if len(option_strings) <= 2:
             return '|'.join(option_strings)

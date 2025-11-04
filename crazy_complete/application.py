@@ -9,7 +9,7 @@ from .errors import CrazyError
 from . import manual
 from . import bash, fish, zsh
 from . import argparse_source, json_source, yaml_source
-from . import argparse_mod # .complete()
+from . import argparse_mod  # .complete()
 from . import help_converter
 from . import utils
 from . import config
@@ -226,7 +226,8 @@ def load_definition_file(opts):
         return yaml_source.load_from_file(opts.definition_file)
 
     if opts.input_type == 'python':
-        return argparse_source.load_from_file(opts.definition_file,
+        return argparse_source.load_from_file(
+            opts.definition_file,
             opts.parser_variable,
             parser_blacklist=[_crazy_complete_argument_parser])
 

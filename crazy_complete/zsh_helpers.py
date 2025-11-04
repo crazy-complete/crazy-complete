@@ -1,9 +1,9 @@
 '''This module contains helper functions for Zsh.'''
 
-from . import helpers
+from .helpers import GeneralHelpers, ShellFunction
 
 
-_QUERY = helpers.ShellFunction('query', r'''
+_QUERY = ShellFunction('query', r'''
 # ===========================================================================
 #
 # This function is for querying the command line.
@@ -303,7 +303,7 @@ for ((; argi <= ${#args[@]}; ++argi)); do
 done
 ''')
 
-_PREFIX = helpers.ShellFunction('prefix', r'''
+_PREFIX = ShellFunction('prefix', r'''
 if [[ "$PREFIX" == "$1"* ]]; then
   PREFIX="${PREFIX#"$1"}"
   IPREFIX="$IPREFIX$1"
@@ -313,7 +313,7 @@ else
 fi
 ''')
 
-_EXEC = helpers.ShellFunction('exec', r'''
+_EXEC = ShellFunction('exec', r'''
 local item='' desc='' describe=()
 
 while IFS=$'\t' read -r item desc; do
@@ -324,7 +324,7 @@ done < <(eval "$1")
 _describe '' describe
 ''')
 
-_HISTORY = helpers.ShellFunction('history', r'''
+_HISTORY = ShellFunction('history', r'''
 [[ -f "$HISTFILE" ]] || return
 
 local match=''
@@ -334,7 +334,7 @@ command grep -E -o -- "$1" "$HISTFILE" | while read -r match; do
 done
 ''')
 
-_MIME_FILE = helpers.ShellFunction('mime_file', r'''
+_MIME_FILE = ShellFunction('mime_file', r'''
 local line='' file='' mime='' i_opt=''
 
 if command file -i /dev/null &>/dev/null; then
@@ -365,22 +365,22 @@ command file -L $i_opt -- "$PREFIX"* 2>/dev/null | while read -r line; do
 done
 ''')
 
-_UID_LIST = helpers.ShellFunction('uid_list', r'''
+_UID_LIST = ShellFunction('uid_list', r'''
 local items=($(command getent passwd | command awk -F: '{printf "%s:%s\n", $3, $1}'))
 _describe 'users' items
 ''')
 
-_GID_LIST = helpers.ShellFunction('gid_list', r'''
+_GID_LIST = ShellFunction('gid_list', r'''
 local items=($(command getent group | command awk -F: '{printf "%s:%s\n", $3, $1}'))
 _describe 'groups' items
 ''')
 
-_CHARSET_LIST = helpers.ShellFunction('charset_list', r'''
+_CHARSET_LIST = ShellFunction('charset_list', r'''
 local items=($(command locale -m))
 _describe 'charsets' items
 ''')
 
-_PATH_FILES_RELATIVE = helpers.ShellFunction('path_files_relative', r'''
+_PATH_FILES_RELATIVE = ShellFunction('path_files_relative', r'''
 local DIR="$1"; shift
 _path_files -W "$PWD/$DIR" "$@"
 ''')
@@ -389,7 +389,7 @@ _path_files -W "$PWD/$DIR" "$@"
 # Bonus
 # =============================================================================
 
-_ALSA_COMPLETE_CARDS = helpers.ShellFunction('alsa_complete_cards', r'''
+_ALSA_COMPLETE_CARDS = ShellFunction('alsa_complete_cards', r'''
 local card='' cards=()
 command aplay -l \
   | command grep -Eo '^card [0-9]+: [^,]+' \
@@ -404,7 +404,7 @@ done
 _describe 'ALSA card' cards
 ''')
 
-_ALSA_COMPLETE_DEVICES = helpers.ShellFunction('alsa_complete_devices', r'''
+_ALSA_COMPLETE_DEVICES = ShellFunction('alsa_complete_devices', r'''
 local card='' id='' name='' devices=()
 command aplay -l \
   | command grep -Eo '^card [0-9]+: [^,]+' \
@@ -420,11 +420,11 @@ _describe 'ALSA device' devices
 ''')
 
 
-class ZshHelpers(helpers.GeneralHelpers):
+class ZshHelpers(GeneralHelpers):
     '''Class holding helper functions for Zsh.'''
 
     def __init__(self, config, function_prefix):
-        super().__init__(config, function_prefix, helpers.ShellFunction)
+        super().__init__(config, function_prefix, ShellFunction)
         self.add_function(_QUERY)
         self.add_function(_EXEC)
         self.add_function(_PREFIX)

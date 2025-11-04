@@ -12,14 +12,16 @@ _Option = namedtuple('_Option', ('option', 'conditions', 'when'))
 
 
 def _make_option_strings(options):
-    r = []
+    option_strings = []
+
     for option in options:
         for option_string in option.option_strings:
             if len(option_string) != 2 and option.complete:
-                r.append(f'{option_string}=')
+                option_strings.append(f'{option_string}=')
             else:
-                r.append(option_string)
-    return ' '.join(shell.quote(option_string) for option_string in r)
+                option_strings.append(option_string)
+
+    return shell.join_quoted(option_strings)
 
 
 def _get_option_full_condition(option):

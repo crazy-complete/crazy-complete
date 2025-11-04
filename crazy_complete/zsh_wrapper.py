@@ -177,13 +177,16 @@ def generate_wrapper(ctxt, commandline):
          _make_short_opts_flag_regex(short_opts_flag)),
 
         ('%SHORT_OPTS_ARG_REGEX1%',
-         _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, None)),
+         _make_short_opts_arg_regex(
+             short_opts_flag, short_opts_arg, None)),
 
         ('%SHORT_OPTS_ARG_REGEX2%',
-         _make_short_opts_arg_regex(short_opts_flag, short_opts_arg, 'arg')),
+         _make_short_opts_arg_regex(
+             short_opts_flag, short_opts_arg, 'arg')),
 
         ('%SHORT_OPTS_OPTIONAL_REGEX%',
-         _make_short_opts_arg_regex(short_opts_flag, short_opts_optional, 'optional'))
+         _make_short_opts_arg_regex(
+             short_opts_flag, short_opts_optional, 'optional'))
     ])
 
     defines = []

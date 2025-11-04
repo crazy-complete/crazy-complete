@@ -37,13 +37,13 @@ def _generate(query, tokens):
 def _generate_option_is(query, obj):
     func = query.use('option_is')
     args = [func, 'option_is', *obj.options, '--', *obj.values]
-    return ' '.join(shell.quote(a) for a in args)
+    return shell.join_quoted(args)
 
 
 def _generate_has_option(query, obj):
     func = query.use('has_option')
     args = [func, 'has_option', *obj.options]
-    return ' '.join(shell.quote(a) for a in args)
+    return shell.join_quoted(args)
 
 
 def generate_when_conditions(query, when_):

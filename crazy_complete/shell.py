@@ -70,6 +70,12 @@ def quote(string, quote_empty_string=True):
     return f"'{s}'"
 
 
+def join_quoted(arguments, string=' '):
+    '''Joins quoted `arguments` on `string`.'''
+
+    return string.join(quote(arg) for arg in arguments)
+
+
 class ShellCompleter:
     '''Base class for argument completion.'''
 
@@ -79,7 +85,7 @@ class ShellCompleter:
 
     def complete(self, ctxt, trace, command, *a):
         if not hasattr(self, command):
-            utils.warn(f"ShellCompleter: Falling back from `{command}` to `none`")
+            utils.warn(f"complete: Falling back from `{command}` to `none`")
             command = 'none'
 
         return getattr(self, command)(ctxt, trace, *a)
@@ -124,15 +130,6 @@ class ShellCompleter:
         }
 
         return self.complete(ctxt, trace, 'choices', signals)
-
-    def range(self, ctxt, trace, start, stop, step=1):
-        return self.fallback(ctxt, trace, 'range', 'choices', list(range(start, stop, step)))
-
-    def directory(self, ctxt, trace, opts):
-        return self.fallback(ctxt, trace, 'directory', 'file', opts)
-
-    def command(self, ctxt, trace):
-        return self.fallback(ctxt, trace, 'command', 'file')
 
     def exec(self, _ctxt, _trace, _command):
         raise NotImplementedError

@@ -25,15 +25,14 @@ class FishCompletionDefinition:
     def __init__(
           self,
           ctxt,
-          short_options=None,      # List of short options
-          long_options=None,       # List of long options
-          old_options=None,        # List of old-style options
-          positional=None,         # Positional number
-          description=None,        # Description
-          requires_argument=False, # Option requires an argument
-          keep_order=False,        # Do not sort completion suggestions
-          completion_obj=None
-        ):
+          short_options=None,       # List of short options
+          long_options=None,        # List of long options
+          old_options=None,         # List of old-style options
+          positional=None,          # Positional number
+          description=None,         # Description
+          requires_argument=False,  # Option requires an argument
+          keep_order=False,         # Do not sort completion suggestions
+          completion_obj=None):
 
         if short_options is None:
             short_options = []

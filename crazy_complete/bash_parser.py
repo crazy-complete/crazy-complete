@@ -50,10 +50,10 @@ _OPT_ISSET = '_OPT_ISSET_'
 def generate(commandline, variable_manager):
     '''Generate code for parsing the command line.'''
 
-    commandlines           = list(reversed(commandline.get_all_commandlines()))
+    commandlines = list(reversed(commandline.get_all_commandlines()))
     subcommand_switch_code = make_subcommand_switch_code(commandline)
-    long_option_cases      = []
-    short_option_cases     = []
+    long_option_cases = []
+    short_option_cases = []
 
     for cmdline in commandlines:
         option_cases = _generate_option_cases(cmdline, variable_manager)
@@ -62,7 +62,7 @@ def generate(commandline, variable_manager):
             command += '*'
 
         if option_cases.long_options:
-            r =  'case "$cmd" in %s)\n' % command
+            r = 'case "$cmd" in %s)\n' % command
             r += '  case "$arg" in\n'
             for case in option_cases.long_options:
                 r += '%s\n' % indent(case, 4)
@@ -71,7 +71,7 @@ def generate(commandline, variable_manager):
             long_option_cases.append(r)
 
         if option_cases.short_options:
-            r =  'case "$cmd" in %s)\n' % command
+            r = 'case "$cmd" in %s)\n' % command
             r += '  case "$char" in\n'
             for case in option_cases.short_options:
                 r += '%s\n' % indent(case, 4)
@@ -158,9 +158,13 @@ def _generate_option_cases(commandline, variable_manager):
     option_cases = OptionCases([], [])
 
     for option in options:
-        long_options  = abbreviations.get_many_abbreviations(option.get_long_option_strings())
-        long_options += abbreviations.get_many_abbreviations(option.get_old_option_strings())
         short_options = option.get_short_option_strings()
+
+        long_options = abbreviations.get_many_abbreviations(
+                option.get_long_option_strings())
+
+        long_options += abbreviations.get_many_abbreviations(
+                option.get_old_option_strings())
 
         variable = variable_manager.capture_variable(option)
 

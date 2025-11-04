@@ -38,13 +38,13 @@ def get_complete(action):
     complete = action.get_complete()
 
     if isinstance(action, (
-        argparse._HelpAction,
-        argparse._VersionAction,
-        argparse._StoreTrueAction,
-        argparse._StoreFalseAction,
-        argparse._StoreConstAction,
-        argparse._AppendConstAction,
-        argparse._CountAction)):
+            argparse._HelpAction,
+            argparse._VersionAction,
+            argparse._StoreTrueAction,
+            argparse._StoreFalseAction,
+            argparse._StoreConstAction,
+            argparse._AppendConstAction,
+            argparse._CountAction)):
 
         if complete:
             utils.warn(f"Action has .complete() set but takes no arguments: {action}")
@@ -52,9 +52,9 @@ def get_complete(action):
         return None
 
     if isinstance(action, (
-        argparse._StoreAction,
-        argparse._ExtendAction,
-        argparse._AppendAction)):
+            argparse._StoreAction,
+            argparse._ExtendAction,
+            argparse._AppendAction)):
 
         if complete:
             if action.choices:
@@ -116,7 +116,7 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
 
     for action in parser._actions:
         if isinstance(action, argparse._SubParsersAction):
-            subparsers  = OrderedDict()
+            subparsers = OrderedDict()
             for name, subparser in action.choices.items():
                 subparsers[name] = {'parser': subparser, 'help': None}
 
@@ -164,14 +164,14 @@ def argumentparser_to_commandline(parser, prog=None, description=None):
 
             commandline.add_option(
                 action.option_strings,
-                metavar         = metavar,
-                complete        = complete,
-                help            = help,
-                optional_arg    = optional_arg,
-                repeatable      = action.get_repeatable(),
-                final           = get_final(action),
-                hidden          = (action.help == argparse.SUPPRESS),
-                when            = action.get_when()
+                metavar      = metavar,
+                complete     = complete,
+                help         = help,
+                optional_arg = optional_arg,
+                repeatable   = action.get_repeatable(),
+                final        = get_final(action),
+                hidden       = (action.help == argparse.SUPPRESS),
+                when         = action.get_when()
             )
 
     group_counter = 0

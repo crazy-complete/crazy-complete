@@ -67,10 +67,10 @@ class FishCompletionCommand(FishCompletionBase):
         self.args = args
 
     def get_code(self):
-        return ' '.join(shell.quote(arg) for arg in self.args)
+        return shell.join_quoted(self.args)
 
     def get_args(self):
-        command = ' '.join(shell.quote(arg) for arg in self.args)
+        command = shell.join_quoted(self.args)
         return ['-f', '-a', '(%s)' % command]
 
     def get_function(self):
@@ -79,6 +79,7 @@ class FishCompletionCommand(FishCompletionBase):
 
         func = self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
         return func
+
 
 class FishCompletionRawCommand(FishCompletionBase):
     '''Class for executing a command (without any escaping)'''
@@ -320,7 +321,7 @@ class FishCompleteCommand(FishCompletionBase):
             prepend = opts.get('path_prepend', None)
 
         def mkpath(path):
-            return ' '.join(shell.quote(p) for p in path.split(':'))
+            return shell.join_quoted(path.split(':'))
 
         if path:
             code = 'set -lx PATH %s' % mkpath(path)

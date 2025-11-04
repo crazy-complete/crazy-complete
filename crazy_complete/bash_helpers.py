@@ -1,8 +1,8 @@
 '''This module contains helper functions for Bash.'''
 
-from . import helpers
+from .helpers import GeneralHelpers, ShellFunction
 
-_VALUES = helpers.ShellFunction('values', r'''
+_VALUES = ShellFunction('values', r'''
 local word append=0
 
 [[ "$1" == "-a" ]] && { shift; append=1; }
@@ -17,7 +17,7 @@ for word; do
 done
 ''')
 
-_DEQUOTE = helpers.ShellFunction('dequote', r'''
+_DEQUOTE = ShellFunction('dequote', r'''
 local in="$1" len=${#1} i=0 result='' ___break_pos=-1 ___in_quotes=0
 
 for ((; i < len; ++i)); do
@@ -57,7 +57,7 @@ ___BREAK_POS=$___break_pos
 ___IN_QUOTES=$___in_quotes
 ''')
 
-_DEQUOTE_WORDS = helpers.ShellFunction('dequote_words', r'''
+_DEQUOTE_WORDS = ShellFunction('dequote_words', r'''
 local word dequoted break_pos in_quotes
 
 words_dequoted=()
@@ -68,7 +68,7 @@ for word in "${words[@]}"; do
 done
 ''', ['dequote'])
 
-_PARSE_LINE = helpers.ShellFunction('parse_line', r'''
+_PARSE_LINE = ShellFunction('parse_line', r'''
 local -n out="$1"
 local in="$2" len=${#2} i=0 word='' active=0
 
@@ -118,7 +118,7 @@ elif [[ "${in:$((len - 1)):1}" == ' ' ]]; then
 fi
 ''')
 
-_GET_PREFIX_SUFFIX_LEN = helpers.ShellFunction('get_prefix_suffix_len', r'''
+_GET_PREFIX_SUFFIX_LEN = ShellFunction('get_prefix_suffix_len', r'''
 local s1="$1"
 local s2="$2"
 
@@ -152,7 +152,7 @@ done
 echo ${#s1}
 ''')
 
-_COMMANDLINE_STRING = helpers.ShellFunction('commandline_string', r'''
+_COMMANDLINE_STRING = ShellFunction('commandline_string', r'''
 local l line break_pos in_quotes
 dequote "$cur" line break_pos in_quotes
 
@@ -200,7 +200,7 @@ COMP_WORDS=("${COMP_WORDS_OLD[@]}")
 COMP_CWORD=$COMP_CWORD_OLD
 ''', ['dequote', 'parse_line', 'get_prefix_suffix_len'])
 
-_EXEC = helpers.ShellFunction('exec', r'''
+_EXEC = ShellFunction('exec', r'''
 local item desc special="$COMP_WORDBREAKS\"'><=;|&({:\\\$\`"
 
 while IFS=$'\t' read -r item desc; do
@@ -211,7 +211,7 @@ while IFS=$'\t' read -r item desc; do
 done < <(eval "$1")
 ''')
 
-_EXEC_FAST = helpers.ShellFunction('exec_fast', r'''
+_EXEC_FAST = ShellFunction('exec_fast', r'''
 local item desc
 
 while IFS=$'\t' read -r item desc; do
@@ -221,13 +221,13 @@ while IFS=$'\t' read -r item desc; do
 done < <(eval "$1")
 ''')
 
-_ARRAY_CONTAINS = helpers.ShellFunction('array_contains', r'''
+_ARRAY_CONTAINS = ShellFunction('array_contains', r'''
 local w='' search="$1"; shift;
 for w; do [[ "$search" == "$w" ]] && return 0; done
 return 1
 ''')
 
-_VALUE_LIST = helpers.ShellFunction('value_list', r'''
+_VALUE_LIST = ShellFunction('value_list', r'''
 local duplicates=0
 [[ "$1" == '-d' ]] && { duplicates=1; shift; }
 local separator="$1"; shift
@@ -283,7 +283,7 @@ elif (( ${#remaining_values[@]} )); then
 fi
 ''', ['dequote', 'array_contains'])
 
-_KEY_VALUE_LIST = helpers.ShellFunction('key_value_list', r'''
+_KEY_VALUE_LIST = ShellFunction('key_value_list', r'''
 local sep1="$1"; shift
 local sep2="$1"; shift
 local -A keys=()
@@ -367,7 +367,7 @@ else
 fi
 ''', ['dequote'])
 
-_PREFIX_COMPREPLY = helpers.ShellFunction('prefix_compreply', r'''
+_PREFIX_COMPREPLY = ShellFunction('prefix_compreply', r'''
 [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
 
 local i prefix="$1"
@@ -376,7 +376,7 @@ for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
 done
 ''')
 
-_HISTORY = helpers.ShellFunction('history', r'''
+_HISTORY = ShellFunction('history', r'''
 [[ -f "$HISTFILE" ]] || return
 
 local match
@@ -388,7 +388,7 @@ while read -r match; do
 done < <(command grep -E -o -- "$1" "$HISTFILE")
 ''')
 
-_GET_LAST_BREAK_POSITION = helpers.ShellFunction('get_last_break_position', r'''
+_GET_LAST_BREAK_POSITION = ShellFunction('get_last_break_position', r'''
 local in="$1" i=0 len=${#1} pos=-1
 
 for ((i=0; i < len; ++i)); do
@@ -415,7 +415,7 @@ done
 echo $pos
 ''')
 
-_PREFIX = helpers.ShellFunction('prefix', r'''
+_PREFIX = ShellFunction('prefix', r'''
 local prefix="$1" func="$2"
 local stripped="$(strip_prefix_keep_quoting "$prefix" "$cur")"
 
@@ -437,7 +437,7 @@ if (( break_position < 0 )); then
 fi
 ''', ['get_last_break_position', 'strip_prefix_keep_quoting'])
 
-_STRIP_PREFIX_KEEP_QUOTING = helpers.ShellFunction('strip_prefix_keep_quoting', r'''
+_STRIP_PREFIX_KEEP_QUOTING = ShellFunction('strip_prefix_keep_quoting', r'''
 local p="$1" pi=0 plen=${#1}
 local s="$2" si=0 slen=${#2} state=w
 
@@ -478,7 +478,7 @@ case "$state" in
 esac
 ''')
 
-_MIME_FILE = helpers.ShellFunction('mime_file', r'''
+_MIME_FILE = ShellFunction('mime_file', r'''
 local line file mime i_opt cur_dequoted
 
 if command file -i /dev/null &>/dev/null; then
@@ -518,7 +518,7 @@ while read -r line; do
 done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
 ''', ['dequote'])
 
-_FILE_FILTER = helpers.ShellFunction('file_filter', '''
+_FILE_FILTER = ShellFunction('file_filter', '''
 local pattern REPLY COMPREPLY_OLD=("${COMPREPLY[@]}")
 
 COMPREPLY=()
@@ -536,22 +536,22 @@ done
 # Bonus
 # =============================================================================
 
-_LOCALES = helpers.ShellFunction('''locales''', r'''
+_LOCALES = ShellFunction('''locales''', r'''
 COMPREPLY=($(compgen -W "$(command locale -a)" -- "$cur"))
 ''')
 
-_CHARSETS = helpers.ShellFunction('''charsets''', r'''
+_CHARSETS = ShellFunction('''charsets''', r'''
 COMPREPLY=($(compgen -W "$(command locale -m)" -- "$cur"))
 ''')
 
-_TIMEZONE_LIST = helpers.ShellFunction('timezone_list', r'''
+_TIMEZONE_LIST = ShellFunction('timezone_list', r'''
 if ! command timedatectl list-timezones 2>/dev/null; then
   command find /usr/share/zoneinfo -type f |\
   command sed 's|/usr/share/zoneinfo/||g'  |\
   command grep -E -v '^(posix|right)'
 fi''')
 
-_ALSA_LIST_CARDS = helpers.ShellFunction('alsa_list_cards', r'''
+_ALSA_LIST_CARDS = ShellFunction('alsa_list_cards', r'''
 local card id cards=()
 while builtin read card; do
   card="${card#card }"
@@ -562,7 +562,7 @@ done < <(command aplay -l | command grep -Eo '^card [0-9]+: [^,]+')
 COMPREPLY=($(compgen -W "${cards[*]}" -- "$cur"))
 ''')
 
-_ALSA_LIST_DEVICES = helpers.ShellFunction('alsa_list_devices', r'''
+_ALSA_LIST_DEVICES = ShellFunction('alsa_list_devices', r'''
 local card id devices=()
 while builtin read card; do
   card="${card#card }"
@@ -574,11 +574,11 @@ COMPREPLY=($(compgen -W "${devices[*]}" -- "$cur"))
 ''')
 
 
-class BashHelpers(helpers.GeneralHelpers):
+class BashHelpers(GeneralHelpers):
     '''Class holding helper functions for Bash.'''
 
     def __init__(self, config, function_prefix):
-        super().__init__(config, function_prefix, helpers.ShellFunction)
+        super().__init__(config, function_prefix, ShellFunction)
         self.add_function(_VALUES)
         self.add_function(_DEQUOTE)
         self.add_function(_DEQUOTE_WORDS)

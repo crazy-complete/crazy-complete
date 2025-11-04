@@ -40,7 +40,6 @@ def make_query(args):
     return make_condition_command("$query '$opts'", args)
 
 
-
 class Condition:
     '''Base class for conditions.'''
 
@@ -164,7 +163,8 @@ class PositionalNum(Condition):
 
     def unsafe_code(self, _ctxt):
         op = self.TEST_OPERATORS[self.operator]
-        r = "test (__fish_number_of_cmd_args_wo_opts) %s %d" % (op, self.number)
+        number = self.number
+        r = "test (__fish_number_of_cmd_args_wo_opts) %s %d" % (op, number)
         return r
 
 

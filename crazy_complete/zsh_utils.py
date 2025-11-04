@@ -55,8 +55,7 @@ def make_option_spec(
         repeatable          = False,
         final               = False,
         metavar             = None,
-        action              = None
-    ):
+        action              = None):
 
     '''
     Make a Zsh option spec.
@@ -122,8 +121,7 @@ def make_positional_spec(
         number,
         repeatable,
         description,
-        action
-    ):
+        action):
 
     '''
     Make a Zsh positional spec.

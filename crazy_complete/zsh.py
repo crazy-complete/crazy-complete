@@ -128,7 +128,7 @@ class ZshCompletionFunction:
                 set_cmds.append('IFS=$"\\n" %s=($(%s get_option %s))' % (
                     option.capture,
                     self.query.use('get_option'),
-                    ' '.join(shell.quote(s) for s in option.option_strings)))
+                    shell.join_quoted(option.option_strings)))
 
         if local_vars:
             r  = 'local %s' % ' '.join(f'{s}=()' for s in local_vars)
@@ -146,7 +146,7 @@ class ZshCompletionFunction:
         query = self.query.use('get_positional')
         positional_num = self.subcommands.get_positional_num()
 
-        r =  'case "$(%s get_positional %d)" in\n' % (query, positional_num)
+        r = 'case "$(%s get_positional %d)" in\n' % (query, positional_num)
         for subcommand in self.subcommands.subcommands:
             sub_funcname = self.ctxt.helpers.make_completion_funcname(subcommand)
             cmds = utils.get_all_command_variations(subcommand)
@@ -205,8 +205,8 @@ class ZshCompletionFunction:
             if arg.hidden:
                 func = self.query.use('has_option')
                 func = self.query.use('with_incomplete')
-                r += '%s has_option WITH_INCOMPLETE %s &&\\\n' % (func,
-                    ' '.join(shell.quote(o) for o in arg.option.option_strings))
+                r += '%s has_option WITH_INCOMPLETE %s &&\\\n' % (
+                    func, shell.join_quoted(arg.option.option_strings))
 
             if arg.when:
                 when_cmd = zsh_when.generate_when_conditions(self.query, arg.when)
