@@ -292,12 +292,3 @@ def is_worth_a_function(commandline):
         return True
 
     return False
-
-
-def key_value_list_normalize_values(values):
-    '''Normalize the `values` parameter of `key_value_list`.'''
-
-    if is_list_type(values):
-        return values
-
-    return [[key, None, func] for key, func in values.items()]

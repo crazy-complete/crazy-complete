@@ -1630,266 +1630,177 @@ zsh_expected: |
 ---
 number: 105
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple"
-send: "crazy-complete-test --simple "
+description: "key_value_list: Check -o"
+send: "crazy-complete-test -o "
 bash_expected: |
-  > crazy-complete-test --simple
-  animal  async   file    nocomp  number  pid     user
-  > crazy-complete-test --simple
+  > crazy-complete-test -o
+  animal  async   file    nocomp  number  proc    user
+  > crazy-complete-test -o
 fish_expected: |
-  > crazy-complete-test --simple
-  animal=  file=    number=  user=
-  async    nocomp=  pid=
+  > crazy-complete-test -o
+  animal=  (select an animal)  nocomp=     (no completer)  user=  (select a user)
+  async      (set async mode)  number=  (select a number)
+  file=                        proc=   (select a process)
 zsh_expected: |
-  > crazy-complete-test --simple
-  animal  async   file    nocomp  number  pid     user
+  > crazy-complete-test -o
+  animal  -- select an animal
+  async   -- set async mode
+  nocomp  -- no completer
+  number  -- select a number
+  proc    -- select a process
+  user    -- select a user
+  file
 ---
 number: 106
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple a"
-send: "crazy-complete-test --simple a"
+description: "key_value_list: Check -o a"
+send: "crazy-complete-test -o a"
 bash_expected: |
-  > crazy-complete-test --simple a
+  > crazy-complete-test -o a
   animal  async
-  > crazy-complete-test --simple a
+  > crazy-complete-test -o a
 fish_expected: |
-  > crazy-complete-test --simple a
-  animal=  async
+  > crazy-complete-test -o a
+  animal=  (select an animal)  async  (set async mode)
 zsh_expected: |
-  > crazy-complete-test --simple a
-  animal  async
+  > crazy-complete-test -o a
+  animal  -- select an animal
+  async   -- set async mode
 ---
 number: 107
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple an"
-send: "crazy-complete-test --simple an"
+description: "key_value_list: Check -o an"
+send: "crazy-complete-test -o an"
 bash_expected: |
-  > crazy-complete-test --simple animal
+  > crazy-complete-test -o animal
 fish_expected: |
-  > crazy-complete-test --simple animal=
+  > crazy-complete-test -o animal=
 zsh_expected: |
-  > crazy-complete-test --simple animal=
+  > crazy-complete-test -o animal=
 ---
 number: 108
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple animal="
-send: "crazy-complete-test --simple animal="
+description: "key_value_list: Check -o animal="
+send: "crazy-complete-test -o animal="
 bash_expected: |
-  > crazy-complete-test --simple animal=
+  > crazy-complete-test -o animal=
   cat    dog    horse
-  > crazy-complete-test --simple animal=
+  > crazy-complete-test -o animal=
 fish_expected: |
-  > crazy-complete-test --simple animal=
+  > crazy-complete-test -o animal=
   animal=cat  animal=dog  animal=horse
 zsh_expected: |
-  > crazy-complete-test --simple animal=
+  > crazy-complete-test -o animal=
   cat    dog    horse
 ---
 number: 109
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple animal,"
-send: "crazy-complete-test --simple animal,"
+description: "key_value_list: Check -o animal,"
+send: "crazy-complete-test -o animal,"
 bash_expected: |
-  > crazy-complete-test --simple animal,
-  animal,async   animal,nocomp  animal,pid
+  > crazy-complete-test -o animal,
+  animal,async   animal,nocomp  animal,proc
   animal,file    animal,number  animal,user
-  > crazy-complete-test --simple animal,
+  > crazy-complete-test -o animal,
 fish_expected: |
-  > crazy-complete-test --simple animal,
-  animal,animal=  animal,file=    animal,number=  animal,user=
-  animal,async    animal,nocomp=  animal,pid=
+  > crazy-complete-test -o animal,
+  animal,animal=  (select an animal)  animal,number=  (select a number)
+  animal,async      (set async mode)  animal,proc=   (select a process)
+  animal,file=                        animal,user=      (select a user)
+  animal,nocomp=      (no completer)
 zsh_expected: |
-  > crazy-complete-test --simple animal,
-  async   file    nocomp  number  pid     user
+  > crazy-complete-test -o animal,
+  async   -- set async mode
+  nocomp  -- no completer
+  number  -- select a number
+  proc    -- select a process
+  user    -- select a user
+  file
 ---
 number: 110
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple animal,n"
-send: "crazy-complete-test --simple animal,n"
+description: "key_value_list: Check -o animal,n"
+send: "crazy-complete-test -o animal,n"
 bash_expected: |
-  > crazy-complete-test --simple animal,n
+  > crazy-complete-test -o animal,n
   animal,nocomp  animal,number
-  > crazy-complete-test --simple animal,n
+  > crazy-complete-test -o animal,n
 fish_expected: |
-  > crazy-complete-test --simple animal,n
-  animal,nocomp=  animal,number=
+  > crazy-complete-test -o animal,n
+  animal,nocomp=  (no completer)  animal,number=  (select a number)
 zsh_expected: |
-  > crazy-complete-test --simple animal,n
-  nocomp  number
+  > crazy-complete-test -o animal,n
+  nocomp  -- no completer
+  number  -- select a number
 ---
 number: 111
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple number="
-send: "crazy-complete-test --simple number="
+description: "key_value_list: Check -o number="
+send: "crazy-complete-test -o number="
 bash_expected: |
-  > crazy-complete-test --simple number=
+  > crazy-complete-test -o number=
   0  1  2
-  > crazy-complete-test --simple number=
+  > crazy-complete-test -o number=
 fish_expected: |
-  > crazy-complete-test --simple number=
+  > crazy-complete-test -o number=
   number=0  (zero)  number=1  (one)  number=2  (two)
 zsh_expected: |
-  > crazy-complete-test --simple number=
+  > crazy-complete-test -o number=
   0  -- zero
   1  -- one
   2  -- two
 ---
 number: 112
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple 'number="
-send: "crazy-complete-test --simple 'number="
+description: "key_value_list: Check -o 'number="
+send: "crazy-complete-test -o 'number="
 bash_expected: |
-  > crazy-complete-test --simple 'number=
+  > crazy-complete-test -o 'number=
   number=0  number=1  number=2
-  > crazy-complete-test --simple 'number=
+  > crazy-complete-test -o 'number=
 fish_expected: |
-  > crazy-complete-test --simple 'number=
+  > crazy-complete-test -o 'number=
   'number=0  (zero)  'number=1  (one)  'number=2  (two)
 zsh_expected: |
-  > crazy-complete-test --simple 'number=
+  > crazy-complete-test -o 'number=
   0  -- zero
   1  -- one
   2  -- two
 ---
 number: 113
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple \"number="
-send: "crazy-complete-test --simple \"number="
+description: "key_value_list: Check -o \"number="
+send: "crazy-complete-test -o \"number="
 bash_expected: |
-  > crazy-complete-test --simple "number=
+  > crazy-complete-test -o "number=
   number=0  number=1  number=2
-  > crazy-complete-test --simple "number=
+  > crazy-complete-test -o "number=
 fish_expected: |
-  > crazy-complete-test --simple "number=
+  > crazy-complete-test -o "number=
   "number=0  (zero)  "number=1  (one)  "number=2  (two)
 zsh_expected: |
-  > crazy-complete-test --simple "number=
+  > crazy-complete-test -o "number=
   0  -- zero
   1  -- one
   2  -- two
 ---
 number: 114
 definition_file: "key_value_list"
-description: "key_value_list: Check --simple file=f"
-send: "crazy-complete-test --simple file=f"
+description: "key_value_list: Check -o file=f"
+send: "crazy-complete-test -o file=f"
 bash_expected: |
-  > crazy-complete-test --simple file=f
+  > crazy-complete-test -o file=f
   file with spaces  file1.TXT         file4.txt.1
   file0.txt         file3.tXt
-  > crazy-complete-test --simple file=file
+  > crazy-complete-test -o file=file
 fish_expected: |
-  > crazy-complete-test --simple file=file
+  > crazy-complete-test -o file=file
   file=file with spaces  file=file1.TXT  file=file4.txt.1
   file=file0.txt         file=file3.tXt
 zsh_expected: |
-  > crazy-complete-test --simple file=file
+  > crazy-complete-test -o file=file
 ---
 number: 115
-definition_file: "key_value_list"
-description: "key_value_list: Check --description"
-send: "crazy-complete-test --description "
-bash_expected: |
-  > crazy-complete-test --description
-  animal  async   file    nocomp  number  proc    user
-  > crazy-complete-test --description
-fish_expected: |
-  > crazy-complete-test --description
-  animal=  (select an animal)  nocomp=     (no completer)  user=  (select a user)
-  async      (set async mode)  number=  (select a number)
-  file=                        proc=   (select a process)
-zsh_expected: |
-  > crazy-complete-test --description
-  animal  -- select an animal
-  async   -- set async mode
-  nocomp  -- no completer
-  number  -- select a number
-  proc    -- select a process
-  user    -- select a user
-  file
----
-number: 116
-definition_file: "key_value_list"
-description: "key_value_list: Check --description a"
-send: "crazy-complete-test --description a"
-bash_expected: |
-  > crazy-complete-test --description a
-  animal  async
-  > crazy-complete-test --description a
-fish_expected: |
-  > crazy-complete-test --description a
-  animal=  (select an animal)  async  (set async mode)
-zsh_expected: |
-  > crazy-complete-test --description a
-  animal  -- select an animal
-  async   -- set async mode
----
-number: 117
-definition_file: "key_value_list"
-description: "key_value_list: Check --description an"
-send: "crazy-complete-test --description an"
-bash_expected: |
-  > crazy-complete-test --description animal
-fish_expected: |
-  > crazy-complete-test --description animal=
-zsh_expected: |
-  > crazy-complete-test --description animal=
----
-number: 118
-definition_file: "key_value_list"
-description: "key_value_list: Check --description animal="
-send: "crazy-complete-test --description animal="
-bash_expected: |
-  > crazy-complete-test --description animal=
-  cat    dog    horse
-  > crazy-complete-test --description animal=
-fish_expected: |
-  > crazy-complete-test --description animal=
-  animal=cat  animal=dog  animal=horse
-zsh_expected: |
-  > crazy-complete-test --description animal=
-  cat    dog    horse
----
-number: 119
-definition_file: "key_value_list"
-description: "key_value_list: Check --description animal,"
-send: "crazy-complete-test --description animal,"
-bash_expected: |
-  > crazy-complete-test --description animal,
-  animal,async   animal,nocomp  animal,proc
-  animal,file    animal,number  animal,user
-  > crazy-complete-test --description animal,
-fish_expected: |
-  > crazy-complete-test --description animal,
-  animal,animal=  (select an animal)  animal,number=  (select a number)
-  animal,async      (set async mode)  animal,proc=   (select a process)
-  animal,file=                        animal,user=      (select a user)
-  animal,nocomp=      (no completer)
-zsh_expected: |
-  > crazy-complete-test --description animal,
-  async   -- set async mode
-  nocomp  -- no completer
-  number  -- select a number
-  proc    -- select a process
-  user    -- select a user
-  file
----
-number: 120
-definition_file: "key_value_list"
-description: "key_value_list: Check --description animal,n"
-send: "crazy-complete-test --description animal,n"
-bash_expected: |
-  > crazy-complete-test --description animal,n
-  animal,nocomp  animal,number
-  > crazy-complete-test --description animal,n
-fish_expected: |
-  > crazy-complete-test --description animal,n
-  animal,nocomp=  (no completer)  animal,number=  (select a number)
-zsh_expected: |
-  > crazy-complete-test --description animal,n
-  nocomp  -- no completer
-  number  -- select a number
----
-number: 121
 definition_file: "complex"
 description: "complex: Check no arguments"
 send: "crazy-complete-test "
@@ -1904,7 +1815,7 @@ zsh_expected: |
   > crazy-complete-test
   log:     output:
 ---
-number: 122
+number: 116
 definition_file: "complex"
 description: "complex: Check l"
 send: "crazy-complete-test l"
@@ -1915,7 +1826,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test log:
 ---
-number: 123
+number: 117
 definition_file: "complex"
 description: "complex: Check log:"
 send: "crazy-complete-test log:"
@@ -1931,7 +1842,7 @@ zsh_expected: |
   format  -- specify output format
   level   -- specify log level
 ---
-number: 124
+number: 118
 definition_file: "complex"
 description: "complex: Check log:l"
 send: "crazy-complete-test log:l"
@@ -1942,7 +1853,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test log:level=
 ---
-number: 125
+number: 119
 definition_file: "complex"
 description: "complex: Check log:level="
 send: "crazy-complete-test log:level="
@@ -1957,7 +1868,7 @@ zsh_expected: |
   > crazy-complete-test log:level=
   debug  error  info   warn
 ---
-number: 126
+number: 120
 definition_file: "complex"
 description: "complex: Check log:level=w"
 send: "crazy-complete-test log:level=w"
@@ -1968,7 +1879,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test log:level=warn,
 ---
-number: 127
+number: 121
 definition_file: "complex"
 description: "complex: Check log:level=warn o"
 send: "crazy-complete-test log:level=warn o"
@@ -1979,7 +1890,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test log:level=warn output:
 ---
-number: 128
+number: 122
 definition_file: "choices"
 description: "Check if nosort is respected (long option)"
 send: "crazy-complete-test --choices-no-sort "
@@ -1994,7 +1905,7 @@ zsh_expected: |
   > crazy-complete-test --choices-no-sort
   3  1  2
 ---
-number: 129
+number: 123
 definition_file: "choices"
 description: "Check if nosort is respected (old option)"
 send: "crazy-complete-test -choices-no-sort "
@@ -2009,7 +1920,7 @@ zsh_expected: |
   > crazy-complete-test -choices-no-sort
   3  1  2
 ---
-number: 130
+number: 124
 definition_file: "choices"
 description: "Check if nosort is respected (short option)"
 send: "crazy-complete-test -n "
@@ -2024,7 +1935,7 @@ zsh_expected: |
   > crazy-complete-test -n
   3  1  2
 ---
-number: 131
+number: 125
 definition_file: "choices"
 description: "Check if nosort is respected (positional)"
 send: "crazy-complete-test "
@@ -2039,7 +1950,7 @@ zsh_expected: |
   > crazy-complete-test
   3  1  2
 ---
-number: 132
+number: 126
 definition_file: "filedir"
 description: "Check --directory-relative"
 send: "crazy-complete-test --directory-relative "
@@ -2054,7 +1965,7 @@ zsh_expected: |
   > crazy-complete-test --directory-relative
   bin/        directory/
 ---
-number: 133
+number: 127
 definition_file: "filedir"
 description: "Check --file-relative"
 send: "crazy-complete-test --file-relative "
@@ -2077,7 +1988,7 @@ zsh_expected: |
   bin/                file1.TXT           image1.JPG
   directory/          file3.tXt           image2.jPg
 ---
-number: 134
+number: 128
 definition_file: "filedir"
 description: "Check --file-ignore-txt-cpp"
 send: "crazy-complete-test --file-ignore-txt-cpp "
@@ -2097,7 +2008,7 @@ zsh_expected: |
   archive.tar.gz      file\ with\ spaces  image1.JPG
   bin/                file4.txt.1         image2.jPg
 ---
-number: 135
+number: 129
 definition_file: "filedir"
 description: "Check --file-ignore-txt-cpp-2"
 send: "crazy-complete-test --file-ignore-txt-cpp-2 "
@@ -2117,7 +2028,7 @@ zsh_expected: |
   archive.tar.gz      file\ with\ spaces  image1.JPG
   bin/                file4.txt.1         image2.jPg
 ---
-number: 136
+number: 130
 definition_file: "when"
 description: "Check with no options"
 send: "crazy-complete-test --"
@@ -2134,7 +2045,7 @@ zsh_expected: |
   --if-not-1           --option-1
   --if-not-1-or-not-2  --option-2
 ---
-number: 137
+number: 131
 definition_file: "when"
 description: "Check with no --option-1"
 send: "crazy-complete-test --option-1 --"
@@ -2149,7 +2060,7 @@ zsh_expected: |
   > crazy-complete-test --option-1 --
   --if-1-or-2  --option-2
 ---
-number: 138
+number: 132
 definition_file: "when"
 description: "Check with no --option-2"
 send: "crazy-complete-test --option-2 --"
@@ -2164,7 +2075,7 @@ zsh_expected: |
   > crazy-complete-test --option-2 --
   --if-1-or-2  --if-not-1   --option-1
 ---
-number: 139
+number: 133
 definition_file: "when"
 description: "Check with no --option-1 and --option-2"
 send: "crazy-complete-test --option-1 --option-2 --"
@@ -2178,7 +2089,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test --option-1 --option-2 --if-1--2
 ---
-number: 140
+number: 134
 definition_file: "when"
 description: "Check special-values without options"
 send: "crazy-complete-test special-values --"
@@ -2189,7 +2100,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test special-values --arg=
 ---
-number: 141
+number: 135
 definition_file: "when"
 description: "Check special-values with --arg='foo bar'"
 send: "crazy-complete-test special-values --arg='foo bar' --"
@@ -2200,7 +2111,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test special-values --arg='foo bar' --if-arg-is-foo-bar
 ---
-number: 142
+number: 136
 definition_file: "when"
 description: "Check special-values with --arg='\"'"
 send: "crazy-complete-test special-values --arg='\"' --"
@@ -2211,7 +2122,7 @@ fish_expected: |
 zsh_expected: |
   > crazy-complete-test special-values --arg='"' --if-arg-is-double-quote
 ---
-number: 143
+number: 137
 definition_file: "when"
 description: "Check special-values with --arg=\"'\""
 send: "crazy-complete-test special-values --arg=\"'\" --"

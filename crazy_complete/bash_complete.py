@@ -5,7 +5,6 @@ from . import bash_versions
 from .str_utils import indent
 from .type_utils import is_dict_type
 from .bash_utils import make_file_extension_pattern
-from .utils import key_value_list_normalize_values
 
 
 class BashCompletionBase:
@@ -163,7 +162,7 @@ class BashCompleteKeyValueList(BashCompletionCode):
                  pair_separator, value_separator, values):
         funcs = {}
 
-        for key, _desc, complete in key_value_list_normalize_values(values):
+        for key, _desc, complete in values:
             if not complete:
                 funcs[key] = 'false'
             elif complete[0] == 'none':

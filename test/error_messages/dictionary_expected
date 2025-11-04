@@ -194,7 +194,7 @@
 3_30_07-key-value-list-sep2-wrong-type   | foo: -o: key_value_list: Parameter `value_separator` has an invalid type. Expected types: string. Received: False (bool)
 3_30_08-key-value-list-sep2-empty        | foo: -o: key_value_list: value_separator: Invalid length. Single character expected
 3_30_09-key-value-list-sep2-wrong-value  | foo: -o: key_value_list: value_separator: Invalid length. Single character expected
-3_30_10-key-value-list-values-wrong-type | foo: -o: key_value_list: Parameter `values` has an invalid type. Expected types: dictionary|list. Received: False (bool)
+3_30_10-key-value-list-values-wrong-type | foo: -o: key_value_list: Parameter `values` has an invalid type. Expected types: list. Received: False (bool)
 3_30_11-key-value-list-1-key-not-string  | foo: -o: key_value_list: Parameter `key` has an invalid type. Expected types: string. Received: False (bool)
 3_30_12-key-value-list-1-key-empty       | foo: -o: key_value_list: key: String cannot be empty
 3_30_13-key-value-list-1-key-with-space  | foo: -o: key_value_list: key: String cannot contain spaces

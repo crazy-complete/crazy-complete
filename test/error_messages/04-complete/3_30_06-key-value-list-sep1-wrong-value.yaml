@@ -1,5 +1,5 @@
 prog: "foo"
 options:
   - option_strings: ["-o"]
-    complete: ["key_value_list", 'foo', '=', {'key': null}]
+    complete: ["key_value_list", 'foo', '=', [['key', null, null]]]
 

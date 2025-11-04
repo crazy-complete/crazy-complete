@@ -1134,17 +1134,6 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
   'definition': 'prog: "example"\n'
                 'options:\n'
                 '  - option_strings: ["--key-value-list"]\n'
-                '    complete: ["key_value_list", ",", "=", {\n'
-                "      'flag':   null,\n"
-                "      'nocomp': ['none'],\n"
-                "      'user':   ['user'],\n"
-                "      'check':  ['choices', {\n"
-                '        \'relaxed\': "convert to lowercase before lookup",\n'
-                '        \'strict\': "no conversion"\n'
-                '      }]\n'
-                '    }]\n'
-                '\n'
-                '  - option_strings: ["--key-value-list-with-desc"]\n'
                 '    complete: ["key_value_list", ",", "=", [\n'
                 "      ['flag',   'An option flag', null],\n"
                 "      ['nodesc', null, null],\n"
@@ -1163,42 +1152,6 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                         '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
                         '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--key-value-list\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m    '
-                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
-                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mkey_value_list\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
-                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33m,\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
-                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33m=\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
-                        '\x1b[39;49;00m{\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m      '
-                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mflag\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m   "
-                        '\x1b[39;49;00m\x1b[31mnull\x1b[39;49;00m,\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m      '
-                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mnocomp\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m "
-                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mnone\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m],\x1b[37m\x1b[39;49;00m\n"
-                        '\x1b[37m      '
-                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33muser\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m   "
-                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33muser\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m],\x1b[37m\x1b[39;49;00m\n"
-                        '\x1b[37m      '
-                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mcheck\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m  "
-                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mchoices\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
-                        '\x1b[39;49;00m{\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m        '
-                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mrelaxed\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m "
-                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mconvert\x1b[39;49;00m\x1b[31m '
-                        '\x1b[39;49;00m\x1b[33mto\x1b[39;49;00m\x1b[31m '
-                        '\x1b[39;49;00m\x1b[33mlowercase\x1b[39;49;00m\x1b[31m '
-                        '\x1b[39;49;00m\x1b[33mbefore\x1b[39;49;00m\x1b[31m '
-                        '\x1b[39;49;00m\x1b[33mlookup\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m        '
-                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mstrict\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m "
-                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mno\x1b[39;49;00m\x1b[31m '
-                        '\x1b[39;49;00m\x1b[33mconversion\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m      \x1b[39;49;00m}]\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m    \x1b[39;49;00m}]\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m\x1b[39;49;00m\n'
-                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
-                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
-                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--key-value-list-with-desc\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m    '
                         '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mkey_value_list\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
@@ -1260,13 +1213,8 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
           'The second argument is the separator used for delimiting the value '
           'from the key.\n'
           '\n'
-          'The third argument is either a dictionary or a list.\n'
-          '\n'
-          'The dictionary has to be in the form of:\n'
-          '\n'
-          '  `{<key>: <completer>, ...}`\n'
-          '\n'
-          'The list has to be in the form of:\n'
+          'The third argument is a list of key-description-completer '
+          'definitions, like:\n'
           '\n'
           '  `[ [<key>, <description>, <completer>], ... ]`\n'
           '\n'
@@ -1280,16 +1228,8 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
                   'The second argument is the separator used for delimiting '
                   'the value from the key.\x1b[37m\x1b[39;49;00m\n'
                   '\x1b[37m\x1b[39;49;00m\n'
-                  'The third argument is either a dictionary or a '
-                  'list.\x1b[37m\x1b[39;49;00m\n'
-                  '\x1b[37m\x1b[39;49;00m\n'
-                  'The dictionary has to be in the form '
-                  'of:\x1b[37m\x1b[39;49;00m\n'
-                  '\x1b[37m\x1b[39;49;00m\n'
-                  '  \x1b[33m`{<key>: <completer>, '
-                  '...}`\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
-                  '\x1b[37m\x1b[39;49;00m\n'
-                  'The list has to be in the form of:\x1b[37m\x1b[39;49;00m\n'
+                  'The third argument is a list of key-description-completer '
+                  'definitions, like:\x1b[37m\x1b[39;49;00m\n'
                   '\x1b[37m\x1b[39;49;00m\n'
                   '  \x1b[33m`[ [<key>, <description>, <completer>], ... '
                   ']`\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'

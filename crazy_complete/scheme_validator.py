@@ -362,50 +362,35 @@ def _check_key_value_list(ctxt, arguments):
 
     _check_type(pair_separator, (str,), 'pair_separator')
     _check_type(value_separator, (str,), 'value_separator')
-    _check_type(values, (dict, list), 'values')
+    _check_type(values, (list,), 'values')
 
     ctxt.trace.append('key_value_list')
 
     _check_char(pair_separator, 'pair_separator')
     _check_char(value_separator, 'value_separator')
+    _check_non_empty_list(values, 'values')
 
-    if isinstance(values.value, dict):
-        _check_non_empty_dict(values, 'values')
+    for compldef in values.value:
+        _check_type(compldef, (list,))
 
-        for key, complete in values.value.items():
-            _check_type(key, (str,))
-            _check_non_empty_string(key, 'key')
-            _check_no_spaces(key, 'key')
-            _check_type(complete, (list, NoneType))
+        if len(compldef.value) != 3:  # TRANSLATION
+            raise _error('Completion definition must have 3 fields', compldef)
 
-            if complete.value is None:
-                continue
+    for compldef in values.value:
+        key = compldef.value[0]
+        description = compldef.value[1]
+        complete = compldef.value[2]
 
-            _check_complete(ctxt, complete)
-    else:
-        _check_non_empty_list(values, 'values')
+        _check_type(key, (str,))
+        _check_type(description, (str, NoneType))
+        _check_type(complete, (list, NoneType))
+        _check_non_empty_string(key, 'key')
+        _check_no_spaces(key, 'key')
 
-        for compldef in values.value:
-            _check_type(compldef, (list,))
+        if complete.value is None:
+            continue
 
-            if len(compldef.value) != 3:  # TRANSLATION
-                raise _error('Completion definition must have 3 fields', compldef)
-
-        for compldef in values.value:
-            key = compldef.value[0]
-            description = compldef.value[1]
-            complete = compldef.value[2]
-
-            _check_type(key, (str,))
-            _check_type(description, (str, NoneType))
-            _check_type(complete, (list, NoneType))
-            _check_non_empty_string(key, 'key')
-            _check_no_spaces(key, 'key')
-
-            if complete.value is None:
-                continue
-
-            _check_complete(ctxt, complete)
+        _check_complete(ctxt, complete)
 
 
 def _check_combine(ctxt, arguments):

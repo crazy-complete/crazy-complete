@@ -7,7 +7,6 @@ from .zsh_utils import (
     escape_colon, escape_square_brackets, make_file_extension_pattern
 )
 from .type_utils import is_dict_type
-from .utils import key_value_list_normalize_values
 
 
 CHOICES_INLINE_THRESHOLD = 80
@@ -224,7 +223,7 @@ class ZshKeyValueList(ZshComplFunc):
         trace.append('key_value_list')
         spec = []
 
-        for key, desc, complete in key_value_list_normalize_values(values):
+        for key, desc, complete in values:
             key = escape_colon(key)
 
             if desc:

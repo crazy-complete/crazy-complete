@@ -338,45 +338,30 @@ def _validate_key_value_list(ctxt, args):
 
     _validate_type(pair_separator, (str,), 'pair_separator')
     _validate_type(value_separator, (str,), 'value_separator')
-    _validate_type(values, (dict, list), 'values')
+    _validate_type(values, (list,), 'values')
 
     _validate_char(pair_separator, 'pair_separator')
     _validate_char(value_separator, 'value_separator')
+    _validate_non_empty_list(values, 'values')
 
-    if is_dict_type(values):
-        _validate_non_empty_dict(values, 'values')
+    for compldef in values:
+        if not is_list_type(compldef):
+            raise CrazyError(f'Completion definition not a list: {compldef}')
 
-        for key, complete in values.items():
-            _validate_type(key, (str,), 'key')
-            _validate_type(complete, (list, NoneType), 'completer')
-            _validate_non_empty_string(key, 'key')
-            _validate_no_spaces(key, 'key')
+        if len(compldef) != 3:
+            raise CrazyError(f'Completion definition must have 3 fields: {compldef}')
 
-            if complete is None:
-                continue
+    for key, description, complete in values:
+        _validate_type(key, (str,), 'key')
+        _validate_non_empty_string(key, 'key')
+        _validate_no_spaces(key, 'key')
+        _validate_type(description, (str, NoneType), 'description')
+        _validate_type(complete, (list, NoneType), 'completer')
 
-            validate_complete(ctxt, complete)
-    else:
-        _validate_non_empty_list(values, 'values')
+        if complete is None:
+            continue
 
-        for compldef in values:
-            if not is_list_type(compldef):
-                raise CrazyError(f'Completion definition not a list: {compldef}')
-
-            if len(compldef) != 3:
-                raise CrazyError(f'Completion definition must have 3 fields: {compldef}')
-
-        for key, description, complete in values:
-            _validate_type(key, (str,), 'key')
-            _validate_non_empty_string(key, 'key')
-            _validate_no_spaces(key, 'key')
-            _validate_type(description, (str, NoneType), 'description')
-            _validate_type(complete, (list, NoneType), 'completer')
-
-            if complete is None:
-                continue
-
-            validate_complete(ctxt, complete)
+        validate_complete(ctxt, complete)
 
 
 def _validate_combine(ctxt, args):

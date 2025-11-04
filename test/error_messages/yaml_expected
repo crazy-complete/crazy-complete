@@ -194,11 +194,11 @@
 3_30_07-key-value-list-sep2-wrong-type   | line 4, column 39: value_separator: Invalid type. Expected: string
 3_30_08-key-value-list-sep2-empty        | line 4, column 39: value_separator: Invalid length. Single character expected
 3_30_09-key-value-list-sep2-wrong-value  | line 4, column 39: value_separator: Invalid length. Single character expected
-3_30_10-key-value-list-values-wrong-type | line 4, column 44: values: Invalid type. Expected: dictionary|list
-3_30_11-key-value-list-1-key-not-string  | line 4, column 45: Invalid type. Expected: string
-3_30_12-key-value-list-1-key-empty       | line 4, column 45: key: String cannot be empty
-3_30_13-key-value-list-1-key-with-space  | line 4, column 45: key: String cannot contain spaces
-3_30_14-key-value-list-1-complete-wrong-type | line 4, column 52: Invalid type. Expected: list|none
+3_30_10-key-value-list-values-wrong-type | line 4, column 44: values: Invalid type. Expected: list
+3_30_11-key-value-list-1-key-not-string  | line 4, column 46: Invalid type. Expected: string
+3_30_12-key-value-list-1-key-empty       | line 4, column 46: key: String cannot be empty
+3_30_13-key-value-list-1-key-with-space  | line 4, column 46: key: String cannot contain spaces
+3_30_14-key-value-list-1-complete-wrong-type | line 4, column 59: Invalid type. Expected: list|none
 3_30_15-key-value-list-2-def-not-list    | line 4, column 45: Invalid type. Expected: list
 3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: Completion definition must have 3 fields
 3_30_17-key-value-list-2-key-not-string  | line 4, column 46: Invalid type. Expected: string

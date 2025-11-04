@@ -4,10 +4,7 @@ from . import shell
 from .pattern import bash_glob_to_regex
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
-from .utils import (
-    get_query_option_strings, get_defined_option_types,
-    key_value_list_normalize_values
-)
+from .utils import get_query_option_strings, get_defined_option_types
 
 
 CHOICES_INLINE_THRESHOLD = 80
@@ -281,7 +278,7 @@ class FishCompletKeyValueList(FishCompletionCommand):
         args = []
         q = shell.quote
 
-        for key, desc, complete in key_value_list_normalize_values(values):
+        for key, desc, complete in values:
             if not complete:
                 func = 'false'
             elif complete[0] == 'none':

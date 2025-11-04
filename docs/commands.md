@@ -1093,13 +1093,7 @@ The first argument is the separator used for delimiting the key-value pairs.
 
 The second argument is the separator used for delimiting the value from the key.
 
-The third argument is either a dictionary or a list.
-
-The dictionary has to be in the form of:
-
-  `{<key>: <completer>, ...}`
-
-The list has to be in the form of:
+The third argument is a list of key-description-completer definitions, like:
 
   `[ [<key>, <description>, <completer>], ... ]`
 
@@ -1112,17 +1106,6 @@ If a key does take an argument but cannot be completed, use `['none']` as comple
 prog: "example"
 options:
   - option_strings: ["--key-value-list"]
-    complete: ["key_value_list", ",", "=", {
-      'flag':   null,
-      'nocomp': ['none'],
-      'user':   ['user'],
-      'check':  ['choices', {
-        'relaxed': "convert to lowercase before lookup",
-        'strict': "no conversion"
-      }]
-    }]
-
-  - option_strings: ["--key-value-list-with-desc"]
     complete: ["key_value_list", ",", "=", [
       ['flag',   'An option flag', null],
       ['nodesc', null, null],
