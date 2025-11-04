@@ -63,9 +63,12 @@ def _generate_final_check_with_options(final_conditions, options):
 def generate(generator):
     '''Generate option strings completion code.'''
 
-    commandline      = generator.commandline
+    if len(generator.options) == 0:
+        return None
+
+    commandline = generator.commandline
     variable_manager = generator.variable_manager
-    options          = []
+    options = []
     final_conditions = []
 
     for final_option in commandline.get_final_options():

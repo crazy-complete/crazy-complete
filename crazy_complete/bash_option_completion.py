@@ -16,7 +16,7 @@ class MasterCompletionFunctionBase:
         self.options = options
         self.abbreviations = abbreviations
         self.generator = generator
-        self.complete = generator._complete_option
+        self.complete = generator.complete_option
 
     def get(self, funcname):
         '''Get the function code.'''
@@ -61,8 +61,8 @@ class MasterCompletionFunction(MasterCompletionFunctionBase):
         self._add_options_with_when(with_when)
         self._add_options_without_when(without_when)
 
-    def _add_options_without_when(self, options):
-        options_group_by_complete = algo.group_by(options, self.complete)
+    def _add_options_without_when(self, options_):
+        options_group_by_complete = algo.group_by(options_, self.complete)
 
         if options_group_by_complete:
             r = 'case "$opt" in\n'
@@ -136,8 +136,8 @@ class MasterCompletionFunctionNoWhen(MasterCompletionFunctionBase):
         '''Return True if none of the options have the when attribute set.'''
         return not any(option.when for option in options)
 
-    def _add_options(self, options):
-        options_group_by_complete = algo.group_by(options, self.complete)
+    def _add_options(self, options_):
+        options_group_by_complete = algo.group_by(options_, self.complete)
 
         if options_group_by_complete:
             r = 'case "$opt" in\n'
@@ -265,6 +265,10 @@ def _get_prev_completion(info):
 
 
 def _get_cur_completion(info):
+    short_no_args_pattern = info.short_no_args_pattern
+    short_required_args = info.short_required_args
+    short_optional_args = info.short_optional_args
+
     r = 'case "$cur" in\n'
 
     if info.long_required or info.long_optional:
@@ -283,7 +287,7 @@ def _get_cur_completion(info):
         r += '    __complete_option "${cur%%=*}" "${cur#*=}" WITH_OPTIONAL && return 0;&\n'
 
     if info.short_required or info.short_optional:
-        r += '  -%s[%s%s]*)\n' % (info.short_no_args_pattern, info.short_required_args, info.short_optional_args)
+        r += '  -%s[%s%s]*)\n' % (short_no_args_pattern, short_required_args, short_optional_args)
         r += '    local i\n'
         r += '    for ((i=2; i <= ${#cur}; ++i)); do\n'
         r += '      local pre="${cur:0:$i}" value="${cur:$i}"\n'

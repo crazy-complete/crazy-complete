@@ -76,4 +76,4 @@ class Output:
 
     def get(self):
         '''Return the output.'''
-        return '\n\n'.join(self.output)
+        return '\n\n'.join(filter(None, self.output))

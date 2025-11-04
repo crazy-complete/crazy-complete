@@ -85,29 +85,41 @@ def indent(string, num_spaces):
     return '\n'.join(lines)
 
 
-def join_with_wrap(primary_sep, secondary_sep, max_line_length, items):
+def join_with_wrap(primary_sep, secondary_sep,
+                   max_line_length, items, line_prefix=''):
     '''
     Join a list of strings with a primary separator, automatically wrapping
     to a new line (using the secondary separator) when the current line
     would exceed max_line_length.
 
     Args:
-        primary_sep: String used to separate items on the same line.
-        secondary_sep: String used to separate wrapped lines.
-        max_line_length: Maximum number of characters per line.
-        items: List of strings to join.
+        primary_sep:
+            String used to separate items on the same line.
+
+        secondary_sep:
+            String used to separate wrapped lines.
+
+        max_line_length:
+            Maximum number of characters per line.
+
+        items:
+            List of strings to join.
+
+        line_prefix:
+            Prefix each line with a prefix.
 
     Returns:
         str: Joined string with line wrapping
     '''
+
     lines = []
-    line = ""
+    line = line_prefix
 
     for item in items:
         candidate = (line + primary_sep + item) if line else item
         if len(candidate) > max_line_length and line:
             lines.append(line)
-            line = item
+            line = line_prefix + primary_sep + item
         else:
             line = candidate
 

@@ -47,7 +47,7 @@ def _generate_positionals_with_when(generator):
                 generator.commandline,
                 generator.variable_manager,
                 positional.when)
-        r += '%s' % _make_block(generator._complete_option(positional))
+        r += '%s' % _make_block(generator.complete_option(positional))
 
         code.append(r)
 
@@ -60,7 +60,7 @@ def _generate_positionals_without_when(generator):
     positionals = filter(_is_not_command_arg, generator.positionals)
 
     grouped_by_complete = algo.group_by(
-        positionals, generator._complete_option)
+        positionals, generator.complete_option)
 
     for complete, positionals in grouped_by_complete.items():
         conditions = [_get_positional_condition(p) for p in positionals]

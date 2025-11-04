@@ -192,6 +192,9 @@ class FishCompleteCommand:
         if self.arguments is not None:
             r.extend(['-a', self.arguments])
 
+        # Pylint doesn't understand that .escape is only called when the
+        # value is not a regular Python string.
+        # pylint: disable=no-member
         return ' '.join(v if isinstance(v, str) else v.escape() for v in r)
 
 

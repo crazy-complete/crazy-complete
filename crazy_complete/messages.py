@@ -28,7 +28,11 @@ def get_lang():
     )
 
     if not lang:
-        lang, _ = locale.getdefaultlocale()
+        locale.setlocale(locale.LC_ALL, "")
+        lang, _ = locale.getlocale()
+
+        if not lang:
+            lang = 'en'
 
     return normalize_lang(lang)
 

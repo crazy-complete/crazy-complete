@@ -16,7 +16,7 @@ from . import bash_option_strings_completion
 from . import bash_positionals_completion
 from . import bash_versions
 from . import bash_patterns
-from .str_utils import indent
+from .str_utils import indent, join_with_wrap
 from .bash_utils import VariableManager
 from .output import Output
 from . import generation
@@ -29,19 +29,20 @@ class BashCompletionGenerator:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, ctxt, commandline):
+        self.ctxt = ctxt
         self.commandline = commandline
-        self.ctxt        = ctxt
-        self.options     = commandline.get_options()
+        self.options = commandline.get_options()
         self.positionals = commandline.get_positionals()
         self.subcommands = commandline.get_subcommands()
-        self.completer   = bash_complete.BashCompleter()
+        self.completer = bash_complete.BashCompleter()
         self.variable_manager = VariableManager('OPT_')
         self._generate()
 
-    def _complete_option(self, option, append=False):
+    def complete_option(self, option):
+        '''Complete an option.'''
         context = self.ctxt.get_option_context(self.commandline, option)
         obj = self.completer.complete(context, [], *option.complete)
-        code = obj.get_code(append)
+        code = obj.get_code(False)
         if code and option.nosort:
             code += '\ncompopt -o nosort'
         return code
@@ -56,27 +57,28 @@ class BashCompletionGenerator:
         r = 'local END_OF_OPTIONS POSITIONALS\n'
 
         if local_vars:
-            r += 'local -a %s\n' % ' '.join(algo.uniq(local_vars))
+            local_vars = algo.uniq(local_vars)
+            r += join_with_wrap(' ', '\n', 78, local_vars, 'local -a')
 
         r += '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
         return r
 
-    def _generate_positionals_completion(self):
-        return bash_positionals_completion.generate(self)
-
     def _generate_subcommand_call(self):
-        # This code is used to call subcommand functions
+        if not self.subcommands:
+            return None
 
-        r  = 'if (( %i < ${#POSITIONALS[@]} )); then\n' % (self.subcommands.get_positional_num() - 1)
-        r += '  case "${POSITIONALS[%i]}" in\n' % (self.subcommands.get_positional_num() - 1)
+        positional_num = self.subcommands.get_positional_num()
+        r  = 'if (( %i < ${#POSITIONALS[@]} )); then\n' % (positional_num - 1)
+        r += '  case "${POSITIONALS[%i]}" in\n' % (positional_num - 1)
         for subcommand in self.subcommands.subcommands:
             cmds = utils.get_all_command_variations(subcommand)
             pattern = bash_patterns.make_pattern([shell.quote(s) for s in cmds])
+            funcname = self.ctxt.helpers.make_completion_funcname(subcommand)
             if utils.is_worth_a_function(subcommand):
                 if self.commandline.inherit_options:
-                    r += '    %s) %s && return 0;;\n' % (pattern, self.ctxt.helpers.make_completion_funcname(subcommand))
+                    r += '    %s) %s && return 0;;\n' % (pattern, funcname)
                 else:
-                    r += '    %s) %s && return 0 || return 1;;\n' % (pattern, self.ctxt.helpers.make_completion_funcname(subcommand))
+                    r += '    %s) %s && return 0 || return 1;;\n' % (pattern, funcname)
             else:
                 if self.commandline.inherit_options:
                     r += '    %s);;\n' % pattern
@@ -87,20 +89,26 @@ class BashCompletionGenerator:
         return r
 
     def _generate_command_arg_call(self):
-        for positional in self.positionals:
-            if positional.complete and positional.complete[0] == 'command_arg':
-                r  = 'if (( ${#POSITIONALS[@]} >= %d )); then\n' % (positional.get_positional_num())
-                r += '  local realpos\n'
-                r += '  for realpos in "${!COMP_WORDS[@]}"; do\n'
-                r += '    [[ "${COMP_WORDS[realpos]}" == "${POSITIONALS[%d]}" ]] && {\n' % (positional.get_positional_num() - 2)
-                r += '      %s $realpos\n' % bash_versions.command_offset(self.ctxt)
-                r += '      return 0;\n'
-                r += '    }\n'
-                r += '  done\n'
-                r += 'fi'
-                return r
+        def is_command_arg(positional):
+            return (positional.complete and
+                    positional.complete[0] == 'command_arg')
 
-        return None
+        try:
+            positional = list(filter(is_command_arg, self.positionals))[0]
+        except IndexError:
+            return None
+
+        num = positional.get_positional_num()
+        r  = 'if (( ${#POSITIONALS[@]} >= %d )); then\n' % num
+        r += '  local realpos\n'
+        r += '  for realpos in "${!COMP_WORDS[@]}"; do\n'
+        r += '    [[ "${COMP_WORDS[realpos]}" == "${POSITIONALS[%d]}" ]] && {\n' % (num - 2)
+        r += '      %s $realpos\n' % bash_versions.command_offset(self.ctxt)
+        r += '      return 0;\n'
+        r += '    }\n'
+        r += '  done\n'
+        r += 'fi'
+        return r
 
     def _generate(self):
         # The completion function returns 0 (success) if there was a completion match.
@@ -111,27 +119,19 @@ class BashCompletionGenerator:
             return
 
         code = OrderedDict()
-
-        # Here we want to parse commandline options. We set this to None because
-        # we have to delay this call for collecting info.
         code['init_completion'] = None
         code['command_line_parsing'] = None
+        code['subcommand_call'] = None
+        code['command_arg'] = None
+        code['option_completion'] = None
+        code['option_strings_completion'] = None
+        code['positional_completion'] = None
 
-        if self.subcommands:
-            code['subcommand_call'] = self._generate_subcommand_call()
-
+        code['subcommand_call'] = self._generate_subcommand_call()
         code['command_arg'] = self._generate_command_arg_call()
-
-        if len(self.options):
-            # This code is used to complete arguments of options
-            code['option_completion'] = bash_option_completion.generate_option_completion(self)
-
-            # This code is used to complete option strings (--foo, ...)
-            code['option_strings_completion'] = bash_option_strings_completion.generate(self)
-
-        if len(self.positionals) or self.subcommands:
-            # This code is used to complete positionals
-            code['positional_completion'] = self._generate_positionals_completion()
+        code['option_completion'] = bash_option_completion.generate_option_completion(self)
+        code['option_strings_completion'] = bash_option_strings_completion.generate(self)
+        code['positional_completion'] = bash_positionals_completion.generate(self)
 
         if self.commandline.parent is None:
             # The root parser makes those variables local and sets up the completion.
@@ -159,8 +159,9 @@ class BashCompletionGenerator:
 
 
 def _generate_wrapper(ctxt, commandline):
-    completion_funcname = ctxt.helpers.make_completion_funcname(commandline)
-    wrapper_funcname = ctxt.helpers.make_completion_funcname(commandline, '__wrapper')
+    make_completion_funcname = ctxt.helpers.make_completion_funcname
+    completion_funcname = make_completion_funcname(commandline)
+    wrapper_funcname = make_completion_funcname(commandline, '__wrapper')
 
     if not commandline.wraps:
         return (completion_funcname, None)
@@ -168,13 +169,13 @@ def _generate_wrapper(ctxt, commandline):
     r  = '%s %s\n' % (bash_versions.completion_loader(ctxt), commandline.wraps)
     r += '\n'
     r += '%s() {\n' % wrapper_funcname
-    r += '  local WRAPS=\'%s\'\n' % commandline.wraps
+    r += '  local WRAPS=%s\n' % shell.quote(commandline.wraps)
     r += '  local COMP_LINE_OLD="$COMP_LINE"\n'
     r += '  local COMP_POINT_OLD="$COMP_POINT"\n'
     r += '  local COMP_WORDS_OLD=("${COMP_WORDS[@]}")\n'
     r += '\n'
     r += '  COMP_LINE="${COMP_LINE/$1/$WRAPS}"\n'
-    r += '  COMP_WORDS[0]=\'%s\'\n' % commandline.wraps
+    r += '  COMP_WORDS[0]=%s\n' % shell.quote(commandline.wraps)
     r += '  COMP_POINT=$(( COMP_POINT + ${#WRAPS} - ${#1} ))\n'
     r += '\n'
     r += '  %s 0\n' % bash_versions.command_offset(ctxt)
@@ -213,15 +214,11 @@ def generate_completion(commandline, config=None):
     output.add_comments()
     output.add_included_files()
     output.add_helper_functions_code()
-    output.extend(generator.result for generator in result if generator.result)
-
-    if wrapper_code:
-        output.add(wrapper_code)
-
+    output.extend(generator.result for generator in result)
+    output.add(wrapper_code)
     output.add('complete -F %s %s' % (
         completion_func, ' '.join([commandline.prog] + commandline.aliases)
     ))
-
     output.add_vim_modeline('sh')
 
     return output.get()
