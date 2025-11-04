@@ -90,10 +90,6 @@ class ZshCompleteChoices(ZshCompletionBase):
         return funcname
 
     def _dict_action_string(self):
-        # _alternative (used in `combine`) does not allow inlined version
-        if self.trace and self.trace[-1] == 'combine':
-            return self._dict_function()
-
         def str0(s):
             return str(s) if s is not None else ''
 
@@ -262,7 +258,8 @@ class ZshCompleteCombine(ZshCompletionBase):
         completions = []
         for command_args in commands:
             compl_obj = completer.complete_from_def(ctxt, trace, command_args)
-            completions.append(compl_obj.get_action_string())
+            action_string = compl_obj.get_action_string()
+            completions.append(f'::{action_string}')
 
         code = '_alternative \\\n'
         code += indent(' \\\n'.join(completions), 2)
