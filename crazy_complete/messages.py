@@ -46,10 +46,10 @@ def command_arg_without_command():
     return 'Completer `command_arg` requires a previously defined `command` completer'
 
 
-def completer_not_allowed_in(completer, completer2):
+def completer_not_allowed_in(completer1, completer2):
     if LANG == 'de':
-        return f'Vervollständiger `{completer}` nicht in `{completer2}` erlaubt'
-    return f'Completer `{completer}` not allowed in `{completer2}`'
+        return f'Vervollständiger `{completer1}` nicht in `{completer2}` erlaubt'
+    return f'Completer `{completer1}` not allowed in `{completer2}`'
 
 
 def completer_not_allowed_in_option(completer):
@@ -162,7 +162,7 @@ def not_an_absolute_path():
 
 def not_an_extended_regex():
     if LANG == 'de':
-        return 'Ungültiger regulärer Ausdruck'
+        return 'Ungültiger erweiterter regulärer Ausdruck'
     return 'Not an extended regular expression'
 
 

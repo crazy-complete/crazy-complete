@@ -299,7 +299,8 @@ def _validate_range(_ctxt, args):
         if stop > start:
             raise CrazyError(f"stop > start: {stop} > {start} (step={step})")
     else:
-        raise CrazyError("step: cannot be 0")
+        msg = '%s: %s' % ('step', m.integer_cannot_be_zero())
+        raise CrazyError(msg)
 
 
 def _validate_exec(_ctxt, args):

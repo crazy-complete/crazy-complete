@@ -1,108 +1,108 @@
 lang: "spec"
-no_programs_defined:                  []
-too_many_programs_defined:            []
-multiple_definition_of_program:       ['program']
-missing_definition_of_program:        ['program']
-parameter_not_allowed_in_subcommand:  ['parameter']
-mutually_exclusive_parameters:        ['parameters']
-parameter_requires_parameter:         ['parameter1', 'parameter2']
-unknown_parameter:                    []
-unknown_completer:                    []
-missing_arg:                          []
-too_many_arguments:                   []
-not_an_extended_regex:                []
-not_an_absolute_path:                 []
-not_a_variable_name:                  []
-single_character_expected:            []
+command_arg_without_command:          []
+completer_not_allowed_in:             ['completer1', 'completer2']
+completer_not_allowed_in_option:      ['completer']
+completer_requires_repeatable:        ['completer']
 dict_cannot_be_empty:                 []
+integer_cannot_be_zero:               []
+integer_must_be_greater_than_zero:    []
+invalid_type_expected_types:          ['types']
+invalid_value:                        []
+invalid_value_expected_values:        ['values']
 list_cannot_be_empty:                 []
 list_must_contain_at_least_two_items: []
 list_must_contain_exact_three_items:  []
-string_cannot_be_empty:               []
-string_cannot_contain_space:          []
-integer_must_be_greater_than_zero:    []
-integer_cannot_be_zero:               []
-invalid_type_expected_types:          ['types']
-invalid_value_expected_values:        ['values']
-invalid_value:                        []
-completer_not_allowed_in:             ['completer', 'completer2']
-completer_not_allowed_in_option:      ['completer']
-completer_requires_repeatable:        ['completer']
-too_many_repeatable_positionals:      []
+missing_arg:                          []
+missing_definition_of_program:        ['program']
+multiple_definition_of_program:       ['program']
+mutually_exclusive_parameters:        ['parameters']
+no_programs_defined:                  []
+not_a_variable_name:                  []
+not_an_absolute_path:                 []
+not_an_extended_regex:                []
+parameter_not_allowed_in_subcommand:  ['parameter']
+parameter_requires_parameter:         ['parameter1', 'parameter2']
 positional_argument_after_repeatable: []
 repeatable_with_subcommands:          []
-command_arg_without_command:          []
+single_character_expected:            []
+string_cannot_be_empty:               []
+string_cannot_contain_space:          []
+too_many_arguments:                   []
+too_many_programs_defined:            []
+too_many_repeatable_positionals:      []
+unknown_completer:                    []
+unknown_parameter:                    []
 
 ---
 
 lang: "en"
-no_programs_defined:                  "No programs defined"
-too_many_programs_defined:            "Too many programs defined"
-multiple_definition_of_program:       "Multiple definition of program `{program}`"
-missing_definition_of_program:        "Missing definition of program `{program}`"
-parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` not allowed in subcommand"
-unknown_parameter:                    "Unknown parameter"
-unknown_completer:                    "Unknown completer"
-mutually_exclusive_parameters:        "Parameters are mutually exclusive: {parameters}"
-parameter_requires_parameter:         "Parameter `{parameter1}` requires `{parameter2}`"
-missing_arg:                          "Missing required argument"
-too_many_arguments:                   "Too many arguments"
-not_an_extended_regex:                "Not an extended regular expression"
-not_an_absolute_path:                 "Not an absolute path"
-not_a_variable_name:                  "Not a valid variable name"
-single_character_expected:            "Invalid length. Single character expected"
+command_arg_without_command:          "Completer `command_arg` requires a previously defined `command` completer"
+completer_not_allowed_in:             "Completer `{completer1}` not allowed in `{completer2}`"
+completer_not_allowed_in_option:      "Completer `{completer}` not allowed inside an option"
+completer_requires_repeatable:        "Completer `{completer}` requires `repeatable=true`"
 dict_cannot_be_empty:                 "Dictionary cannot be empty"
+integer_cannot_be_zero:               "Integer cannot be zero"
+integer_must_be_greater_than_zero:    "Integer must be greater than zero"
+invalid_type_expected_types:          "Invalid type. Expected: {types}"
+invalid_value:                        "Invalid value"
+invalid_value_expected_values:        "Invalid value. Expected: {values}"
 list_cannot_be_empty:                 "List cannot be empty"
 list_must_contain_at_least_two_items: "List must contain at least two items"
 list_must_contain_exact_three_items:  "List must contain exactly three items"
-string_cannot_be_empty:               "String cannot be empty"
-string_cannot_contain_space:          "String cannot contain spaces"
-integer_must_be_greater_than_zero:    "Integer must be greater than zero"
-integer_cannot_be_zero:               "Integer cannot be zero"
-invalid_type_expected_types:          "Invalid type. Expected: {types}"
-invalid_value_expected_values:        "Invalid value. Expected: {values}"
-invalid_value:                        "Invalid value"
-completer_not_allowed_in:             "Completer `{completer}` not allowed in `{completer2}`"
-completer_not_allowed_in_option:      "Completer `{completer}` not allowed inside an option"
-completer_requires_repeatable:        "Completer `{completer}` requires `repeatable=true`"
-too_many_repeatable_positionals:      "Too many repeatable positionals"
+missing_arg:                          "Missing required argument"
+missing_definition_of_program:        "Missing definition of program `{program}`"
+multiple_definition_of_program:       "Multiple definition of program `{program}`"
+mutually_exclusive_parameters:        "Parameters are mutually exclusive: {parameters}"
+no_programs_defined:                  "No programs defined"
+not_a_variable_name:                  "Not a valid variable name"
+not_an_absolute_path:                 "Not an absolute path"
+not_an_extended_regex:                "Not an extended regular expression"
+parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` not allowed in subcommand"
+parameter_requires_parameter:         "Parameter `{parameter1}` requires `{parameter2}`"
 positional_argument_after_repeatable: "Positional argument found after a repeatable positional argument"
 repeatable_with_subcommands:          "Repeatable positional arguments cannot be used together with subcommands"
-command_arg_without_command:          "Completer `command_arg` requires a previously defined `command` completer"
+single_character_expected:            "Invalid length. Single character expected"
+string_cannot_be_empty:               "String cannot be empty"
+string_cannot_contain_space:          "String cannot contain spaces"
+too_many_arguments:                   "Too many arguments"
+too_many_programs_defined:            "Too many programs defined"
+too_many_repeatable_positionals:      "Too many repeatable positionals"
+unknown_completer:                    "Unknown completer"
+unknown_parameter:                    "Unknown parameter"
 
 ---
 
 lang: "de"
-no_programs_defined:                  "Keine Programme definiert"
-too_many_programs_defined:            "Zu viele Programme definiert"
-multiple_definition_of_program:       "Mehrfache Definition des Programms `{program}`"
-missing_definition_of_program:        "Fehlende Definition des Programms `{program}`"
-parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` ist nicht erlaub einem Unterkommando"
-unknown_parameter:                    "Unbekannter Parameter"
-unknown_completer:                    "Unbekannter Vervollständiger"
-mutually_exclusive_parameters:        "Parameter schließen sich gegenseitig aus: {parameters}"
-parameter_requires_parameter:         "Parameter `{parameter1}` benötigt `{parameter2}`"
-missing_arg:                          "Fehlendes benötigtes Argument"
-too_many_arguments:                   "Zu viele Argumente"
-not_an_extended_regex:                "Ungültiger regulärer Ausdruck"
-not_an_absolute_path:                 "Kein absoluter Pfad"
-not_a_variable_name:                  "Ungültiger Variablenname"
+command_arg_without_command:          "Vervollständiger `command_arg` benötigt einen vorher definierten `command` Vervollständiger"
+completer_not_allowed_in:             "Vervollständiger `{completer1}` nicht in `{completer2}` erlaubt"
+completer_not_allowed_in_option:      "Vervollständiger `{completer}` nicht erlaubt in einer Option"
+completer_requires_repeatable:        "Vervollständiger `{completer}` benötigt `repeatable=True`"
 dict_cannot_be_empty:                 "Dictionary darf nicht leer sein"
+integer_cannot_be_zero:               "Ganzzahl darf nicht Null sein"
+integer_must_be_greater_than_zero:    "Ganzzahl muss größer als Null sein"
+invalid_type_expected_types:          "Ungültiger Typ. Erwartet: {types}"
+invalid_value:                        "Ungültiger Wert"
+invalid_value_expected_values:        "Ungültiger Wert. Erwartet: {values}"
 list_cannot_be_empty:                 "Liste darf nicht leer sein"
 list_must_contain_at_least_two_items: "Liste muss mindestens zwei Elemente enthalten"
 list_must_contain_exact_three_items:  "Liste muss exakt 3 Elemente enthalten"
+missing_arg:                          "Fehlendes benötigtes Argument"
+missing_definition_of_program:        "Fehlende Definition des Programms `{program}`"
+multiple_definition_of_program:       "Mehrfache Definition des Programms `{program}`"
+mutually_exclusive_parameters:        "Parameter schließen sich gegenseitig aus: {parameters}"
+no_programs_defined:                  "Keine Programme definiert"
+not_a_variable_name:                  "Ungültiger Variablenname"
+not_an_absolute_path:                 "Kein absoluter Pfad"
+not_an_extended_regex:                "Ungültiger erweiterter regulärer Ausdruck"
+parameter_not_allowed_in_subcommand:  "Parameter `{parameter}` ist nicht erlaub einem Unterkommando"
+parameter_requires_parameter:         "Parameter `{parameter1}` benötigt `{parameter2}`"
+positional_argument_after_repeatable: "Positionsargument nach einem wiederholbaren Positionsargument gefunden"
+repeatable_with_subcommands:          "Wiederholbare Positionsargumente dürfen nicht zusammen mit Unterkommandos definiert werden"
 single_character_expected:            "Ungültige Länge. Einzelner Buchstabe erwartet"
 string_cannot_be_empty:               "Zeichenkette darf nicht leer sein"
 string_cannot_contain_space:          "Zeichenkette darf keine Leerzeichen enthalten"
-integer_must_be_greater_than_zero:    "Ganzzahl muss größer als Null sein"
-integer_cannot_be_zero:               "Ganzzahl darf nicht Null sein"
-invalid_type_expected_types:          "Ungültiger Typ. Erwartet: {types}"
-invalid_value_expected_values:        "Ungültiger Wert. Erwartet: {values}"
-invalid_value:                        "Ungültiger Wert"
-completer_not_allowed_in:             "Vervollständiger `{completer}` nicht in `{completer2}` erlaubt"
-completer_not_allowed_in_option:      "Vervollständiger `{completer}` nicht erlaubt in einer Option"
-completer_requires_repeatable:        "Vervollständiger `{completer}` benötigt `repeatable=True`"
+too_many_arguments:                   "Zu viele Argumente"
+too_many_programs_defined:            "Zu viele Programme definiert"
 too_many_repeatable_positionals:      "Zu viele wiederholbare Positionsargumente"
-positional_argument_after_repeatable: "Positionsargument nach einem wiederholbaren Positionsargument gefunden"
-repeatable_with_subcommands:          "Wiederholbare Positionsargumente dürfen nicht zusammen mit Unterkommandos definiert werden"
-command_arg_without_command:          "Vervollständiger `command_arg` benötigt einen vorher definierten `command` Vervollständiger"
+unknown_completer:                    "Unbekannter Vervollständiger"
+unknown_parameter:                    "Unbekannter Parameter"

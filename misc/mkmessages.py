@@ -53,7 +53,10 @@ def make_functions():
         args = {'msgid': msgid, 'parameters': specification[msgid]}
 
         for lang, defintion in by_lang.items():
-            args[lang] = defintion.get(msgid, None)
+            try:
+                args[lang] = defintion[msgid]
+            except KeyError:
+                raise Exception(f'{lang}: Missing translation: {msgid}')
 
         functions.append(make_function(args))
 
