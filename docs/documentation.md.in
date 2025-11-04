@@ -115,7 +115,7 @@ positionals:
 
 ### Using Aliases
 
-Aliases / defines can be handy if completers are reused of to keep the defintion file clean.
+Aliases / defines can be handy if completers are reused or to keep the defintion file clean.
 
 **NOTE:** Every defined string is replaced throughout the YAML document, regardless of its context.
 
@@ -275,6 +275,7 @@ This helps crazy-complete generate reliable completions. Key practices include:
   in the suggestion list
 - **Mutually exclusive options**: Use `groups: [...]` to define sets of options that cannot appear
     together
+- **Repeatable options**: Use `repeatable: true` for options that may be used more than once
 
 ### Trying out zsh autocompletion scripts
 
