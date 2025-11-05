@@ -15,7 +15,7 @@ from .output import Output
 from .str_utils import indent
 
 
-Arg = namedtuple('Arg', ('option', 'when', 'hidden', 'option_spec'))
+Arg = namedtuple('Arg', ('option', 'when', 'option_spec'))
 
 
 class ZshQuery:
@@ -69,12 +69,13 @@ class ZshCompletionFunction:
             complete = option.complete,
             optional_arg = option.optional_arg,
             repeatable = option.repeatable,
+            hidden = option.hidden,
             final = option.final,
             metavar = option.metavar,
             action = action
         )
 
-        return Arg(option, option.when, option.hidden, option_spec)
+        return Arg(option, option.when, option_spec)
 
     def _complete_subcommands(self, positional):
         choices = positional.get_choices()
@@ -87,7 +88,7 @@ class ZshCompletionFunction:
             self._complete(positional, 'choices', choices).get_action_string()
         )
 
-        return Arg(positional, None, False, spec)
+        return Arg(positional, None, spec)
 
     def _complete_positional(self, positional):
         spec = zsh_utils.make_positional_spec(
@@ -97,7 +98,7 @@ class ZshCompletionFunction:
             self._complete(positional, *positional.complete).get_action_string()
         )
 
-        return Arg(positional, positional.when, False, spec)
+        return Arg(positional, positional.when, spec)
 
     def _generate_completion_code(self):
         self.code = OrderedDict()
@@ -186,7 +187,7 @@ class ZshCompletionFunction:
         args_with_when = []
         args_without_when = []
         for arg in args:
-            if arg.when is None and arg.hidden is False:
+            if arg.when is None:
                 args_without_when.append(arg)
             else:
                 args_with_when.append(arg)
@@ -202,16 +203,8 @@ class ZshCompletionFunction:
             r += ')\n'
 
         for arg in args_with_when:
-            if arg.hidden:
-                func = self.query.use('has_option')
-                func = self.query.use('with_incomplete')
-                r += '%s has_option WITH_INCOMPLETE %s &&\\\n' % (
-                    func, shell.join_quoted(arg.option.option_strings))
-
-            if arg.when:
-                when_cmd = zsh_when.generate_when_conditions(self.query, arg.when)
-                r += '%s &&\\\n' % when_cmd
-
+            when_cmd = zsh_when.generate_when_conditions(self.query, arg.when)
+            r += '%s &&\\\n' % when_cmd
             r += '  args+=(%s)\n' % arg.option_spec
 
         if self.ctxt.config.option_stacking:

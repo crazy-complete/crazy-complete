@@ -53,6 +53,7 @@ def make_option_spec(
         complete            = None,
         optional_arg        = False,
         repeatable          = False,
+        hidden              = False,
         final               = False,
         metavar             = None,
         action              = None):
@@ -68,6 +69,10 @@ def make_option_spec(
 
     if conflicting_options is None:
         conflicting_options = []
+
+    # Hidden option ===========================================================
+    if hidden:
+        result.append("'!'")
 
     # Not options =============================================================
     not_options = []
