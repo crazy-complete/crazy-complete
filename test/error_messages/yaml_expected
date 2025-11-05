@@ -43,6 +43,7 @@
 161-repeatable-wrong-value               | line 4, column 17: repeatable: Invalid value. Expected: true, false or `INHERIT`
 180-final-wrong-type                     | line 4, column 12: final: Invalid type. Expected: boolean|none
 190-hidden-wrong-type                    | line 4, column 13: hidden: Invalid type. Expected: boolean|none
+191-hidden-but-repeatable                | line 3, column 5: Parameters are mutually exclusive: repeatable, hidden
 200-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected: list|none
 210-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected: string|none
 211-when-wrong-value                     | line 4, column 11: when: Invalid command: 'invalid'

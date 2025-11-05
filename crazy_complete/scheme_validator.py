@@ -77,6 +77,11 @@ def _has_set(dictionary, key):
             dictionary.value[key].value is not None)
 
 
+def _is_true(dictionary, key):
+    return (key in dictionary.value and
+            dictionary.value[key].value is True)
+
+
 def _check_type(value, types, parameter_name=None):
     if not isinstance(value.value, types):
         types_strings = []
@@ -598,8 +603,12 @@ def _check_option(ctxt, option):
         msg = m.parameter_requires_parameter('metavar', 'complete')
         raise _error(msg, option)
 
-    if _has_set(option, 'optional_arg') and not _has_set(option, 'complete'):
+    if _is_true(option, 'optional_arg') and not _has_set(option, 'complete'):
         msg = m.parameter_requires_parameter('optional_arg', 'complete')
+        raise _error(msg, option)
+
+    if _is_true(option, 'repeatable') and _is_true(option, 'hidden'):
+        msg = m.mutually_exclusive_parameters('repeatable, hidden')
         raise _error(msg, option)
 
     if _has_set(option, 'group') and _has_set(option, 'groups'):

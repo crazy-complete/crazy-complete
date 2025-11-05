@@ -708,6 +708,9 @@ class Option:
         if optional_arg and not complete:
             raise CrazyError(f'Option {option_strings} has optional_arg=True, but has no complete')
 
+        if hidden is True and repeatable is True:
+            raise CrazyError(f'Option {option_strings} has both hidden and repeatable set to True')
+
         self.parent = parent
         self.option_strings = option_strings
         self.metavar = metavar

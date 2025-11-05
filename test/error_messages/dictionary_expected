@@ -43,6 +43,7 @@
 161-repeatable-wrong-value               | Parameter `repeatable` has an invalid type. Expected types: ExtendedBool. Received: 'wrong' (str)
 180-final-wrong-type                     | Parameter `final` has an invalid type. Expected types: bool. Received: 'wrong' (str)
 190-hidden-wrong-type                    | Parameter `hidden` has an invalid type. Expected types: bool. Received: 'wrong' (str)
+191-hidden-but-repeatable                | Option ['-o'] has both hidden and repeatable set to True
 200-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|tuple|None. Received: False (bool)
 210-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
 211-when-wrong-value                     | foo: -o: when: invalid: Invalid command: 'invalid'
@@ -123,7 +124,7 @@
 3_17_00-range-missing-arg-1              | foo: -o: range: Missing required argument: start
 3_17_01-range-missing-arg-2              | foo: -o: range: Missing required argument: stop
 3_17_02-range-too-many-args              | foo: -o: range: Too many arguments: [4]
-3_17_03-range-step-zero                  | foo: -o: range: step: cannot be 0
+3_17_03-range-step-zero                  | foo: -o: range: step: Integer cannot be zero
 3_17_04-range-invalid-range-0            | foo: -o: range: stop > start: 2 > 1 (step=-1)
 3_17_05-range-invalid-range-1            | foo: -o: range: start > stop: 2 > 1 (step=1)
 3_18_00-exec-missing-arg                 | foo: -o: exec: Missing required argument: command
