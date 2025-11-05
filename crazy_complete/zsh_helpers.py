@@ -389,6 +389,14 @@ _path_files -W "$PWD/$DIR" "$@"
 # Bonus
 # =============================================================================
 
+_MOUNTPOINT = ShellFunction('mountpoint', r'''
+local item=''
+
+command findmnt -lno TARGET | while read -r item; do
+  compadd -- "$item"
+done
+''')
+
 _ALSA_COMPLETE_CARDS = ShellFunction('alsa_complete_cards', r'''
 local card='' cards=()
 command aplay -l \
@@ -434,5 +442,6 @@ class ZshHelpers(GeneralHelpers):
         self.add_function(_UID_LIST)
         self.add_function(_GID_LIST)
         self.add_function(_CHARSET_LIST)
+        self.add_function(_MOUNTPOINT)
         self.add_function(_ALSA_COMPLETE_CARDS)
         self.add_function(_ALSA_COMPLETE_DEVICES)

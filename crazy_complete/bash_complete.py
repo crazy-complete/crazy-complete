@@ -413,6 +413,10 @@ class BashCompleter(shell.ShellCompleter):
     # Bonus
     # =========================================================================
 
+    def mountpoint(self, ctxt, _trace):
+        func = ctxt.helpers.use_function('mountpoint')
+        return BashCompletionFunc(ctxt, [func])
+
     def locale(self, ctxt, trace):
         func = ctxt.helpers.use_function('locales')
         return BashCompletionFunc(ctxt, [func])

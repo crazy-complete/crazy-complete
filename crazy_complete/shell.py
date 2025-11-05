@@ -169,6 +169,3 @@ class ShellCompleter:
 
     def charset(self, ctxt, trace):
         return self.exec(ctxt, trace, "command locale -m")
-
-    def mountpoint(self, ctxt, trace):
-        return self.exec(ctxt, trace, "command mount | command cut -d' ' -f3")

@@ -472,6 +472,10 @@ class ZshCompleter(shell.ShellCompleter):
     # Bonus
     # =========================================================================
 
+    def mountpoint(self, ctxt, _trace):
+        func = ctxt.helpers.use_function('mountpoint')
+        return ZshComplFunc(ctxt, [func], needs_braces=True)
+
     def net_interface(self, ctxt, _trace):
         return ZshComplFunc(ctxt, ['_net_interfaces'])
 

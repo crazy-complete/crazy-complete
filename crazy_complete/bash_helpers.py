@@ -546,6 +546,16 @@ done
 # Bonus
 # =============================================================================
 
+_MOUNTPOINT = ShellFunction('mountpoint', r'''
+local REPLY
+
+COMPREPLY=()
+
+while read -r REPLY; do
+  COMPREPLY+=("$(printf '%q' "$REPLY")")
+done < <(command findmnt -lno TARGET)
+''')
+
 _LOCALES = ShellFunction('''locales''', r'''
 COMPREPLY=($(compgen -W "$(command locale -a)" -- "$cur"))
 ''')
@@ -607,6 +617,7 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
         self.add_function(_MIME_FILE)
+        self.add_function(_MOUNTPOINT)
         self.add_function(_LOCALES)
         self.add_function(_CHARSETS)
         self.add_function(_TIMEZONE_LIST)
