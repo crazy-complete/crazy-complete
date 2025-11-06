@@ -477,6 +477,41 @@ def _check_ip_address(_ctxt, arguments):
         raise _error(msg, type_)
 
 
+def _check_integer_float(_ctxt, arguments, types):
+    options = arguments.get_optional_arg({})
+    arguments.require_no_more()
+    _check_type(options, (dict,), "options")
+
+    _check_dictionary(options, {
+        'min':          (False, types, None),
+        'max':          (False, types, None),
+        'help':         (False, (str,), _check_non_empty_string),
+        'suffixes':     (False, (dict,), _check_non_empty_dict),
+    })
+
+    if _has_set(options, 'min') and _has_set(options, 'max'):
+        min_ = options.value['min'].value
+        max_ = options.value['max'].value
+
+        if (min_ > max_):
+            raise _error(f'min > max ({min_} > {max_})', options)
+
+    if _has_set(options, 'suffixes'):
+        for suffix, description in options.value['suffixes'].value.items():
+            _check_type(suffix, (str,), "suffix")
+            _check_type(description, (str,), "description")
+            _check_non_empty_string(suffix, "suffix")
+            _check_non_empty_string(description, "description")
+
+
+def _check_integer(ctxt, arguments):
+    _check_integer_float(ctxt, arguments, (int,))
+
+
+def _check_float(ctxt, arguments):
+    _check_integer_float(ctxt, arguments, (int, float))
+
+
 _COMMANDS = {
     'alsa_card':          _check_void,
     'alsa_device':        _check_void,
@@ -497,12 +532,12 @@ _COMMANDS = {
     'file':               _check_file,
     'file_list':          _check_file_list,
     'filesystem_type':    _check_void,
-    'float':              _check_void,
+    'float':              _check_float,
     'gid':                _check_void,
     'group':              _check_void,
     'history':            _check_history,
     'hostname':           _check_void,
-    'integer':            _check_void,
+    'integer':            _check_integer,
     'ip_address':         _check_ip_address,
     'key_value_list':     _check_key_value_list,
     'list':               _check_list,

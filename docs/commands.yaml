@@ -137,35 +137,58 @@ output: |
 
 command: 'integer'
 category: 'basic'
+synopsis: |
+  ["integer"]
+  
+  ["integer", <OPTIONS>]
 short: 'Complete an integer'
-notes:
-  - "This completer currently serves as documentation and does not provide actual functionality."
+long: |
+  A min value can be specified by using `{"min": <VALUE>}`.
+  
+  A max value can be specified by using `{"max": <VALUE>}`.
+  
+  A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
+
+  A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
 also:
+  float: "For completing a floating point number"
   range: "For completing a range of integers"
 definition: |
   prog: "example"
   options:
-    - option_strings: ["--integer"]
-      complete: ["integer"]
+    - option_strings: ["--time"]
+      complete: ["integer", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
 output: |
-  ~ > example --integer=<TAB>
-  <NO OUTPUT>
+  ~ > example --integer=3<TAB>
+  s -- seconds  m -- minutes  h -- hours
 
 ---
 
 command: 'float'
 category: 'basic'
-short: 'Complete floating point number'
-notes:
-  - "This completer currently serves as documentation and does not provide actual functionality."
+synopsis: |
+  ["float"]
+  
+  ["float", <OPTIONS>]
+short: 'Complete a floating point number'
+long: |
+  A min value can be specified by using `{"min": <VALUE>}`.
+  
+  A max value can be specified by using `{"max": <VALUE>}`.
+  
+  A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
+
+  A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
+also:
+  integer: "For completing an integer"
 definition: |
   prog: "example"
   options:
-    - option_strings: ["--float"]
-      complete: ["float"]
+    - option_strings: ["--time"]
+      complete: ["float", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
 output: |
-  ~ > example --float=<TAB>
-  <NO OUTPUT>
+  ~ > example --time=3.0<TAB>
+  s -- seconds  m -- minutes  h -- hours
 
 ---
 

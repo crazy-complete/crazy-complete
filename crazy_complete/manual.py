@@ -917,29 +917,58 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
             'devtmpfs\n'
             '[...]\n',
   'short': 'Complete a filesystem type'},
- {'also': None,
+ {'also': {'integer': 'For completing an integer'},
   'category': 'basic',
   'command': 'float',
   'definition': 'prog: "example"\n'
                 'options:\n'
-                '  - option_strings: ["--float"]\n'
-                '    complete: ["float"]\n',
+                '  - option_strings: ["--time"]\n'
+                '    complete: ["float", {"suffixes": {"s": "seconds", "m": '
+                '"minutes", "h": "hours"}}]\n',
   'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
                         '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
-                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--float\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--time\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m    '
                         '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
-                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mfloat\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n',
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mfloat\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m{\x1b[33m"\x1b[39;49;00m\x1b[33msuffixes\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m{\x1b[33m"\x1b[39;49;00m\x1b[33ms\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mseconds\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mm\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mminutes\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mh\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mhours\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m}}]\x1b[37m\x1b[39;49;00m\n',
   'implemented': None,
-  'long': None,
-  'long_colored': None,
-  'notes': ['This completer currently serves as documentation and does not '
-            'provide actual functionality.'],
-  'output': '~ > example --float=<TAB>\n<NO OUTPUT>\n',
-  'short': 'Complete floating point number'},
+  'long': 'A min value can be specified by using `{"min": <VALUE>}`.\n'
+          '\n'
+          'A max value can be specified by using `{"max": <VALUE>}`.\n'
+          '\n'
+          'A list of suffixes can be specified by using `{"suffixes": '
+          '{"<SUFFIX>": "<DESCRIPTION", ...}}`\n'
+          '\n'
+          'A help text can be set by using `{"help": "<TEXT>"}`. If not '
+          'supplied, the `help` attribute of the option is used.\n',
+  'long_colored': 'A min value can be specified by using \x1b[33m`{"min": '
+                  '<VALUE>}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'A max value can be specified by using \x1b[33m`{"max": '
+                  '<VALUE>}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'A list of suffixes can be specified by using '
+                  '\x1b[33m`{"suffixes": {"<SUFFIX>": "<DESCRIPTION", '
+                  '...}}`\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'A help text can be set by using \x1b[33m`{"help": '
+                  '"<TEXT>"}`\x1b[39;49;00m. If not supplied, the '
+                  '\x1b[33m`help`\x1b[39;49;00m attribute of the option is '
+                  'used.\x1b[37m\x1b[39;49;00m\n',
+  'notes': [],
+  'output': '~ > example --time=3.0<TAB>\n'
+            's -- seconds  m -- minutes  h -- hours\n',
+  'short': 'Complete a floating point number'},
  {'also': {'group': 'For completing a group name'},
   'category': 'basic',
   'command': 'gid',
@@ -1046,28 +1075,58 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
   'notes': [],
   'output': '~ > example --hostname=<TAB>\nlocalhost\n',
   'short': 'Complete a hostname'},
- {'also': {'range': 'For completing a range of integers'},
+ {'also': {'float': 'For completing a floating point number',
+           'range': 'For completing a range of integers'},
   'category': 'basic',
   'command': 'integer',
   'definition': 'prog: "example"\n'
                 'options:\n'
-                '  - option_strings: ["--integer"]\n'
-                '    complete: ["integer"]\n',
+                '  - option_strings: ["--time"]\n'
+                '    complete: ["integer", {"suffixes": {"s": "seconds", "m": '
+                '"minutes", "h": "hours"}}]\n',
   'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
                         '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
                         '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
-                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--integer\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--time\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
                         '\x1b[37m    '
                         '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
-                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33minteger\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n',
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33minteger\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m{\x1b[33m"\x1b[39;49;00m\x1b[33msuffixes\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m{\x1b[33m"\x1b[39;49;00m\x1b[33ms\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mseconds\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mm\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mminutes\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mh\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mhours\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m}}]\x1b[37m\x1b[39;49;00m\n',
   'implemented': None,
-  'long': None,
-  'long_colored': None,
-  'notes': ['This completer currently serves as documentation and does not '
-            'provide actual functionality.'],
-  'output': '~ > example --integer=<TAB>\n<NO OUTPUT>\n',
+  'long': 'A min value can be specified by using `{"min": <VALUE>}`.\n'
+          '\n'
+          'A max value can be specified by using `{"max": <VALUE>}`.\n'
+          '\n'
+          'A list of suffixes can be specified by using `{"suffixes": '
+          '{"<SUFFIX>": "<DESCRIPTION", ...}}`\n'
+          '\n'
+          'A help text can be set by using `{"help": "<TEXT>"}`. If not '
+          'supplied, the `help` attribute of the option is used.\n',
+  'long_colored': 'A min value can be specified by using \x1b[33m`{"min": '
+                  '<VALUE>}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'A max value can be specified by using \x1b[33m`{"max": '
+                  '<VALUE>}`\x1b[39;49;00m.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'A list of suffixes can be specified by using '
+                  '\x1b[33m`{"suffixes": {"<SUFFIX>": "<DESCRIPTION", '
+                  '...}}`\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'A help text can be set by using \x1b[33m`{"help": '
+                  '"<TEXT>"}`\x1b[39;49;00m. If not supplied, the '
+                  '\x1b[33m`help`\x1b[39;49;00m attribute of the option is '
+                  'used.\x1b[37m\x1b[39;49;00m\n',
+  'notes': [],
+  'output': '~ > example --integer=3<TAB>\n'
+            's -- seconds  m -- minutes  h -- hours\n',
   'short': 'Complete an integer'},
  {'also': {'net_interface': 'For completing a network interface'},
   'category': 'basic',

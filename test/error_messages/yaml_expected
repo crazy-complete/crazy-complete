@@ -82,6 +82,17 @@
 3_04_00-group-too-many-args              | line 4, column 15: Too many arguments
 3_05_00-hostname-too-many-args           | line 4, column 15: Too many arguments
 3_06_00-integer-too-many-args            | line 4, column 15: Too many arguments
+3_06_01-integer-help-wrong-type          | line 4, column 36: help: Invalid type. Expected: string
+3_06_02-integer-help-wrong-value         | line 4, column 36: help: String cannot be empty
+3_06_03-integer-min-wrong-type           | line 4, column 35: min: Invalid type. Expected: integer
+3_06_04-integer-max-wrong-type           | line 4, column 35: max: Invalid type. Expected: integer
+3_06_05-integer-min-greater-max          | line 4, column 27: min > max (1 > 0)
+3_06_06-integer-suffixes-wrong-type      | line 4, column 40: suffixes: Invalid type. Expected: dictionary
+3_06_07-integer-suffixes-empty           | line 4, column 40: suffixes: Dictionary cannot be empty
+3_06_08-integer-suffixes-key-wrong-type  | line 4, column 41: suffix: Invalid type. Expected: string
+3_06_09-integer-suffixes-key-empty       | line 5, column 41: suffix: String cannot be empty
+3_06_10-integer-suffixes-value-wrong-type | line 4, column 46: description: Invalid type. Expected: string
+3_06_11-integer-suffixes-value-wrong-value | line 4, column 46: description: String cannot be empty
 3_07_00-none-too-many-args               | line 4, column 15: Too many arguments
 3_08_00-pid-too-many-args                | line 4, column 15: Too many arguments
 3_09_00-process-too-many-args            | line 4, column 15: Too many arguments

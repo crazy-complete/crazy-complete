@@ -68,6 +68,8 @@ cmdp.add_argument('--prefix-list',      help='Complete with a prefix').complete(
 cmdp.add_argument('--ip',               help='Complete an ip address').complete('ip_address')
 cmdp.add_argument('--ip-v4',            help='Complete an ipv4 address').complete('ip_address', 'ipv4')
 cmdp.add_argument('--ip-v6',            help='Complete an ipv6 address').complete('ip_address', 'ipv6')
+cmdp.add_argument('--time',             help='Complete a time').complete('integer', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}})
+cmdp.add_argument('--time-2',           help='Complete a time (float)').complete('float', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}})
 
 # =============================================================================
 # Command 'when'

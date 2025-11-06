@@ -82,6 +82,17 @@
 3_04_00-group-too-many-args              | foo: -o: group: Too many arguments: ['wrong']
 3_05_00-hostname-too-many-args           | foo: -o: hostname: Too many arguments: ['wrong']
 3_06_00-integer-too-many-args            | foo: -o: integer: Too many arguments: ['wrong']
+3_06_01-integer-help-wrong-type          | foo: -o: integer: Parameter `help` has an invalid type. Expected types: string. Received: False (bool)
+3_06_02-integer-help-wrong-value         | foo: -o: integer: help: String cannot be empty
+3_06_03-integer-min-wrong-type           | foo: -o: integer: Parameter `min` has an invalid type. Expected types: integer. Received: [] (list)
+3_06_04-integer-max-wrong-type           | foo: -o: integer: Parameter `max` has an invalid type. Expected types: integer. Received: [] (list)
+3_06_05-integer-min-greater-max          | foo: -o: integer: min > max (1 > 0)
+3_06_06-integer-suffixes-wrong-type      | foo: -o: integer: Parameter `suffixes` has an invalid type. Expected types: dictionary. Received: False (bool)
+3_06_07-integer-suffixes-empty           | foo: -o: integer: suffixes: Dictionary cannot be empty
+3_06_08-integer-suffixes-key-wrong-type  | foo: -o: integer: Parameter `suffix` has an invalid type. Expected types: string. Received: False (bool)
+3_06_09-integer-suffixes-key-empty       | foo: -o: integer: suffix: String cannot be empty
+3_06_10-integer-suffixes-value-wrong-type | foo: -o: integer: Parameter `description` has an invalid type. Expected types: string. Received: False (bool)
+3_06_11-integer-suffixes-value-wrong-value | foo: -o: integer: description: String cannot be empty
 3_07_00-none-too-many-args               | No error
 3_08_00-pid-too-many-args                | foo: -o: pid: Too many arguments: ['wrong']
 3_09_00-process-too-many-args            | foo: -o: process: Too many arguments: ['wrong']

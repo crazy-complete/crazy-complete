@@ -441,6 +441,41 @@ def _validate_ip_address(_ctxt, args):
         raise CrazyError(msg)
 
 
+def _validate_integer_float(_ctxt, args, types):
+    options = args.get_optional_arg({})
+    args.require_no_more()
+    _validate_type(options, (dict,), "options")
+
+    _validate_dictionary(options, {
+        'min':          (False, types, None),
+        'max':          (False, types, None),
+        'help':         (False, (str,), _validate_non_empty_string),
+        'suffixes':     (False, (dict,), _validate_non_empty_dict),
+    })
+
+    if 'min' in options and 'max' in options:
+        min_ = options['min']
+        max_ = options['max']
+
+        if (min_ > max_):
+            raise CrazyError(f'min > max ({min_} > {max_})')
+
+    if 'suffixes' in options:
+        for suffix, description in options['suffixes'].items():
+            _validate_type(suffix, (str,), "suffix")
+            _validate_type(description, (str,), "description")
+            _validate_non_empty_string(suffix, "suffix")
+            _validate_non_empty_string(description, "description")
+
+
+def _validate_integer(ctxt, args):
+    _validate_integer_float(ctxt, args, (int,))
+
+
+def _validate_float(ctxt, args):
+    _validate_integer_float(ctxt, args, (int, float))
+
+
 # =============================================================================
 # Real validation functions
 # =============================================================================
@@ -466,12 +501,12 @@ _COMMANDS = {
     'file':               _validate_file,
     'file_list':          _validate_file_list,
     'filesystem_type':    _validate_void,
-    'float':              _validate_void,
+    'float':              _validate_float,
     'gid':                _validate_void,
     'group':              _validate_void,
     'history':            _validate_history,
     'hostname':           _validate_void,
-    'integer':            _validate_void,
+    'integer':            _validate_integer,
     'ip_address':         _validate_ip_address,
     'key_value_list':     _validate_key_value_list,
     'list':               _validate_list,

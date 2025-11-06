@@ -26,7 +26,7 @@
 | [file](#file)                              | Complete a file                                |
 | [file\_list](#file_list)                   | Complete a comma-separated list of files       |
 | [filesystem\_type](#filesystem_type)       | Complete a filesystem type                     |
-| [float](#float)                            | Complete floating point number                 |
+| [float](#float)                            | Complete a floating point number               |
 | [gid](#gid)                                | Complete a group id                            |
 | [group](#group)                            | Complete a group                               |
 | [history](#history)                        | Complete based on a shell's history            |
@@ -623,23 +623,32 @@ cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
 
 ### float
 
-> Complete floating point number
+> Complete a floating point number
 
-**NOTES**
+A min value can be specified by using `{"min": <VALUE>}`.
 
-- This completer currently serves as documentation and does not provide actual functionality.
+A max value can be specified by using `{"max": <VALUE>}`.
+
+A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
+
+A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
+
 
 ```yaml
 prog: "example"
 options:
-  - option_strings: ["--float"]
-    complete: ["float"]
+  - option_strings: ["--time"]
+    complete: ["float", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
 ```
 
 ```
-~ > example --float=<TAB>
-<NO OUTPUT>
+~ > example --time=3.0<TAB>
+s -- seconds  m -- minutes  h -- hours
 ```
+
+**SEE ALSO**
+
+- [integer](#integer): For completing an integer
 
 ---
 
@@ -743,23 +752,30 @@ localhost
 
 > Complete an integer
 
-**NOTES**
+A min value can be specified by using `{"min": <VALUE>}`.
 
-- This completer currently serves as documentation and does not provide actual functionality.
+A max value can be specified by using `{"max": <VALUE>}`.
+
+A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
+
+A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
+
 
 ```yaml
 prog: "example"
 options:
-  - option_strings: ["--integer"]
-    complete: ["integer"]
+  - option_strings: ["--time"]
+    complete: ["integer", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
 ```
 
 ```
-~ > example --integer=<TAB>
-<NO OUTPUT>
+~ > example --integer=3<TAB>
+s -- seconds  m -- minutes  h -- hours
 ```
 
 **SEE ALSO**
+
+- [float](#float): For completing a floating point number
 
 - [range](#range): For completing a range of integers
 

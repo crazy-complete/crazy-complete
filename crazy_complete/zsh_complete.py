@@ -284,11 +284,41 @@ class ZshCompleter(shell.ShellCompleter):
     def none(self, ctxt, _trace, *_):
         return ZshComplFunc(ctxt, [' '])
 
-    def integer(self, ctxt, _trace):
-        return ZshComplFunc(ctxt, ['_numbers'])
+    def integer(self, ctxt, _trace, options=None):
+        args = []
+        suffixes = []
+        help_ = ctxt.option.help or ctxt.option.metavar or ''
 
-    def float(self, ctxt, _trace):
-        return ZshComplFunc(ctxt, ['_numbers', '-f'])
+        if options:
+            if 'min' in options:
+                args += ['-l', str(options['min'])]
+            if 'max' in options:
+                args += ['-m', str(options['max'])]
+            if 'suffixes' in options:
+                for suffix, description in options['suffixes'].items():
+                    suffixes.append(f'{suffix}:{description}')
+            if 'help' in options:
+                help_ = options['help']
+
+        return ZshComplFunc(ctxt, ['_numbers', *args, help_, *suffixes])
+
+    def float(self, ctxt, _trace, options=None):
+        args = ['-f']
+        suffixes = []
+        help_ = ctxt.option.help or ctxt.option.metavar or ''
+
+        if options:
+            if 'min' in options:
+                args += ['-l', str(options['min'])]
+            if 'max' in options:
+                args += ['-m', str(options['max'])]
+            if 'suffixes' in options:
+                for suffix, description in options['suffixes'].items():
+                    suffixes.append(f'{suffix}:{description}')
+            if 'help' in options:
+                help_ = options['help']
+
+        return ZshComplFunc(ctxt, ['_numbers', *args, help_, *suffixes])
 
     def choices(self, ctxt, trace, choices):
         return ZshCompleteChoices(ctxt, trace, choices)
