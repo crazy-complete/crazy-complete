@@ -53,7 +53,12 @@ class CrazySchemaValidationError(CrazyError):
         super().__init__(self.__str__())
 
     def __str__(self):
-        return f'{self.value_with_trace.get_position_string()}: {self.message}'
+        pos_string = self.value_with_trace.get_position_string()
+
+        if not pos_string:
+            return self.message
+
+        return f'{pos_string}: {self.message}'
 
 
 class InternalError(Exception):

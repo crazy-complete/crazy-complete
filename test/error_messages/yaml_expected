@@ -11,218 +11,218 @@
 009-duplicate-subcommands                | line 5, column 1: Multiple definition of program `test subcommand`
 010-missing-command                      | line 3, column 1: Missing definition of program `test bar`
 011-missing-command-2                    | line 5, column 1: Missing definition of program `test bar`
-020-aliases-wrong-type                   | line 2, column 10: aliases: Invalid type. Expected: list|none
-021-aliases-not-str                      | line 2, column 11: alias: Invalid type. Expected: string
-022-aliases-with-space                   | line 2, column 11: alias: String cannot contain spaces
-030-abbreviate-commands-wrong-type       | line 2, column 22: abbreviate_commands: Invalid type. Expected: boolean|string|none
-031-abbreviate-commands-wrong-value      | line 2, column 22: abbreviate_commands: Invalid value. Expected: true, false or `INHERIT`
-040-abbreviate-options-wrong-type        | line 2, column 21: abbreviate_options: Invalid type. Expected: boolean|string|none
-041-abbreviate-options-wrong-value       | line 2, column 21: abbreviate_options: Invalid value. Expected: true, false or `INHERIT`
-050-inherit-options-wrong-type           | line 2, column 18: inherit_options: Invalid type. Expected: boolean|string|none
-051-inherit-options-wrong-value          | line 2, column 18: inherit_options: Invalid value. Expected: true, false or `INHERIT`
-060-options-wrong-type                   | line 2, column 10: options: Invalid type. Expected: list|none
-070-positionals-wrong-type               | line 2, column 14: positionals: Invalid type. Expected: list|none
-080-wraps-wrong-type                     | line 2, column 8: wraps: Invalid type. Expected: string|none
-081-wraps-empty                          | line 2, column 8: wraps: String cannot be empty
-082-wraps-in-subcommand                  | line 4, column 8: Parameter `wraps` not allowed in subcommand
+020-aliases-wrong-type                   | line 2, column 10: foo: aliases: Invalid type. Expected: list|none
+021-aliases-not-str                      | line 2, column 11: foo: alias: Invalid type. Expected: string
+022-aliases-with-space                   | line 2, column 11: foo: alias: String cannot contain spaces
+030-abbreviate-commands-wrong-type       | line 2, column 22: foo: abbreviate_commands: Invalid type. Expected: boolean|string|none
+031-abbreviate-commands-wrong-value      | line 2, column 22: foo: abbreviate_commands: Invalid value. Expected: true, false or `INHERIT`
+040-abbreviate-options-wrong-type        | line 2, column 21: foo: abbreviate_options: Invalid type. Expected: boolean|string|none
+041-abbreviate-options-wrong-value       | line 2, column 21: foo: abbreviate_options: Invalid value. Expected: true, false or `INHERIT`
+050-inherit-options-wrong-type           | line 2, column 18: foo: inherit_options: Invalid type. Expected: boolean|string|none
+051-inherit-options-wrong-value          | line 2, column 18: foo: inherit_options: Invalid value. Expected: true, false or `INHERIT`
+060-options-wrong-type                   | line 2, column 10: foo: options: Invalid type. Expected: list|none
+070-positionals-wrong-type               | line 2, column 14: foo: positionals: Invalid type. Expected: list|none
+080-wraps-wrong-type                     | line 2, column 8: foo: wraps: Invalid type. Expected: string|none
+081-wraps-empty                          | line 2, column 8: foo: wraps: String cannot be empty
+082-wraps-in-subcommand                  | line 4, column 8: foo bar: Parameter `wraps` not allowed in subcommand
 ======= Directory "02-option" =======
-100-no-option-strings                    | line 3, column 5: Missing required argument: option_strings
-101-option-strings-wrong-type            | line 3, column 21: option_strings: Invalid type. Expected: list
-102-option-strings-is-empty              | line 3, column 21: option_strings: List cannot be empty
-103-option-string-wrong-type             | line 3, column 22: option_string: Invalid type. Expected: string
-104-option-string-is-double-dash         | line 3, column 22: Invalid value
-105-option-string-with-space             | line 3, column 22: Invalid value
-106-option-string-with-comma             | line 3, column 22: Invalid value
-110-metavar-wrong-type                   | line 4, column 14: metavar: Invalid type. Expected: string|none
-120-help-wrong-type                      | line 4, column 11: help: Invalid type. Expected: string|none
-130-optional-arg-wrong-type              | line 4, column 19: optional_arg: Invalid type. Expected: boolean|none
-140-group-wrong-type                     | line 4, column 12: group: Invalid type. Expected: string|none
-150-groups-wrong-type                    | line 4, column 13: groups: Invalid type. Expected: list|none
-151-groups-wrong-value                   | line 4, column 14: group: Invalid type. Expected: string
-160-repeatable-wrong-type                | line 4, column 17: repeatable: Invalid type. Expected: boolean|string|none
-161-repeatable-wrong-value               | line 4, column 17: repeatable: Invalid value. Expected: true, false or `INHERIT`
-180-final-wrong-type                     | line 4, column 12: final: Invalid type. Expected: boolean|none
-190-hidden-wrong-type                    | line 4, column 13: hidden: Invalid type. Expected: boolean|none
-191-hidden-but-repeatable                | line 3, column 5: Parameters are mutually exclusive: repeatable, hidden
-200-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected: list|none
-210-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected: string|none
-211-when-wrong-value                     | line 4, column 11: when: Invalid command: 'invalid'
-220-metavar-but-no-complete              | line 3, column 5: Parameter `metavar` requires `complete`
-230-optional-arg-but-no-complete         | line 3, column 5: Parameter `optional_arg` requires `complete`
-240-capture-wrong-type                   | line 4, column 14: capture: Invalid type. Expected: string|none
-241-capture-empty                        | line 4, column 14: capture: Not a valid variable name
-242-capture-wrong-value                  | line 4, column 14: capture: Not a valid variable name
+100-no-option-strings                    | line 3, column 5: foo: Missing required argument: option_strings
+101-option-strings-wrong-type            | line 3, column 21: foo: option_strings: Invalid type. Expected: list
+102-option-strings-is-empty              | line 3, column 21: foo: : option_strings: List cannot be empty
+103-option-string-wrong-type             | line 3, column 22: foo: option_string: Invalid type. Expected: string
+104-option-string-is-double-dash         | line 3, column 22: foo: --: Invalid value
+105-option-string-with-space             | line 3, column 22: foo: -o : Invalid value
+106-option-string-with-comma             | line 3, column 22: foo: -o,: Invalid value
+110-metavar-wrong-type                   | line 4, column 14: foo: -o: metavar: Invalid type. Expected: string|none
+120-help-wrong-type                      | line 4, column 11: foo: -o: help: Invalid type. Expected: string|none
+130-optional-arg-wrong-type              | line 4, column 19: foo: -o: optional_arg: Invalid type. Expected: boolean|none
+140-group-wrong-type                     | line 4, column 12: foo: -o: group: Invalid type. Expected: string|none
+150-groups-wrong-type                    | line 4, column 13: foo: -o: groups: Invalid type. Expected: list|none
+151-groups-wrong-value                   | line 4, column 14: foo: -o: group: Invalid type. Expected: string
+160-repeatable-wrong-type                | line 4, column 17: foo: -o: repeatable: Invalid type. Expected: boolean|string|none
+161-repeatable-wrong-value               | line 4, column 17: foo: -o: repeatable: Invalid value. Expected: true, false or `INHERIT`
+180-final-wrong-type                     | line 4, column 12: foo: -o: final: Invalid type. Expected: boolean|none
+190-hidden-wrong-type                    | line 4, column 13: foo: -o: hidden: Invalid type. Expected: boolean|none
+191-hidden-but-repeatable                | line 3, column 5: foo: -o: Parameters are mutually exclusive: repeatable, hidden
+200-complete-wrong-type                  | line 4, column 15: foo: -o: complete: Invalid type. Expected: list|none
+210-when-wrong-type                      | line 4, column 11: foo: -o: when: Invalid type. Expected: string|none
+211-when-wrong-value                     | line 4, column 11: foo: -o: when: Invalid command: 'invalid'
+220-metavar-but-no-complete              | line 3, column 5: foo: -o: Parameter `metavar` requires `complete`
+230-optional-arg-but-no-complete         | line 3, column 5: foo: -o: Parameter `optional_arg` requires `complete`
+240-capture-wrong-type                   | line 4, column 14: foo: -o: capture: Invalid type. Expected: string|none
+241-capture-empty                        | line 4, column 14: foo: -o: capture: Not a valid variable name
+242-capture-wrong-value                  | line 4, column 14: foo: -o: capture: Not a valid variable name
 ======= Directory "03-positional" =======
-200-no-number                            | line 3, column 5: Missing required argument: number
-201-number-wrong-type                    | line 3, column 13: number: Invalid type. Expected: integer
-202-number-is-zero                       | line 3, column 13: number: Integer must be greater than zero
-203-number-is-negative                   | line 3, column 13: number: Integer must be greater than zero
-210-metavar-wrong-type                   | line 4, column 14: metavar: Invalid type. Expected: string|none
-220-help-wrong-type                      | line 4, column 14: metavar: Invalid type. Expected: string|none
-230-repeatable-wrong-type                | line 4, column 17: repeatable: Invalid type. Expected: boolean|none
-240-complete-wrong-type                  | line 4, column 15: complete: Invalid type. Expected: list|none
-250-when-wrong-type                      | line 4, column 11: when: Invalid type. Expected: string|none
-251-when-wrong-value                     | line 4, column 11: when: Invalid command: 'invalid'
-260-capture-wrong-type                   | line 4, column 14: capture: Invalid type. Expected: string|none
-261-capture-empty                        | line 4, column 14: capture: Not a valid variable name
-262-capture-wrong-value                  | line 4, column 14: capture: Not a valid variable name
+200-no-number                            | line 3, column 5: foo: metavar: Missing required argument: number
+201-number-wrong-type                    | line 3, column 13: foo: unknown: number: Invalid type. Expected: integer
+202-number-is-zero                       | line 3, column 13: foo: positional #0: number: Integer must be greater than zero
+203-number-is-negative                   | line 3, column 13: foo: positional #-1: number: Integer must be greater than zero
+210-metavar-wrong-type                   | line 4, column 14: foo: positional #1: metavar: Invalid type. Expected: string|none
+220-help-wrong-type                      | line 4, column 14: foo: positional #1: metavar: Invalid type. Expected: string|none
+230-repeatable-wrong-type                | line 4, column 17: foo: positional #1: repeatable: Invalid type. Expected: boolean|none
+240-complete-wrong-type                  | line 4, column 15: foo: positional #1: complete: Invalid type. Expected: list|none
+250-when-wrong-type                      | line 4, column 11: foo: positional #1: when: Invalid type. Expected: string|none
+251-when-wrong-value                     | line 4, column 11: foo: positional #1: when: Invalid command: 'invalid'
+260-capture-wrong-type                   | line 4, column 14: foo: positional #1: capture: Invalid type. Expected: string|none
+261-capture-empty                        | line 4, column 14: foo: positional #1: capture: Not a valid variable name
+262-capture-wrong-value                  | line 4, column 14: foo: positional #1: capture: Not a valid variable name
 ======= Directory "04-complete" =======
-3_00_00-invalid-command                  | line 4, column 16: Unknown completer: wrong
-3_01_00-command-options-wrong-type       | line 4, column 27: Invalid type. Expected: dictionary
-3_01_01-command-path-wrong-type          | line 4, column 36: path: Invalid type. Expected: string
-3_01_02-command-path-empty               | line 4, column 36: path: String cannot be empty
-3_01_03-command-path-append-wrong-type   | line 4, column 43: path_append: Invalid type. Expected: string
-3_01_04-command-path-append-empty        | line 4, column 43: path_append: String cannot be empty
-3_01_05-command-path-prepend-wrong-type  | line 4, column 44: path_prepend: Invalid type. Expected: string
-3_01_06-command-path-prepend-empty       | line 4, column 44: path_prepend: String cannot be empty
-3_01_07-command-invalid-option           | line 4, column 28: Unknown parameter: wrong
-3_01_10-command-too-many-args            | line 4, column 15: Too many arguments
-3_02_00-environment-too-many-args        | line 4, column 15: Too many arguments
-3_03_00-float-too-many-args              | line 4, column 15: Too many arguments
-3_04_00-group-too-many-args              | line 4, column 15: Too many arguments
-3_05_00-hostname-too-many-args           | line 4, column 15: Too many arguments
-3_06_00-integer-too-many-args            | line 4, column 15: Too many arguments
-3_06_01-integer-help-wrong-type          | line 4, column 36: help: Invalid type. Expected: string
-3_06_02-integer-help-wrong-value         | line 4, column 36: help: String cannot be empty
-3_06_03-integer-min-wrong-type           | line 4, column 35: min: Invalid type. Expected: integer
-3_06_04-integer-max-wrong-type           | line 4, column 35: max: Invalid type. Expected: integer
-3_06_05-integer-min-greater-max          | line 4, column 27: min > max (1 > 0)
-3_06_06-integer-suffixes-wrong-type      | line 4, column 40: suffixes: Invalid type. Expected: dictionary
-3_06_07-integer-suffixes-empty           | line 4, column 40: suffixes: Dictionary cannot be empty
-3_06_08-integer-suffixes-key-wrong-type  | line 4, column 41: suffix: Invalid type. Expected: string
-3_06_09-integer-suffixes-key-empty       | line 5, column 41: suffix: String cannot be empty
-3_06_10-integer-suffixes-value-wrong-type | line 4, column 46: description: Invalid type. Expected: string
-3_06_11-integer-suffixes-value-wrong-value | line 4, column 46: description: String cannot be empty
-3_07_00-none-too-many-args               | line 4, column 15: Too many arguments
-3_08_00-pid-too-many-args                | line 4, column 15: Too many arguments
-3_09_00-process-too-many-args            | line 4, column 15: Too many arguments
-3_10_00-service-too-many-args            | line 4, column 15: Too many arguments
-3_11_00-signal-too-many-args             | line 4, column 15: Too many arguments
-3_12_00-user-too-many-args               | line 4, column 15: Too many arguments
-3_13_00-variable-too-many-args           | line 4, column 15: Too many arguments
-3_14_00-choices-missing-arg              | line 4, column 15: Missing required argument: choices
-3_14_01-choices-arg-wrong-type           | line 4, column 27: Invalid type. Expected: list|dictionary
+3_00_00-invalid-command                  | line 4, column 16: foo: -o: Unknown completer: wrong
+3_01_00-command-options-wrong-type       | line 4, column 27: foo: -o: command: options: Invalid type. Expected: dictionary
+3_01_01-command-path-wrong-type          | line 4, column 36: foo: -o: command: path: Invalid type. Expected: string
+3_01_02-command-path-empty               | line 4, column 36: foo: -o: command: path: String cannot be empty
+3_01_03-command-path-append-wrong-type   | line 4, column 43: foo: -o: command: path_append: Invalid type. Expected: string
+3_01_04-command-path-append-empty        | line 4, column 43: foo: -o: command: path_append: String cannot be empty
+3_01_05-command-path-prepend-wrong-type  | line 4, column 44: foo: -o: command: path_prepend: Invalid type. Expected: string
+3_01_06-command-path-prepend-empty       | line 4, column 44: foo: -o: command: path_prepend: String cannot be empty
+3_01_07-command-invalid-option           | line 4, column 28: foo: -o: command: Unknown parameter: wrong
+3_01_10-command-too-many-args            | line 4, column 15: foo: -o: command: Too many arguments
+3_02_00-environment-too-many-args        | line 4, column 15: foo: -o: environment: Too many arguments
+3_03_00-float-too-many-args              | line 4, column 15: foo: -o: float: Too many arguments
+3_04_00-group-too-many-args              | line 4, column 15: foo: -o: group: Too many arguments
+3_05_00-hostname-too-many-args           | line 4, column 15: foo: -o: hostname: Too many arguments
+3_06_00-integer-too-many-args            | line 4, column 15: foo: -o: integer: Too many arguments
+3_06_01-integer-help-wrong-type          | line 4, column 36: foo: -o: integer: help: Invalid type. Expected: string
+3_06_02-integer-help-wrong-value         | line 4, column 36: foo: -o: integer: help: String cannot be empty
+3_06_03-integer-min-wrong-type           | line 4, column 35: foo: -o: integer: min: Invalid type. Expected: integer
+3_06_04-integer-max-wrong-type           | line 4, column 35: foo: -o: integer: max: Invalid type. Expected: integer
+3_06_05-integer-min-greater-max          | line 4, column 27: foo: -o: integer: min > max (1 > 0)
+3_06_06-integer-suffixes-wrong-type      | line 4, column 40: foo: -o: integer: suffixes: Invalid type. Expected: dictionary
+3_06_07-integer-suffixes-empty           | line 4, column 40: foo: -o: integer: suffixes: Dictionary cannot be empty
+3_06_08-integer-suffixes-key-wrong-type  | line 4, column 41: foo: -o: integer: suffix: Invalid type. Expected: string
+3_06_09-integer-suffixes-key-empty       | line 5, column 41: foo: -o: integer: suffix: String cannot be empty
+3_06_10-integer-suffixes-value-wrong-type | line 4, column 46: foo: -o: integer: description: Invalid type. Expected: string
+3_06_11-integer-suffixes-value-wrong-value | line 4, column 46: foo: -o: integer: description: String cannot be empty
+3_07_00-none-too-many-args               | line 4, column 15: foo: -o: none: Too many arguments
+3_08_00-pid-too-many-args                | line 4, column 15: foo: -o: pid: Too many arguments
+3_09_00-process-too-many-args            | line 4, column 15: foo: -o: process: Too many arguments
+3_10_00-service-too-many-args            | line 4, column 15: foo: -o: service: Too many arguments
+3_11_00-signal-too-many-args             | line 4, column 15: foo: -o: signal: Too many arguments
+3_12_00-user-too-many-args               | line 4, column 15: foo: -o: user: Too many arguments
+3_13_00-variable-too-many-args           | line 4, column 15: foo: -o: variable: Too many arguments
+3_14_00-choices-missing-arg              | line 4, column 15: foo: -o: choices: Missing required argument: values
+3_14_01-choices-arg-wrong-type           | line 4, column 27: foo: -o: choices: values: Invalid type. Expected: list|dictionary
 3_14_02-choices-dict-key-wrong-type      | No error
-3_14_03-choices-dict-desc-wrong-type     | line 4, column 36: Invalid type. Expected: string|integer
-3_14_04-choices-list-value-wrong-type    | line 4, column 28: Invalid type. Expected: string|integer
-3_14_05-choices-too-many-args            | line 4, column 15: Too many arguments
-3_15_00-file-options-wrong-type          | line 4, column 24: Invalid type. Expected: dictionary
-3_15_01-file-unknown-key                 | line 4, column 25: Unknown parameter: wrong
-3_15_02-file-directory-wrong-type        | line 4, column 38: directory: Invalid type. Expected: string
-3_15_03-file-directory-empty             | line 4, column 38: directory: String cannot be empty
+3_14_03-choices-dict-desc-wrong-type     | line 4, column 36: foo: -o: choices: values[0]: description: Invalid type. Expected: string|integer
+3_14_04-choices-list-value-wrong-type    | line 4, column 28: foo: -o: choices: values[0]: Invalid type. Expected: string|integer
+3_14_05-choices-too-many-args            | line 4, column 15: foo: -o: choices: Too many arguments
+3_15_00-file-options-wrong-type          | line 4, column 24: foo: -o: file: options: Invalid type. Expected: dictionary
+3_15_01-file-unknown-key                 | line 4, column 25: foo: -o: file: Unknown parameter: wrong
+3_15_02-file-directory-wrong-type        | line 4, column 38: foo: -o: file: directory: Invalid type. Expected: string
+3_15_03-file-directory-empty             | line 4, column 38: foo: -o: file: directory: String cannot be empty
 3_15_04-file-directory-not-absolute      | No error
-3_15_05-file-extensions-wrong-type       | line 4, column 39: extensions: Invalid type. Expected: list
-3_15_06-file-extensions-empty            | line 4, column 39: extensions: List cannot be empty
-3_15_07-file-extension-empty             | line 4, column 40: extension: String cannot be empty
-3_15_08-file-extension-with-space        | line 4, column 40: extension: String cannot contain spaces
-3_15_09-file-too-many-args               | line 4, column 15: Too many arguments
-3_15_10-file-invalid-ignore-globs-1      | line 4, column 42: pattern: Extended glob of form *(...) not supported in zsh glob
-3_15_11-file-invalid-ignore-globs-2      | line 4, column 42: pattern: Extended glob of form +(...) not supported in zsh glob
-3_15_12-file-invalid-ignore-globs-3      | line 4, column 42: pattern: Extended glob of form ?(...) not supported in zsh glob
-3_15_13-file-invalid-ignore-globs-4      | line 4, column 42: pattern: Negated glob !(...) not supported in regex
-3_15_14-file-invalid-ignore-globs-5      | line 4, column 42: pattern: Unclosed extglob
-3_15_15-file-invalid-ignore-globs-6      | line 4, column 42: pattern: Unclosed character class
-3_15_16-file-invalid-ignore-globs-7      | line 4, column 42: pattern: Unclosed single quote
-3_15_17-file-invalid-ignore-globs-8      | line 4, column 42: pattern: Unclosed double quote
-3_15_18-file-ignore-globs-invalid-type   | line 4, column 41: ignore_globs: Invalid type. Expected: list
-3_15_19-file-ignore-globs-invalid-empty  | line 4, column 41: ignore_globs: List cannot be empty
-3_16_00-directory-options-wrong-type     | line 4, column 29: Invalid type. Expected: dictionary
-3_16_01-directory-unknown-key            | line 4, column 30: Unknown parameter: wrong
-3_16_02-directory-directory-wrong-type   | line 4, column 43: directory: Invalid type. Expected: string
-3_16_03-directory-directory-empty        | line 4, column 43: directory: String cannot be empty
+3_15_05-file-extensions-wrong-type       | line 4, column 39: foo: -o: file: extensions: Invalid type. Expected: list
+3_15_06-file-extensions-empty            | line 4, column 39: foo: -o: file: extensions: List cannot be empty
+3_15_07-file-extension-empty             | line 4, column 40: foo: -o: file: extensions[0]: String cannot be empty
+3_15_08-file-extension-with-space        | line 4, column 40: foo: -o: file: extensions[0]: String cannot contain spaces
+3_15_09-file-too-many-args               | line 4, column 15: foo: -o: file: Too many arguments
+3_15_10-file-invalid-ignore-globs-1      | line 4, column 42: foo: -o: file: pattern: Extended glob of form *(...) not supported in zsh glob
+3_15_11-file-invalid-ignore-globs-2      | line 4, column 42: foo: -o: file: pattern: Extended glob of form +(...) not supported in zsh glob
+3_15_12-file-invalid-ignore-globs-3      | line 4, column 42: foo: -o: file: pattern: Extended glob of form ?(...) not supported in zsh glob
+3_15_13-file-invalid-ignore-globs-4      | line 4, column 42: foo: -o: file: pattern: Negated glob !(...) not supported in regex
+3_15_14-file-invalid-ignore-globs-5      | line 4, column 42: foo: -o: file: pattern: Unclosed extglob
+3_15_15-file-invalid-ignore-globs-6      | line 4, column 42: foo: -o: file: pattern: Unclosed character class
+3_15_16-file-invalid-ignore-globs-7      | line 4, column 42: foo: -o: file: pattern: Unclosed single quote
+3_15_17-file-invalid-ignore-globs-8      | line 4, column 42: foo: -o: file: pattern: Unclosed double quote
+3_15_18-file-ignore-globs-invalid-type   | line 4, column 41: foo: -o: file: ignore_globs: Invalid type. Expected: list
+3_15_19-file-ignore-globs-invalid-empty  | line 4, column 41: foo: -o: file: ignore_globs: List cannot be empty
+3_16_00-directory-options-wrong-type     | line 4, column 29: foo: -o: directory: options: Invalid type. Expected: dictionary
+3_16_01-directory-unknown-key            | line 4, column 30: foo: -o: directory: Unknown parameter: wrong
+3_16_02-directory-directory-wrong-type   | line 4, column 43: foo: -o: directory: directory: Invalid type. Expected: string
+3_16_03-directory-directory-empty        | line 4, column 43: foo: -o: directory: directory: String cannot be empty
 3_16_04-directory-directory-not-absolute | No error
-3_16_05-directory-too-many-args          | line 4, column 15: Too many arguments
-3_17_00-range-missing-arg-1              | line 4, column 15: Missing required argument: start
-3_17_01-range-missing-arg-2              | line 4, column 15: Missing required argument: stop
-3_17_02-range-too-many-args              | line 4, column 15: Too many arguments
-3_17_03-range-step-zero                  | line 4, column 31: step: Integer cannot be zero
-3_17_04-range-invalid-range-0            | line 4, column 31: stop > start: 2 > 1 (step=-1)
-3_17_05-range-invalid-range-1            | line 4, column 31: start > stop: 2 > 1 (step=1)
-3_18_00-exec-missing-arg                 | line 4, column 15: Missing required argument: command
-3_18_01-exec-too-many-arguments          | line 4, column 15: Too many arguments
-3_18_02-exec-command-wrong-type          | line 4, column 24: command: Invalid type. Expected: string
-3_19_00-exec-fast-missing-arg            | line 4, column 15: Missing required argument: command
-3_19_01-exec-fast-too-many-arguments     | line 4, column 15: Too many arguments
-3_19_02-exec-fast-command-wrong-type     | line 4, column 29: command: Invalid type. Expected: string
-3_20_00-exec-internal-missing-arg        | line 4, column 15: Missing required argument: command
-3_20_01-exec-internal-too-many-arguments | line 4, column 15: Too many arguments
-3_20_02-exec-internal-command-wrong-type | line 4, column 33: command: Invalid type. Expected: string
-3_21_00-value-list-missing-arg           | line 4, column 15: Missing required argument: options
-3_21_01-value-list-missing-values        | line 4, column 30: Missing required argument: values
-3_21_02-value-list-values-wrong-type     | line 4, column 39: values: Invalid type. Expected: list|dictionary
-3_21_03-value-list-separator-wrong-type  | line 4, column 64: separator: Invalid type. Expected: string
-3_21_04-value-list-separator-wrong-value | line 4, column 64: separator: Invalid length. Single character expected
-3_21_05-value-list-values-empty          | line 4, column 41: values: List cannot be empty
-3_21_06-value-list-list-wrong-type       | line 4, column 42: Invalid type. Expected: string
-3_21_07-value-list-dict-key-wrong-type   | line 4, column 42: Invalid type. Expected: string
-3_21_08-value-list-dict-desc-wrong-type  | line 4, column 48: Invalid type. Expected: string
-3_21_09-value-list-too-many-args         | line 4, column 15: Too many arguments
-3_22_00-combine-missing-arg              | line 4, column 15: Missing required argument: commands
-3_22_01-combine-wrong-type               | line 4, column 27: Invalid type. Expected: list
-3_22_02-combine-empty-subcommands        | line 4, column 27: commands: List cannot be empty
-3_22_03-combine-single-subcommand        | line 4, column 27: List must contain at least two items
-3_22_04-combine-subcommand-no-command    | line 4, column 38: Missing required argument: command
-3_22_05-combine-subcommand-invalid-type  | line 4, column 38: Invalid type. Expected: list
-3_22_06-combine-subcommand-invalid-command | line 4, column 39: Unknown completer: invalid
-3_22_07-combine-subcommand-is-none       | line 4, column 38: Completer `none` not allowed in `combine`
+3_16_05-directory-too-many-args          | line 4, column 15: foo: -o: directory: Too many arguments
+3_17_00-range-missing-arg-1              | line 4, column 15: foo: -o: range: Missing required argument: start
+3_17_01-range-missing-arg-2              | line 4, column 15: foo: -o: range: Missing required argument: stop
+3_17_02-range-too-many-args              | line 4, column 15: foo: -o: range: Too many arguments
+3_17_03-range-step-zero                  | line 4, column 31: foo: -o: range: step: Integer cannot be zero
+3_17_04-range-invalid-range-0            | line 4, column 31: foo: -o: range: stop > start: 2 > 1 (step=-1)
+3_17_05-range-invalid-range-1            | line 4, column 31: foo: -o: range: start > stop: 2 > 1 (step=1)
+3_18_00-exec-missing-arg                 | line 4, column 15: foo: -o: exec: Missing required argument: command
+3_18_01-exec-too-many-arguments          | line 4, column 15: foo: -o: exec: Too many arguments
+3_18_02-exec-command-wrong-type          | line 4, column 24: foo: -o: exec: command: Invalid type. Expected: string
+3_19_00-exec-fast-missing-arg            | line 4, column 15: foo: -o: exec_fast: Missing required argument: command
+3_19_01-exec-fast-too-many-arguments     | line 4, column 15: foo: -o: exec_fast: Too many arguments
+3_19_02-exec-fast-command-wrong-type     | line 4, column 29: foo: -o: exec_fast: command: Invalid type. Expected: string
+3_20_00-exec-internal-missing-arg        | line 4, column 15: foo: -o: exec_internal: Missing required argument: command
+3_20_01-exec-internal-too-many-arguments | line 4, column 15: foo: -o: exec_internal: Too many arguments
+3_20_02-exec-internal-command-wrong-type | line 4, column 33: foo: -o: exec_internal: command: Invalid type. Expected: string
+3_21_00-value-list-missing-arg           | line 4, column 15: foo: -o: value_list: Missing required argument: options
+3_21_01-value-list-missing-values        | line 4, column 30: foo: -o: value_list: Missing required argument: values
+3_21_02-value-list-values-wrong-type     | line 4, column 39: foo: -o: value_list: values: Invalid type. Expected: list|dictionary
+3_21_03-value-list-separator-wrong-type  | line 4, column 64: foo: -o: value_list: separator: Invalid type. Expected: string
+3_21_04-value-list-separator-wrong-value | line 4, column 64: foo: -o: value_list: separator: Invalid length. Single character expected
+3_21_05-value-list-values-empty          | line 4, column 41: foo: -o: value_list: values: List cannot be empty
+3_21_06-value-list-list-wrong-type       | line 4, column 42: foo: -o: value_list: values[0]: item: Invalid type. Expected: string
+3_21_07-value-list-dict-key-wrong-type   | line 4, column 42: foo: -o: value_list: values[0]: item: Invalid type. Expected: string
+3_21_08-value-list-dict-desc-wrong-type  | line 4, column 48: foo: -o: value_list: values[0]: description: Invalid type. Expected: string
+3_21_09-value-list-too-many-args         | line 4, column 15: foo: -o: value_list: Too many arguments
+3_22_00-combine-missing-arg              | line 4, column 15: foo: -o: combine: Missing required argument: commands
+3_22_01-combine-wrong-type               | line 4, column 27: foo: -o: combine: commands: Invalid type. Expected: list
+3_22_02-combine-empty-subcommands        | line 4, column 27: foo: -o: combine: commands: List cannot be empty
+3_22_03-combine-single-subcommand        | line 4, column 27: foo: -o: combine: commands: List must contain at least two items
+3_22_04-combine-subcommand-no-command    | line 4, column 38: foo: -o: combine: Missing required argument: command
+3_22_05-combine-subcommand-invalid-type  | line 4, column 38: foo: -o: combine: command[1]: Invalid type. Expected: list
+3_22_06-combine-subcommand-invalid-command | line 4, column 39: foo: -o: combine: Unknown completer: invalid
+3_22_07-combine-subcommand-is-none       | line 4, column 38: foo: -o: combine: none: Completer `none` not allowed in `combine`
 3_22_08-combine-subcommand-is-combine    | No error
-3_22_09-combine-too-many-args            | line 4, column 15: Too many arguments
-3_23_00-history-missing-arg              | line 4, column 15: Missing required argument: pattern
-3_23_01-history-too-many-arguments       | line 4, column 15: Too many arguments
-3_23_02-history-pattern-wrong-type       | line 4, column 27: pattern: Invalid type. Expected: string
-3_23_03-history-pattern-wrong-regex      | line 4, column 27: pattern: Not an extended regular expression
-3_24_00-command-arg-without-command      | line 3, column 5: Completer `command_arg` requires a previously defined `command` completer
-3_24_01-command-arg-non-repeatable       | line 6, column 5: Completer `command_arg` requires `repeatable=true`
-3_25_00-mime-file-missing-arg            | line 4, column 15: Missing required argument: pattern
-3_25_01-mime-file-too-many-arguments     | line 4, column 15: Too many arguments
-3_25_02-mime-file-pattern-wrong-type     | line 4, column 29: pattern: Invalid type. Expected: string
-3_25_03-mime-file-pattern-wrong-regex    | line 4, column 29: pattern: Not an extended regular expression
-3_26_00-date-missing-arg                 | line 4, column 15: Missing required argument: format
-3_26_01-date-too-many-arguments          | line 4, column 15: Too many arguments
-3_26_02-date-format-wrong-type           | line 4, column 24: format: Invalid type. Expected: string
-3_26_03-date-format-empty                | line 4, column 24: format: String cannot be empty
-3_27_00-date-format-too-many-arguments   | line 4, column 15: Too many arguments
-3_28_00-list-missing-arg                 | line 4, column 15: Missing required argument: command
-3_28_01-list-wrong-type                  | line 4, column 24: Invalid type. Expected: list
-3_28_02-list-options-wrong-type          | line 4, column 34: options: Invalid type. Expected: dictionary
-3_28_03-list-too-many-args               | line 4, column 15: Too many arguments
-3_28_04-list-no-command                  | line 4, column 24: Missing required argument: command
-3_28_05-list-command-is-none             | line 4, column 24: Completer `none` not allowed in `list`
+3_22_09-combine-too-many-args            | line 4, column 15: foo: -o: combine: Too many arguments
+3_23_00-history-missing-arg              | line 4, column 15: foo: -o: history: Missing required argument: pattern
+3_23_01-history-too-many-arguments       | line 4, column 15: foo: -o: history: Too many arguments
+3_23_02-history-pattern-wrong-type       | line 4, column 27: foo: -o: history: pattern: Invalid type. Expected: string
+3_23_03-history-pattern-wrong-regex      | line 4, column 27: foo: -o: history: pattern: Not an extended regular expression
+3_24_00-command-arg-without-command      | line 3, column 5: foo: positional #1: command_arg: Completer `command_arg` requires a previously defined `command` completer
+3_24_01-command-arg-non-repeatable       | line 6, column 5: foo: positional #2: command_arg: Completer `command_arg` requires `repeatable=true`
+3_25_00-mime-file-missing-arg            | line 4, column 15: foo: -o: mime_file: Missing required argument: pattern
+3_25_01-mime-file-too-many-arguments     | line 4, column 15: foo: -o: mime_file: Too many arguments
+3_25_02-mime-file-pattern-wrong-type     | line 4, column 29: foo: -o: mime_file: pattern: Invalid type. Expected: string
+3_25_03-mime-file-pattern-wrong-regex    | line 4, column 29: foo: -o: mime_file: pattern: Not an extended regular expression
+3_26_00-date-missing-arg                 | line 4, column 15: foo: -o: date: Missing required argument: format
+3_26_01-date-too-many-arguments          | line 4, column 15: foo: -o: date: Too many arguments
+3_26_02-date-format-wrong-type           | line 4, column 24: foo: -o: date: format: Invalid type. Expected: string
+3_26_03-date-format-empty                | line 4, column 24: foo: -o: date: format: String cannot be empty
+3_27_00-date-format-too-many-arguments   | line 4, column 15: foo: -o: date_format: Too many arguments
+3_28_00-list-missing-arg                 | line 4, column 15: foo: -o: list: Missing required argument: command
+3_28_01-list-wrong-type                  | line 4, column 24: foo: -o: list: command: Invalid type. Expected: list
+3_28_02-list-options-wrong-type          | line 4, column 34: foo: -o: list: options: Invalid type. Expected: dictionary
+3_28_03-list-too-many-args               | line 4, column 15: foo: -o: list: Too many arguments
+3_28_04-list-no-command                  | line 4, column 24: foo: -o: list: Missing required argument: command
+3_28_05-list-command-is-none             | line 4, column 24: foo: -o: list: none: Completer `none` not allowed in `list`
 3_28_06-list-command-is-list             | No error
-3_28_09-list-command-is-command-arg      | line 4, column 24: Completer `command_arg` not allowed in `list`
-3_28_10-list-separator-wrong-type        | line 4, column 48: separator: Invalid type. Expected: string
-3_28_11-list-separator-wrong-value       | line 4, column 48: separator: Invalid length. Single character expected
-3_28_12-list-unkown-option               | line 4, column 35: Unknown parameter: wrong
-3_29_00-command-arg-too-many-args        | line 4, column 15: Too many arguments
-3_29_01-command-arg-in-option            | line 4, column 15: Completer `command_arg` not allowed inside an option
-3_29_02-command-arg-not-repeatable       | line 3, column 5: Completer `command_arg` requires `repeatable=true`
-3_30_00-key-value-list-missing-args      | line 4, column 15: Missing required argument: pair_separator
-3_30_01-key-value-list-missing-args-1    | line 4, column 15: Missing required argument: value_separator
-3_30_02-key-value-list-missing-args-2    | line 4, column 15: Missing required argument: values
-3_30_03-key-value-list-too-many-args     | line 4, column 15: Too many arguments
-3_30_04-key-value-list-sep1-wrong-type   | line 4, column 34: pair_separator: Invalid type. Expected: string
-3_30_05-key-value-list-sep1-empty        | line 4, column 34: pair_separator: Invalid length. Single character expected
-3_30_06-key-value-list-sep1-wrong-value  | line 4, column 34: pair_separator: Invalid length. Single character expected
-3_30_07-key-value-list-sep2-wrong-type   | line 4, column 39: value_separator: Invalid type. Expected: string
-3_30_08-key-value-list-sep2-empty        | line 4, column 39: value_separator: Invalid length. Single character expected
-3_30_09-key-value-list-sep2-wrong-value  | line 4, column 39: value_separator: Invalid length. Single character expected
-3_30_10-key-value-list-values-wrong-type | line 4, column 44: values: Invalid type. Expected: list
-3_30_11-key-value-list-1-key-not-string  | line 4, column 46: Invalid type. Expected: string
-3_30_12-key-value-list-1-key-empty       | line 4, column 46: key: String cannot be empty
-3_30_13-key-value-list-1-key-with-space  | line 4, column 46: key: String cannot contain spaces
-3_30_14-key-value-list-1-complete-wrong-type | line 4, column 59: Invalid type. Expected: list|none
-3_30_15-key-value-list-2-def-not-list    | line 4, column 45: Invalid type. Expected: list
-3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: List must contain exactly three items
-3_30_17-key-value-list-2-key-not-string  | line 4, column 46: Invalid type. Expected: string
-3_30_18-key-value-list-2-key-empty       | line 4, column 46: key: String cannot be empty
-3_30_19-key-value-list-key-with-space    | line 4, column 46: key: String cannot contain spaces
-3_30_20-key-value-list-2-desc-not-string | line 4, column 53: Invalid type. Expected: string|none
-3_31_00-ip-address-too-many-args         | line 4, column 15: Too many arguments
-3_31_01-ip-address-arg-wrong-type        | line 4, column 30: type: Invalid type. Expected: string
-3_31_02-ip-address-arg-wrong-value       | line 4, column 30: type: Invalid value. Expected: ipv4, ipv6, all
+3_28_09-list-command-is-command-arg      | line 4, column 24: foo: -o: list: command_arg: Completer `command_arg` not allowed in `list`
+3_28_10-list-separator-wrong-type        | line 4, column 48: foo: -o: list: separator: Invalid type. Expected: string
+3_28_11-list-separator-wrong-value       | line 4, column 48: foo: -o: list: separator: Invalid length. Single character expected
+3_28_12-list-unkown-option               | line 4, column 35: foo: -o: list: Unknown parameter: wrong
+3_29_00-command-arg-too-many-args        | line 4, column 15: foo: positional #1: command_arg: Too many arguments
+3_29_01-command-arg-in-option            | line 4, column 15: foo: -o: command_arg: Completer `command_arg` not allowed inside an option
+3_29_02-command-arg-not-repeatable       | line 3, column 5: foo: positional #1: command_arg: Completer `command_arg` requires `repeatable=true`
+3_30_00-key-value-list-missing-args      | line 4, column 15: foo: -o: key_value_list: Missing required argument: pair_separator
+3_30_01-key-value-list-missing-args-1    | line 4, column 15: foo: -o: key_value_list: Missing required argument: value_separator
+3_30_02-key-value-list-missing-args-2    | line 4, column 15: foo: -o: key_value_list: Missing required argument: values
+3_30_03-key-value-list-too-many-args     | line 4, column 15: foo: -o: key_value_list: Too many arguments
+3_30_04-key-value-list-sep1-wrong-type   | line 4, column 34: foo: -o: key_value_list: pair_separator: Invalid type. Expected: string
+3_30_05-key-value-list-sep1-empty        | line 4, column 34: foo: -o: key_value_list: pair_separator: Invalid length. Single character expected
+3_30_06-key-value-list-sep1-wrong-value  | line 4, column 34: foo: -o: key_value_list: pair_separator: Invalid length. Single character expected
+3_30_07-key-value-list-sep2-wrong-type   | line 4, column 39: foo: -o: key_value_list: value_separator: Invalid type. Expected: string
+3_30_08-key-value-list-sep2-empty        | line 4, column 39: foo: -o: key_value_list: value_separator: Invalid length. Single character expected
+3_30_09-key-value-list-sep2-wrong-value  | line 4, column 39: foo: -o: key_value_list: value_separator: Invalid length. Single character expected
+3_30_10-key-value-list-values-wrong-type | line 4, column 44: foo: -o: key_value_list: values: Invalid type. Expected: list
+3_30_11-key-value-list-1-key-not-string  | line 4, column 46: foo: -o: key_value_list: definition[0]: key: Invalid type. Expected: string
+3_30_12-key-value-list-1-key-empty       | line 4, column 46: foo: -o: key_value_list: definition[0]: key: String cannot be empty
+3_30_13-key-value-list-1-key-with-space  | line 4, column 46: foo: -o: key_value_list: definition[0]: key: String cannot contain spaces
+3_30_14-key-value-list-1-complete-wrong-type | line 4, column 59: foo: -o: key_value_list: definition[0]: completer: Invalid type. Expected: list|none
+3_30_15-key-value-list-2-def-not-list    | line 4, column 45: foo: -o: key_value_list: definition[0]: Invalid type. Expected: list
+3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: foo: -o: key_value_list: definition[0]: List must contain exactly three items
+3_30_17-key-value-list-2-key-not-string  | line 4, column 46: foo: -o: key_value_list: definition[0]: key: Invalid type. Expected: string
+3_30_18-key-value-list-2-key-empty       | line 4, column 46: foo: -o: key_value_list: definition[0]: key: String cannot be empty
+3_30_19-key-value-list-key-with-space    | line 4, column 46: foo: -o: key_value_list: definition[0]: key: String cannot contain spaces
+3_30_20-key-value-list-2-desc-not-string | line 4, column 53: foo: -o: key_value_list: definition[0]: description: Invalid type. Expected: string|none
+3_31_00-ip-address-too-many-args         | line 4, column 15: foo: -o: ip_address: Too many arguments
+3_31_01-ip-address-arg-wrong-type        | line 4, column 30: foo: -o: ip_address: type: Invalid type. Expected: string
+3_31_02-ip-address-arg-wrong-value       | line 4, column 30: foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected: dictionary
-001-multiple-repeatable-positionals      | line 6, column 5: Too many repeatable positionals
-002-positional-after-repeatable          | line 6, column 5: Positional argument found after a repeatable positional argument
-003-positional-after-repeatable          | line 3, column 5: Positional argument found after a repeatable positional argument
-004-repeatable-and-subcommands           | line 1, column 1: Repeatable positional arguments cannot be used together with subcommands
+001-multiple-repeatable-positionals      | line 6, column 5: foo: Too many repeatable positionals
+002-positional-after-repeatable          | line 6, column 5: foo: Positional argument found after a repeatable positional argument
+003-positional-after-repeatable          | line 3, column 5: foo: Positional argument found after a repeatable positional argument
+004-repeatable-and-subcommands           | line 1, column 1: foo: Repeatable positional arguments cannot be used together with subcommands

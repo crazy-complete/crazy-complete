@@ -45,3 +45,24 @@ class ValueWithTrace:
 
     def __repr__(self):
         return f'{self.value!r}'
+
+
+class ValueWithOutTrace:
+    '''Class holding a value without metadata. '''
+
+    def __init__(self, value):
+        self.value = value
+
+    def get_position_string(self):
+        '''Return empty string.'''
+
+        return ''
+
+    def __hash__(self):
+        return hash(self.value)
+
+    def __eq__(self, other):
+        return self.value == other
+
+    def __repr__(self):
+        return f'{self.value!r}'

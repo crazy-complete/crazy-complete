@@ -116,7 +116,7 @@ def _check_dictionary(dictionary, rules):
 
     for key, rule in rules.items():
         if rule[0] is True and key not in dictionary.value:
-            raise _error('%s: %s' % (m.missing_arg(), key),  dictionary)
+            raise _error('%s: %s' % (m.missing_arg(), key), dictionary)
 
 
 def _check_regex(value, parameter):
@@ -126,7 +126,8 @@ def _check_regex(value, parameter):
 
 def _check_char(value, parameter):
     if len(value.value) != 1:
-        raise _error('%s: %s' % (parameter, m.single_character_expected()), value)
+        msg = '%s: %s' % (parameter, m.single_character_expected())
+        raise _error(msg, value)
 
 
 def _check_variable_name(value, parameter):
@@ -141,7 +142,8 @@ def _check_non_empty_string(value, parameter):
 
 def _check_no_spaces(value, parameter):
     if contains_space(value.value):
-        raise _error('%s: %s' % (parameter, m.string_cannot_contain_space()), value)
+        msg = '%s: %s' % (parameter, m.string_cannot_contain_space())
+        raise _error(msg, value)
 
 
 def _check_non_empty_list(value, parameter):
@@ -186,23 +188,23 @@ def _check_none(ctxt, arguments):
 
 
 def _check_choices(_ctxt, arguments):
-    choices = arguments.get_required_arg('choices')
-    _check_type(choices, (list, dict))
+    choices = arguments.get_required_arg('values')
+    _check_type(choices, (list, dict), 'values')
     arguments.require_no_more()
 
     if isinstance(choices.value, dict):
-        for value, desc in choices.value.items():
-            _check_type(value, (str, int))
-            _check_type(desc,  (str, int))
+        for i, (value, desc) in enumerate(choices.value.items()):
+            _check_type(value, (str, int), f'values[{i}]: item')
+            _check_type(desc,  (str, int), f'values[{i}]: description')
 
     elif isinstance(choices.value, list):
-        for value in choices.value:
-            _check_type(value, (str, int))
+        for i, value in enumerate(choices.value):
+            _check_type(value, (str, int), f'values[{i}]')
 
 
 def _check_command(_ctxt, arguments):
     opts = arguments.get_optional_arg({})
-    _check_type(opts, (dict, ))
+    _check_type(opts, (dict,), 'options')
     arguments.require_no_more()
 
     _check_dictionary(opts, {
@@ -255,7 +257,7 @@ def _check_command_arg(ctxt, arguments):
 
 def _check_filedir(_ctxt, arguments, with_file_opts=False, with_list_opts=False):
     options = arguments.get_optional_arg({})
-    _check_type(options, (dict,))
+    _check_type(options, (dict,), 'options')
     arguments.require_no_more()
 
     spec = {'directory': (False, (str,), _check_non_empty_string)}
@@ -272,10 +274,10 @@ def _check_filedir(_ctxt, arguments, with_file_opts=False, with_list_opts=False)
     _check_dictionary(options, spec)
 
     if _has_set(options, 'extensions'):
-        for extension in options.value['extensions'].value:
-            _check_type(extension, (str,), 'extension')
-            _check_non_empty_string(extension, 'extension')
-            _check_no_spaces(extension, 'extension')
+        for i, extension in enumerate(options.value['extensions'].value):
+            _check_type(extension, (str,), f'extensions[{i}]')
+            _check_non_empty_string(extension, f'extensions[{i}]')
+            _check_no_spaces(extension, f'extensions[{i}]')
 
     if _has_set(options, 'ignore_globs'):
         for pattern in options.value['ignore_globs'].value:
@@ -321,16 +323,16 @@ def _check_range(_ctxt, arguments):
     _check_type(stop, (int,), "stop")
     _check_type(step, (int,), "step")
 
-    if step.value > 0:
-        if start.value > stop.value:
-            msg = f"start > stop: {start.value} > {stop.value} (step={step.value})"
-            raise _error(msg, step)
-    elif step.value < 0:
-        if stop.value > start.value:
-            msg = f"stop > start: {stop.value} > {start.value} (step={step.value})"
-            raise _error(msg, step)
-    else:
+    if step.value == 0:
         msg = '%s: %s' % ('step', m.integer_cannot_be_zero())
+        raise _error(msg, step)
+
+    if step.value > 0 and start.value > stop.value:
+        msg = f"start > stop: {start.value} > {stop.value} (step={step.value})"
+        raise _error(msg, step)
+
+    if step.value < 0 and stop.value > start.value:
+        msg = f"stop > start: {stop.value} > {start.value} (step={step.value})"
         raise _error(msg, step)
 
 
@@ -356,14 +358,14 @@ def _check_value_list(_ctxt, arguments):
     if isinstance(values.value, dict):
         _check_non_empty_dict(values, 'values')
 
-        for item, desc in values.value.items():
-            _check_type(item, (str,))
-            _check_type(desc, (str,))
+        for i, (item, desc) in enumerate(values.value.items()):
+            _check_type(item, (str,), f'values[{i}]: item')
+            _check_type(desc, (str,), f'values[{i}]: description')
     else:
         _check_non_empty_list(values, 'values')
 
-        for value in values.value:
-            _check_type(value, (str,))
+        for i, value in enumerate(values.value):
+            _check_type(value, (str,), f'values[{i}]: item')
 
 
 def _check_key_value_list(ctxt, arguments):
@@ -382,23 +384,23 @@ def _check_key_value_list(ctxt, arguments):
     _check_char(value_separator, 'value_separator')
     _check_non_empty_list(values, 'values')
 
-    for compldef in values.value:
-        _check_type(compldef, (list,))
+    for i, compldef in enumerate(values.value):
+        index = f'definition[{i}]'
+        _check_type(compldef, (list,), index)
 
         if len(compldef.value) != 3:
-            msg = m.list_must_contain_exact_three_items()
+            msg = '%s: %s' % (index, m.list_must_contain_exact_three_items())
             raise _error(msg, compldef)
 
-    for compldef in values.value:
         key = compldef.value[0]
         description = compldef.value[1]
         complete = compldef.value[2]
 
-        _check_type(key, (str,))
-        _check_type(description, (str, NoneType))
-        _check_type(complete, (list, NoneType))
-        _check_non_empty_string(key, 'key')
-        _check_no_spaces(key, 'key')
+        _check_type(key, (str,), index + ': key')
+        _check_type(description, (str, NoneType), index + ': description')
+        _check_type(complete, (list, NoneType), index + ': completer')
+        _check_non_empty_string(key, index + ': key')
+        _check_no_spaces(key, index + ': key')
 
         if complete.value is None:
             continue
@@ -410,17 +412,17 @@ def _check_combine(ctxt, arguments):
     commands = arguments.get_required_arg('commands')
     arguments.require_no_more()
 
-    _check_type(commands, (list,))
+    _check_type(commands, (list,), 'commands')
     _check_non_empty_list(commands, 'commands')
 
     if len(commands.value) == 1:
-        msg = m.list_must_contain_at_least_two_items()
+        msg = '%s: %s' % ('commands', m.list_must_contain_at_least_two_items())
         raise _error(msg, commands)
 
     ctxt.trace.append('combine')
 
-    for completer in commands.value:
-        _check_type(completer, (list,))
+    for i, completer in enumerate(commands.value):
+        _check_type(completer, (list,), f'command[{i}]')
         _check_complete(ctxt, completer)
 
 
@@ -429,7 +431,7 @@ def _check_list(ctxt, arguments):
     options = arguments.get_optional_arg({})
     arguments.require_no_more()
 
-    _check_type(command, (list,))
+    _check_type(command, (list,), 'command')
     _check_type(options, (dict,), 'options')
 
     _check_dictionary(options, {
@@ -473,7 +475,8 @@ def _check_ip_address(_ctxt, arguments):
     _check_type(type_, (str,), "type")
 
     if type_.value not in ('ipv4', 'ipv6', 'all'):
-        msg = '%s: %s' % ('type', m.invalid_value_expected_values('ipv4, ipv6, all'))
+        allowed = 'ipv4, ipv6, all'
+        msg = '%s: %s' % ('type', m.invalid_value_expected_values(allowed))
         raise _error(msg, type_)
 
 
@@ -483,17 +486,17 @@ def _check_integer_float(_ctxt, arguments, types):
     _check_type(options, (dict,), "options")
 
     _check_dictionary(options, {
-        'min':          (False, types, None),
-        'max':          (False, types, None),
-        'help':         (False, (str,), _check_non_empty_string),
-        'suffixes':     (False, (dict,), _check_non_empty_dict),
+        'min':      (False, types, None),
+        'max':      (False, types, None),
+        'help':     (False, (str,), _check_non_empty_string),
+        'suffixes': (False, (dict,), _check_non_empty_dict),
     })
 
     if _has_set(options, 'min') and _has_set(options, 'max'):
         min_ = options.value['min'].value
         max_ = options.value['max'].value
 
-        if (min_ > max_):
+        if min_ > max_:
             raise _error(f'min > max ({min_} > {max_})', options)
 
     if _has_set(options, 'suffixes'):
@@ -571,10 +574,14 @@ def _check_complete(ctxt, args):
         msg = '%s: %s' % (m.unknown_completer(), cmd.value)
         raise _error(msg, cmd)
 
-    _COMMANDS[cmd.value](ctxt, arguments)
+    try:
+        _COMMANDS[cmd.value](ctxt, arguments)
+    except _error as e:
+        msg = '%s: %s' % (cmd.value, e.message)
+        raise _error(msg, e.value_with_trace) from e
 
 
-def _check_positionals_repeatable(definition_tree, definition):
+def _check_positionals_repeatable0(definition_tree, definition):
     if not _has_set(definition, 'positionals'):
         return
 
@@ -604,23 +611,32 @@ def _check_positionals_repeatable(definition_tree, definition):
         raise _error(msg, definition)
 
 
-def _check_option(ctxt, option):
+def _check_positionals_repeatable(definition_tree, definition):
+    try:
+        _check_positionals_repeatable0(definition_tree, definition)
+    except _error as e:
+        prog = definition.value['prog'].value
+        msg = '%s: %s' % (prog, e.message)
+        raise _error(msg, e.value_with_trace) from e
+
+
+def _check_option0(ctxt, option):
     chkbool = _check_extended_bool
 
     _check_dictionary(option, {
-        'option_strings':       (True,  (list,),                None),
-        'metavar':              (False, (str,  NoneType),       None),
-        'help':                 (False, (str,  NoneType),       None),
-        'optional_arg':         (False, (bool, NoneType),       None),
-        'group':                (False, (str,  NoneType),       None),
-        'groups':               (False, (list, NoneType),       None),
-        'repeatable':           (False, (bool, str, NoneType),  chkbool),
-        'final':                (False, (bool, NoneType),       None),
-        'hidden':               (False, (bool, NoneType),       None),
-        'nosort':               (False, (bool, NoneType),       None),
-        'complete':             (False, (list, NoneType),       None),
-        'when':                 (False, (str,  NoneType),       None),
-        'capture':              (False, (str,  NoneType),       None),
+        'option_strings': (True,  (list,),               None),
+        'metavar':        (False, (str,  NoneType),      None),
+        'help':           (False, (str,  NoneType),      None),
+        'optional_arg':   (False, (bool, NoneType),      None),
+        'group':          (False, (str,  NoneType),      None),
+        'groups':         (False, (list, NoneType),      None),
+        'repeatable':     (False, (bool, str, NoneType), chkbool),
+        'final':          (False, (bool, NoneType),      None),
+        'hidden':         (False, (bool, NoneType),      None),
+        'nosort':         (False, (bool, NoneType),      None),
+        'complete':       (False, (list, NoneType),      None),
+        'when':           (False, (str,  NoneType),      None),
+        'capture':        (False, (str,  NoneType),      None),
     })
 
     option_strings = option.value['option_strings']
@@ -667,16 +683,30 @@ def _check_option(ctxt, option):
         _check_variable_name(option.value['capture'], 'capture')
 
 
-def _check_positional(ctxt, positional):
+def _check_option(ctxt, option):
+    try:
+        _check_option0(ctxt, option)
+    except _error as e:
+        try:
+            option_strings = option.value['option_strings'].value
+            option_strings = '|'.join([o.value for o in option_strings])
+        except (KeyError, TypeError):
+            raise e from None
+
+        msg = '%s: %s' % (option_strings, e.message)
+        raise _error(msg, e.value_with_trace) from e
+
+
+def _check_positional0(ctxt, positional):
     _check_dictionary(positional, {
-        'number':               (True,  (int,),            None),
-        'metavar':              (False, (str,  NoneType),  None),
-        'help':                 (False, (str,  NoneType),  None),
-        'repeatable':           (False, (bool, NoneType),  None),
-        'nosort':               (False, (bool, NoneType),  None),
-        'complete':             (False, (list, NoneType),  None),
-        'when':                 (False, (str,  NoneType),  None),
-        'capture':              (False, (str,  NoneType),  None),
+        'number':     (True,  (int,),           None),
+        'metavar':    (False, (str,  NoneType), None),
+        'help':       (False, (str,  NoneType), None),
+        'repeatable': (False, (bool, NoneType), None),
+        'nosort':     (False, (bool, NoneType), None),
+        'complete':   (False, (list, NoneType), None),
+        'when':       (False, (str,  NoneType), None),
+        'capture':    (False, (str,  NoneType), None),
     })
 
     if positional.value['number'].value < 1:
@@ -696,19 +726,41 @@ def _check_positional(ctxt, positional):
         _check_variable_name(positional.value['capture'], 'capture')
 
 
-def _check_definition(ctxt, definition):
+def _check_positional(ctxt, positional):
+    try:
+        _check_positional0(ctxt, positional)
+    except _error as e:
+        metavar = 'unknown'
+
+        try:
+            metavar = 'positional #%d' % positional.value['number'].value
+        except (KeyError, TypeError):
+            pass
+
+        try:
+            metavar_ = positional.value['metavar'].value
+            assert isinstance(metavar_, str)
+            metavar = metavar_
+        except (AssertionError, KeyError):
+            pass
+
+        msg = '%s: %s' % (metavar, e.message)
+        raise _error(msg, e.value_with_trace) from e
+
+
+def _check_commandline_definition0(ctxt, definition):
     chkbool = _check_extended_bool
 
     _check_dictionary(definition, {
-        'prog':                 (True,  (str,),                None),
-        'help':                 (False, (str,  NoneType),      None),
-        'aliases':              (False, (list, NoneType),      None),
-        'wraps':                (False, (str,  NoneType),      None),
-        'abbreviate_commands':  (False, (bool, str, NoneType), chkbool),
-        'abbreviate_options':   (False, (bool, str, NoneType), chkbool),
-        'inherit_options':      (False, (bool, str, NoneType), chkbool),
-        'options':              (False, (list, NoneType),      None),
-        'positionals':          (False, (list, NoneType),      None),
+        'prog':                (True,  (str,),                None),
+        'help':                (False, (str,  NoneType),      None),
+        'aliases':             (False, (list, NoneType),      None),
+        'wraps':               (False, (str,  NoneType),      None),
+        'abbreviate_commands': (False, (bool, str, NoneType), chkbool),
+        'abbreviate_options':  (False, (bool, str, NoneType), chkbool),
+        'inherit_options':     (False, (bool, str, NoneType), chkbool),
+        'options':             (False, (list, NoneType),      None),
+        'positionals':         (False, (list, NoneType),      None),
     })
 
     try:
@@ -740,13 +792,38 @@ def _check_definition(ctxt, definition):
             _check_positional(ctxt, positional)
 
 
-class _DefinitionTree:
-    def __init__(self, prog):
-        self.prog = prog
+def _check_commandline_definition(ctxt, definition):
+    try:
+        _check_commandline_definition0(ctxt, definition)
+    except _error as e:
+        try:
+            prog = definition.value['prog'].value
+        except (KeyError, TypeError):
+            prog = 'unknown'
+
+        msg = '%s: %s' % (prog, e.message)
+        raise _error(msg, e.value_with_trace) from e
+
+
+class DefinitionTree:
+    '''Holds a command-line definition with subcommands.'''
+
+    def __init__(self, definition):
+        self.definition = definition
         self.subcommands = {}
 
     def add_definition(self, definition):
-        '''Add a definition to the tree.'''
+        '''Add a definition to subcommands.'''
+
+        _check_type(definition, (dict,))
+
+        if not _has_set(definition, 'prog'):
+            raise _error('%s: %s' % (m.missing_arg(), 'prog'), definition)
+
+        try:
+            validate_prog(definition.value['prog'].value)
+        except CrazyError as e:
+            raise _error(f'prog: {e}', definition.value['prog']) from None
 
         commands = definition.value['prog'].value.split(' ')
         subcommand = commands.pop(-1)
@@ -766,7 +843,7 @@ class _DefinitionTree:
             msg = m.multiple_definition_of_program(prog)
             raise _error(msg, definition)
 
-        node.subcommands[subcommand] = _DefinitionTree(subcommand)
+        node.subcommands[subcommand] = DefinitionTree(definition)
 
     def get_definition(self, prog):
         '''Get definition by prog.'''
@@ -779,11 +856,27 @@ class _DefinitionTree:
 
         return node
 
+    def visit(self, callback):
+        '''Call `callback` on each node in the tree.'''
+        callback(self)
+        for subcommand in self.subcommands.values():
+            callback(subcommand)
+
+    def get_all(self):
+        '''Return a list of all nodes.'''
+        result = []
+        self.visit(result.append)
+        return result
+
+    def get_first_commandline(self):
+        '''Return the first command line in the tree.'''
+        return list(self.subcommands.values())[0]
+
     @staticmethod
     def make_tree(definition_list):
         '''Make a tree out of a list of definitions.'''
 
-        root = _DefinitionTree('<root>')
+        root = DefinitionTree(None)
 
         for definition in definition_list:
             root.add_definition(definition)
@@ -795,22 +888,19 @@ def validate(definition_list):
     '''Validate a list of definitions.'''
 
     context = Context()
+    commandline_root = DefinitionTree.make_tree(definition_list)
 
-    for definition in definition_list:
-        context.definition = definition
-        _check_definition(context, definition)
-
-    tree = _DefinitionTree.make_tree(definition_list)
-
-    if len(tree.subcommands) == 0:
+    if len(commandline_root.subcommands) == 0:
         msg = m.no_programs_defined()
         raise _error(msg, ValueWithTrace(None, '', 1, 1))
 
-    if len(tree.subcommands) > 1:
+    if len(commandline_root.subcommands) > 1:
         value = ValueWithTrace(None, '', 1, 1)
-        progs = list(tree.subcommands.keys())
+        progs = list(commandline_root.subcommands.keys())
         msg = m.too_many_programs_defined()
         raise _error('%s: %s' % (msg, progs), value)
 
-    for definition in definition_list:
-        _check_positionals_repeatable(tree, definition)
+    for cmdline in commandline_root.get_first_commandline().get_all():
+        context.definition = cmdline.definition
+        _check_commandline_definition(context, cmdline.definition)
+        _check_positionals_repeatable(commandline_root, cmdline.definition)
