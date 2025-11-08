@@ -181,6 +181,9 @@ class ZshCompletionFunction:
         if self.subcommands:
             args.append(self._complete_subcommands(self.subcommands))
 
+        if self.commandline.wraps:
+            args.append(Arg(None, None, "'::*'"))
+
         if not args:
             return ''
 
