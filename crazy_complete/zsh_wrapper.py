@@ -96,7 +96,7 @@ def _make_short_opts_flag_regex(flag_opts):
     if not flag_opts:
         return ''
 
-    return '^-[%s]+$' % ''.join(flag_opts)
+    return '^-[%s]+$' % flag_opts
 
 
 def _make_short_opts_arg_regex(flag_opts, arg_opts, arg_type):
@@ -104,9 +104,9 @@ def _make_short_opts_arg_regex(flag_opts, arg_opts, arg_type):
         return ''
 
     if flag_opts:
-        r = '-[%s]*[%s]' % (''.join(flag_opts), ''.join(arg_opts))
+        r = '-[%s]*[%s]' % (flag_opts, arg_opts)
     else:
-        r = '-[%s]' % ''.join(arg_opts)
+        r = '-[%s]' % arg_opts
 
     if arg_type == 'arg':
         r += '.+'
@@ -149,6 +149,8 @@ def generate_wrapper(ctxt, commandline):
             short_opts_flag += option.get_short_option_strings()
 
     short_opts_flag = ''.join(o[1] for o in short_opts_flag)
+    short_opts_arg = ''.join(o[1] for o in short_opts_arg)
+    short_opts_optional = ''.join(o[1] for o in short_opts_optional)
 
     s = _CODE.strip()
     s = replace_many(s, [
