@@ -253,7 +253,7 @@ def get_query_option_strings(commandline, with_parent_options=True):
     '''Return a string that can be used by {fish,zsh}_query functions.
 
     Returns something like:
-        "-f,--flag,-a=,--argument=,-o=?,--optional=?"
+        "-f --flag -a= --argument= -o=? --optional=?"
     '''
 
     r = []
@@ -266,7 +266,7 @@ def get_query_option_strings(commandline, with_parent_options=True):
         else:
             r.extend(option.option_strings)
 
-    return ','.join(r)
+    return ' '.join(r)
 
 
 def is_worth_a_function(commandline):

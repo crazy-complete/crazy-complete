@@ -106,7 +106,7 @@ else
   set -l option
 
   if test -n "$options"
-    for option in (string split -- ',' $options)
+    for option in (string split -- ' ' $options)
       if false
         true
 #ifdef long_options

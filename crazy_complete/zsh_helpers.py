@@ -152,9 +152,7 @@ case "$cmd" in
     return 1;;
 #endif
   init)
-    local IFS=','
     local -a options=(${=1})
-    unset IFS
     shift;;
   *)
     echo "%FUNCNAME%: argv[1]: invalid command" >&2
