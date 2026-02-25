@@ -276,7 +276,7 @@ def _get_config_from_options(opts):
 def try_print_manual(args):
     '''Print manual.'''
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--manual', nargs='?', const='all')
     opts, _ = parser.parse_known_args(args)
 
@@ -290,7 +290,7 @@ def try_print_manual(args):
 def try_batch(args):
     '''Do batch processing.'''
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--batch')
     opts, _ = parser.parse_known_args(args)
 
