@@ -6,7 +6,6 @@ import shlex
 import argparse
 
 from .errors import CrazyError
-from . import manual
 from . import bash, fish, zsh
 from . import argparse_source, json_source, yaml_source
 from . import argparse_mod  # .complete()
@@ -283,6 +282,7 @@ def try_print_manual(args):
     if not opts.manual:
         return
 
+    from . import manual
     manual.print_help_topic(opts.manual, os.isatty(sys.stdout.fileno()))
     sys.exit(0)
 
