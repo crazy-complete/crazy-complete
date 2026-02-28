@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2025-2026 Benjamin Abendroth <braph93@gmx.de>
+
 '''Code for generating a Zsh auto completion file.'''
 
 from collections import namedtuple, OrderedDict

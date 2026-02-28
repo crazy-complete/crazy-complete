@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2025-2026 Benjamin Abendroth <braph93@gmx.de>
+
 '''Type utility functions.'''
 
 from types import NoneType

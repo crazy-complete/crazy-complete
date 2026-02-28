@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2025-2026 Benjamin Abendroth <braph93@gmx.de>
+
 '''Classes for including functions in the generation process.'''
 
 import re

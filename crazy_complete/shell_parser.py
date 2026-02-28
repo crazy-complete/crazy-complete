@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2025-2026 Benjamin Abendroth <braph93@gmx.de>
+
 '''Module for parsing shell-like commands with logical operators.'''
 
 from .string_stream import StringStream
