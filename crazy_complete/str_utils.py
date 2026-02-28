@@ -113,18 +113,24 @@ def join_with_wrap(primary_sep, secondary_sep,
     '''
 
     lines = []
-    line = line_prefix
+    current_items = []
+    current_length = len(line_prefix)
 
     for item in items:
-        candidate = (line + primary_sep + item) if line else item
-        if len(candidate) > max_line_length and line:
-            lines.append(line)
-            line = line_prefix + primary_sep + item
-        else:
-            line = candidate
+        sep_len = len(primary_sep) if current_items else 0
+        new_length = current_length + sep_len + len(item)
 
-    if line:
-        lines.append(line)
+        if current_items and new_length > max_line_length:
+            # flush current line
+            lines.append(line_prefix + primary_sep.join(current_items))
+            current_items = [item]
+            current_length = len(line_prefix) + len(item)
+        else:
+            current_items.append(item)
+            current_length = new_length
+
+    if current_items:
+        lines.append(line_prefix + primary_sep.join(current_items))
 
     return secondary_sep.join(lines)
 

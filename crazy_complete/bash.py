@@ -59,7 +59,7 @@ class BashCompletionGenerator:
         if local_vars:
             local_vars = algo.uniq(local_vars)
             line_length = self.ctxt.config.line_length - 2
-            r += join_with_wrap(' ', '\n', line_length, local_vars, 'local -a')
+            r += join_with_wrap(' ', '\n', line_length, local_vars, 'local -a ')
 
         r += '\n%s' % self.ctxt.helpers.use_function('parse_commandline')
         return r
