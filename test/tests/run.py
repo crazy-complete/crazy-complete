@@ -25,6 +25,7 @@ TESTS_OUTFILE       = 'tests.new.yaml'
 CRAZY_COMPLETE      = '../../crazy-complete'
 COMPLETIONS_OUTDIR  = 'output'
 TEMP_DIR            = 'tmp'
+OUTPUT_WAIT         = 5
 
 # =============================================================================
 # Switch to the script's directory
@@ -40,11 +41,15 @@ CURRENT_DIRECTORY = os.path.abspath(os.getcwd())
 argp = argparse.ArgumentParser()
 argp.add_argument('-f', '--fast', action='store_true', default=False,
     help='Enable fast testing mode. For tests where the input matches the expected output, these tests will always pass')
-argp.add_argument('-d', '--driver', default='pyte', choices=['pyte', 'tmux'],
+argp.add_argument('-d', '--driver', default='tmux', choices=['pyte', 'tmux'],
     help='Select driver for tests')
 argp.add_argument('-t', '--threads', default=1, type=int,
     help='Set the number of threads per shell')
+argp.add_argument('-w', '--wait', default=OUTPUT_WAIT, type=float,
+    help='Set how many seconds to wait for terminal output')
 opts = argp.parse_args()
+
+OUTPUT_WAIT = opts.wait
 
 # =============================================================================
 # Helper functions
@@ -94,16 +99,12 @@ def test_to_yaml(test):
 # Import driver depending on command line arguments
 # =============================================================================
 
-if opts.driver == 'pyte':
-    try:
-        from pyte_driver import PyteTerminal
-    except ImportError as e:
-        print_err(e)
-        print_err('Please install the missing modules.')
-        print_err('Alternatively, you can use --driver=tmux if you have tmux installed')
-        sys.exit(2)
-elif opts.driver == 'tmux':
+if opts.driver == 'tmux':
     from tmux_driver import TmuxTerminal
+elif opts.driver == 'pyte':
+    print_err("The `pyte` driver has been disabled because it does not implement the `kitty`")
+    print_err("protocol used by the Fish shell, causing tests to fail.")
+    sys.exit(2)
 
 # =============================================================================
 # Ensure all dependencies are available
@@ -252,6 +253,7 @@ def tests_worker_thread(thread_id, shell, input_queue, result_queue):
         output = term.complete(
             test['send'],
             test.get(shell+'_tabs', 1),
+            OUTPUT_WAIT,
             test[shell+'_expected'],
             opts.fast)
 
@@ -337,7 +339,7 @@ tests.write_tests_file(TESTS_OUTFILE)
 if tester.num_failed:
     print_err(f'{tester.num_failed} tests failed.')
     print_err(f'Use diff or vimdiff on `{TESTS_INFILE}` and `{TESTS_OUTFILE}` for further details')
-    if opts.threads > 2:
+    if opts.threads > 1:
         print_err('NOTE:')
         print_err(' A high value for -t|--threads may cause that tests fail.')
         print_err(' Consider running this script again with `-t 1`.')

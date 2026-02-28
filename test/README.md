@@ -37,20 +37,29 @@ Test subdirectories
 
   - **Execution methods**
 
-    - `--driver=pyte`: This is the default. It requires the python modules
-      `pyte` and `pexpect` to be installed.
+    - `--driver=tmux`:
+      This is the default driver.
+      It uses `tmux` to emulate terminals.
 
-    - `--driver=tmux`: This method uses `tmux` to emulate terminals.
-      This method is not recommended.
+    - `--driver=pyte`:
+      This requires the python modules `pyte` and `pexpect` to be installed.
+      This driver has been disabled, because the Fish shell started using
+      the `kitty` protocol which is not supported by `pyte`.
 
-  - **Usage**: `./tests/run.py [-t|--threads=<NUM>] [-d|--driver={pyte,tmux}] [-f|--fast]`
+  - **Usage**: `./tests/run.py [-t=<NUM>] [-w=<SECONDS>] [-d={pyte,tmux}] [-f]`
 
     - `-d|--driver`:
       As stated above, this option is used to specify the execution method.
-    
+
     - `-t|--threads`:
       Sets how many threads per shell shall be used while testing.
-      A value of `5` has been proven to be the most effective.
+      The default is `1` to ensure there are no problems even on slow systems.
+      However, a value of `5` is recommended on normal systems.
+
+    - `-w|--wait`:
+      Sets how many seconds to wait for completion output per test.
+      The default is `5` to ensure there are no problems even on slow systems.
+      However, a value of `1` is recommended on normal systems.
 
     - `-f|--fast`:
       Makes the tests run even faster at the cost of corectness for some tests.
@@ -62,7 +71,7 @@ Test subdirectories
 - **./conversion/run.sh**
 
    - Simple tests that validate JSON and YAML conversion.
-  
+
    - Also includes simple tests for parsing the help output.
 
    - **Usage**: `./test/conversion/run.sh`

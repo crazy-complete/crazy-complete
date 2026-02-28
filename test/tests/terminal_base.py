@@ -16,7 +16,7 @@ class TerminalBase:
             # Idk why, but sometime we have to try again
             self.clear_screen()
 
-    def complete(self, commandline, num_tabs=1, expected=None, fast=False):
+    def complete(self, commandline, num_tabs=1, wait=5, expected=None, fast=False):
         self.clear_screen()
         self.send(commandline)
 
@@ -24,9 +24,9 @@ class TerminalBase:
             self.send_tab()
 
         if fast:
-            return self.wait_for_text(expected, 1, 0.01)
+            return self.wait_for_text(expected, wait, 0.01)
         else:
-            time.sleep(1)
+            time.sleep(wait)
             return self.get_output_stripped()
 
     def wait_for_text(self, expected, timeout, poll_interval):
