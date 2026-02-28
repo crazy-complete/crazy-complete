@@ -198,11 +198,22 @@ class BashCompleter(shell.ShellCompleter):
     def none(self, ctxt, _trace, *_):
         return BashCompletionCode(ctxt, '')
 
-    def integer(self, ctxt, _trace, *_):
-        return BashCompletionCode(ctxt, '')
+    def integer(self, ctxt, _trace, options):
+        suffixes = []
 
-    def float(self, ctxt, _trace, *_):
-        return BashCompletionCode(ctxt, '')
+        if options:
+            if 'suffixes' in options:
+                for suffix, description in options['suffixes'].items():
+                    suffixes.append(f'{suffix}:{description}')
+
+        if not suffixes:
+            return BashCompletionCode(ctxt, '')
+
+        func = ctxt.helpers.use_function('number')
+        return BashCompletionFunc(ctxt, [func, *suffixes])
+
+    def float(self, ctxt, trace, options=None):
+        return self.integer(ctxt, trace, options)
 
     def choices(self, ctxt, _trace, choices):
         return CompgenW(ctxt, choices)

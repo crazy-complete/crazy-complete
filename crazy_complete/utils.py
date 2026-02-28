@@ -285,7 +285,13 @@ def is_worth_a_function(commandline):
         return True
 
     for positional in commandline.get_positionals():
-        if positional.complete[0] not in ('none', 'integer', 'float'):
+        if positional.complete[0] == 'none':
+            pass
+        elif positional.complete[0] in ('integer', 'float'):
+            # integer/float without options have no real completion
+            if len(positional.complete) > 1:
+                return True
+        else:
             return True
 
     options = commandline.get_options()

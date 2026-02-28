@@ -545,6 +545,18 @@ for REPLY in "${COMPREPLY_OLD[@]}"; do
 done
 ''')
 
+_NUMBER = ShellFunction('number', '''
+local number="$(command grep -E -o '^[0-9,.]+' <<< "$cur")" suffix_and_desc
+
+[[ -z "$number" ]] && return
+
+COMPREPLY=("$number")
+
+for suffix_and_desc; do
+  COMPREPLY+=("${number}${suffix_and_desc%%:*}")
+done
+''')
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -619,6 +631,7 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_FILE_FILTER)
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)
+        self.add_function(_NUMBER)
         self.add_function(_MIME_FILE)
         self.add_function(_MOUNTPOINT)
         self.add_function(_LOCALES)

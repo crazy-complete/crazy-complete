@@ -421,11 +421,22 @@ class FishCompleter(shell.ShellCompleter):
     def none(self, ctxt, _trace, *_):
         return FishCompleteNone(ctxt)
 
-    def integer(self, ctxt, _trace, *_):
-        return FishCompleteNone(ctxt)
+    def integer(self, ctxt, _trace, options=None):
+        suffixes = []
 
-    def float(self, ctxt, _trace, *_):
-        return FishCompleteNone(ctxt)
+        if options:
+            if 'suffixes' in options:
+                for suffix, description in options['suffixes'].items():
+                    suffixes.append(f'{suffix}:{description}')
+
+        if not suffixes:
+            return FishCompleteNone(ctxt)
+
+        func = ctxt.helpers.use_function('number')
+        return FishCompletionCommand(ctxt, [func, *suffixes])
+
+    def float(self, ctxt, trace, options=None):
+        return self.integer(ctxt, trace, options)
 
     def choices(self, ctxt, _trace, choices):
         return FishCompleteChoices(ctxt, choices)

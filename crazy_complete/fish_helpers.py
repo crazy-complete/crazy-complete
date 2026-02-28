@@ -748,6 +748,21 @@ if test "$(string sub -s -1 -l 1 -- $comp)" = '%'
 end
 ''', ['get_completing_arg'])
 
+_NUMBER = FishFunction('number', r'''
+set -l comp (get_completing_arg)
+set -l number (string match -r -- '^[0-9,.]*' $comp)
+
+if test -z "$number"
+  return
+end
+
+set -l suffix_and_desc
+for suffix_and_desc in $argv
+  set suffix_and_desc (string split -m 1 -- ':' $suffix_and_desc)
+  printf '%s%s\t%s\n' $number $suffix_and_desc[1] $suffix_and_desc[2]
+end
+''', ['get_completing_arg'])
+
 # =============================================================================
 # Bonus
 # =============================================================================
@@ -800,6 +815,7 @@ class FishHelpers(GeneralHelpers):
         self.add_function(_KEY_VALUE_LIST)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)
+        self.add_function(_NUMBER)
         self.add_function(_MIME_FILE)
         self.add_function(_SUBSTRACT_PREFIX_SUFFIX)
         self.add_function(_COMMANDLINE_STRING)
