@@ -50,10 +50,13 @@ def feature_list(string):
 
     return features
 
+_URL = "https://github.com/crazy-complete/crazy-complete"
+_EPILOG = f"For complete documentation, see {_URL}"
 
 p = argparse.ArgumentParser(
     'crazy-complete',
     description='Generate shell auto completion files for all major shells',
+    epilog=_EPILOG,
     exit_on_error=False)
 
 p.add_argument(
