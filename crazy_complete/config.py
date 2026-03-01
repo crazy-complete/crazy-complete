@@ -29,6 +29,7 @@ class Config:
         self.repeatable_options     = False
         self.inherit_options        = False
         self.option_stacking        = True
+        self.long_options_append_equal = True
         self.vim_modeline           = True
         self.include_files          = []
         self.comments               = []
@@ -198,7 +199,7 @@ class Config:
 
         Args:
             enable (bool):
-                IF True, option stacking is allowed.
+                If True, option stacking is allowed.
                 If False, it is not.
 
         Notes:
@@ -220,6 +221,34 @@ class Config:
         _assert_is_bool(enable, "set_option_stacking", "enable")
 
         self.option_stacking = enable
+
+    def set_long_options_append_equal(self, enable):
+        '''Sets whether an equal sign is appended to long options with
+        argument.
+
+        Args:
+            enable (bool):
+                If True, an equal sign is added (--opt-with-arg=).
+                If False, no equal sign is added.
+
+        Notes:
+            This feature defaults to `True`.
+
+            Implementation status for shells:
+                Bash:
+                    - set_long_options_append_equal(True): works
+                    - set_long_options_append_equal(False): works
+                Fish:
+                    - set_long_options_append_equal(True): not implemented
+                    - set_long_options_append_equal(False): not implemented
+                Zsh:
+                    - set_long_options_append_equal(True): not implemented
+                    - set_long_options_append_equal(False): not implemented
+        '''
+
+        _assert_is_bool(enable, "set_long_options_append_equal", "enable")
+
+        self.long_options_append_equal = enable
 
     def set_vim_modeline(self, enable):
         '''Sets whether a vim modeline comment shall be appended to the code.

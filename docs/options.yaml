@@ -76,6 +76,16 @@ long: |
 
 ---
 
+options: ['--long-options-append-equal']
+metavar: 'BOOL'
+choices: ['True', 'False']
+default: 'True'
+short: 'Sets whether an equal sign is appended to long options with argument'
+long: |
+  Currently only supported in Bash.
+
+---
+
 options: ['--disable']
 metavar: 'FEATURES'
 short: 'Disable features'

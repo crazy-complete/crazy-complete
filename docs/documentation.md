@@ -1595,6 +1595,16 @@ This option defaults to `True`.
 
 ---
 
+**--long-options-append-equal=BOOL** *(True, False)*
+
+> Sets whether an equal sign is appended to long options with argument
+
+Currently only supported in Bash.
+
+This option defaults to `True`.
+
+---
+
 **--disable=FEATURES** *(hidden, final, groups, repeatable, when)*
 
 > Disable features

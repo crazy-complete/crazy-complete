@@ -110,6 +110,11 @@ p.add_argument(
 ).complete('choices', ('True', 'False'))
 
 p.add_argument(
+    '--long-options-append-equal', metavar='BOOL', default=True, type=boolean,
+    help='Sets whether an equal sign is appended to long options with argument'
+).complete('choices', ('True', 'False'))
+
+p.add_argument(
     '--disable', metavar='FEATURES', default=[], type=feature_list,
     help='Disable features (hidden,final,groups,repeatable,when)'
 ).complete('value_list', {'values': {
@@ -253,6 +258,7 @@ def _get_config_from_options(opts):
     conf.set_repeatable_options(opts.repeatable_options)
     conf.set_inherit_options(opts.inherit_options)
     conf.set_option_stacking(opts.option_stacking)
+    conf.set_long_options_append_equal(opts.long_options_append_equal)
     conf.set_vim_modeline(opts.vim_modeline)
     conf.set_bash_completions_version(opts.bash_completions_version)
     conf.set_zsh_compdef(opts.zsh_compdef)

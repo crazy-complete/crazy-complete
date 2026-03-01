@@ -5,6 +5,7 @@
 
 from collections import namedtuple
 
+from . import cli
 from . import algo
 from . import shell
 from . import bash_when
@@ -14,17 +15,25 @@ from .str_utils import indent
 _Option = namedtuple('_Option', ('option', 'conditions', 'when'))
 
 
-def _make_option_strings(options):
-    option_strings = []
+def _make_option_strings(ctxt, options):
+    opt_strings = []
 
-    for option in options:
-        for option_string in option.option_strings:
-            if len(option_string) != 2 and option.complete:
-                option_strings.append(f'{option_string}=')
-            else:
-                option_strings.append(option_string)
+    for opt in options:
+        opt_strings.extend(opt.get_short_option_strings())
 
-    return shell.join_quoted(option_strings)
+        add_equal_sign = (
+            opt.has_optional_arg() or
+            (opt.has_required_arg() and ctxt.config.long_options_append_equal)
+        )
+
+        if add_equal_sign:
+            opt_strings.extend(f'{s}=' for s in opt.get_long_option_strings())
+            opt_strings.extend(f'{s}=' for s in opt.get_old_option_strings())
+        else:
+            opt_strings.extend(opt.get_long_option_strings())
+            opt_strings.extend(opt.get_old_option_strings())
+
+    return shell.join_quoted(opt_strings)
 
 
 def _get_option_full_condition(option):
@@ -38,12 +47,12 @@ def _get_option_full_condition(option):
     return ''
 
 
-def _generate_option_strings_completion(options):
+def _generate_option_strings_completion(ctxt, options):
     r = []
 
     grouped_by_condition = algo.group_by(options, _get_option_full_condition)
     for condition, opts in grouped_by_condition.items():
-        s = 'opts+=(%s)' % _make_option_strings([o.option for o in opts])
+        s = 'opts+=(%s)' % _make_option_strings(ctxt, [o.option for o in opts])
         if condition:
             s = '%s && %s' % (condition, s)
         r.append(s)
@@ -51,8 +60,8 @@ def _generate_option_strings_completion(options):
     return '\n'.join(r)
 
 
-def _generate_final_check_with_options(final_conditions, options):
-    option_strings_completion = _generate_option_strings_completion(options)
+def _generate_final_check_with_options(ctxt, final_conditions, options):
+    option_strings_completion = _generate_option_strings_completion(ctxt, options)
 
     if not final_conditions:
         return option_strings_completion
@@ -69,6 +78,7 @@ def generate(generator):
     if len(generator.options) == 0:
         return None
 
+    ctxt = generator.ctxt
     commandline = generator.commandline
     variable_manager = generator.variable_manager
     options = []
@@ -105,7 +115,7 @@ def generate(generator):
 
     r  = 'if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then\n'
     r += '  local -a opts\n'
-    r += '%s\n' % indent(_generate_final_check_with_options(final_conditions, options), 2)
+    r += '%s\n' % indent(_generate_final_check_with_options(ctxt, final_conditions, options), 2)
     r += '  COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))\n'
     r += '  [[ ${COMPREPLY-} == *= ]] && compopt -o nospace\n'
     r += '  return 1\n'
