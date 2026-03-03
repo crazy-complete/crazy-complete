@@ -1,0 +1,13 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ['--both']
+    long_opt_arg_sep: 'both'
+    complete: ["choices", ["foo", "bar"]]
+
+  - option_strings: ['--equals']
+    long_opt_arg_sep: 'equals'
+    complete: ["choices", ["foo", "bar"]]
+
+  - option_strings: ['--space']
+    long_opt_arg_sep: 'space'
+    complete: ["choices", ["foo", "bar"]]

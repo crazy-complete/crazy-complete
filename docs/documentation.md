@@ -72,6 +72,7 @@ options:
     groups: ["<GROUP>", ...]
     when: "<CONDITION>"
     capture: "<VARIABLE>"
+    long_opt_arg_sep: "equals|space|both"
 [...]
 ```
 
@@ -87,6 +88,7 @@ options:
 - *groups* (optional): Add this option into the specified groups. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags
 - *when* (optional): Only enable this option if [CONDITION](#when-conditionals) evaluates to true
 - *capture* (optional): Specify the [variable](#capturing-options) where values of this option should be captured
+- *long_opt_arg_sep* (optional): Specifies which separators are used for delimiting a long option from its argument
 
 ## Defining a Positional Argument
 
@@ -1595,13 +1597,17 @@ This option defaults to `True`.
 
 ---
 
-**--long-options-append-equal=BOOL** *(True, False)*
+**--long-option-argument-separator=SEPARATOR** *(space, equals, both)*
 
-> Sets whether an equal sign is appended to long options with argument
+> Sets which separators are used for delimiting a long option from its argument
 
-Currently only supported in Bash.
+If `space`, only the form `--option argument` is allowed.
+If `equals`, only the form `--option=argument` is allowed.
+If `both`, both forms are allowed.
 
-This option defaults to `True`.
+Currently only supported in Bash and Zsh.
+
+This option defaults to `both`.
 
 ---
 

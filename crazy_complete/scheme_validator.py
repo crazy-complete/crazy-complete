@@ -640,6 +640,7 @@ def _check_option0(ctxt, option):
         'complete':       (False, (list, NoneType),      None),
         'when':           (False, (str,  NoneType),      None),
         'capture':        (False, (str,  NoneType),      None),
+        'long_opt_arg_sep': (False, (str,),              None),
     })
 
     option_strings = option.value['option_strings']
@@ -684,6 +685,13 @@ def _check_option0(ctxt, option):
 
     if _has_set(option, 'capture'):
         _check_variable_name(option.value['capture'], 'capture')
+
+    if _has_set(option, 'long_opt_arg_sep'):
+        if option.value['long_opt_arg_sep'] not in (
+                'space', 'equals', 'both', ExtendedBool.INHERIT):
+            expected = f'space, equals, both, {ExtendedBool.INHERIT}'
+            msg = m.invalid_value_expected_values(expected)
+            raise _error(msg, option.value['long_opt_arg_sep'])
 
 
 def _check_option(ctxt, option):

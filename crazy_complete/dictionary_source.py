@@ -53,7 +53,7 @@ def dictionary_to_commandline(dictionary, prog=None):
         _validate_keys(option,
             ['option_strings', 'metavar', 'help', 'optional_arg', 'groups',
              'repeatable', 'final', 'hidden', 'complete', 'nosort',
-             'when', 'capture'])
+             'when', 'capture', 'long_opt_arg_sep'])
 
         commandline.add_option(
             option.get('option_strings',  None),
@@ -67,7 +67,9 @@ def dictionary_to_commandline(dictionary, prog=None):
             complete      = option.get('complete',     None),
             nosort        = option.get('nosort',       False),
             when          = option.get('when',         None),
-            capture       = option.get('capture',      None))
+            capture       = option.get('capture',      None),
+            long_opt_arg_sep = option.get('long_opt_arg_sep', _INHERIT)
+        )
 
     for positional in positionals:
         _validate_keys(positional,
@@ -238,6 +240,9 @@ def option_to_dictionary(self):
 
     if self.capture is not None:
         r['capture'] = self.capture
+
+    if self.long_opt_arg_sep != ExtendedBool.INHERIT:
+        r['long_opt_arg_sep'] = self.long_opt_arg_sep
 
     return r
 

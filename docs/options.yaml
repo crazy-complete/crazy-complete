@@ -76,13 +76,17 @@ long: |
 
 ---
 
-options: ['--long-options-append-equal']
-metavar: 'BOOL'
-choices: ['True', 'False']
-default: 'True'
-short: 'Sets whether an equal sign is appended to long options with argument'
+options: ['--long-option-argument-separator']
+metavar: 'SEPARATOR'
+choices: ['space', 'equals', 'both']
+default: 'both'
+short: 'Sets which separators are used for delimiting a long option from its argument'
 long: |
-  Currently only supported in Bash.
+  If `space`, only the form `--option argument` is allowed.
+  If `equals`, only the form `--option=argument` is allowed.
+  If `both`, both forms are allowed.
+
+  Currently only supported in Bash and Zsh.
 
 ---
 

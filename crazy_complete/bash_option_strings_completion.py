@@ -15,15 +15,17 @@ from .str_utils import indent
 _Option = namedtuple('_Option', ('option', 'conditions', 'when'))
 
 
-def _make_option_strings(ctxt, options):
+def _make_option_strings(options):
     opt_strings = []
 
     for opt in options:
         opt_strings.extend(opt.get_short_option_strings())
 
         add_equal_sign = (
-            opt.has_optional_arg() or
-            (opt.has_required_arg() and ctxt.config.long_options_append_equal)
+            opt.has_optional_arg() or (
+                opt.has_required_arg() and
+                opt.long_opt_arg_sep in ('both', 'equals')
+            )
         )
 
         if add_equal_sign:
@@ -47,12 +49,12 @@ def _get_option_full_condition(option):
     return ''
 
 
-def _generate_option_strings_completion(ctxt, options):
+def _generate_option_strings_completion(options):
     r = []
 
     grouped_by_condition = algo.group_by(options, _get_option_full_condition)
     for condition, opts in grouped_by_condition.items():
-        s = 'opts+=(%s)' % _make_option_strings(ctxt, [o.option for o in opts])
+        s = 'opts+=(%s)' % _make_option_strings([o.option for o in opts])
         if condition:
             s = '%s && %s' % (condition, s)
         r.append(s)
@@ -60,8 +62,8 @@ def _generate_option_strings_completion(ctxt, options):
     return '\n'.join(r)
 
 
-def _generate_final_check_with_options(ctxt, final_conditions, options):
-    option_strings_completion = _generate_option_strings_completion(ctxt, options)
+def _generate_final_check_with_options(final_conditions, options):
+    option_strings_completion = _generate_option_strings_completion(options)
 
     if not final_conditions:
         return option_strings_completion
@@ -78,7 +80,6 @@ def generate(generator):
     if len(generator.options) == 0:
         return None
 
-    ctxt = generator.ctxt
     commandline = generator.commandline
     variable_manager = generator.variable_manager
     options = []
@@ -115,7 +116,7 @@ def generate(generator):
 
     r  = 'if (( ! END_OF_OPTIONS )) && [[ "$cur" = -* ]]; then\n'
     r += '  local -a opts\n'
-    r += '%s\n' % indent(_generate_final_check_with_options(ctxt, final_conditions, options), 2)
+    r += '%s\n' % indent(_generate_final_check_with_options(final_conditions, options), 2)
     r += '  COMPREPLY+=($(compgen -W "${opts[*]}" -- "$cur"))\n'
     r += '  [[ ${COMPREPLY-} == *= ]] && compopt -o nospace\n'
     r += '  return 1\n'

@@ -75,7 +75,8 @@ class ZshCompletionFunction:
             hidden = option.hidden,
             final = option.final,
             metavar = option.metavar,
-            action = action
+            action = action,
+            long_opt_arg_sep = option.long_opt_arg_sep
         )
 
         return Arg(option, option.when, option_spec)

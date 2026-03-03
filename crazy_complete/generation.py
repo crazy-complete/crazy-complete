@@ -74,6 +74,9 @@ def _apply_config(commandline, config):
         if option.repeatable == cli.ExtendedBool.INHERIT:
             option.repeatable = config.repeatable_options
 
+        if option.long_opt_arg_sep == cli.ExtendedBool.INHERIT:
+            option.long_opt_arg_sep = config.long_opt_arg_sep
+
         if config.disabled_hidden:
             option.hidden = False
 

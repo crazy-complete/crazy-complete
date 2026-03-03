@@ -29,7 +29,7 @@ class Config:
         self.repeatable_options     = False
         self.inherit_options        = False
         self.option_stacking        = True
-        self.long_options_append_equal = True
+        self.long_opt_arg_sep       = 'both'
         self.vim_modeline           = True
         self.include_files          = []
         self.comments               = []
@@ -222,33 +222,40 @@ class Config:
 
         self.option_stacking = enable
 
-    def set_long_options_append_equal(self, enable):
-        '''Sets whether an equal sign is appended to long options with
-        argument.
+    def set_long_option_argument_separator(self, separator):
+        '''Sets which separators are used for delimiting a long option from
+        its argument.
 
         Args:
-            enable (bool):
-                If True, an equal sign is added (--opt-with-arg=).
-                If False, no equal sign is added.
+            separator (string):
+                If `space`, only the form `--option argument` is allowed.
+                If `equals`, only the form `--option=argument` is allowed.
+                If `both`, both forms are allowed.
 
         Notes:
-            This feature defaults to `True`.
+            This feature defaults to `both`.
 
             Implementation status for shells:
                 Bash:
-                    - set_long_options_append_equal(True): works
-                    - set_long_options_append_equal(False): works
+                    - set_long_option_argument_separator('space'): works
+                    - set_long_option_argument_separator('equals'): works
+                    - set_long_option_argument_separator('both'): works
                 Fish:
-                    - set_long_options_append_equal(True): not implemented
-                    - set_long_options_append_equal(False): not implemented
+                    - set_long_option_argument_separator('space'): not implemented
+                    - set_long_option_argument_separator('equals'): not implemented
+                    - set_long_option_argument_separator('both'): works
                 Zsh:
-                    - set_long_options_append_equal(True): not implemented
-                    - set_long_options_append_equal(False): not implemented
+                    - set_long_option_argument_separator('space'): works
+                    - set_long_option_argument_separator('equals'): works
+                    - set_long_option_argument_separator('both'): works
         '''
 
-        _assert_is_bool(enable, "set_long_options_append_equal", "enable")
+        if separator not in ('space', 'equals', 'both'):
+            raise AssertionError('Config.set_long_option_argument_separator: '
+                                 'separator: Invalid value: '
+                                 'expected: `space`, `equals` or `both`')
 
-        self.long_options_append_equal = enable
+        self.long_opt_arg_sep = separator
 
     def set_vim_modeline(self, enable):
         '''Sets whether a vim modeline comment shall be appended to the code.

@@ -40,6 +40,7 @@ def option_to_yaml(dictionary):
         ('nosort',          None,       lambda v: v is True),
         ('when',            None,       lambda v: v is not None),
         ('capture',         None,       lambda v: v is not None),
+        ('long_opt_arg_sep', _INHERIT,  lambda v: v != _INHERIT),
     ]
 
     r = [f'- option_strings: {json.dumps(option_strings)}']

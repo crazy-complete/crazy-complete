@@ -52,6 +52,8 @@
 240-capture-wrong-type                   | line 4, column 14: foo: -o: capture: Invalid type. Expected: string|none
 241-capture-empty                        | line 4, column 14: foo: -o: capture: Not a valid variable name
 242-capture-wrong-value                  | line 4, column 14: foo: -o: capture: Not a valid variable name
+250-long-opt-arg-sep-wrong-type          | line 4, column 23: foo: -o: long_opt_arg_sep: Invalid type. Expected: string
+251-long-opt-arg-sep-wrong-value         | line 4, column 23: foo: -o: Invalid value. Expected: space, equals, both, INHERIT
 ======= Directory "03-positional" =======
 200-no-number                            | line 3, column 5: foo: metavar: Missing required argument: number
 201-number-wrong-type                    | line 3, column 13: foo: unknown: number: Invalid type. Expected: integer

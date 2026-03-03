@@ -12,6 +12,7 @@ wrapper: {"args": ["--input-type=yaml"], "definition_file": "wrapper.yaml"}
 list: {"args": ["--input-type=yaml"], "definition_file": "list.yaml"}
 key_value_list: {"args": ["--input-type=yaml"], "definition_file": "key_value_list.yaml"}
 complex: {"args": ["--input-type=yaml"], "definition_file": "complex.yaml"}
+long_opt_arg_sep: {"args": ["--input-type=yaml"], "definition_file": "long_opt_arg_sep.yaml"}
 ---
 number: 1
 definition_file: "main"
@@ -2177,3 +2178,36 @@ fish_expected: |
   > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote
 zsh_expected: |
   > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote
+---
+number: 141
+definition_file: "long_opt_arg_sep"
+description: "Check long_opt_arg_sep (both)"
+send: "crazy-complete-test --both"
+bash_expected: |
+  > crazy-complete-test --both=
+fish_expected: |
+  > crazy-complete-test --both
+zsh_expected: |
+  > crazy-complete-test --both=
+---
+number: 142
+definition_file: "long_opt_arg_sep"
+description: "Check long_opt_arg_sep (equals)"
+send: "crazy-complete-test --equals"
+bash_expected: |
+  > crazy-complete-test --equals=
+fish_expected: |
+  > crazy-complete-test --equals
+zsh_expected: |
+  > crazy-complete-test --equals=
+---
+number: 143
+definition_file: "long_opt_arg_sep"
+description: "Check long_opt_arg_sep (space)"
+send: "crazy-complete-test --space"
+bash_expected: |
+  > crazy-complete-test --space
+fish_expected: |
+  > crazy-complete-test --space
+zsh_expected: |
+  > crazy-complete-test --space

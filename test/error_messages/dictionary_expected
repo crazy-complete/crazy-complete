@@ -52,6 +52,8 @@
 240-capture-wrong-type                   | Parameter `capture` has an invalid type. Expected types: str|None. Received: False (bool)
 241-capture-empty                        | Invalid variable name: ''
 242-capture-wrong-value                  | Invalid variable name: '1'
+250-long-opt-arg-sep-wrong-type          | Parameter `long_opt_arg_sep` has an invalid type. Expected types: str. Received: False (bool)
+251-long-opt-arg-sep-wrong-value         | Invalid value for `long_opt_arg_sep`
 ======= Directory "03-positional" =======
 200-no-number                            | Parameter `number` has an invalid type. Expected types: int. Received: None (NoneType)
 201-number-wrong-type                    | Parameter `number` has an invalid type. Expected types: int. Received: 'wrong' (str)

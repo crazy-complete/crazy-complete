@@ -59,7 +59,8 @@ def make_option_spec(
         hidden              = False,
         final               = False,
         metavar             = None,
-        action              = None):
+        action              = None,
+        long_opt_arg_sep    = 'both'):
 
     '''
     Make a Zsh option spec.
@@ -101,7 +102,12 @@ def make_option_spec(
     if complete and optional_arg is True:
         opts = [o+'-' if len(o) == 2 else o+'=-' for o in option_strings]
     elif complete:
-        opts = [o+'+' if len(o) == 2 else o+'=' for o in option_strings]
+        if long_opt_arg_sep == 'both':
+            opts = [o+'+' if len(o) == 2 else o+'=' for o in option_strings]
+        elif long_opt_arg_sep == 'equals':
+            opts = [o+'+' if len(o) == 2 else o+'=-' for o in option_strings]
+        elif long_opt_arg_sep == 'space':
+            opts = [o+'+' if len(o) == 2 else o for o in option_strings]
     else:
         opts = option_strings
 

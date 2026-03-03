@@ -415,7 +415,8 @@ class CommandLine:
                 final           = option.final,
                 hidden          = option.hidden,
                 when            = option.when,
-                capture         = option.capture
+                capture         = option.capture,
+                long_opt_arg_sep = option.long_opt_arg_sep
             )
 
         for positional in self.positionals:
@@ -621,7 +622,8 @@ class Option:
             final=False,
             hidden=False,
             when=None,
-            capture=None):
+            capture=None,
+            long_opt_arg_sep=ExtendedBool.INHERIT):
         '''Initializes an Option object with the specified parameters.
 
         Args:
@@ -665,6 +667,16 @@ class Option:
             capture (str):
                 Specifies the variable name for capturing
 
+            long_opt_arg_sep (str):
+                Specifies which separators are used for delimiting a long
+                option from its argument.
+
+                If `space`, only the form `--option argument` is allowed.
+                If `equals`, only the form `--option=argument` is allowed.
+                If `both`, both forms are allowed.
+                If `INHERIT`, the default setting from the config object is
+                used.
+
         Returns:
             Option: The newly added Option object.
         '''
@@ -691,6 +703,7 @@ class Option:
         validate_type(nosort, (bool,), 'nosort')
         validate_type(when, (str, NoneType), 'when')
         validate_type(capture, (str, NoneType), 'capture')
+        validate_type(long_opt_arg_sep, (str,), 'long_opt_arg_sep')
 
         if not option_strings:
             raise CrazyError('Empty option strings')
@@ -714,6 +727,9 @@ class Option:
         if hidden is True and repeatable is True:
             raise CrazyError(f'Option {option_strings} has both hidden and repeatable set to True')
 
+        if long_opt_arg_sep not in (ExtendedBool.INHERIT, 'space', 'equals', 'both'):
+            raise CrazyError('Invalid value for `long_opt_arg_sep`')
+
         self.parent = parent
         self.option_strings = option_strings
         self.metavar = metavar
@@ -727,6 +743,7 @@ class Option:
         self.hidden = hidden
         self.when = when
         self.capture = capture
+        self.long_opt_arg_sep = long_opt_arg_sep
 
     def get_option_strings(self):
         '''Returns the option strings associated with the Option object.

@@ -72,6 +72,7 @@ options:
     groups: ["<GROUP>", ...]
     when: "<CONDITION>"
     capture: "<VARIABLE>"
+    long_opt_arg_sep: "equals|space|both"
 [...]
 ```
 
@@ -87,6 +88,7 @@ options:
 - *groups* (optional): Add this option into the specified groups. Multiple flags from the same group cannot be completed at once. Useful for mutually exclusive flags
 - *when* (optional): Only enable this option if [CONDITION](#when-conditionals) evaluates to true
 - *capture* (optional): Specify the [variable](#capturing-options) where values of this option should be captured
+- *long_opt_arg_sep* (optional): Specifies which separators are used for delimiting a long option from its argument
 
 ## Defining a Positional Argument
 
