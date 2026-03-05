@@ -29,7 +29,7 @@ type ar || {
   apt install -y binutils
 }
 
-export PATH="$HOME/.local/share/gem/ruby/3.1.0/bin/:$PATH"
+export PATH="$HOME/.local/share/gem/ruby/3.3.0/bin/:$PATH"
 
 type fpm || {
   gem install --user-install fpm

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ARCH=amd64
-RELEASE=bookworm
+RELEASE=trixie
 CACHE_DIR=/tmp/debian.cache
 
 set -e
