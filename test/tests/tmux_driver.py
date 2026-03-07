@@ -54,8 +54,8 @@ class TmuxTerminal(TerminalBase):
     def send_tab(self):
         self._run(['send-keys', '-t', self.session, 'Tab'])
 
-    def send_ctrl_c(self):
-        self._run(['send-keys', '-t', self.session, 'C-c'])
+    def send_ctrl(self, key):
+        self._run(['send-keys', '-t', self.session, f'C-{key}'])
 
     def get_output(self):
         return self._run(['capture-pane', '-t', self.session, '-p'])
