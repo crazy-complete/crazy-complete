@@ -52,7 +52,7 @@ class BashShell(ShellBase):
 
 class FishShell(ShellBase):
     def start(self):
-        self.term.start(['fish', '--no-config'], SHELL_ENV)
+        self.term.start(['fish', '--no-config'], SHELL_ENV | {'fish_autosuggestion_enabled': 0})
 
     def set_prompt(self):
         self.term.send_line("clear; function fish_prompt; printf '> '; end")

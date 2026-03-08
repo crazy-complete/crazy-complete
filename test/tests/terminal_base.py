@@ -15,7 +15,9 @@ class TerminalBase:
             # Clear current command line, as fish does not do it on ^C
             self.send_ctrl("u")
             self.wait_for_last_line('>', 5, 0.01)
-            self.send_line('clear')
+            self.send('clear')
+            self.wait_for_last_line('> clear', 5, 0.01)
+            self.send_line('')
             result = self.wait_for_text('>', 5, 0.01)
 
     def complete(self, commandline, num_tabs=1, wait=5, expected=None, fast=False):
