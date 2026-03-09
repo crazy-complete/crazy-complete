@@ -1097,7 +1097,7 @@ bash_expected: |
   --option=   --sub-bar=
   > crazy-complete-test subcommand --
 fish_expected: |
-  > crazy-complete-test subcommand --option
+  > crazy-complete-test subcommand --
   --option  --sub-bar
 zsh_expected: |
   > crazy-complete-test subcommand --
@@ -1112,7 +1112,7 @@ bash_expected: |
   --option=   --sub-bar=
   > crazy-complete-test subcommand --option lastcommand --
 fish_expected: |
-  > crazy-complete-test subcommand --option lastcommand --option
+  > crazy-complete-test subcommand --option lastcommand --
   --option  --sub-bar
 zsh_expected: |
   > crazy-complete-test subcommand --option lastcommand --

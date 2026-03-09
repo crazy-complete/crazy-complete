@@ -35,8 +35,8 @@ class PyteTerminal(TerminalBase):
     def send_tab(self):
         self.terminal.send("\t")
     
-    def send_ctrl_c(self):
-        self.terminal.sendcontrol("c")
+    def send_ctrl(self, key):
+        self.terminal.sendcontrol(key)
     
     def _read_output(self):
         try:
