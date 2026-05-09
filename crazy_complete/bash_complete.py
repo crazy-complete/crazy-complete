@@ -198,7 +198,7 @@ class BashCompleter(shell.ShellCompleter):
     def none(self, ctxt, _trace, *_):
         return BashCompletionCode(ctxt, '')
 
-    def integer(self, ctxt, _trace, options):
+    def integer(self, ctxt, _trace, options=None):
         suffixes = []
 
         if options:
