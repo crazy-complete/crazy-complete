@@ -4,22 +4,14 @@ set -e
 
 cd "$(dirname "$0")"
 
-type ruby || {
-  dnf install -y ruby
-}
-
-type git || {
-  dnf install -y git
-}
-
-type rpmbuild || {
-  dnf install -y rpmbuild
-}
-
-dnf install -y python3-setuptools
-dnf install -y python3-wheel
-dnf install -y python3-pip
-dnf install -y python3-packaging
+dnf install -y \
+  python3-setuptools \
+  python3-wheel \
+  python3-pip \
+  python3-packaging \
+  ruby \
+  git \
+  rpmbuild
 
 export PATH="$HOME/.local/share/gem/ruby/bin/:$PATH"
 
