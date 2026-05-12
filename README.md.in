@@ -69,16 +69,16 @@ Installation
 
 |Operating System       | Download                       | Command                                        |
 |-----------------------|--------------------------------|-------------------------------------------------
-|Arch Linux             | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/arch-linux-python-crazy-complete-0.3.8-1-any.pkg.tar.zst)       | `sudo pacman -U ./arch-linux-python-crazy-complete-0.3.8-1-any.pkg.tar.zst`         |
-|Debian Trixie          | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/debian-trixie-python-crazy-complete_0.3.8_all.deb)   | `sudo apt install ./debian-trixie-python-crazy-complete_0.3.8_all.deb`   |
-|Debian Bookworm        | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/debian-bookworm-python-crazy-complete_0.3.8_all.deb) | `sudo apt install ./debian-bookworm-python-crazy-complete_0.3.8_all.deb` |
-|Ubuntu Noble           | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/ubuntu-noble-python-crazy-complete_0.3.8_all.deb)    | `sudo apt install ./ubuntu-noble-python-crazy-complete_0.3.8_all.deb`    |
-|Ubuntu Jammy           | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/ubuntu-jammy-python-crazy-complete_0.3.8_all.deb)    | `sudo apt install ./ubuntu-jammy-python-crazy-complete_0.3.8_all.deb`    |
-|Linux Mint 22          | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/linux-mint-22-python-crazy-complete_0.3.8_all.deb)   | `sudo apt install ./linux-mint-22-python-crazy-complete_0.3.8_all.deb`   |
-|Linux Mint 21          | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/linux-mint-21-python-crazy-complete_0.3.8_all.deb)   | `sudo apt install ./linux-mint-21-python-crazy-complete_0.3.8_all.deb`   |
-|Fedora 44              | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/fedora-44-python-crazy-complete-0.3.8-1.noarch.rpm)       | `sudo dnf install ./fedora-44-python-crazy-complete-0.3.8-1.noarch.rpm`       |
-|Fedora 43              | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/fedora-43-python-crazy-complete-0.3.8-1.noarch.rpm)       | `sudo dnf install ./fedora-43-python-crazy-complete-0.3.8-1.noarch.rpm`       |
-|OpenSuse (Tumbleweed)  | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/opensuse-python-crazy-complete-0.3.8-1.noarch.rpm)        | `sudo zypper install ./opensuse-python-crazy-complete-0.3.8-1.noarch.rpm`     |
+|Arch Linux             | [%TAG%](%ARCHLINUX_URL%)       | `sudo pacman -U ./%ARCHLINUX_PACKAGE%`         |
+|Debian Trixie          | [%TAG%](%DEBIAN_TRIXIE_URL%)   | `sudo apt install ./%DEBIAN_TRIXIE_PACKAGE%`   |
+|Debian Bookworm        | [%TAG%](%DEBIAN_BOOKWORM_URL%) | `sudo apt install ./%DEBIAN_BOOKWORM_PACKAGE%` |
+|Ubuntu Noble           | [%TAG%](%UBUNTU_NOBLE_URL%)    | `sudo apt install ./%UBUNTU_NOBLE_PACKAGE%`    |
+|Ubuntu Jammy           | [%TAG%](%UBUNTU_JAMMY_URL%)    | `sudo apt install ./%UBUNTU_JAMMY_PACKAGE%`    |
+|Linux Mint 22          | [%TAG%](%LINUX_MINT_22_URL%)   | `sudo apt install ./%LINUX_MINT_22_PACKAGE%`   |
+|Linux Mint 21          | [%TAG%](%LINUX_MINT_21_URL%)   | `sudo apt install ./%LINUX_MINT_21_PACKAGE%`   |
+|Fedora 44              | [%TAG%](%FEDORA_44_URL%)       | `sudo dnf install ./%FEDORA_44_PACKAGE%`       |
+|Fedora 43              | [%TAG%](%FEDORA_43_URL%)       | `sudo dnf install ./%FEDORA_43_PACKAGE%`       |
+|OpenSuse (Tumbleweed)  | [%TAG%](%OPENSUSE_URL%)        | `sudo zypper install ./%OPENSUSE_PACKAGE%`     |
 
 - For other Linux distributions:
   ```
@@ -160,4 +160,3 @@ Questions or problems
 =====================
 
 Don't hesitate to open an issue on [GitHub](https://github.com/crazy-complete/crazy-complete/issues).
-
