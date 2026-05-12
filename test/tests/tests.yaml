@@ -25,10 +25,13 @@ bash_expected: |
   > crazy-complete-test
 fish_expected: |
   > crazy-complete-test
-  alias1        (For testing the completer)  subcommand  (Test nested subcommands)
-  alias2        (For testing the completer)  test      (For testing the completer)
-  argparse-actions  (argparse tool actions)  when        (Test the "when"-feature)
-  complete         (Test complete commands)
+  alias1            (For testing the completer)
+  alias2            (For testing the completer)
+  argparse-actions  (argparse tool actions)
+  complete          (Test complete commands)
+  subcommand        (Test nested subcommands)
+  test              (For testing the completer)
+  when              (Test the "when"-feature)
 zsh_expected: |
   > crazy-complete-test
   alias2            alias1  test  -- For testing the completer
@@ -65,15 +68,15 @@ bash_expected: |
   > crazy-complete-test test -
 fish_expected: |
   > crazy-complete-test test -
-  -A  -arg  --arg                                        (Option with arg)
-  -F  -flag  --flag                                        (A option flag)
-  -h  --help                             (show this help message and exit)
-  -O  -optional  --optional  --optional=        (Option with optional arg)
+  -A  -arg  --arg                         (Option with arg)
+  -F  -flag  --flag                       (A option flag)
+  -h  --help                              (show this help message and exit)
+  -O  -optional  --optional  --optional=  (Option with optional arg)
   --exclusive-1
   --exclusive-2
   --repeatable-arg
   --repeatable-flag
-  --special-chars-in-description  (Here are some special chars: $"'\[]*`))
+  --special-chars-in-description          (Here are some special chars: $"'\[]*`))
 zsh_expected: |
   > crazy-complete-test test -
   --exclusive-1      --exclusive-2      --repeatable-arg   --repeatable-flag
@@ -204,8 +207,8 @@ bash_expected: |
   > crazy-complete-test test -O
 fish_expected: |
   > crazy-complete-test test -O
-  -O1  (Option with optional arg)  -OA                  (Option with arg)
-  -O2  (Option with optional arg)  -OF                    (A option flag)
+  -O1  (Option with optional arg)  -OA  (Option with arg)
+  -O2  (Option with optional arg)  -OF  (A option flag)
   -O3  (Option with optional arg)  -Oh  (show this help message and exit)
 zsh_expected: |
   > crazy-complete-test test -O
@@ -393,7 +396,7 @@ bash_expected: |
   > crazy-complete-test test -F
 fish_expected: |
   > crazy-complete-test test -F
-  -FA                  (Option with arg)  -FO  (Option with optional arg)
+  -FA  (Option with arg)                  -FO  (Option with optional arg)
   -Fh  (show this help message and exit)
 zsh_expected: |
   > crazy-complete-test test -F
@@ -442,7 +445,7 @@ bash_expected: |
   > crazy-complete-test test -FO
 fish_expected: |
   > crazy-complete-test test -FO
-  -FO1  (Option with optional arg)  -FOA                  (Option with arg)
+  -FO1  (Option with optional arg)  -FOA  (Option with arg)
   -FO2  (Option with optional arg)  -FOh  (show this help message and exit)
   -FO3  (Option with optional arg)
 zsh_expected: |
@@ -460,7 +463,7 @@ bash_expected: |
   > crazy-complete-test when -
 fish_expected: |
   > crazy-complete-test when -
-  -h  --help                       (show this help message and exit)
+  -h  --help                                  (show this help message and exit)
   -O  -optional  -V  -var  --optional  --var  (Conditional variable)
 zsh_expected: |
   > crazy-complete-test when -
@@ -511,7 +514,7 @@ bash_expected: |
   > crazy-complete-test when -V foo --if-var
 fish_expected: |
   > crazy-complete-test when -V foo --if-var
-  --if-var              (Only show option if --var is given)
+  --if-var         (Only show option if --var is given)
   --if-var-is-foo  (Only show option if --var is foo or bar)
 zsh_tabs: 2
 zsh_expected: |
@@ -529,7 +532,7 @@ bash_expected: |
   > crazy-complete-test when -Vfoo --if-var
 fish_expected: |
   > crazy-complete-test when -Vfoo --if-var
-  --if-var              (Only show option if --var is given)
+  --if-var         (Only show option if --var is given)
   --if-var-is-foo  (Only show option if --var is foo or bar)
 zsh_tabs: 2
 zsh_expected: |
@@ -547,7 +550,7 @@ bash_expected: |
   > crazy-complete-test when --var foo --if-var
 fish_expected: |
   > crazy-complete-test when --var foo --if-var
-  --if-var              (Only show option if --var is given)
+  --if-var         (Only show option if --var is given)
   --if-var-is-foo  (Only show option if --var is foo or bar)
 zsh_tabs: 2
 zsh_expected: |
@@ -565,7 +568,7 @@ bash_expected: |
   > crazy-complete-test when --var=foo --if-var
 fish_expected: |
   > crazy-complete-test when --var=foo --if-var
-  --if-var              (Only show option if --var is given)
+  --if-var         (Only show option if --var is given)
   --if-var-is-foo  (Only show option if --var is foo or bar)
 zsh_tabs: 2
 zsh_expected: |
@@ -583,7 +586,7 @@ bash_expected: |
   > crazy-complete-test when -var foo --if-var
 fish_expected: |
   > crazy-complete-test when -var foo --if-var
-  --if-var              (Only show option if --var is given)
+  --if-var         (Only show option if --var is given)
   --if-var-is-foo  (Only show option if --var is foo or bar)
 zsh_tabs: 2
 zsh_expected: |
@@ -601,7 +604,7 @@ bash_expected: |
   > crazy-complete-test when -var=foo --if-var
 fish_expected: |
   > crazy-complete-test when -var=foo --if-var
-  --if-var              (Only show option if --var is given)
+  --if-var         (Only show option if --var is given)
   --if-var-is-foo  (Only show option if --var is foo or bar)
 zsh_tabs: 2
 zsh_expected: |
@@ -619,7 +622,7 @@ bash_expected: |
   > crazy-complete-test when --var bar --if-var
 fish_expected: |
   > crazy-complete-test when --var bar --if-var
-  --if-var              (Only show option if --var is given)
+  --if-var         (Only show option if --var is given)
   --if-var-is-foo  (Only show option if --var is foo or bar)
 zsh_tabs: 2
 zsh_expected: |
@@ -670,7 +673,7 @@ bash_expected: |
   > crazy-complete-test when -Ofoo --if-optional
 fish_expected: |
   > crazy-complete-test when -Ofoo --if-optional
-  …-optional       (Only show option if --optional is given)
+  …-optional         (Only show option if --optional is given)
   …-optional-is-foo  (Only show option if --optional is foo)
 zsh_tabs: 2
 zsh_expected: |
@@ -688,7 +691,7 @@ bash_expected: |
   > crazy-complete-test when --optional=foo --if-optional
 fish_expected: |
   > crazy-complete-test when --optional=foo --if-optional
-  …-optional       (Only show option if --optional is given)
+  …-optional         (Only show option if --optional is given)
   …-optional-is-foo  (Only show option if --optional is foo)
 zsh_tabs: 2
 zsh_expected: |
@@ -706,7 +709,7 @@ bash_expected: |
   > crazy-complete-test when -optional=foo --if-optional
 fish_expected: |
   > crazy-complete-test when -optional=foo --if-optional
-  …-optional       (Only show option if --optional is given)
+  …-optional         (Only show option if --optional is given)
   …-optional-is-foo  (Only show option if --optional is foo)
 zsh_tabs: 2
 zsh_expected: |
@@ -1058,7 +1061,7 @@ bash_expected: |
   > crazy-complete-test -o
 fish_expected: |
   > crazy-complete-test -o
-  0  2  4  6    (six)
+  0  2  4  6  (six)
   1  3  5  7  (seven)
 zsh_expected: |
   > crazy-complete-test -o
@@ -1684,9 +1687,9 @@ bash_expected: |
   > crazy-complete-test -o
 fish_expected: |
   > crazy-complete-test -o
-  animal=  (select an animal)  nocomp=     (no completer)  user=  (select a user)
-  async      (set async mode)  number=  (select a number)
-  file=                        proc=   (select a process)
+  animal=  (select an animal)  nocomp=  (no completer)      user=  (select a user)
+  async    (set async mode)    number=  (select a number)
+  file=                        proc=    (select a process)
 zsh_expected: |
   > crazy-complete-test -o
   animal  -- select an animal
@@ -1751,9 +1754,9 @@ bash_expected: |
 fish_expected: |
   > crazy-complete-test -o animal,
   animal,animal=  (select an animal)  animal,number=  (select a number)
-  animal,async      (set async mode)  animal,proc=   (select a process)
-  animal,file=                        animal,user=      (select a user)
-  animal,nocomp=      (no completer)
+  animal,async    (set async mode)    animal,proc=    (select a process)
+  animal,file=                        animal,user=    (select a user)
+  animal,nocomp=  (no completer)
 zsh_expected: |
   > crazy-complete-test -o animal,
   async   -- set async mode
@@ -1940,6 +1943,7 @@ number: 125
 definition_file: "choices"
 description: "Check if nosort is respected (long option)"
 send: "crazy-complete-test --choices-no-sort "
+require_order: true
 bash_expected: |
   > crazy-complete-test --choices-no-sort
   3  1  2
@@ -1955,6 +1959,7 @@ number: 126
 definition_file: "choices"
 description: "Check if nosort is respected (old option)"
 send: "crazy-complete-test -choices-no-sort "
+require_order: true
 bash_expected: |
   > crazy-complete-test -choices-no-sort
   3  1  2
@@ -1970,6 +1975,7 @@ number: 127
 definition_file: "choices"
 description: "Check if nosort is respected (short option)"
 send: "crazy-complete-test -n "
+require_order: true
 bash_expected: |
   > crazy-complete-test -n
   3  1  2
@@ -1985,6 +1991,7 @@ number: 128
 definition_file: "choices"
 description: "Check if nosort is respected (positional)"
 send: "crazy-complete-test "
+require_order: true
 bash_expected: |
   > crazy-complete-test
   3  1  2

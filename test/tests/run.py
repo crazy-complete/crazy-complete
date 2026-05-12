@@ -74,27 +74,6 @@ def indent(string, num_spaces):
 def make_yaml_block_string(s):
     return "|\n%s" % indent(s, 2)
 
-def test_to_yaml(test):
-    r = OrderedDict()
-
-    r['number']          = str(test['number'])
-    r['definition_file'] = json.dumps(test['definition_file'])
-    r['description']     = json.dumps(test['description'])
-    if 'comment' in test:
-        r['comment']     = json.dumps(test['comment'])
-    r['send']            = json.dumps(test['send'])
-    if test.get('bash_tabs', 1) != 1:
-        r['bash_tabs']   = str(test['bash_tabs'])
-    r['bash_expected']   = make_yaml_block_string(test['bash_result'])
-    if test.get('fish_tabs', 1) != 1:
-        r['fish_tabs']   = str(test['fish_tabs'])
-    r['fish_expected']   = make_yaml_block_string(test['fish_result'])
-    if test.get('zsh_tabs', 1) != 1:
-        r['zsh_tabs']    = str(test['zsh_tabs'])
-    r['zsh_expected']    = make_yaml_block_string(test['zsh_result'])
-
-    return '\n'.join('%s: %s' % key_value for key_value in r.items())
-
 # =============================================================================
 # Import driver depending on command line arguments
 # =============================================================================
@@ -110,11 +89,11 @@ elif opts.driver == 'pyte':
 # Ensure all dependencies are available
 # =============================================================================
 
-for program in SHELLS:
+for shell in SHELLS:
     try:
-        run(['sh', '-c', f'type {program}'])
+        run(['sh', '-c', f'type {shell}'])
     except Exception:
-        print_err(f'Program `{program}` not found')
+        print_err(f'Program `{shell}` not found')
         sys.exit(2)
 
 if not os.path.exists('/usr/share/bash-completion/bash_completion'):
@@ -125,31 +104,107 @@ if not os.path.exists('/usr/share/bash-completion/bash_completion'):
 # Test code
 # =============================================================================
 
+class Test:
+    def __init__(self, data):
+        self.number = data.get('number', None) 
+        self.definition_file = data['definition_file']
+        self.description = data['description']
+        self.comment = data.get('comment', None)
+        self.send = data['send']
+        self.require_order = data.get('require_order', False)
+        self.bash_tabs = data.get('bash_tabs', 1)
+        self.fish_tabs = data.get('fish_tabs', 1)
+        self.zsh_tabs = data.get('zsh_tabs', 1)
+        self.bash_expected = data.get('bash_expected', '').strip()
+        self.fish_expected = data.get('fish_expected', '').strip()
+        self.zsh_expected = data.get('zsh_expected', '').strip()
+        self.bash_result = None
+        self.fish_result = None
+        self.zsh_result = None
+
+    def get_tabs(self, shell):
+        if shell == 'bash':
+            return self.bash_tabs
+        if shell == 'fish':
+            return self.fish_tabs
+        if shell == 'zsh':
+            return self.zsh_tabs
+        raise
+
+    def get_expected(self, shell):
+        if shell == 'bash':
+            return self.bash_expected
+        if shell == 'fish':
+            return self.fish_expected
+        if shell == 'zsh':
+            return self.zsh_expected
+
+    def get_result(self, shell):
+        if shell == 'bash':
+            return self.bash_result
+        if shell == 'fish':
+            return self.fish_result
+        if shell == 'zsh':
+            return self.zsh_result
+        raise
+
+    def set_result(self, shell, result):
+        if shell == 'bash':
+            self.bash_result = result
+        elif shell == 'fish':
+            self.fish_result = result
+        elif shell == 'zsh':
+            self.zsh_result = result
+        else:
+            raise
+
+    def passed(self, shell):
+        result = self.get_result(shell)
+        expected = self.get_expected(shell)
+
+        if self.require_order:
+            return result.split() == expected.split()
+        else:
+            return sorted(result.split()) == sorted(expected.split())
+
+    def to_yaml(self):
+        r = OrderedDict()
+
+        r['number']          = str(self.number)
+        r['definition_file'] = json.dumps(self.definition_file)
+        r['description']     = json.dumps(self.description)
+        if self.comment:
+            r['comment']     = json.dumps(self.comment)
+        r['send']            = json.dumps(self.send)
+        if self.require_order:
+            r['require_order'] = 'true'
+        if self.bash_tabs != 1:
+            r['bash_tabs']   = str(self.bash_tabs)
+        r['bash_expected']   = make_yaml_block_string(self.bash_result)
+        if self.fish_tabs != 1:
+            r['fish_tabs']   = str(self.fish_tabs)
+        r['fish_expected']   = make_yaml_block_string(self.fish_result)
+        if self.zsh_tabs != 1:
+            r['zsh_tabs']    = str(self.zsh_tabs)
+        r['zsh_expected']    = make_yaml_block_string(self.zsh_result)
+
+        return '\n'.join('%s: %s' % key_value for key_value in r.items())
+
+
 class Tests:
     def __init__(self, tests):
         self.definition_files = tests.pop(0)
-        self.tests = tests
+        self.tests = [Test(data) for data in tests]
 
     def enumerate_tests(self):
         number = 1
         for test in self.tests:
-            test['number'] = number
+            test.number = number
             number += 1
-
-    def add_empty_expected(self):
-        for test in self.tests:
-            test.setdefault('bash_expected', '')
-            test.setdefault('fish_expected', '')
-            test.setdefault('zsh_expected',  '')
-
-    def strip_expected(self):
-        for test in self.tests:
-            for key in ['bash_expected', 'fish_expected', 'zsh_expected']:
-                test[key] = test[key].strip()
 
     def find_test_by_number(self, num):
         for test in self.tests:
-            if test['number'] == num:
+            if test.number == num:
                 return test
 
         raise Exception(f"No test with number {num} found")
@@ -163,7 +218,7 @@ class Tests:
         r += [files.strip()]
 
         for test in self.tests:
-            r += [test_to_yaml(test)]
+            r += [test.to_yaml()]
 
         r = '\n---\n'.join(r)
 
@@ -235,14 +290,14 @@ def tests_worker_thread(thread_id, shell, input_queue, result_queue):
         except queue.Empty:
             break
 
-        if old_definition_file != test['definition_file']:
-            old_definition_file = test['definition_file']
+        if old_definition_file != test.definition_file:
+            old_definition_file = test.definition_file
 
             try:
                 term_shell.stop()
             except Exception:
                 pass
-            completion_file = '%s/%s.%s' % (COMPLETIONS_OUTDIR, test['definition_file'], shell)
+            completion_file = '%s/%s.%s' % (COMPLETIONS_OUTDIR, test.definition_file, shell)
             term_shell.start()
             term.resize_window(80, 100)
             term_shell.set_prompt()
@@ -251,14 +306,14 @@ def tests_worker_thread(thread_id, shell, input_queue, result_queue):
             time.sleep(1.5)
 
         output = term.complete(
-            test['send'],
-            test.get(shell+'_tabs', 1),
+            test.send,
+            test.get_tabs(shell),
             OUTPUT_WAIT,
-            test[shell+'_expected'],
+            test.get_expected(shell),
             opts.fast)
 
         result = {
-            'number': test['number'],
+            'number': test.number,
             'shell':  shell,
             'result': output
         }
@@ -312,15 +367,13 @@ class Tester():
     def process_result(self, result):
         test = self.tests.find_test_by_number(result['number'])
         shell = result['shell']
-        shell_result_key   = '%s_result'   % shell
-        shell_expected_key = '%s_expected' % shell
-        test[shell_result_key] = result['result']
+        test.set_result(shell, result['result'])
 
-        if test[shell_result_key] != test[shell_expected_key]:
+        if not test.passed(shell):
             self.num_failed += 1
-            print_err("Test #%02d (%-4s - %s) failed" % (test['number'], shell, test['description']))
+            print_err("Test #%02d (%-4s - %s) failed" % (test.number, shell, test.description))
         else:
-            print_err("Test #%02d (%-4s - %s) OK" % (test['number'], shell, test['description']))
+            print_err("Test #%02d (%-4s - %s) OK" % (test.number, shell, test.description))
 
 # =============================================================================
 # Main
@@ -330,8 +383,6 @@ with open(TESTS_INFILE, 'r') as fh:
     tests = Tests(list(yaml.safe_load_all(fh)))
 
 tests.enumerate_tests()
-tests.add_empty_expected()
-tests.strip_expected()
 tests.generate_completion_files()
 tester = Tester(tests)
 tester.run()
