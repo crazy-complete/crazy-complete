@@ -20,18 +20,14 @@ from .str_utils import (
 # pylint: disable=too-many-positional-arguments
 
 
-class ExtendedBool:
-    '''Class that holds an extended bool.'''
-
-    TRUE    = True
-    FALSE   = False
-    INHERIT = 'INHERIT'
+# Used for inheriting options
+INHERIT = 'INHERIT'
 
 
 def is_extended_bool(obj):
-    '''Check if `obj` an instance of `ExtendedBool`.'''
+    '''Check if `obj` is a bool or `INHERIT`'''
 
-    return obj in (True, False, ExtendedBool.INHERIT)
+    return obj in (True, False, INHERIT)
 
 
 class CommandLine:
@@ -43,9 +39,9 @@ class CommandLine:
                  help=None,
                  aliases=None,
                  wraps=None,
-                 abbreviate_commands=ExtendedBool.INHERIT,
-                 abbreviate_options=ExtendedBool.INHERIT,
-                 inherit_options=ExtendedBool.INHERIT):
+                 abbreviate_commands=INHERIT,
+                 abbreviate_options=INHERIT,
+                 inherit_options=INHERIT):
         '''Initializes a CommandLine object with the specified parameters.
 
         Args:
@@ -618,12 +614,12 @@ class Option:
             nosort=False,
             groups=None,
             optional_arg=False,
-            repeatable=ExtendedBool.INHERIT,
+            repeatable=INHERIT,
             final=False,
             hidden=False,
             when=None,
             capture=None,
-            long_opt_arg_sep=ExtendedBool.INHERIT):
+            long_opt_arg_sep=INHERIT):
         '''Initializes an Option object with the specified parameters.
 
         Args:
@@ -727,7 +723,7 @@ class Option:
         if hidden is True and repeatable is True:
             raise CrazyError(f'Option {option_strings} has both hidden and repeatable set to True')
 
-        if long_opt_arg_sep not in (ExtendedBool.INHERIT, 'space', 'equals', 'both'):
+        if long_opt_arg_sep not in (INHERIT, 'space', 'equals', 'both'):
             raise CrazyError('Invalid value for `long_opt_arg_sep`')
 
         self.parent = parent

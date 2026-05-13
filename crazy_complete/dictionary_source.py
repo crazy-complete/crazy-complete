@@ -9,12 +9,9 @@ dictionaries and vice versa.
 from collections import OrderedDict
 
 from .errors import CrazyError, CrazyTypeError
-from .cli import CommandLine, ExtendedBool
+from .cli import CommandLine, INHERIT
 from .str_utils import validate_prog
 from . import compat
-
-
-_INHERIT = ExtendedBool.INHERIT
 
 
 def _validate_keys(dictionary, allowed_keys):
@@ -45,9 +42,9 @@ def dictionary_to_commandline(dictionary, prog=None):
         help                = dictionary.get('help', None),
         aliases             = dictionary.get('aliases', []),
         wraps               = dictionary.get('wraps', None),
-        abbreviate_commands = dictionary.get('abbreviate_commands', _INHERIT),
-        abbreviate_options  = dictionary.get('abbreviate_options', _INHERIT),
-        inherit_options     = dictionary.get('inherit_options', _INHERIT))
+        abbreviate_commands = dictionary.get('abbreviate_commands', INHERIT),
+        abbreviate_options  = dictionary.get('abbreviate_options', INHERIT),
+        inherit_options     = dictionary.get('inherit_options', INHERIT))
 
     for option in options:
         _validate_keys(option,
@@ -61,14 +58,14 @@ def dictionary_to_commandline(dictionary, prog=None):
             help          = option.get('help',         None),
             optional_arg  = option.get('optional_arg', False),
             groups        = option.get('groups',       None),
-            repeatable    = option.get('repeatable',   _INHERIT),
+            repeatable    = option.get('repeatable',   INHERIT),
             final         = option.get('final',        False),
             hidden        = option.get('hidden',       False),
             complete      = option.get('complete',     None),
             nosort        = option.get('nosort',       False),
             when          = option.get('when',         None),
             capture       = option.get('capture',      None),
-            long_opt_arg_sep = option.get('long_opt_arg_sep', _INHERIT)
+            long_opt_arg_sep = option.get('long_opt_arg_sep', INHERIT)
         )
 
     for positional in positionals:
@@ -220,7 +217,7 @@ def option_to_dictionary(self):
     if self.groups is not None:
         r['groups'] = self.groups
 
-    if self.repeatable != ExtendedBool.INHERIT:
+    if self.repeatable != INHERIT:
         r['repeatable'] = self.repeatable
 
     if self.final is True:
@@ -241,7 +238,7 @@ def option_to_dictionary(self):
     if self.capture is not None:
         r['capture'] = self.capture
 
-    if self.long_opt_arg_sep != ExtendedBool.INHERIT:
+    if self.long_opt_arg_sep != INHERIT:
         r['long_opt_arg_sep'] = self.long_opt_arg_sep
 
     return r
@@ -294,13 +291,13 @@ def commandline_to_dictionary(commandline):
     if commandline.wraps is not None:
         r['wraps'] = commandline.wraps
 
-    if commandline.abbreviate_commands != ExtendedBool.INHERIT:
+    if commandline.abbreviate_commands != INHERIT:
         r['abbreviate_commands'] = commandline.abbreviate_commands
 
-    if commandline.abbreviate_options != ExtendedBool.INHERIT:
+    if commandline.abbreviate_options != INHERIT:
         r['abbreviate_options'] = commandline.abbreviate_options
 
-    if commandline.inherit_options != ExtendedBool.INHERIT:
+    if commandline.inherit_options != INHERIT:
         r['inherit_options'] = commandline.inherit_options
 
     if commandline.options:

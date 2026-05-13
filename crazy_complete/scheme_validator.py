@@ -5,7 +5,7 @@
 
 from types import NoneType
 
-from .cli import ExtendedBool, is_extended_bool
+from .cli import INHERIT, is_extended_bool
 from .when import parse_when
 from .errors import CrazyError, CrazySchemaValidationError
 from .pattern import bash_glob_to_regex, bash_glob_to_zsh_glob
@@ -161,7 +161,7 @@ def _check_non_empty_dict(value, parameter):
 
 def _check_extended_bool(value, parameter):
     if not is_extended_bool(value.value):
-        expected = 'true, false or `%s`' % ExtendedBool.INHERIT
+        expected = 'true, false or `%s`' % INHERIT
         msg = '%s: %s' % (parameter, m.invalid_value_expected_values(expected))
         raise _error(msg, value)
 
@@ -688,8 +688,8 @@ def _check_option0(ctxt, option):
 
     if _has_set(option, 'long_opt_arg_sep'):
         if option.value['long_opt_arg_sep'] not in (
-                'space', 'equals', 'both', ExtendedBool.INHERIT):
-            expected = f'space, equals, both, {ExtendedBool.INHERIT}'
+                'space', 'equals', 'both', INHERIT):
+            expected = f'space, equals, both, {INHERIT}'
             msg = m.invalid_value_expected_values(expected)
             raise _error(msg, option.value['long_opt_arg_sep'])
 

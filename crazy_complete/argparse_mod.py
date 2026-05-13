@@ -8,7 +8,7 @@ custom methods.
 
 import argparse
 
-from .cli import ExtendedBool
+from .cli import INHERIT
 
 # We have to use implementation details of the argparse module...
 # pylint: disable=protected-access
@@ -43,7 +43,7 @@ def _action_set_repeatable(self, enable=True):
 
 
 def _action_get_repeatable(self):
-    return getattr(self, '_repeatable', ExtendedBool.INHERIT)
+    return getattr(self, '_repeatable', INHERIT)
 
 
 def _action_set_final(self, enable=True):

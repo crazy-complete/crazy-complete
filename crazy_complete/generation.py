@@ -44,9 +44,8 @@ class OptionGenerationContext(GenerationContext):
 def _apply_config(commandline, config):
     '''Applies configuration settings to a command line object.
 
-    If a setting in the CommandLine or Option object is set to
-    ExtendedBool.INHERIT, it will be overridden by the corresponding setting
-    from the config object.
+    If a setting in the CommandLine or Option object is set to cli.INHERIT,
+    it will be overridden by the corresponding setting from the config object.
 
     Args:
         commandline (CommandLine):
@@ -61,20 +60,20 @@ def _apply_config(commandline, config):
     assert isinstance(commandline, cli.CommandLine)
     assert isinstance(config, _config.Config)
 
-    if commandline.abbreviate_commands == cli.ExtendedBool.INHERIT:
+    if commandline.abbreviate_commands == cli.INHERIT:
         commandline.abbreviate_commands = config.abbreviate_commands
 
-    if commandline.abbreviate_options == cli.ExtendedBool.INHERIT:
+    if commandline.abbreviate_options == cli.INHERIT:
         commandline.abbreviate_options = config.abbreviate_options
 
-    if commandline.inherit_options == cli.ExtendedBool.INHERIT:
+    if commandline.inherit_options == cli.INHERIT:
         commandline.inherit_options = config.inherit_options
 
     for option in commandline.options:
-        if option.repeatable == cli.ExtendedBool.INHERIT:
+        if option.repeatable == cli.INHERIT:
             option.repeatable = config.repeatable_options
 
-        if option.long_opt_arg_sep == cli.ExtendedBool.INHERIT:
+        if option.long_opt_arg_sep == cli.INHERIT:
             option.long_opt_arg_sep = config.long_opt_arg_sep
 
         if config.disabled_hidden:

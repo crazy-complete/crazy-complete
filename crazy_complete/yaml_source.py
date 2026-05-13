@@ -13,13 +13,10 @@ from . import dictionary_source
 from . import scheme_validator
 from .str_utils import indent
 from .extended_yaml_parser import ExtendedYAMLParser
-from .cli import ExtendedBool
+from .cli import INHERIT
 
 
 # pylint: disable=redefined-builtin
-
-
-_INHERIT = ExtendedBool.INHERIT
 
 
 def option_to_yaml(dictionary):
@@ -33,14 +30,14 @@ def option_to_yaml(dictionary):
         ('help',            None,       lambda v: v is not None),
         ('optional_arg',    False,      lambda v: v is True),
         ('groups',          None,       lambda v: v is not None),
-        ('repeatable',      _INHERIT,   lambda v: v != _INHERIT),
+        ('repeatable',      INHERIT,    lambda v: v != INHERIT),
         ('final',           False,      lambda v: v is True),
         ('hidden',          False,      lambda v: v is True),
         ('complete',        None,       lambda v: v is not None),
         ('nosort',          None,       lambda v: v is True),
         ('when',            None,       lambda v: v is not None),
         ('capture',         None,       lambda v: v is not None),
-        ('long_opt_arg_sep', _INHERIT,  lambda v: v != _INHERIT),
+        ('long_opt_arg_sep', INHERIT,   lambda v: v != INHERIT),
     ]
 
     r = [f'- option_strings: {json.dumps(option_strings)}']
@@ -88,9 +85,9 @@ def to_yaml(dictionary):
     aliases             = dictionary.get('aliases',             None)
     help                = dictionary.get('help',                None)
     wraps               = dictionary.get('wraps',               None)
-    abbreviate_commands = dictionary.get('abbreviate_commands', _INHERIT)
-    abbreviate_options  = dictionary.get('abbreviate_options',  _INHERIT)
-    inherit_options     = dictionary.get('inherit_options',     _INHERIT)
+    abbreviate_commands = dictionary.get('abbreviate_commands', INHERIT)
+    abbreviate_options  = dictionary.get('abbreviate_options',  INHERIT)
+    inherit_options     = dictionary.get('inherit_options',     INHERIT)
     options             = dictionary.get('options',             None)
     positionals         = dictionary.get('positionals',         None)
 
@@ -105,13 +102,13 @@ def to_yaml(dictionary):
     if wraps is not None:
         r += 'wraps: %s\n' % json.dumps(wraps)
 
-    if abbreviate_commands != ExtendedBool.INHERIT:
+    if abbreviate_commands != INHERIT:
         r += 'abbreviate_commands: %s\n' % json.dumps(abbreviate_commands)
 
-    if abbreviate_options != ExtendedBool.INHERIT:
+    if abbreviate_options != INHERIT:
         r += 'abbreviate_options: %s\n' % json.dumps(abbreviate_options)
 
-    if inherit_options != ExtendedBool.INHERIT:
+    if inherit_options != INHERIT:
         r += 'inherit_options: %s\n' % json.dumps(inherit_options)
 
     if options:
