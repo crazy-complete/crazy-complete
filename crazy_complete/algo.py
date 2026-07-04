@@ -86,3 +86,33 @@ def numbers_are_contiguous(numbers):
 
     sorted_nums = sorted(numbers)
     return all(b - a == 1 for a, b in zip(sorted_nums, sorted_nums[1:]))
+
+
+class SparseList(list):
+    '''A list that automatically grows when assigning past its end.
+
+     Assigning to an index greater than or equal to the current length extends
+     the list with the configured default value until the index exists.
+     '''
+
+    def __init__(self, iterable=(), default=None):
+        super().__init__(iterable)
+        self.default = default
+
+    def _extend_to(self, index):
+        if index >= len(self):
+            self.extend([self.default] * (index + 1 - len(self)))
+
+    def __setitem__(self, index, value):
+        if isinstance(index, slice):
+            super().__setitem__(index, value)
+        else:
+            if index < 0:
+                super().__setitem__(index, value)
+            else:
+                self._extend_to(index)
+                super().__setitem__(index, value)
+
+    def insert(self, index, value):
+        self._extend_to(index)
+        super().insert(index, value)

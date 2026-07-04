@@ -7,7 +7,6 @@ from . import shell
 from .pattern import bash_glob_to_regex
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
-from .utils import get_query_option_strings, get_defined_option_types
 
 
 CHOICES_INLINE_THRESHOLD = 80
@@ -378,21 +377,11 @@ class FishCompleteCommandArg(FishCompletionBase):
     def __init__(self, ctxt):
         super().__init__(ctxt)
 
-        query = ctxt.helpers.use_function('query', 'positionals_positions')
-        types = get_defined_option_types(ctxt.option.parent.get_root_commandline())
-        if types.short:
-            ctxt.helpers.use_function('query', 'short_options')
-        if types.long:
-            ctxt.helpers.use_function('query', 'long_options')
-        if types.old:
-            ctxt.helpers.use_function('query', 'old_options')
-
-        opts = get_query_option_strings(ctxt.option.parent, with_parent_options=True)
-        opts = shell.quote(opts)
+        ctxt.helpers.use_function('query_init', 'positional_position')
+        pos_pos_func = ctxt.helpers.use_function('positional_position')
         command_pos = ctxt.option.get_positional_num() - 1
 
-        r =  'set -l opts %s\n' % shell.quote(opts)
-        r += 'set -l pos (%s "$opts" positional_pos %d)\n' % (query, command_pos)
+        r = 'set -l pos (%s %d)\n' % (pos_pos_func, command_pos)
         r += 'set -l cmdline (commandline -poc | string escape) (commandline -ct)\n'
         r += 'complete -C -- "$cmdline[$pos..]"'
 

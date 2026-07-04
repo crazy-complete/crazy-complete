@@ -205,6 +205,7 @@ def get_defined_option_types(commandline):
     old_optional   = False
     old_flag       = False
     positionals    = False
+    subcommands    = False
 
     for cmdline in commandline.get_all_commandlines():
         if len(cmdline.get_positionals()) > 0:
@@ -212,6 +213,7 @@ def get_defined_option_types(commandline):
 
         if cmdline.get_subcommands() and len(cmdline.get_subcommands().subcommands) > 0:
             positionals = True
+            subcommands = True
 
         for option in cmdline.options:
             if option.get_long_option_strings():
@@ -239,11 +241,11 @@ def get_defined_option_types(commandline):
                     short_flag = True
 
     return namedtuple('Types', (
-        'positionals',
+        'positionals', 'subcommands',
         'short_required', 'short_optional', 'short_flag', 'short',
         'long_required',  'long_optional',  'long_flag',  'long',
         'old_required',   'old_optional',   'old_flag',   'old'))(
-        positionals,
+        positionals, subcommands,
         short_required,    short_optional,   short_flag,
         short_required or  short_optional or short_flag,
         long_required,     long_optional,    long_flag,

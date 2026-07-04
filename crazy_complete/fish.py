@@ -6,6 +6,7 @@
 from . import config as config_
 from . import utils
 from . import algo
+from . import fish_prepare
 from . import fish_complete
 from . import fish_helpers
 from . import generation
@@ -82,10 +83,8 @@ class FishCompletionDefinition:
 
         cmd.parse_args(self.completion_obj.get_args())
 
-        if ctxt.config.fish_fast:
-            cmd.set_condition(self.conditions.unsafe_code(ctxt), raw=True)
-        else:
-            cmd.set_condition(self.conditions.query_code(ctxt), raw=True)
+        for condition in self.conditions.get_conditions(ctxt):
+            cmd.add_condition(condition, raw=True)
 
         return cmd
 
@@ -146,9 +145,13 @@ class FishCompletionGenerator:
             cmd = definition.get_complete_cmd(self.ctxt)
 
             if not self.ctxt.config.fish_inline_conditions:
-                if cmd.condition is not None:
-                    cmd.set_condition(self.conditions.add(cmd.condition.string), raw=True)
+                conditions = cmd.conditions
+                cmd.conditions = []
 
+                for condition in conditions:
+                    cmd.add_condition(self.conditions.add(condition.string), raw=True)
+
+            cmd.insert_condition(0, '$P', raw=True)
             self.lines.append(cmd.get())
 
     def _complete(self, context, *args):
@@ -168,7 +171,7 @@ class FishCompletionGenerator:
 
         callback(self)
         for child in self.children:
-            callback(child)
+            child.visit(callback)
 
     def get_all(self):
         '''Return all generator objects.'''
@@ -271,11 +274,6 @@ class FishCompletionGenerator:
         '''Return a comment for the current command.'''
         return '# command %s' % self.commandline.get_command_path()
 
-    def get_options_for_query(self):
-        '''Return the options for the query command.'''
-        return 'set -l opts "%s"' % (
-            utils.get_query_option_strings(self.commandline))
-
 
 def generate_completion(commandline, config=None):
     '''Code for generating a Fish auto completion file.'''
@@ -287,15 +285,18 @@ def generate_completion(commandline, config=None):
     helpers = fish_helpers.FishHelpers(config, commandline.prog)
     ctxt = generation.GenerationContext(config, helpers)
     result = FishCompletionGenerator(ctxt, commandline)
+    prepare = fish_prepare.get_prepare_function(commandline, ctxt)
 
-    if helpers.is_used('query'):
+    if helpers.is_used('query_init'):
         types = utils.get_defined_option_types(commandline)
         if types.short:
-            ctxt.helpers.use_function('query', 'short_options')
+            ctxt.helpers.use_function('query_init', 'short_options')
         if types.long:
-            ctxt.helpers.use_function('query', 'long_options')
+            ctxt.helpers.use_function('query_init', 'long_options')
         if types.old:
-            ctxt.helpers.use_function('query', 'old_options')
+            ctxt.helpers.use_function('query_init', 'old_options')
+        if types.subcommands:
+            ctxt.helpers.use_function('query_init', 'subcommands')
 
     output = Output(config, helpers)
     output.add_generation_notice()
@@ -305,9 +306,12 @@ def generate_completion(commandline, config=None):
 
     with output.add_as_block() as block:
         block.add("set -l prog '%s'" % commandline.prog)
+        block.add("set -l P '%s'" % prepare)
 
-        if helpers.is_used('query'):
-            block.add("set -l query '%s'" % helpers.use_function('query'))
+        for func in ["positional_contains", "has_option", "option_is",
+                        "num_of_positionals", "positional_position"]:
+            if helpers.is_used(func):
+                block.add(f"set -l {func} '{helpers.use_function(func)}'")
 
         block.add('')
         block.add('# Delete existing completions')
@@ -325,7 +329,6 @@ def generate_completion(commandline, config=None):
         if generator.lines:
             with output.add_as_block() as block:
                 block.add(generator.get_command_comment())
-                block.add(generator.get_options_for_query())
                 block.extend(generator.conditions.get_lines())
                 block.extend(generator.lines)
 

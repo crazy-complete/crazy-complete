@@ -1083,13 +1083,13 @@ zsh_expected: |
 number: 71
 definition_file: "inherit-off"
 description: "Check if options are not inherited (2)"
-send: "crazy-complete-test subcommand --option lastcommand --"
+send: "crazy-complete-test subcommand lastcommand --"
 bash_expected: |
-  > crazy-complete-test subcommand --option lastcommand --last-option=
+  > crazy-complete-test subcommand lastcommand --last-option=
 fish_expected: |
-  > crazy-complete-test subcommand --option lastcommand --sub-bar
+  > crazy-complete-test subcommand lastcommand --last-option
 zsh_expected: |
-  > crazy-complete-test subcommand --option lastcommand --sub-bar=
+  > crazy-complete-test subcommand lastcommand --last-option=
 ---
 number: 72
 definition_file: "inherit-on"
@@ -1109,17 +1109,17 @@ zsh_expected: |
 number: 73
 definition_file: "inherit-on"
 description: "Check if options are inherited (2)"
-send: "crazy-complete-test subcommand --option lastcommand --"
+send: "crazy-complete-test subcommand lastcommand --"
 bash_expected: |
-  > crazy-complete-test subcommand --option lastcommand --
-  --option=   --sub-bar=
-  > crazy-complete-test subcommand --option lastcommand --
+  > crazy-complete-test subcommand lastcommand --
+  --last-option=  --option=       --sub-bar=
+  > crazy-complete-test subcommand lastcommand --
 fish_expected: |
-  > crazy-complete-test subcommand --option lastcommand --
-  --option  --sub-bar
+  > crazy-complete-test subcommand lastcommand --
+  --last-option  --option  --sub-bar
 zsh_expected: |
-  > crazy-complete-test subcommand --option lastcommand --
-  --option   --sub-bar
+  > crazy-complete-test subcommand lastcommand --
+  --last-option  --option       --sub-bar
 ---
 number: 74
 definition_file: "capture"
@@ -1131,6 +1131,7 @@ bash_expected: |
   > crazy-complete-test --database mysql -t
 fish_expected: |
   > crazy-complete-test --database mysql -t
+  orders  products  users
 zsh_expected: |
   > crazy-complete-test --database mysql -t
   orders    products  users
@@ -1145,6 +1146,7 @@ bash_expected: |
   > crazy-complete-test --database postgres -t
 fish_expected: |
   > crazy-complete-test --database postgres -t
+  customers  invoices  transactions
 zsh_expected: |
   > crazy-complete-test --database postgres -t
   customers     invoices      transactions

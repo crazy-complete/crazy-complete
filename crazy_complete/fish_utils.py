@@ -99,7 +99,7 @@ class FishCompleteCommand:
     def __init__(self):
         self.command       = None
         self.description   = None
-        self.condition     = None
+        self.conditions    = []
         self.arguments     = None
         self.short_options = []
         self.long_options  = []
@@ -126,9 +126,13 @@ class FishCompleteCommand:
         '''Add old options (-o|--old-option).'''
         self.old_options.extend(FishString(o.lstrip('-'), raw) for o in opts)
 
-    def set_condition(self, condition, raw=False):
-        '''Set the condition (-n|--condition).'''
-        self.condition = make_fish_string(condition, raw)
+    def add_condition(self, condition, raw=False):
+        '''Add a condition (-n|--condition).'''
+        self.conditions.append(make_fish_string(condition, raw))
+
+    def insert_condition(self, pos, condition, raw=False):
+        '''Insert a condition (-n|--condition)'''
+        self.conditions.insert(pos, make_fish_string(condition, raw))
 
     def set_arguments(self, arguments, raw=False):
         '''Set the arguments (-a|--arguments).'''
@@ -165,8 +169,8 @@ class FishCompleteCommand:
         if self.command is not None:
             r.extend(['-c', self.command])
 
-        if self.condition is not None:
-            r.extend(['-n', self.condition])
+        for condition in self.conditions:
+            r.extend(['-n', condition])
 
         for o in self.short_options:
             r.extend(['-s', o])

@@ -37,7 +37,6 @@ class Config:
         self.line_length            = 80
         self.bash_completions_version = (2,)
         self.zsh_compdef            = True
-        self.fish_fast              = False
         self.fish_inline_conditions = False
 
         self.disabled_hidden        = False
@@ -347,13 +346,6 @@ class Config:
         assert isinstance(length, int)
 
         self.line_length = length if length > 0 else sys.maxsize
-
-    def set_fish_fast(self, enable):
-        '''Use faster conditions at the cost of correctness.'''
-
-        _assert_is_bool(enable, "set_fish_fast", "enable")
-
-        self.fish_fast = enable
 
     def set_fish_inline_conditions(self, enable):
         '''Don't store conditions in an extra variable.'''

@@ -59,7 +59,7 @@ While crazy-complete offers many advantages, there are some trade-offs to be awa
 - **Code size and verbosity:**
   Its biggest strength - **secure, fully controlled completions** - can also be its biggest weakness.
   - For **Bash**, this means the generated scripts contain a significant amount of boilerplate code for parsing options and positional arguments.
-  - For **Fish**, large command-line definitions (more than 500 options) may result in slower completions, although performance is usually acceptable for most use cases.
+  - For **Fish**, large command-line definitions (more than 1000 options) may result in slower completions, although performance is usually acceptable for most use cases.
   - **Mitigation:** There are ways to reduce script size and improve performance. See [Tips And Tricks](docs/documentation.md#tips-and-tricks) for more details.
 - **Not as optimized as hand-written scripts:**
    The generated scripts prioritize correctness and reliability over minimal size or maximum performance. Hand-written scripts may be more compact and slightly faster in some cases.

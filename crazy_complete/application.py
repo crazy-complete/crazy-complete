@@ -143,11 +143,6 @@ p.add_argument(
 ).complete('choices', ('True', 'False'))
 
 p.add_argument(
-    '--fish-fast', metavar='BOOL', default=False, type=boolean,
-    help='Use faster commandline parsing at the cost of correctness'
-).complete('choices', ('True', 'False'))
-
-p.add_argument(
     '--fish-inline-conditions', metavar='BOOL', default=False, type=boolean,
     help="Don't store conditions in a variable"
 ).complete('choices', ('True', 'False'))
@@ -264,7 +259,6 @@ def _get_config_from_options(opts):
     conf.set_vim_modeline(opts.vim_modeline)
     conf.set_bash_completions_version(opts.bash_completions_version)
     conf.set_zsh_compdef(opts.zsh_compdef)
-    conf.set_fish_fast(opts.fish_fast)
     conf.set_fish_inline_conditions(opts.fish_inline_conditions)
     conf.include_many_files(opts.include_file or [])
     conf.set_keep_comments(opts.keep_comments)

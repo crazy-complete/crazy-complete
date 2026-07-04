@@ -56,7 +56,7 @@ class Output:
         self.add(_GENERATION_NOTICE)
 
     def add_comments(self):
-        '''Add additioanl comments.'''
+        '''Add additional comments.'''
         if self.config.comments:
             self.add('\n'.join(f'# {c}' for c in self.config.comments))
 

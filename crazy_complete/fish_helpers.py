@@ -5,377 +5,373 @@
 
 from .helpers import GeneralHelpers, FishFunction
 
-_QUERY = FishFunction('query', r'''
+_QUERY_INIT = FishFunction('query_init', r'''
 # ===========================================================================
 #
 # This function implements the parsing of options and positionals in the
 # Fish shell.
 #
-# Usage: query <OPTIONS> <COMMAND> [ARGS...]
+# Usage: query_init COMMANDLINE_DEFINITION...
 #
-# The first argument is a comma-separated list of options that the parser
-# should know about.
+# COMMANDLINE DEFINITION
+#   A command line definition has the format:
+#      POSITIONAL_PATTERN=>OPTIONS
 #
-# Short options (-o), long options (--option), and old-style options (-option)
-# are supported.
+#   Definitions must be ordered from the least specific to the most specific
+#   (global options first, then subcommand options).
 #
-# If an option takes an argument, it is suffixed by '='.
-# If an option takes an optional argument, it is suffixed by '=?'.
+# POSITIONAL PATTERN
+#   The text before the '=>' is the positional pattern. An empty pattern
+#   matches the top-level command. Subcommands inside the positional-pattern
+#   are separated by '>'.
 #
-# For example:
-#   query '-f,--flag,-old-style,--with-arg=,--with-optional=?' [...]
+# OPTIONS
+#   The text after the '=>' are the options for the command. Options
+#   are separated by space.
 #
-#   Here, -f, --flag and -old-style don't take options, --with-arg requires an
+# OPTION
+#   Short options (-o), long options (--option), and old-style options (-option)
+#   are supported.
+#
+#   If an option takes an argument, it is suffixed by '='.
+#   If an option takes an optional argument, it is suffixed by '=?'.
+#
+# EXAMPLE
+#   set -l opts \
+#      '=>-f --flag -old-flag --with-arg= --with-optional=?' \
+#      '(subcommand|subcmd)=>--choices=' \
+#      '(subcommand|subcmd)>(subsub)=>--sub-sub-flag'
+#
+#   query_init $opts
+#
+#   Here, -f, --flag and -old-flag don't take options, --with-arg requires an
 #   argument and --with-optional takes an optional argument.
 #
-# COMMANDS
-#   positional_contains <NUM> <WORDS...>
-#     Checks if the positional argument number NUM is one of WORDS.
-#     NUM counts from one.
+#   If the first positional matches "subcommand" or "subcmd", --choices is
+#   available as an option.
 #
-#   has_option [WITH_INCOMPLETE] <OPTIONS...>
-#     Checks if an option given in OPTIONS is passed on commandline.
-#     If an option requires an argument, this command returns true only if the
-#     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
-#     returns true for options missing their arguments.
-#
-#   option_is <OPTIONS...> -- <VALUES...>
-#     Checks if any option in OPTIONS has a value of VALUES.
-#
-#   num_of_positionals [<OPERATOR> <NUMBER>]
-#     If no arguments are provided, print the count of positional arguments.
-#     If two arguments are provided, the first argument should be one of
-#     the comparison operators: '-lt', '-le', '-eq', '-ne', '-gt', '-ge'.
-#     Returns 0 if the count of positional arguments matches the
-#     specified NUMBER according to the comparison operator, otherwise
-#     returns 1.
+#   If, additionally, the seconds positional matches "subsub", --sub-sub-flag
+#   is available as an option.
 #
 # ===========================================================================
-
+#
+set -l definitions $argv
 set -l positionals
-#ifdef positionals_positions
+#ifdef positional_position
 set -l positionals_positions
 #endif
 set -l having_options
 set -l option_values
 
+#ifdef subcommands
+function %PREFIX%_match_positionals -S
+  set -l patterns (string split -- '>' "$argv[1]")
+  set -l i (count $patterns)
+
+  while test $i -ge 1
+    string match -q -r -- "^$patterns[$i]\$" "$positionals[$i]" || return 1
+    set i (math $i - 1)
+  end
+end
+#endif
+
+function %PREFIX%_get_option -S
+  set -l option $argv[1]
+  set -l i (count $definitions)
+
+  while test $i -ge 1
+    set -l split (string split -m 1 -- '=>' $definitions[$i])
+#ifdef subcommands
+    if %PREFIX%_match_positionals "$split[1]"
+#else
+    if true
+#endif
+      set -l opt
+      for opt in (string split -- ' ' $split[2])
+        test "$opt" = "$option"   && begin echo '0'; return; end
+        test "$opt" = "$option="  && begin echo '1'; return; end
+        test "$opt" = "$option=?" && begin echo '?'; return; end
+      end
+    end
+
+    set i (math $i - 1)
+  end
+end
+
+set -l cmdline (commandline -poc)
+set -l cmdline_count (count $cmdline)
+
+set -l argi 2 # cmdline[1] is command name
+while test $argi -le $cmdline_count
+  set -l arg "$cmdline[$argi]"
+  set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
+
+  switch $arg
+    case '-'
+      set -a positionals -
+#ifdef positional_position
+      set -a positionals_positions $argi
+#endif
+    case '--'
+      set -a positionals $cmdline[$(math $argi + 1)..]
+#ifdef positional_position
+      set -a positionals_positions (seq (math $argi + 1) $cmdline_count)
+#endif
+      break
+    case '--*=*'
+      set -l split (string split -m 1 -- '=' $arg)
+      set -a having_options $split[1]
+      set -a option_values "$split[2]"
+    case '--*'
+#ifdef long_options
+      set -l option_type (%PREFIX%_get_option $arg)
+      if test "$option_type" = '1'
+        if $have_trailing_arg
+          set -a having_options $arg
+          set -a option_values $cmdline[(math $argi + 1)]
+          set argi (math $argi + 1)
+        end
+      else
+        set -a having_options $arg
+        set -a option_values ''
+      end
+#endif
+    case '-*'
+      set -l end_of_parsing false
+#ifdef old_options
+
+      if string match -q -- '*=*' $arg
+        set -l split (string split -m 1 -- '=' $arg)
+        set -l option_type (%PREFIX%_get_option $split[1])
+        if contains -- "$option_type" '1' '?'
+          set -a having_options $split[1]
+          set -a option_values "$split[2]"
+          set end_of_parsing true
+        end
+      else
+        set -l option_type (%PREFIX%_get_option $arg)
+        if test "$option_type" = '1'
+          set end_of_parsing true
+          if $have_trailing_arg
+            set -a having_options $arg
+            set -a option_values $cmdline[(math $argi + 1)]
+            set argi (math $argi + 1)
+          end
+        else if contains -- "$option_type" '0' '?'
+          set -a having_options $arg
+          set -a option_values ''
+          set end_of_parsing true
+        end
+      end
+#endif
+#ifdef short_options
+
+      set -l arg_length (string length -- $arg)
+      set -l i 2
+      while not $end_of_parsing; and test $i -le $arg_length
+        set -l option "-$(string sub -s $i -l 1 -- $arg)"
+        set -l trailing_chars "$(string sub -s (math $i + 1) -- $arg)"
+        set -l option_type (%PREFIX%_get_option $option)
+
+        if test "$option_type" = '0'
+          set -a having_options $option
+          set -a option_values ''
+        else if test "$option_type" = '1'
+          set end_of_parsing true
+
+          if test -n "$trailing_chars"
+            set -a having_options $option
+            set -a option_values $trailing_chars
+          else if $have_trailing_arg
+            set -a having_options $option
+            set -a option_values $cmdline[(math $argi + 1)]
+            set argi (math $argi + 1)
+          end
+        else if test "$option_type" = '?'
+          set end_of_parsing true
+          set -a having_options $option
+          set -a option_values "$trailing_chars" # may be empty
+        end
+
+        set i (math $i + 1)
+      end
+#endif
+    case '*'
+      set -a positionals $arg
+#ifdef positional_position
+      set -a positionals_positions $argi
+#endif
+  end
+
+  set argi (math $argi + 1)
+end
+
+set -g __QUERY_CACHE_POSITIONALS    $positionals
+#ifdef positional_position
+set -g __QUERY_CACHE_POSITIONALS_POSITIONS $positionals_positions
+#endif
+set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
+set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+''')
+
+_POSITIONAL_CONTAINS = FishFunction('positional_contains', r'''
+# positional_contains <NUM> <WORDS>
+#
+# Checks if the positional argument number NUM is one of WORDS.
+# NUM counts from one.
+#
 #ifdef DEBUG
+if test (count $argv) -eq 0
+  echo '%FUNCNAME%: missing number' >&2
+  return 1
+end
+
+#endif
+set -l positional_num $argv[1]
+set -e argv[1]
+contains -- $__QUERY_CACHE_POSITIONALS[$positional_num] $argv
+''', ['query_init'])
+
+_HAS_OPTION = FishFunction('has_option', r'''
+# has_option [WITH_INCOMPLETE] <OPTIONS>
+#
+# Checks if an option given in OPTIONS is passed on commandline.
+# If an option requires an argument, this command returns true only if the
+# option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
+# returns true for options missing their arguments.
+#
+set -l option
+#ifdef with_incomplete
+set -l with_incomplete false
+
+if test $argv[1] = 'WITH_INCOMPLETE'
+  set with_incomplete true
+  set -e argv[1]
+end
+
+#endif
+for option in $__QUERY_CACHE_HAVING_OPTIONS
+  contains -- $option $argv && return 0
+end
+
+#ifdef with_incomplete
+if $with_incomplete
+  set -l tokens (commandline -po)
+  set -e tokens[1]
+  for option in $argv
+    if test 2 -eq (string length -- $option)
+      set option (string sub -l 1 -s 2 -- $option)
+      string match -rq -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
+      string match -rq -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
+    else
+      string match -q -r -- "^$option\$"       $tokens[-2] && return 0
+      string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
+      contains -- $tokens[-1] $argv && return 0
+    end
+  end
+end
+
+#endif
+return 1
+''', ['query_init'])
+
+_OPTION_IS = FishFunction('option_is', r'''
+# option_is <OPTIONS...> -- <VALUES...>
+#
+# Checks if any option in OPTIONS has a value of VALUES.
+#
+set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
+set -l options $argv[1..$(math $eof_string - 1)]
+set -l values $argv[$eof_string..]
+
+#ifdef DEBUG
+if test (count $options) -eq 0
+  echo '%FUNCNAME%: missing options' >&2
+  return 1
+end
+
+if test (count $values) -eq 0
+  echo '%FUNCNAME%: missing values' >&2
+  return 1
+end
+
+#endif
+set -l i (count $__QUERY_CACHE_HAVING_OPTIONS)
+while test $i -ge 1
+  contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options && \
+  contains -- $__QUERY_CACHE_OPTION_VALUES[$i]  $values  && \
+  return 0
+
+  set i (math $i - 1)
+end
+
+return 1
+''', ['query_init'])
+
+_NUM_OF_POSITIONALS = FishFunction('num_of_positionals', r'''
+# num_of_positionals [<OPERATOR> <NUMBER>]
+#
+# If no arguments are provided, print the count of positional arguments.
+#
+# If two arguments are provided, the first argument should be one of
+# the comparison operators: '-lt', '-le', '-eq', '-ne', '-gt', '-ge'.
+# Returns 0 if the count of positional arguments matches the
+# specified NUMBER according to the comparison operator, otherwise
+# returns 1.
+#
 switch (count $argv)
   case 0
-    echo '%FUNCNAME%: missing OPTIONS argument' >&2
-    return 1
+    count $__QUERY_CACHE_POSITIONALS
+#ifdef DEBUG
   case 1
-    echo '%FUNCNAME%: missing COMMAND' >&2
-    return 1
-end
-#endif
-
-set -l options $argv[1]
-set -e argv[1]
-
-set -l cmd $argv[1]
-set -e argv[1]
-
-set -l my_cache_key "$(commandline -b) $options"
-
-if test "$__QUERY_CACHE_KEY" = "$my_cache_key"
-  set positionals    $__QUERY_CACHE_POSITIONALS
-#ifdef positionals_positions
-  set positionals_positions $__QUERY_CACHE_POSITIONALS_POSITIONS
-#endif
-  set having_options $__QUERY_CACHE_HAVING_OPTIONS
-  set option_values  $__QUERY_CACHE_OPTION_VALUES
-else
-  # =========================================================================
-  # Parsing of OPTIONS argument
-  # =========================================================================
-
-#ifdef short_options
-  set -l short_opts_with_arg
-  set -l short_opts_without_arg
-  set -l short_opts_with_optional_arg
-#endif
-#ifdef long_options
-  set -l long_opts_with_arg
-  set -l long_opts_without_arg
-  set -l long_opts_with_optional_arg
-#endif
-#ifdef old_options
-  set -l old_opts_with_arg
-  set -l old_opts_without_arg
-  set -l old_opts_with_optional_arg
-#endif
-
-  set -l option
-
-  if test -n "$options"
-    for option in (string split -- ' ' $options)
-      if false
-        true
-#ifdef long_options
-      else if string match -qr -- '^--.+=$' $option
-        set -a long_opts_with_arg (string replace -- '=' '' $option)
-      else if string match -qr -- '^--.+=\?$' $option
-        set -a long_opts_with_optional_arg (string replace -- '=?' '' $option)
-      else if string match -qr -- '^--.+$' $option
-        set -a long_opts_without_arg $option
-#endif
-#ifdef short_options
-      else if string match -qr -- '^-.=$' $option
-        set -a short_opts_with_arg (string replace -- '=' '' $option)
-      else if string match -qr -- '^-.=\?$' $option
-        set -a short_opts_with_optional_arg (string replace -- '=?' '' $option)
-      else if string match -qr -- '^-.$' $option
-        set -a short_opts_without_arg $option
-#endif
-#ifdef old_options
-      else if string match -qr -- '^-..+=$' $option
-        set -a old_opts_with_arg (string replace -- '=' '' $option)
-      else if string match -qr -- '^-..+=\?$' $option
-        set -a old_opts_with_optional_arg (string replace -- '=?' '' $option)
-      else if string match -qr -- '^-..+$' $option
-        set -a old_opts_without_arg $option
-#endif
-      end
-    end
-  end
-
-  # =========================================================================
-  # Parsing of options and positionals
-  # =========================================================================
-
-  set -l cmdline (commandline -poc)
-  set -l cmdline_count (count $cmdline)
-
-  set -l argi 2 # cmdline[1] is command name
-  while test $argi -le $cmdline_count
-    set -l arg "$cmdline[$argi]"
-    set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
-
-    switch $arg
-      case '-'
-        set -a positionals -
-#ifdef positionals_positions
-        set -s positionals_positions $argi
-#endif
-      case '--'
-        set -a positionals $cmdline[$(math $argi + 1)..]
-#ifdef positionals_positions
-        set -a positionals_positions (seq (math $argi + 1) $cmdline_count)
-#endif
-        break
-      case '--*=*'
-        set -l split (string split -m 1 -- '=' $arg)
-        set -a having_options $split[1]
-        set -a option_values "$split[2]"
-      case '--*'
-#ifdef long_options
-        if contains -- $arg $long_opts_with_arg
-          if $have_trailing_arg
-            set -a having_options $arg
-            set -a option_values $cmdline[(math $argi + 1)]
-            set argi (math $argi + 1)
-          end
-        else
-          set -a having_options $arg
-          set -a option_values ''
-        end
-#endif
-      case '-*'
-        set -l end_of_parsing false
-#ifdef old_options
-
-        if string match -q -- '*=*' $arg
-          set -l split (string split -m 1 -- '=' $arg)
-          if contains -- $split[1] $old_opts_with_arg $old_opts_with_optional_arg
-            set -a having_options $split[1]
-            set -a option_values "$split[2]"
-            set end_of_parsing true
-          end
-        else if contains -- $arg $old_opts_with_arg
-          set end_of_parsing true
-          if $have_trailing_arg
-            set -a having_options $arg
-            set -a option_values $cmdline[(math $argi + 1)]
-            set argi (math $argi + 1)
-          end
-        else if contains -- $arg $old_opts_without_arg $old_opts_with_optional_arg
-          set -a having_options $arg
-          set -a option_values ''
-          set end_of_parsing true
-        end
-#endif
-#ifdef short_options
-
-        set -l arg_length (string length -- $arg)
-        set -l i 2
-        while not $end_of_parsing; and test $i -le $arg_length
-          set -l option "-$(string sub -s $i -l 1 -- $arg)"
-          set -l trailing_chars "$(string sub -s (math $i + 1) -- $arg)"
-
-          if contains -- $option $short_opts_without_arg
-            set -a having_options $option
-            set -a option_values ''
-          else if contains -- $option $short_opts_with_arg
-            set end_of_parsing true
-
-            if test -n "$trailing_chars"
-              set -a having_options $option
-              set -a option_values $trailing_chars
-            else if $have_trailing_arg
-              set -a having_options $option
-              set -a option_values $cmdline[(math $argi + 1)]
-              set argi (math $argi + 1)
-            end
-          else if contains -- $option $short_opts_with_optional_arg
-            set end_of_parsing true
-            set -a having_options $option
-            set -a option_values "$trailing_chars" # may be empty
-          end
-
-          set i (math $i + 1)
-        end
-#endif
-      case '*'
-        set -a positionals $arg
-#ifdef positionals_positions
-        set -a positionals_positions $argi
-#endif
-    end
-
-    set argi (math $argi + 1)
-  end
-
-  set -g __QUERY_CACHE_POSITIONALS    $positionals
-#ifdef positionals_positions
-  set -g __QUERY_CACHE_POSITIONALS_POSITIONS $positionals_positions
-#endif
-  set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
-  set -g __QUERY_CACHE_OPTION_VALUES  $option_values
-  set -g __QUERY_CACHE_KEY            $my_cache_key
-end
-
-# ===========================================================================
-# Commands
-# ===========================================================================
-
-switch $cmd
-#ifdef positional_contains
-  case 'positional_contains'
-#ifdef DEBUG
-    if test (count $argv) -eq 0
-      echo '%FUNCNAME%: positional_contains: argv[3]: missing number' >&2
-      return 1
-    end
-
-#endif
-    set -l positional_num $argv[1]
-    set -e argv[1]
-    contains -- $positionals[$positional_num] $argv && return 0 || return 1
-#endif
-#ifdef has_option
-  case 'has_option'
-#ifdef with_incomplete
-    set -l with_incomplete false
-
-    if test $argv[1] = 'WITH_INCOMPLETE'
-      set with_incomplete true
-      set -e argv[1]
-    end
-
-#endif
-    for option in $having_options
-      contains -- $option $argv && return 0
-    end
-
-#ifdef with_incomplete
-    if $with_incomplete
-      set -l tokens (commandline -po)
-      set -e tokens[1]
-      for option in $argv
-        if test 2 -eq (string length -- $option)
-          set option (string sub -l 1 -s 2 -- $option)
-          string match -rq -- "^-[A-z0-9]*$option\$"   $tokens[-2] && return 0
-          string match -rq -- "^-[A-z0-9]*$option.*\$" $tokens[-1] && return 0
-        else
-          string match -q -r -- "^$option\$"       $tokens[-2] && return 0
-          string match -q -r -- "^$option(=.*)?\$" $tokens[-1] && return 0
-          contains -- $tokens[-1] $argv && return 0
-        end
-      end
-    end
-
-#endif
+    echo '%FUNCNAME%: $argv[1]: missing operand' >&2
     return 1
 #endif
-#ifdef num_of_positionals
-  case 'num_of_positionals'
-    switch (count $argv)
-      case 0
-        count $positionals
+  case 2
 #ifdef DEBUG
-      case 1
-        echo '%FUNCNAME%: num_of_positionals: $argv[1]: missing operand' >&2
-        return 1
-#endif
-      case 2
-        if contains -- $argv[1] -lt -le -eq -ne -gt -ge;
-          test (count $positionals) $argv[1] $argv[2] && return 0 || return 1
-#ifdef DEBUG
-        else
-          echo '%FUNCNAME%: num_of_positionals: $argv[1]: unknown operator' >&2
-          return 1
-#endif
-        end
-#ifdef DEBUG
-      case '*'
-        echo '%FUNCNAME%: num_of_positionals: too many arguments' >&2
-        return 1
-#endif
-    end
-#endif
-#ifdef option_is
-  case 'option_is'
-    set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
-    set -l options $argv[1..$(math $eof_string - 1)]
-    set -l values $argv[$eof_string..]
-
-#ifdef DEBUG
-    if test (count $options) -eq 0
-      echo '%FUNCNAME%: missing options' >&2
+    if not contains -- $argv[1] -lt -le -eq -ne -gt -ge;
+      echo '%FUNCNAME%: $argv[1]: unknown operator' >&2
       return 1
     end
-
-    if test (count $values) -eq 0
-      echo '%FUNCNAME%: missing values' >&2
-      return 1
-    end
-
 #endif
-    set -l i (count $having_options)
-    while test $i -ge 1
-      if contains -- $having_options[$i] $options
-        if contains -- $option_values[$i] $values
-          return 0
-        end
-      end
-
-      set i (math $i - 1)
-    end
-
-    return 1
-#endif
-#ifdef positionals_positions
-  case 'positional_pos'
-    echo $positionals_positions[$argv[1]]
-#endif
+    test (count $__QUERY_CACHE_POSITIONALS) $argv[1] $argv[2] && return 0 || return 1
 #ifdef DEBUG
   case '*'
-    echo '%FUNCNAME%: argv[2]: invalid command' >&2
+    echo '%FUNCNAME%: too many arguments' >&2
     return 1
 #endif
 end
-''')
+''', ['query_init'])
+
+_POSITIONAL_POSITION = FishFunction('positional_position', r'''
+# positional_position <POSITIONAL_NUMBER>
+#
+# Prints the command-line index of the specified positional argument.
+#
+echo $__QUERY_CACHE_POSITIONALS_POSITIONS[$argv[1]]
+''', ['query_init'])
+
+_CAPTURE_OPTION = FishFunction('capture_option', r'''
+# capture_option <VARIABLE> <OPTIONS>
+#
+# Stores all values supplied to OPTIONS in VARIABLE.
+# VARIABLE is global.
+#
+set -l variable $argv[1]
+set -l options $argv[2..]
+set -l values
+set -l i 1
+
+while test $i -le (count $__QUERY_CACHE_HAVING_OPTIONS)
+  if contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options
+    set -a values $__QUERY_CACHE_OPTION_VALUES[$i]
+  end
+
+  set i (math $i + 1)
+end
+
+set -g $variable $values
+''', ['query_init'])
 
 _GET_COMPLETING_ARG = FishFunction('get_completing_arg', r'''
 set -l arg (commandline -ct | string unescape)
@@ -807,7 +803,14 @@ class FishHelpers(GeneralHelpers):
 
     def __init__(self, config, function_prefix):
         super().__init__(config, function_prefix, FishFunction)
-        self.add_function(_QUERY)
+        self.add_function(_QUERY_INIT)
+        self.add_function(_POSITIONAL_CONTAINS)
+        self.add_function(_HAS_OPTION)
+        self.add_function(_OPTION_IS)
+        self.add_function(_NUM_OF_POSITIONALS)
+        self.add_function(_POSITIONAL_POSITION)
+        self.add_function(_CAPTURE_OPTION)
+
         self.add_function(_GET_COMPLETING_ARG)
         self.add_function(_FILEDIR)
         self.add_function(_LIST)

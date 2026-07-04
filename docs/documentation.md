@@ -1656,14 +1656,6 @@ This option defaults to `True`.
 
 ---
 
-**--fish-fast=BOOL** *(True, False)*
-
-> Use faster commandline parsing for fish at the cost of correctness
-
-This option defaults to `False`.
-
----
-
 **--fish-inline-conditions=BOOL** *(True, False)*
 
 > Don't store conditions in a variable
@@ -1813,10 +1805,9 @@ The value of `capture` is the **name of a variable** that will receive all value
 - The captured variable is always an **array**, containing one element for each occurence of the option on the command line.
 - This makes it easy to implement **context-sensitive completions** that depend on previously supplied option values
 
-> **NOTE:** There is currently **no automatic check for name clashes** between your capture variables and the parser's internal variables.
-> To minimize the risk of conflicts, it is recommended to prefix variable names with `CAPTURE_` or `CAPTURED_`.
-
-> **NOTE:** Captured variables are currently only available in **Bash** and **Zsh**.
+> **NOTE:** In **Fish**, captured variables are stored as global variables.
+> To avoid interfering with the user's environment, it is highly recommended to use distinctive variable names.
+> Variable names should begin with an underscore and include a program-specific prefix (for example, `_MYTOOL_DATABASE`).
 
 **Example:**
 
@@ -1825,7 +1816,7 @@ prog: my_db_tool
 options:
   - option_strings: ["--database", "-d"]
     complete: ["choices", ["mysql", "postgres", "sqlite"]]
-    capture: "CAPTURED_DB"
+    capture: "_MYDBTOOL_DATABASE"
 
   - option_strings: ["--table", "-t"]
     complete: ["exec", "_my_db_tool_complete_table"]
@@ -1835,12 +1826,24 @@ For **Bash** and **Zsh**:
 
 ```bash
 _my_db_tool_complete_table() {
-  case "${CAPTURED_DB[-1]}" in
+  case "${_MYDBTOOL_DATABASE[-1]}" in
     mysql)    printf '%s\n' users orders products;;
     postgres) printf '%s\n' customers invoices transactions;;
     sqlite)   printf '%s\n' local_cache config sessions;;
   esac
 }
+```
+
+For **Fish**:
+
+```fish
+function _my_db_tool_complete_table
+  switch $_MYDBTOOL_DATABASE[-1]
+    case mysql;    printf '%s\n' users orders products
+    case postgres; printf '%s\n' customers invoices transactions
+    case sqlite;   printf '%s\n' local_cache config sessions
+  end
+end
 ```
 
 ## Tips and Tricks

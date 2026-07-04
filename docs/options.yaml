@@ -135,14 +135,6 @@ long: |
 
 ---
 
-options: ['--fish-fast']
-metavar: 'BOOL'
-choices: ['True', 'False']
-default: 'False'
-short: 'Use faster commandline parsing for fish at the cost of correctness'
-
----
-
 options: ['--fish-inline-conditions']
 metavar: 'BOOL'
 choices: ['True', 'False']

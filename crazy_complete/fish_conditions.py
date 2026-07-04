@@ -21,11 +21,12 @@ def escape_in_double(string):
 def make_condition_command(prefix, args):
     '''Make a condition command.
 
-    In our completion scripts, we use the variables $query and $opts.
+    In our completion scripts, we use variables like $has_option,
+    $positional_contains, $num_of_positionals etc.
 
     We generate code like this:
 
-        complete -n "$query '$opts' has_option --foo"
+        complete -n "$has_option -f --foo"
 
     This function generates such a condition command.
 
@@ -37,21 +38,11 @@ def make_condition_command(prefix, args):
     return '%s %s' % (prefix, ' '.join(args_quoted))
 
 
-def make_query(args):
-    '''Make a query command.'''
-
-    return make_condition_command("$query '$opts'", args)
-
-
 class Condition:
     '''Base class for conditions.'''
 
-    def query_code(self, ctxt):
-        '''Returns code using the `query` function.'''
-        raise NotImplementedError
-
-    def unsafe_code(self, ctxt):
-        '''Returns code using Fish's internal functions.'''
+    def get_code(self, ctxt):
+        '''Returns the condition code.'''
         raise NotImplementedError
 
 
@@ -61,11 +52,8 @@ class Not(Condition):
     def __init__(self, conditional):
         self.conditional = conditional
 
-    def query_code(self, ctxt):
-        return 'not %s' % self.conditional.query_code(ctxt)
-
-    def unsafe_code(self, ctxt):
-        return 'not %s' % self.conditional.unsafe_code(ctxt)
+    def get_code(self, ctxt):
+        return 'not %s' % self.conditional.get_code(ctxt)
 
 
 class HasOption(Condition):
@@ -77,22 +65,9 @@ class HasOption(Condition):
 
         self.option_strings = option_strings
 
-    def query_code(self, ctxt):
-        ctxt.helpers.use_function('query', 'has_option')
-        return make_query(['has_option'] + self.option_strings)
-
-    def unsafe_code(self, _ctxt):
-        args = []
-
-        for opt in self.option_strings:
-            if cli.is_long_option_string(opt):
-                args += ['-l', opt.lstrip('-')]
-            elif cli.is_short_option_string(opt):
-                args += ['-s', opt[1]]
-            else:
-                args += ['-o', opt.lstrip('-')]
-
-        return make_condition_command('__fish_seen_argument', args)
+    def get_code(self, ctxt):
+        ctxt.helpers.use_function('has_option')
+        return make_condition_command('$has_option', self.option_strings)
 
 
 class HasHiddenOption(Condition):
@@ -104,14 +79,11 @@ class HasHiddenOption(Condition):
 
         self.option_strings = option_strings
 
-    def query_code(self, ctxt):
-        ctxt.helpers.use_function('query', 'has_option')
-        ctxt.helpers.use_function('query', 'with_incomplete')
+    def get_code(self, ctxt):
+        ctxt.helpers.use_function('has_option')
+        ctxt.helpers.use_function('has_option', 'with_incomplete')
         options = self.option_strings
-        return make_query(['has_option', 'WITH_INCOMPLETE'] + options)
-
-    def unsafe_code(self, ctxt):
-        return self.query_code(ctxt)
+        return make_condition_command('$has_option', ['WITH_INCOMPLETE'] + options)
 
 
 class OptionIs(Condition):
@@ -127,14 +99,11 @@ class OptionIs(Condition):
         self.option_strings = option_strings
         self.values = values
 
-    def query_code(self, ctxt):
-        ctxt.helpers.use_function('query', 'option_is')
+    def get_code(self, ctxt):
+        ctxt.helpers.use_function('option_is')
         options = self.option_strings
         values = self.values
-        return make_query(['option_is', *options, '--', *values])
-
-    def unsafe_code(self, ctxt):
-        return self.query_code(ctxt)
+        return make_condition_command('$option_is', [*options, '--', *values])
 
 
 class PositionalNum(Condition):
@@ -159,16 +128,10 @@ class PositionalNum(Condition):
         self.operator = operator
         self.number = number
 
-    def query_code(self, ctxt):
-        ctxt.helpers.use_function('query', 'num_of_positionals')
+    def get_code(self, ctxt):
+        ctxt.helpers.use_function('num_of_positionals')
         op = self.TEST_OPERATORS[self.operator]
-        return make_query(['num_of_positionals', op, str(self.number - 1)])
-
-    def unsafe_code(self, _ctxt):
-        op = self.TEST_OPERATORS[self.operator]
-        number = self.number
-        r = "test (__fish_number_of_cmd_args_wo_opts) %s %d" % (op, number)
-        return r
+        return make_condition_command('$num_of_positionals', [op, str(self.number - 1)])
 
 
 class PositionalContains(Condition):
@@ -184,15 +147,11 @@ class PositionalContains(Condition):
         self.number = number
         self.values = values
 
-    def query_code(self, ctxt):
-        ctxt.helpers.use_function('query', 'positional_contains')
+    def get_code(self, ctxt):
+        ctxt.helpers.use_function('positional_contains')
         values = self.values
         number = str(self.number)
-        return make_query(['positional_contains', number, *values])
-
-    def unsafe_code(self, _ctxt):
-        values = self.values
-        return make_condition_command('__fish_seen_subcommand_from', values)
+        return make_condition_command('$positional_contains', [number, *values])
 
 
 def replace_commands(tokens):
@@ -247,57 +206,26 @@ class Conditions(Condition):
         r.extend(other)
         return r
 
-    def _get_tokens(self):
-        r = []
+    def get_conditions(self, ctxt):
+        conditions = []
 
         for condition in self._optimized_conditions():
-            r.append(condition)
-            r.append('&&')
+            conditions.append('"%s"' % condition.get_code(ctxt))
 
         if self.when:
-            if r and when.needs_braces(self.when):
-                r += ['(', *self.when, ')']
-            else:
-                r += self.when
+            r = []
+            for obj in self.when:
+                if obj == '(':
+                    r.append('begin')
+                elif obj == ')':
+                    r.append(';end')
+                elif obj in ('!', '&&', '||'):
+                    r.append(obj)
+                else:
+                    r.append(obj.get_code(ctxt))
+            conditions.append('"%s"' % ' '.join(r))
 
-        if r and r[-1] == '&&':
-            r.pop(-1)
-
-        return r
-
-    def query_code(self, ctxt):
-        r = []
-        for obj in self._get_tokens():
-            if obj == '(':
-                r.append('begin')
-            elif obj == ')':
-                r.append(';end')
-            elif obj in ('!', '&&', '||'):
-                r.append(obj)
-            else:
-                r.append(obj.query_code(ctxt))
-
-        if not r:
-            return None
-
-        return '"%s"' % ' '.join(r)
-
-    def unsafe_code(self, ctxt):
-        r = []
-        for obj in self._get_tokens():
-            if obj == '(':
-                r.append('begin')
-            elif obj == ')':
-                r.append(';end')
-            elif obj in ('!', '&&', '||'):
-                r.append(obj)
-            else:
-                r.append(obj.unsafe_code(ctxt))
-
-        if not r:
-            return None
-
-        return '"%s"' % ' '.join(r)
+        return conditions
 
     def add(self, condition):
         '''Add a condition.'''
