@@ -355,7 +355,7 @@ else
   pair="${cur##*"$sep1"}"
   if [[ "$pair" == *"$sep2"* ]]; then
     key="${pair%%"$sep2"*}"
-    value="${pair##*"$sep2"}"
+    value="${pair#*"$sep2"}"
     cur="$value"
     ${keys[$key]}
 
@@ -396,7 +396,7 @@ local strip_chars=''
 local cur="$cur" break_pos in_quotes
 dequote "$cur" cur break_pos in_quotes
 
-local key="${cur%%"$sep"*}" value="${cur##*"$sep"}" cur_stripped="$cur"
+local key="${cur%%"$sep"*}" value="${cur#*"$sep"}" cur_stripped="$cur"
 
 COMPREPLY=()
 

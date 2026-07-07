@@ -596,7 +596,7 @@ function %PREFIX%__call_func_for_key -S
 end
 
 set -l pair (string split -- $sep1 $comp)[-1]
-set -l split (string split -- $sep2 $pair)
+set -l split (string split -m1 -- $sep2 $pair)
 
 switch $pair
   case "*$sep2*"
