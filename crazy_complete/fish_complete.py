@@ -284,7 +284,7 @@ def _make_key_value_pair_arguments(ctxt, trace, completer, values):
     return args
 
 
-class FishCompletKeyValueList(FishCompletionCommand):
+class FishCompleteKeyValueList(FishCompletionCommand):
     '''Used for completing a list of key-value pairs.'''
 
     # pylint: disable=too-many-arguments
@@ -306,7 +306,7 @@ class FishCompletKeyValueList(FishCompletionCommand):
         super().__init__(ctxt, [func])
 
 
-class FishCompletKeyValuePair(FishCompletionCommand):
+class FishCompleteKeyValuePair(FishCompletionCommand):
     '''Used for completing a single key-value pair.'''
 
     # pylint: disable=too-many-arguments
@@ -513,10 +513,10 @@ class FishCompleter(shell.ShellCompleter):
         return FishCompleteValueList(ctxt, opts)
 
     def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
-        return FishCompletKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
+        return FishCompleteKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
 
     def key_value_pair(self, ctxt, trace, value_separator, values):
-        return FishCompletKeyValuePair(ctxt, trace, self, value_separator, values)
+        return FishCompleteKeyValuePair(ctxt, trace, self, value_separator, values)
 
     def combine(self, ctxt, trace, commands):
         return FishCompleteCombine(ctxt, trace, self, commands)
