@@ -340,13 +340,13 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
   'notes': [],
   'output': '~ > example --date=<TAB>\n'
             '\n'
-            '         November                        \n'
-            'Mo  Tu  We  Th  Fr  Sa  Su     \n'
-            '     1   2   3   4   5   6    \n'
+            '         November\n'
+            'Mo  Tu  We  Th  Fr  Sa  Su\n'
+            '     1   2   3   4   5   6\n'
             ' 7   8   9  10  11  12  13\n'
             '14  15  16  17  18  19  20\n'
             '21  22  23  24  25  26  27\n'
-            '28  29  30                 \n',
+            '28  29  30\n',
   'short': 'Complete a date string'},
  {'also': {'date': 'For completing a date'},
   'category': 'basic',
@@ -1189,7 +1189,8 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
             '~ > example --ip-address-v6=<TAB>\n'
             '::1   fe80::f567:7a1a:3c98:808d\n',
   'short': 'Complete a bound ip address'},
- {'also': {'list': 'For completing a comma-separated list of any completer',
+ {'also': {'key_value_pair': 'For completing a single key=value pair',
+           'list': 'For completing a comma-separated list of any completer',
            'value_list': 'For completing a comma-separated list of values'},
   'category': 'meta',
   'command': 'key_value_list',
@@ -1309,6 +1310,127 @@ COMMANDS = [{'also': {'alsa_device': 'For completing an ALSA device'},
             'colord                  dbus\n'
             'dhcpcd                  git\n',
   'short': 'Complete a comma-separated list of key=value pairs'},
+ {'also': {'key_value_list': 'For completing a comma-separated list of '
+                             'key=value pairs'},
+  'category': 'meta',
+  'command': 'key_value_pair',
+  'definition': 'prog: "example"\n'
+                'options:\n'
+                '  - option_strings: ["--key-value-pair"]\n'
+                '    complete: ["key_value_pair", "=", [\n'
+                "      ['flag',   'An option flag', null],\n"
+                "      ['nodesc', null, null],\n"
+                "      ['nocomp', 'An option with arg but without completer', "
+                "['none']],\n"
+                "      ['user',   'Takes a username',  ['user']],\n"
+                "      ['check',  'Specify file name conversions', ['choices', "
+                '{\n'
+                '        \'relaxed\': "convert to lowercase before lookup",\n'
+                '        \'strict\': "no conversion"\n'
+                '      }]]\n'
+                '    ]]\n',
+  'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33m--key-value-pair\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[33m"\x1b[39;49;00m\x1b[33mkey_value_pair\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33m=\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m[\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m      '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mflag\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m   "
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mAn\x1b[39;49;00m\x1b[31m "
+                        '\x1b[39;49;00m\x1b[33moption\x1b[39;49;00m\x1b[31m '
+                        "\x1b[39;49;00m\x1b[33mflag\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        '\x1b[39;49;00m\x1b[31mnull\x1b[39;49;00m],\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m      '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mnodesc\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        '\x1b[39;49;00m\x1b[31mnull\x1b[39;49;00m,\x1b[37m '
+                        '\x1b[39;49;00m\x1b[31mnull\x1b[39;49;00m],\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m      '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mnocomp\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mAn\x1b[39;49;00m\x1b[31m "
+                        '\x1b[39;49;00m\x1b[33moption\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mwith\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33marg\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mbut\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mwithout\x1b[39;49;00m\x1b[31m '
+                        "\x1b[39;49;00m\x1b[33mcompleter\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mnone\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m]],\x1b[37m\x1b[39;49;00m\n"
+                        '\x1b[37m      '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33muser\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m   "
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mTakes\x1b[39;49;00m\x1b[31m "
+                        '\x1b[39;49;00m\x1b[33ma\x1b[39;49;00m\x1b[31m '
+                        "\x1b[39;49;00m\x1b[33musername\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m  "
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33muser\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m]],\x1b[37m\x1b[39;49;00m\n"
+                        '\x1b[37m      '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mcheck\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m  "
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mSpecify\x1b[39;49;00m\x1b[31m "
+                        '\x1b[39;49;00m\x1b[33mfile\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mname\x1b[39;49;00m\x1b[31m '
+                        "\x1b[39;49;00m\x1b[33mconversions\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mchoices\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        '\x1b[39;49;00m{\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m        '
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mrelaxed\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m "
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mconvert\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mto\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mlowercase\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mbefore\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mlookup\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m,\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m        '
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mstrict\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m:\x1b[37m "
+                        '\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[33mno\x1b[39;49;00m\x1b[31m '
+                        '\x1b[39;49;00m\x1b[33mconversion\x1b[39;49;00m\x1b[33m"\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m      '
+                        '\x1b[39;49;00m}]]\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m    \x1b[39;49;00m]]\x1b[37m\x1b[39;49;00m\n',
+  'implemented': None,
+  'long': 'The first argument is the separator used for delimiting the value '
+          'from the key.\n'
+          '\n'
+          'The second argument is a list of key-description-completer '
+          'definitions, like:\n'
+          '\n'
+          '  `[ [<key>, <description>, <completer>], ... ]`\n'
+          '\n'
+          'If a key does not take an argument, use `null` as completer.\n'
+          '\n'
+          'If a key does take an argument but cannot be completed, use '
+          "`['none']` as completer.\n",
+  'long_colored': 'The first argument is the separator used for delimiting the '
+                  'value from the key.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'The second argument is a list of key-description-completer '
+                  'definitions, like:\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  '  \x1b[33m`[ [<key>, <description>, <completer>], ... '
+                  ']`\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'If a key does not take an argument, use '
+                  '\x1b[33m`null`\x1b[39;49;00m as '
+                  'completer.\x1b[37m\x1b[39;49;00m\n'
+                  '\x1b[37m\x1b[39;49;00m\n'
+                  'If a key does take an argument but cannot be completed, use '
+                  "\x1b[33m`['none']`\x1b[39;49;00m as "
+                  'completer.\x1b[37m\x1b[39;49;00m\n',
+  'notes': [],
+  'output': '~ > example --key-value-pair <TAB>\n'
+            'animal  -- select an animal\n'
+            'async   -- set async mode\n'
+            'nocomp  -- no completer\n'
+            'number  -- select a number\n'
+            'proc    -- select a process\n'
+            'user    -- sel\n'
+            '\n'
+            '~ > example --key-value-pair user=<TAB>\n'
+            'bin                     braph\n'
+            'colord                  dbus\n'
+            'dhcpcd                  git\n',
+  'short': 'Complete a single key=value pair'},
  {'also': {'directory_list': 'For completing a comma-separated list of '
                              'directories',
            'file_list': 'For completing a comma-separated list of files',

@@ -4,6 +4,7 @@
 | ----------------------------------- | --------------------------------------------------------- |
 | [combine](#combine)                 | Combine multiple completers                               |
 | [key\_value\_list](#key_value_list) | Complete a comma-separated list of key=value pairs        |
+| [key\_value\_pair](#key_value_pair) | Complete a single key=value pair                          |
 | [list](#list)                       | Complete a comma-separated list of any completer          |
 | [none](#none)                       | No completion, but specifies that an argument is required |
 | [prefix](#prefix)                   | Prefix completion by a string                             |
@@ -381,9 +382,9 @@ options:
 ```
 ~ > example --date=<TAB>
 
-         November                        
-Mo  Tu  We  Th  Fr  Sa  Su     
-     1   2   3   4   5   6    
+         November
+Mo  Tu  We  Th  Fr  Sa  Su
+     1   2   3   4   5   6
  7   8   9  10  11  12  13
 14  15  16  17  18  19  20
 21  22  23  24  25  26  27
@@ -1146,6 +1147,60 @@ dhcpcd                  git
 - [list](#list): For completing a comma-separated list of any completer
 
 - [value\_list](#value_list): For completing a comma-separated list of values
+
+- [key\_value\_pair](#key_value_pair): For completing a single key=value pair
+
+---
+
+### key\_value\_pair
+
+> Complete a single key=value pair
+
+The first argument is the separator used for delimiting the value from the key.
+
+The second argument is a list of key-description-completer definitions, like:
+
+  `[ [<key>, <description>, <completer>], ... ]`
+
+If a key does not take an argument, use `null` as completer.
+
+If a key does take an argument but cannot be completed, use `['none']` as completer.
+
+
+```yaml
+prog: "example"
+options:
+  - option_strings: ["--key-value-pair"]
+    complete: ["key_value_pair", "=", [
+      ['flag',   'An option flag', null],
+      ['nodesc', null, null],
+      ['nocomp', 'An option with arg but without completer', ['none']],
+      ['user',   'Takes a username',  ['user']],
+      ['check',  'Specify file name conversions', ['choices', {
+        'relaxed': "convert to lowercase before lookup",
+        'strict': "no conversion"
+      }]]
+    ]]
+```
+
+```
+~ > example --key-value-pair <TAB>
+animal  -- select an animal
+async   -- set async mode
+nocomp  -- no completer
+number  -- select a number
+proc    -- select a process
+user    -- sel
+
+~ > example --key-value-pair user=<TAB>
+bin                     braph
+colord                  dbus
+dhcpcd                  git
+```
+
+**SEE ALSO**
+
+- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
 
 ---
 

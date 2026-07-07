@@ -232,7 +232,7 @@ def _check_command(_ctxt, arguments):
 def _check_command_arg(ctxt, arguments):
     arguments.require_no_more()
 
-    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list'):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'key_value_list', 'key_value_pair'):
         msg = m.completer_not_allowed_in('command_arg', ctxt.trace[-1])
         raise _error(msg, arguments.args)
 
@@ -371,6 +371,31 @@ def _check_value_list(_ctxt, arguments):
             _check_type(value, (str,), f'values[{i}]: item')
 
 
+def _check_key_value_pair_definitions(ctxt, values):
+    for i, compldef in enumerate(values.value):
+        index = f'definition[{i}]'
+        _check_type(compldef, (list,), index)
+
+        if len(compldef.value) != 3:
+            msg = '%s: %s' % (index, m.list_must_contain_exact_three_items())
+            raise _error(msg, compldef)
+
+        key = compldef.value[0]
+        description = compldef.value[1]
+        complete = compldef.value[2]
+
+        _check_type(key, (str,), f'{index}: key')
+        _check_type(description, (str, NoneType), f'{index}: description')
+        _check_type(complete, (list, NoneType), f'{index}: completer')
+        _check_non_empty_string(key, f'{index}: key')
+        _check_no_spaces(key, f'{index}: key')
+
+        if complete.value is None:
+            continue
+
+        _check_complete(ctxt, complete)
+
+
 def _check_key_value_list(ctxt, arguments):
     pair_separator = arguments.get_required_arg('pair_separator')
     value_separator = arguments.get_required_arg('value_separator')
@@ -387,28 +412,23 @@ def _check_key_value_list(ctxt, arguments):
     _check_char(value_separator, 'value_separator')
     _check_non_empty_list(values, 'values')
 
-    for i, compldef in enumerate(values.value):
-        index = f'definition[{i}]'
-        _check_type(compldef, (list,), index)
+    _check_key_value_pair_definitions(ctxt, values)
 
-        if len(compldef.value) != 3:
-            msg = '%s: %s' % (index, m.list_must_contain_exact_three_items())
-            raise _error(msg, compldef)
 
-        key = compldef.value[0]
-        description = compldef.value[1]
-        complete = compldef.value[2]
+def _check_key_value_pair(ctxt, arguments):
+    value_separator = arguments.get_required_arg('value_separator')
+    values = arguments.get_required_arg('values')
+    arguments.require_no_more()
 
-        _check_type(key, (str,), index + ': key')
-        _check_type(description, (str, NoneType), index + ': description')
-        _check_type(complete, (list, NoneType), index + ': completer')
-        _check_non_empty_string(key, index + ': key')
-        _check_no_spaces(key, index + ': key')
+    _check_type(value_separator, (str,), 'value_separator')
+    _check_type(values, (list,), 'values')
 
-        if complete.value is None:
-            continue
+    ctxt.trace.append('key_value_pair')
 
-        _check_complete(ctxt, complete)
+    _check_char(value_separator, 'value_separator')
+    _check_non_empty_list(values, 'values')
+
+    _check_key_value_pair_definitions(ctxt, values)
 
 
 def _check_combine(ctxt, arguments):
@@ -546,6 +566,7 @@ _COMMANDS = {
     'integer':            _check_integer,
     'ip_address':         _check_ip_address,
     'key_value_list':     _check_key_value_list,
+    'key_value_pair':     _check_key_value_pair,
     'list':               _check_list,
     'locale':             _check_void,
     'login_shell':        _check_void,

@@ -266,6 +266,24 @@ class FishCompleteValueList(FishCompletionCommand):
             super().__init__(ctxt, [complete_list_func, separator, func])
 
 
+def _make_key_value_pair_arguments(ctxt, trace, completer, values):
+    args = []
+    q = shell.quote
+
+    for key, desc, complete in values:
+        if not complete:
+            func = 'false'
+        elif complete[0] == 'none':
+            func = 'true'
+        else:
+            obj = completer.complete_from_def(ctxt, trace, complete)
+            func = obj.get_function()
+
+        args.append('%s %s %s' % (q(key), q(desc or ''), q(func)))
+
+    return args
+
+
 class FishCompletKeyValueList(FishCompletionCommand):
     '''Used for completing a list of key-value pairs.'''
 
@@ -274,23 +292,32 @@ class FishCompletKeyValueList(FishCompletionCommand):
 
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         trace.append('key_value_list')
-        args = []
-        q = shell.quote
-
-        for key, desc, complete in values:
-            if not complete:
-                func = 'false'
-            elif complete[0] == 'none':
-                func = 'true'
-            else:
-                obj = completer.complete_from_def(ctxt, trace, complete)
-                func = obj.get_function()
-
-            args.append('%s %s %s' % (q(key), q(desc or ''), q(func)))
+        args = _make_key_value_pair_arguments(ctxt, trace, completer, values)
 
         code = '%s %s %s \\\n%s' % (
             ctxt.helpers.use_function('key_value_list'),
             shell.quote(pair_separator),
+            shell.quote(value_separator),
+            indent(' \\\n'.join(args), 2)
+        )
+
+        func = ctxt.helpers.add_dynamic_func(ctxt, code)
+
+        super().__init__(ctxt, [func])
+
+
+class FishCompletKeyValuePair(FishCompletionCommand):
+    '''Used for completing a single key-value pair.'''
+
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+
+    def __init__(self, ctxt, trace, completer, value_separator, values):
+        trace.append('key_value_pair')
+        args = _make_key_value_pair_arguments(ctxt, trace, completer, values)
+
+        code = '%s %s \\\n%s' % (
+            ctxt.helpers.use_function('key_value_pair'),
             shell.quote(value_separator),
             indent(' \\\n'.join(args), 2)
         )
@@ -487,6 +514,9 @@ class FishCompleter(shell.ShellCompleter):
 
     def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
         return FishCompletKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
+
+    def key_value_pair(self, ctxt, trace, value_separator, values):
+        return FishCompletKeyValuePair(ctxt, trace, self, value_separator, values)
 
     def combine(self, ctxt, trace, commands):
         return FishCompleteCombine(ctxt, trace, self, commands)

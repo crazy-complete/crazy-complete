@@ -380,6 +380,43 @@ else
 fi
 ''', ['dequote'])
 
+_KEY_VALUE_PAIR = ShellFunction('key_value_pair', r'''
+local sep="$1"; shift
+local -A keys=()
+local i
+
+for ((i=1; i <= $#; i += 2)); do
+  keys["${@:i:1}"]="${@:i + 1:1}"
+done
+
+local strip_chars=''
+[[ "$COMP_WORDBREAKS" == *"$sep"* ]] && strip_chars+="$sep"
+[[ "${cur:0:1}" == '"' ]] && strip_chars=''
+[[ "${cur:0:1}" == "'" ]] && strip_chars=''
+local cur="$cur" break_pos in_quotes
+dequote "$cur" cur break_pos in_quotes
+
+local key="${cur%%"$sep"*}" value="${cur##*"$sep"}" cur_stripped="$cur"
+
+COMPREPLY=()
+
+if [[ "$cur" != *"$sep"* ]]; then
+  values "${!keys[@]}"
+elif array_contains "$key" "${!keys[@]}"; then
+  cur="$value"
+  ${keys[$key]}
+
+  cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
+  if [[ -n "$strip_chars" ]]; then
+      cur_stripped="${cur_stripped##*[$strip_chars]}"
+  fi
+
+  for i in "${!COMPREPLY[@]}"; do
+    COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
+  done
+fi
+''', ['dequote', 'array_contains', 'values'])
+
 _PREFIX_COMPREPLY = ShellFunction('prefix_compreply', r'''
 [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
 
@@ -628,6 +665,7 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
         self.add_function(_KEY_VALUE_LIST)
+        self.add_function(_KEY_VALUE_PAIR)
         self.add_function(_FILE_FILTER)
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)

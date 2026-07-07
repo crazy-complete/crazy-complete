@@ -222,6 +222,20 @@
 3_31_00-ip-address-too-many-args         | foo: -o: ip_address: Too many arguments
 3_31_01-ip-address-arg-wrong-type        | foo: -o: ip_address: type: Invalid type. Expected: string
 3_31_02-ip-address-arg-wrong-value       | foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all
+3_32_00-key-value-pair-missing-args      | foo: -o: key_value_pair: Missing required argument: value_separator
+3_32_01-key-value-pair-missing-args-1    | foo: -o: key_value_pair: Missing required argument: values
+3_32_02-key-value-pair-too-many-args     | foo: -o: key_value_pair: Too many arguments
+3_32_03-key-value-pair-sep-wrong-type    | foo: -o: key_value_pair: value_separator: Invalid type. Expected: string
+3_32_04-key-value-pair-sep-empty         | foo: -o: key_value_pair: value_separator: Invalid length. Single character expected
+3_32_05-key-value-pair-sep-wrong-value   | foo: -o: key_value_pair: value_separator: Invalid length. Single character expected
+3_32_06-key-value-pair-values-wrong-type | foo: -o: key_value_pair: values: Invalid type. Expected: list
+3_32_07-key-value-pair-key-not-string    | foo: -o: key_value_pair: definition[0]: key: Invalid type. Expected: string
+3_32_08-key-value-pair-key-empty         | foo: -o: key_value_pair: definition[0]: key: String cannot be empty
+3_32_09-key-value-pair-key-with-space    | foo: -o: key_value_pair: definition[0]: key: String cannot contain spaces
+3_32_10-key-value-pair-desc-not-string   | foo: -o: key_value_pair: definition[0]: description: Invalid type. Expected: string|none
+3_32_11-key-value-pair-complete-wrong-type | foo: -o: key_value_pair: definition[0]: completer: Invalid type. Expected: list|none
+3_32_12-key-value-pair-def-not-list      | foo: -o: key_value_pair: definition[0]: Invalid type. Expected: list
+3_32_13-key-value-pair-def-invalid-length | foo: -o: key_value_pair: definition[0]: List must contain exactly three items
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Too many repeatable positionals

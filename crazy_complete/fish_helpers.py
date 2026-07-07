@@ -623,6 +623,50 @@ switch $pair
 end
 ''', ['get_completing_arg'])
 
+_KEY_VALUE_PAIR = FishFunction('key_value_pair', r'''
+set -l sep $argv[1]
+set -l keys
+set -l descriptions
+set -l functions
+set -l i
+
+for i in (seq 2 3 (count $argv))
+  set -a keys $argv[$i]
+  set -a descriptions $argv[(math $i + 1)]
+  set -a functions $argv[(math $i + 2)]
+end
+
+function %PREFIX%__call_func_for_key -S
+  set -l i
+  for i in (seq 1 (count $keys))
+    if test $keys[$i] = $argv[1]
+      set -g __fish_stripprefix "^.*"(string escape --style=regex -- $sep)
+      $functions[$i]
+      set -e __fish_stripprefix
+      return
+    end
+  end
+end
+
+set -l comp (get_completing_arg)
+set -l split (string split -m1 -- $sep $comp)
+
+if test (count $split) -eq 2
+  set -l value
+  for value in (%PREFIX%__call_func_for_key $split[1])
+    printf '%s%s%s\n' $split[1] $sep $value
+  end
+else
+  for i in (seq 1 (count $keys))
+    if test "$functions[$i]" = false
+      printf '%s\t%s\n' $keys[$i] "$descriptions[$i]"
+    else
+      printf '%s%s\t%s\n' $keys[$i] $sep "$descriptions[$i]"
+    end
+  end
+end
+''', ['get_completing_arg'])
+
 _HISTORY = FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
 ''')
@@ -816,6 +860,7 @@ class FishHelpers(GeneralHelpers):
         self.add_function(_LIST)
         self.add_function(_PREFIX)
         self.add_function(_KEY_VALUE_LIST)
+        self.add_function(_KEY_VALUE_PAIR)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)
         self.add_function(_NUMBER)

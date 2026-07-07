@@ -11,6 +11,7 @@ filedir: {"args": ["--input-type=yaml"], "definition_file": "filedir.yaml"}
 wrapper: {"args": ["--input-type=yaml"], "definition_file": "wrapper.yaml"}
 list: {"args": ["--input-type=yaml"], "definition_file": "list.yaml"}
 key_value_list: {"args": ["--input-type=yaml"], "definition_file": "key_value_list.yaml"}
+key_value_pair: {"args": ["--input-type=yaml"], "definition_file": "key_value_pair.yaml"}
 complex: {"args": ["--input-type=yaml"], "definition_file": "complex.yaml"}
 long_opt_arg_sep: {"args": ["--input-type=yaml"], "definition_file": "long_opt_arg_sep.yaml"}
 ---
@@ -2220,3 +2221,135 @@ fish_expected: |
   > crazy-complete-test --space
 zsh_expected: |
   > crazy-complete-test --space
+---
+number: 144
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o"
+send: "crazy-complete-test -o "
+bash_expected: |
+  > crazy-complete-test -o
+  animal  async   file    nocomp  number  proc    user
+  > crazy-complete-test -o
+fish_expected: |
+  > crazy-complete-test -o
+  animal=  (select an animal)  nocomp=  (no completer)      user=  (select a user)
+  async    (set async mode)    number=  (select a number)
+  file=                        proc=    (select a process)
+zsh_expected: |
+  > crazy-complete-test -o
+  animal  -- select an animal
+  async   -- set async mode
+  nocomp  -- no completer
+  number  -- select a number
+  proc    -- select a process
+  user    -- select a user
+  file
+---
+number: 145
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o a"
+send: "crazy-complete-test -o a"
+bash_expected: |
+  > crazy-complete-test -o a
+  animal  async
+  > crazy-complete-test -o a
+fish_expected: |
+  > crazy-complete-test -o a
+  animal=  (select an animal)  async  (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o a
+  animal  -- select an animal
+  async   -- set async mode
+---
+number: 146
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o an"
+send: "crazy-complete-test -o an"
+bash_expected: |
+  > crazy-complete-test -o animal
+fish_expected: |
+  > crazy-complete-test -o animal=
+zsh_expected: |
+  > crazy-complete-test -o animal=
+---
+number: 147
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o animal="
+send: "crazy-complete-test -o animal="
+bash_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+  animal=cat  animal=dog  animal=horse
+zsh_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+---
+number: 148
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o number="
+send: "crazy-complete-test -o number="
+bash_expected: |
+  > crazy-complete-test -o number=
+  0  1  2
+  > crazy-complete-test -o number=
+fish_expected: |
+  > crazy-complete-test -o number=
+  number=0  (zero)  number=1  (one)  number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 149
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o 'number="
+send: "crazy-complete-test -o 'number="
+bash_expected: |
+  > crazy-complete-test -o 'number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o 'number=
+fish_expected: |
+  > crazy-complete-test -o 'number=
+  'number=0  (zero)  'number=1  (one)  'number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o 'number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 150
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o \"number="
+send: "crazy-complete-test -o \"number="
+bash_expected: |
+  > crazy-complete-test -o "number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o "number=
+fish_expected: |
+  > crazy-complete-test -o "number=
+  "number=0  (zero)  "number=1  (one)  "number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o "number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 151
+definition_file: "key_value_pair"
+description: "key_value_pair: Check -o file=f"
+send: "crazy-complete-test -o file=f"
+bash_expected: |
+  > crazy-complete-test -o file=f
+  file with spaces  file1.TXT         file4.txt.1
+  file0.txt         file3.tXt
+  > crazy-complete-test -o file=file
+fish_expected: |
+  > crazy-complete-test -o file=file
+  file=file with spaces  file=file1.TXT  file=file4.txt.1
+  file=file0.txt         file=file3.tXt
+zsh_expected: |
+  > crazy-complete-test -o file=file

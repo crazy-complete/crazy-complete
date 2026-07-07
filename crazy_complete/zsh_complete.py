@@ -214,7 +214,11 @@ class ZshCompleteRange(ZshCompletionBase):
 
 
 class ZshKeyValueList(ZshComplFunc):
-    '''Used for completing a list of key-value pairs.'''
+    '''Used for completing key-value pairs.
+
+    If pair_separator is None, only a single key-value pair is completed.
+    Else, a list of key-value pairs are completed.
+    '''
 
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
@@ -240,12 +244,19 @@ class ZshKeyValueList(ZshComplFunc):
                 action = compl_obj.get_action_string()
                 spec.append(f'{key}{desc}:::{action}')
 
-        code = '_values -s %s -S %s %s \\\n%s' % (
-            shell.quote(pair_separator),
-            shell.quote(value_separator),
-            shell.quote(ctxt.option.metavar or ''),
-            indent(' \\\n'.join(spec), 2)
-        )
+        if pair_separator is not None:
+            code = '_values -s %s -S %s %s \\\n%s' % (
+                shell.quote(pair_separator),
+                shell.quote(value_separator),
+                shell.quote(ctxt.option.metavar or ''),
+                indent(' \\\n'.join(spec), 2)
+            )
+        else:
+            code = '_values -S %s %s \\\n%s' % (
+                shell.quote(value_separator),
+                shell.quote(ctxt.option.metavar or ''),
+                indent(' \\\n'.join(spec), 2)
+            )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
 
@@ -434,6 +445,9 @@ class ZshCompleter(shell.ShellCompleter):
 
     def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
         return ZshKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
+
+    def key_value_pair(self, ctxt, trace, value_separator, values):
+        return ZshKeyValueList(ctxt, trace, self, None, value_separator, values)
 
     def combine(self, ctxt, trace, commands):
         return ZshCompleteCombine(ctxt, trace, self, commands)

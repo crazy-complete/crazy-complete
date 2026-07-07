@@ -155,6 +155,22 @@ class BashCompleteCombine(BashCompletionBase):
         return self.ctxt.helpers.add_dynamic_func(self.ctxt, self.get_code())
 
 
+def _make_key_value_pair_arguments(ctxt, trace, completer, values):
+    funcs = {}
+
+    for key, _desc, complete in values:
+        if not complete:
+            funcs[key] = 'false'
+        elif complete[0] == 'none':
+            funcs[key] = 'true'
+        else:
+            obj = completer.complete_from_def(ctxt, trace, complete)
+            funcs[key] = obj.get_function()
+
+    q = shell.quote
+    return ' \\\n'.join('%s %s' % (q(k), q(f)) for k, f in funcs.items())
+
+
 class BashCompleteKeyValueList(BashCompletionCode):
     '''Used for completing a list of key-value pairs.'''
 
@@ -163,23 +179,29 @@ class BashCompleteKeyValueList(BashCompletionCode):
 
     def __init__(self, ctxt, trace, completer,
                  pair_separator, value_separator, values):
-        funcs = {}
-
-        for key, _desc, complete in values:
-            if not complete:
-                funcs[key] = 'false'
-            elif complete[0] == 'none':
-                funcs[key] = 'true'
-            else:
-                obj = completer.complete_from_def(ctxt, trace, complete)
-                funcs[key] = obj.get_function()
-
-        q = shell.quote
-        args = ' \\\n'.join('%s %s' % (q(k), q(f)) for k, f in funcs.items())
+        args = _make_key_value_pair_arguments(ctxt, trace, completer, values)
 
         code = '%s %s %s \\\n%s' % (
             ctxt.helpers.use_function('key_value_list'),
             shell.quote(pair_separator),
+            shell.quote(value_separator),
+            indent(args, 2)
+        )
+
+        super().__init__(ctxt, code)
+
+
+class BashCompleteKeyValuePair(BashCompletionCode):
+    '''Used for completing a single of key-value pair.'''
+
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+
+    def __init__(self, ctxt, trace, completer, value_separator, values):
+        args = _make_key_value_pair_arguments(ctxt, trace, completer, values)
+
+        code = '%s %s \\\n%s' % (
+            ctxt.helpers.use_function('key_value_pair'),
             shell.quote(value_separator),
             indent(args, 2)
         )
@@ -352,6 +374,9 @@ class BashCompleter(shell.ShellCompleter):
 
     def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
         return BashCompleteKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
+
+    def key_value_pair(self, ctxt, trace, value_separator, values):
+        return BashCompleteKeyValuePair(ctxt, trace, self, value_separator, values)
 
     def combine(self, ctxt, trace, commands):
         return BashCompleteCombine(ctxt, trace, self, commands)
