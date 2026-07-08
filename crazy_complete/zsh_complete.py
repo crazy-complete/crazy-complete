@@ -4,6 +4,7 @@
 '''This module contains code for completing arguments in Zsh.'''
 
 from . import shell
+from . import utils
 from .pattern import bash_glob_to_zsh_glob
 from .str_utils import join_with_wrap, indent
 from .zsh_utils import (
@@ -214,17 +215,62 @@ class ZshCompleteRange(ZshCompletionBase):
 
 
 class ZshKeyValueList(ZshComplFunc):
-    '''Used for completing key-value pairs.
-
-    If pair_separator is None, only a single key-value pair is completed.
-    Else, a list of key-value pairs are completed.
-    '''
+    '''Used for completing a comma-separated list of key-value pairs.'''
 
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         trace.append('key_value_list')
+        spec = []
+
+        for definition in utils.get_key_value_list_definitions(values):
+            key = escape_colon(definition.key)
+
+            if definition.description:
+                desc = shell.quote('[%s]' % escape_square_brackets(definition.description))
+            else:
+                desc = ''
+
+            if definition.excludes:
+                excludes = shell.quote('(%s)' % ' '.join(definition.excludes))
+            else:
+                excludes = ''
+
+            if definition.repeatable:
+                repeatable = "'*'"
+            else:
+                repeatable = ''
+
+            if not definition.completer:
+                spec.append(f'{excludes}{repeatable}{key}{desc}')
+            elif definition.completer[0] == 'none':
+                spec.append(f'{excludes}{repeatable}{key}{desc}:::')
+            else:
+                compl_obj = completer.complete_from_def(ctxt, trace, definition.completer)
+                action = compl_obj.get_action_string()
+                spec.append(f'{excludes}{repeatable}{key}{desc}:::{action}')
+
+        code = '_values -s %s -S %s %s \\\n%s' % (
+            shell.quote(pair_separator),
+            shell.quote(value_separator),
+            shell.quote(ctxt.option.metavar or ''),
+            indent(' \\\n'.join(spec), 2)
+        )
+
+        func = ctxt.helpers.add_dynamic_func(ctxt, code)
+
+        super().__init__(ctxt, [func], needs_braces=True)
+
+
+class ZshKeyValuePair(ZshComplFunc):
+    '''Used for completing a single key-value pair.'''
+
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+
+    def __init__(self, ctxt, trace, completer, value_separator, values):
+        trace.append('key_value_pair')
         spec = []
 
         for key, desc, complete in values:
@@ -244,19 +290,11 @@ class ZshKeyValueList(ZshComplFunc):
                 action = compl_obj.get_action_string()
                 spec.append(f'{key}{desc}:::{action}')
 
-        if pair_separator is not None:
-            code = '_values -s %s -S %s %s \\\n%s' % (
-                shell.quote(pair_separator),
-                shell.quote(value_separator),
-                shell.quote(ctxt.option.metavar or ''),
-                indent(' \\\n'.join(spec), 2)
-            )
-        else:
-            code = '_values -S %s %s \\\n%s' % (
-                shell.quote(value_separator),
-                shell.quote(ctxt.option.metavar or ''),
-                indent(' \\\n'.join(spec), 2)
-            )
+        code = '_values -S %s %s \\\n%s' % (
+            shell.quote(value_separator),
+            shell.quote(ctxt.option.metavar or ''),
+            indent(' \\\n'.join(spec), 2)
+        )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
 
@@ -447,7 +485,7 @@ class ZshCompleter(shell.ShellCompleter):
         return ZshKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
 
     def key_value_pair(self, ctxt, trace, value_separator, values):
-        return ZshKeyValueList(ctxt, trace, self, None, value_separator, values)
+        return ZshKeyValuePair(ctxt, trace, self, value_separator, values)
 
     def combine(self, ctxt, trace, commands):
         return ZshCompleteCombine(ctxt, trace, self, commands)

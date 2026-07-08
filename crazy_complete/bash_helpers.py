@@ -299,11 +299,13 @@ fi
 _KEY_VALUE_LIST = ShellFunction('key_value_list', r'''
 local sep1="$1"; shift
 local sep2="$1"; shift
-local -A keys=()
+local -A funcs=()
+local -A excludes=()
 local i
 
-for ((i=1; i <= $#; i += 2)); do
-  keys["${@:i:1}"]="${@:i + 1:1}"
+for ((i=1; i <= $#; i += 3)); do
+  funcs["${@:i:1}"]="${@:i + 1:1}"
+  excludes["${@:i:1}"]="${@:i + 2:1}"
 done
 
 local strip_chars=''
@@ -315,20 +317,22 @@ local cur="$cur" break_pos in_quotes
 dequote "$cur" cur break_pos in_quotes
 
 if [[ -z "$cur" ]]; then
-  COMPREPLY=("${!keys[@]}")
+  COMPREPLY=("${!funcs[@]}")
   return
 fi
 
 local pair key value found_key cur_stripped="$cur"
-local -a having_pairs having_keys remaining_keys
+local -a tmp having_pairs having_keys remaining_keys
 
 IFS="$sep1" read -r -a having_pairs <<< "$cur"
 
 for pair in "${having_pairs[@]}"; do
-  having_keys+=("${pair%%"$sep2"*}")
+  key="${pair%%"$sep2"*}"
+  IFS=' ' read -r -a tmp <<< "${excludes[$key]}"
+  having_keys+=("${tmp[@]}")
 done
 
-for key in "${!keys[@]}"; do
+for key in "${!funcs[@]}"; do
   found_key=0
 
   for having_key in "${having_keys[@]}"; do
@@ -357,7 +361,7 @@ else
     key="${pair%%"$sep2"*}"
     value="${pair#*"$sep2"}"
     cur="$value"
-    ${keys[$key]}
+    ${funcs[$key]}
 
     cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
     if [[ -n "$strip_chars" ]]; then
@@ -382,11 +386,11 @@ fi
 
 _KEY_VALUE_PAIR = ShellFunction('key_value_pair', r'''
 local sep="$1"; shift
-local -A keys=()
+local -A funcs=()
 local i
 
 for ((i=1; i <= $#; i += 2)); do
-  keys["${@:i:1}"]="${@:i + 1:1}"
+  funcs["${@:i:1}"]="${@:i + 1:1}"
 done
 
 local strip_chars=''
@@ -401,10 +405,10 @@ local key="${cur%%"$sep"*}" value="${cur#*"$sep"}" cur_stripped="$cur"
 COMPREPLY=()
 
 if [[ "$cur" != *"$sep"* ]]; then
-  values "${!keys[@]}"
-elif array_contains "$key" "${!keys[@]}"; then
+  values "${!funcs[@]}"
+elif array_contains "$key" "${!funcs[@]}"; then
   cur="$value"
-  ${keys[$key]}
+  ${funcs[$key]}
 
   cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
   if [[ -n "$strip_chars" ]]; then

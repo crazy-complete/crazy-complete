@@ -303,3 +303,39 @@ def is_worth_a_function(commandline):
         return True
 
     return False
+
+
+_KEY_VALUE_LIST_DEFINITION = namedtuple('KeyValueListDefinition', (
+    'key', 'repeatable', 'description', 'completer', 'excludes'))
+
+
+def get_key_value_list_definitions(definitions):
+    '''Normalize a list of key-value definitions.
+
+    Each definition is represented as a list containing either three or four
+    elements. This function converts the various supported forms into a
+    consistent representation, making them easier to process.
+
+    If the key name starts with '*', the returned definition is marked as
+    repeatable and the leading '*' is removed from the key name.
+    '''
+
+    r = []
+
+    for definition in definitions:
+        key = definition[0]
+        repeatable = False
+        excludes = []
+
+        if key.startswith('*'):
+            key = key[1:]
+            repeatable = True
+
+        if len(definition) == 4:
+            excludes = definition[3]
+
+        r.append(_KEY_VALUE_LIST_DEFINITION(
+            key, repeatable, definition[1], definition[2], excludes
+        ))
+
+    return r

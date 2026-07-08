@@ -109,16 +109,16 @@ def list_cannot_be_empty():
     return 'List cannot be empty'
 
 
-def list_must_contain_at_least_two_items():
+def list_must_contain_at_least_n_items(n):
     if LANG == 'de':
-        return 'Liste muss mindestens zwei Elemente enthalten'
-    return 'List must contain at least two items'
+        return f'Liste muss mindestens {n} Elemente enthalten'
+    return f'List must contain at least {n} items'
 
 
-def list_must_contain_exact_three_items():
+def list_must_contain_exact_n_items(n):
     if LANG == 'de':
-        return 'Liste muss exakt 3 Elemente enthalten'
-    return 'List must contain exactly three items'
+        return f'Liste muss exakt {n} Elemente enthalten'
+    return f'List must contain exactly {n} items'
 
 
 def missing_arg():

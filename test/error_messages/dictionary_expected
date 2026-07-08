@@ -162,7 +162,7 @@
 3_22_00-combine-missing-arg              | foo: -o: combine: Missing required argument: commands
 3_22_01-combine-wrong-type               | foo: -o: combine: commands: Invalid type. Expected: list
 3_22_02-combine-empty-subcommands        | foo: -o: combine: commands: List cannot be empty
-3_22_03-combine-single-subcommand        | foo: -o: combine: commands: List must contain at least two items
+3_22_03-combine-single-subcommand        | foo: -o: combine: commands: List must contain at least 2 items
 3_22_04-combine-subcommand-no-command    | foo: -o: combine: Missing required argument: command
 3_22_05-combine-subcommand-invalid-type  | foo: -o: combine: command[1]: Invalid type. Expected: list
 3_22_06-combine-subcommand-invalid-command | foo: -o: combine: Unknown completer: invalid
@@ -214,11 +214,16 @@
 3_30_13-key-value-list-1-key-with-space  | foo: -o: key_value_list: definition[0]: key: String cannot contain spaces
 3_30_14-key-value-list-1-complete-wrong-type | foo: -o: key_value_list: definition[0]: completer: Invalid type. Expected: list|none
 3_30_15-key-value-list-2-def-not-list    | foo: -o: key_value_list: definition[0]: Invalid type. Expected: list
-3_30_16-key-value-list-2-def-invalid-length | foo: -o: key_value_list: definition[0]: List must contain exactly three items
+3_30_16-key-value-list-2-def-invalid-length | foo: -o: key_value_list: definition[0]: List must contain at least 3 items
 3_30_17-key-value-list-2-key-not-string  | foo: -o: key_value_list: definition[0]: key: Invalid type. Expected: string
 3_30_18-key-value-list-2-key-empty       | foo: -o: key_value_list: definition[0]: key: String cannot be empty
 3_30_19-key-value-list-key-with-space    | foo: -o: key_value_list: definition[0]: key: String cannot contain spaces
 3_30_20-key-value-list-2-desc-not-string | foo: -o: key_value_list: definition[0]: description: Invalid type. Expected: string|none
+3_30_21-key-value-list-excludes-wrong-type | foo: -o: key_value_list: definition[0]: excludes: Invalid type. Expected: list
+3_30_22-key-value-list-excludes-key-wrong-type | foo: -o: key_value_list: definition[0]: excludes[0]: Invalid type. Expected: string
+3_30_23-key-value-list-excludes-key-empty | foo: -o: key_value_list: definition[0]: excludes[0]: String cannot be empty
+3_30_24-key-value-list-excludes-key-missing | foo: -o: key_value_list: definition[0]: excludes[0]: missing: No such key
+3_30_25-key-value-list-duplicate-key     | foo: -o: key_value_list: definition[1]: key: Duplicate key
 3_31_00-ip-address-too-many-args         | foo: -o: ip_address: Too many arguments
 3_31_01-ip-address-arg-wrong-type        | foo: -o: ip_address: type: Invalid type. Expected: string
 3_31_02-ip-address-arg-wrong-value       | foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all
@@ -235,7 +240,7 @@
 3_32_10-key-value-pair-desc-not-string   | foo: -o: key_value_pair: definition[0]: description: Invalid type. Expected: string|none
 3_32_11-key-value-pair-complete-wrong-type | foo: -o: key_value_pair: definition[0]: completer: Invalid type. Expected: list|none
 3_32_12-key-value-pair-def-not-list      | foo: -o: key_value_pair: definition[0]: Invalid type. Expected: list
-3_32_13-key-value-pair-def-invalid-length | foo: -o: key_value_pair: definition[0]: List must contain exactly three items
+3_32_13-key-value-pair-def-invalid-length | foo: -o: key_value_pair: definition[0]: List must contain exactly 3 items
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Too many repeatable positionals

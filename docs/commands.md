@@ -1110,9 +1110,18 @@ The first argument is the separator used for delimiting the key-value pairs.
 
 The second argument is the separator used for delimiting the value from the key.
 
-The third argument is a list of key-description-completer definitions, like:
+The third argument is a list of definitions, like:
 
   `[ [<key>, <description>, <completer>], ... ]`
+
+  -- OR --
+
+  `[ [<key>, <description>, <completer>, <excludes>], ... ]`
+
+`excludes` is a list of keys that should no longer be offered once a key has been used.
+
+By default, each key is offered for completion only once.
+To allow a key to be completed multiple times, prefix its name with `*`.
 
 If a key does not take an argument, use `null` as completer.
 
@@ -1124,11 +1133,13 @@ prog: "example"
 options:
   - option_strings: ["--key-value-list"]
     complete: ["key_value_list", ",", "=", [
-      ['flag',   'An option flag', null],
-      ['nodesc', null, null],
-      ['nocomp', 'An option with arg but without completer', ['none']],
-      ['user',   'Takes a username',  ['user']],
-      ['check',  'Specify file name conversions', ['choices', {
+      ['flag',        'An option flag', null],
+      ['nodesc',      null, null],
+      ['nocomp',      'An option with arg but without completer', ['none']],
+      ['user',        'Takes a username', ['user']],
+      ['*repeatable', 'This option is repeatable', null],
+      ['exclusive',   'This option disables other options', null, ['flag', 'nodesc', 'nocomp']],
+      ['check',       'Specify file name conversions', ['choices', {
         'relaxed': "convert to lowercase before lookup",
         'strict': "no conversion"
       }]]

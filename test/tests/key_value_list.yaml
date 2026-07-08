@@ -2,11 +2,13 @@ prog: "crazy-complete-test"
 options:
   - option_strings: ["-o"]
     complete: ["key_value_list", ',', '=', [
-      ['async',    'set async mode',        null],
-      ['nocomp',   'no completer',          ["none"]],
-      ['animal',   'select an animal',      ["choices", ["cat", "dog", "horse"]]],
-      ['number',   'select a number',       ["choices", {"0": "zero", "1": "one", "2": "two"}]],
-      ['proc',     'select a process',      ['combine', [["pid"], ['process']]]],
-      ['file',     null,                    ["file", {"directory": "%TEST_DIR%/test_data"}]],
-      ['with_sep', 'values containing sep', ['choices', ['value=foo']]],
+      ['async',       'set async mode',          null],
+      ['nocomp',      'no completer',            ["none"]],
+      ['animal',      'select an animal',        ["choices", ["cat", "dog", "horse"]]],
+      ['number',      'select a number',         ["choices", {"0": "zero", "1": "one", "2": "two"}]],
+      ['proc',        'select a process',        ['combine', [["pid"], ['process']]]],
+      ['file',        null,                      ["file", {"directory": "%TEST_DIR%/test_data"}]],
+      ['with_sep',    'values containing sep',   ['choices', ['value=foo']]],
+      ['exclusive',   'deactivate some options', null, ['async', 'nocomp', 'animal', 'number']],
+      ['*repeatable', 'repeatable option',       null]
     ]]

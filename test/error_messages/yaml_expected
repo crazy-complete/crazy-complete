@@ -162,7 +162,7 @@
 3_22_00-combine-missing-arg              | line 4, column 15: foo: -o: combine: Missing required argument: commands
 3_22_01-combine-wrong-type               | line 4, column 27: foo: -o: combine: commands: Invalid type. Expected: list
 3_22_02-combine-empty-subcommands        | line 4, column 27: foo: -o: combine: commands: List cannot be empty
-3_22_03-combine-single-subcommand        | line 4, column 27: foo: -o: combine: commands: List must contain at least two items
+3_22_03-combine-single-subcommand        | line 4, column 27: foo: -o: combine: commands: List must contain at least 2 items
 3_22_04-combine-subcommand-no-command    | line 4, column 38: foo: -o: combine: Missing required argument: command
 3_22_05-combine-subcommand-invalid-type  | line 4, column 38: foo: -o: combine: command[1]: Invalid type. Expected: list
 3_22_06-combine-subcommand-invalid-command | line 4, column 39: foo: -o: combine: Unknown completer: invalid
@@ -214,11 +214,16 @@
 3_30_13-key-value-list-1-key-with-space  | line 4, column 46: foo: -o: key_value_list: definition[0]: key: String cannot contain spaces
 3_30_14-key-value-list-1-complete-wrong-type | line 4, column 59: foo: -o: key_value_list: definition[0]: completer: Invalid type. Expected: list|none
 3_30_15-key-value-list-2-def-not-list    | line 4, column 45: foo: -o: key_value_list: definition[0]: Invalid type. Expected: list
-3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: foo: -o: key_value_list: definition[0]: List must contain exactly three items
+3_30_16-key-value-list-2-def-invalid-length | line 4, column 45: foo: -o: key_value_list: definition[0]: List must contain at least 3 items
 3_30_17-key-value-list-2-key-not-string  | line 4, column 46: foo: -o: key_value_list: definition[0]: key: Invalid type. Expected: string
 3_30_18-key-value-list-2-key-empty       | line 4, column 46: foo: -o: key_value_list: definition[0]: key: String cannot be empty
 3_30_19-key-value-list-key-with-space    | line 4, column 46: foo: -o: key_value_list: definition[0]: key: String cannot contain spaces
 3_30_20-key-value-list-2-desc-not-string | line 4, column 53: foo: -o: key_value_list: definition[0]: description: Invalid type. Expected: string|none
+3_30_21-key-value-list-excludes-wrong-type | line 4, column 67: foo: -o: key_value_list: definition[0]: excludes: Invalid type. Expected: list
+3_30_22-key-value-list-excludes-key-wrong-type | line 4, column 68: foo: -o: key_value_list: definition[0]: excludes[0]: Invalid type. Expected: string
+3_30_23-key-value-list-excludes-key-empty | line 4, column 68: foo: -o: key_value_list: definition[0]: excludes[0]: String cannot be empty
+3_30_24-key-value-list-excludes-key-missing | line 4, column 68: foo: -o: key_value_list: definition[0]: excludes[0]: missing: No such key
+3_30_25-key-value-list-duplicate-key     | line 6, column 8: foo: -o: key_value_list: definition[1]: key: Duplicate key
 3_31_00-ip-address-too-many-args         | line 4, column 15: foo: -o: ip_address: Too many arguments
 3_31_01-ip-address-arg-wrong-type        | line 4, column 30: foo: -o: ip_address: type: Invalid type. Expected: string
 3_31_02-ip-address-arg-wrong-value       | line 4, column 30: foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all
@@ -235,7 +240,7 @@
 3_32_10-key-value-pair-desc-not-string   | line 4, column 48: foo: -o: key_value_pair: definition[0]: description: Invalid type. Expected: string|none
 3_32_11-key-value-pair-complete-wrong-type | line 4, column 54: foo: -o: key_value_pair: definition[0]: completer: Invalid type. Expected: list|none
 3_32_12-key-value-pair-def-not-list      | line 4, column 40: foo: -o: key_value_pair: definition[0]: Invalid type. Expected: list
-3_32_13-key-value-pair-def-invalid-length | line 4, column 40: foo: -o: key_value_pair: definition[0]: List must contain exactly three items
+3_32_13-key-value-pair-def-invalid-length | line 4, column 40: foo: -o: key_value_pair: definition[0]: List must contain exactly 3 items
 ======= Directory "05-misc" =======
 000-list                                 | line 1, column 1: Invalid type. Expected: dictionary
 001-multiple-repeatable-positionals      | line 6, column 5: foo: Too many repeatable positionals

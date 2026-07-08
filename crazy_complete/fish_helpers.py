@@ -562,18 +562,38 @@ set -l value
 set -l keys
 set -l descriptions
 set -l functions
+set -l excludes
 set -l i
 
-for i in (seq 3 3 (count $argv))
+for i in (seq 3 4 (count $argv))
   set -a keys $argv[$i]
   set -a descriptions $argv[(math $i + 1)]
   set -a functions $argv[(math $i + 2)]
+  set -a excludes $argv[(math $i + 3)]
 end
 
 set -l comp (get_completing_arg)
+set -l remaining (seq 1 (count $keys))
+set -l pairs (string split -- $sep1 $comp)
+set -l pair
+
+for pair in $pairs
+  set -l split (string split -m1 -- $sep2 $pair)
+  set i (contains -i -- $split[1] $keys)
+
+  if test $status -eq 0
+    set -l exclude
+    for exclude in (string split -- ' ' $excludes[$i])
+      set i (contains -i -- $exclude $keys)
+      if test $status -eq 0
+        set remaining (string match -v $i -- $remaining)
+      end
+    end
+  end
+end
 
 if test -z "$comp" || test (string sub -s -1 -l 1 -- $comp) = $sep1
-  for i in (seq 1 (count $keys))
+  for i in $remaining
     if test "$functions[$i]" = false
       printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
     else
@@ -595,7 +615,7 @@ function %PREFIX%__call_func_for_key -S
   end
 end
 
-set -l pair (string split -- $sep1 $comp)[-1]
+set -l pair $pairs[-1]
 set -l split (string split -m1 -- $sep2 $pair)
 
 switch $pair
@@ -613,7 +633,7 @@ switch $pair
     set -l key_len (string length -- $split[1])
     set comp (string sub -e -$key_len -- $comp)
 
-    for i in (seq 1 (count $keys))
+    for i in $remaining
       if test "$functions[$i]" = false
         printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
       else

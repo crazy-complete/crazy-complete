@@ -371,13 +371,95 @@ def _check_value_list(_ctxt, arguments):
             _check_type(value, (str,), f'values[{i}]: item')
 
 
-def _check_key_value_pair_definitions(ctxt, values):
+def _check_key_value_list(ctxt, arguments):
+    pair_separator = arguments.get_required_arg('pair_separator')
+    value_separator = arguments.get_required_arg('value_separator')
+    values = arguments.get_required_arg('values')
+    arguments.require_no_more()
+
+    _check_type(pair_separator, (str,), 'pair_separator')
+    _check_type(value_separator, (str,), 'value_separator')
+    _check_type(values, (list,), 'values')
+
+    ctxt.trace.append('key_value_list')
+
+    _check_char(pair_separator, 'pair_separator')
+    _check_char(value_separator, 'value_separator')
+    _check_non_empty_list(values, 'values')
+
+    defined_keys = set()
+
+    for i, compldef in enumerate(values.value):
+        index = f'definition[{i}]'
+        _check_type(compldef, (list,), index)
+
+        if len(compldef.value) < 3:
+            msg = '%s: %s' % (index, m.list_must_contain_at_least_n_items('3'))
+            raise _error(msg, compldef)
+
+        if len(compldef.value) > 4:
+            msg = '%s: %s' % (index, m.list_must_contain_exact_n_items('3/4'))
+            raise _error(msg, compldef)
+
+        key = compldef.value[0]
+        description = compldef.value[1]
+        complete = compldef.value[2]
+
+        _check_type(key, (str,), f'{index}: key')
+        _check_type(description, (str, NoneType), f'{index}: description')
+        _check_type(complete, (list, NoneType), f'{index}: completer')
+        _check_non_empty_string(key, f'{index}: key')
+        _check_no_spaces(key, f'{index}: key')
+
+        if key.value in defined_keys:
+            cause = f'{index}: {key.value}'
+            msg = '%s: Duplicate key' % cause
+            raise _error(msg, key)
+
+        defined_keys.add(key.value)
+
+        if complete.value is not None:
+            _check_complete(ctxt, complete)
+
+        if len(compldef.value) == 4:
+            excludes = compldef.value[3]
+            _check_type(excludes, (list,), f'{index}: excludes')
+            for i2, exclude in enumerate(excludes.value):
+                _check_type(exclude, (str,), f'{index}: excludes[{i2}]')
+                _check_non_empty_string(exclude, f'{index}: excludes[{i2}]')
+
+    # Check if keys which are specified in `excludes` actually exist
+    for i, compldef in enumerate(values.value):
+        if len(compldef.value) != 4:
+            continue
+
+        index = f'definition[{i}]'
+        for i2, exclude in enumerate(compldef.value[3].value):
+            if exclude.value not in defined_keys:
+                cause = f'definition[{i}]: excludes[{i2}]: {exclude.value}'
+                msg = '%s: No such key' % cause
+                raise _error(msg, exclude)
+
+
+def _check_key_value_pair(ctxt, arguments):
+    value_separator = arguments.get_required_arg('value_separator')
+    values = arguments.get_required_arg('values')
+    arguments.require_no_more()
+
+    _check_type(value_separator, (str,), 'value_separator')
+    _check_type(values, (list,), 'values')
+
+    ctxt.trace.append('key_value_pair')
+
+    _check_char(value_separator, 'value_separator')
+    _check_non_empty_list(values, 'values')
+
     for i, compldef in enumerate(values.value):
         index = f'definition[{i}]'
         _check_type(compldef, (list,), index)
 
         if len(compldef.value) != 3:
-            msg = '%s: %s' % (index, m.list_must_contain_exact_three_items())
+            msg = '%s: %s' % (index, m.list_must_contain_exact_n_items('3'))
             raise _error(msg, compldef)
 
         key = compldef.value[0]
@@ -396,41 +478,6 @@ def _check_key_value_pair_definitions(ctxt, values):
         _check_complete(ctxt, complete)
 
 
-def _check_key_value_list(ctxt, arguments):
-    pair_separator = arguments.get_required_arg('pair_separator')
-    value_separator = arguments.get_required_arg('value_separator')
-    values = arguments.get_required_arg('values')
-    arguments.require_no_more()
-
-    _check_type(pair_separator, (str,), 'pair_separator')
-    _check_type(value_separator, (str,), 'value_separator')
-    _check_type(values, (list,), 'values')
-
-    ctxt.trace.append('key_value_list')
-
-    _check_char(pair_separator, 'pair_separator')
-    _check_char(value_separator, 'value_separator')
-    _check_non_empty_list(values, 'values')
-
-    _check_key_value_pair_definitions(ctxt, values)
-
-
-def _check_key_value_pair(ctxt, arguments):
-    value_separator = arguments.get_required_arg('value_separator')
-    values = arguments.get_required_arg('values')
-    arguments.require_no_more()
-
-    _check_type(value_separator, (str,), 'value_separator')
-    _check_type(values, (list,), 'values')
-
-    ctxt.trace.append('key_value_pair')
-
-    _check_char(value_separator, 'value_separator')
-    _check_non_empty_list(values, 'values')
-
-    _check_key_value_pair_definitions(ctxt, values)
-
-
 def _check_combine(ctxt, arguments):
     commands = arguments.get_required_arg('commands')
     arguments.require_no_more()
@@ -439,7 +486,7 @@ def _check_combine(ctxt, arguments):
     _check_non_empty_list(commands, 'commands')
 
     if len(commands.value) == 1:
-        msg = '%s: %s' % ('commands', m.list_must_contain_at_least_two_items())
+        msg = '%s: %s' % ('commands', m.list_must_contain_at_least_n_items('2'))
         raise _error(msg, commands)
 
     ctxt.trace.append('combine')

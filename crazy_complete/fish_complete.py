@@ -4,6 +4,7 @@
 '''This module contains code for completing arguments in Fish.'''
 
 from . import shell
+from . import utils
 from .pattern import bash_glob_to_regex
 from .type_utils import is_dict_type
 from .str_utils import indent, join_with_wrap
@@ -221,10 +222,11 @@ class FishCompleteDirectory(FishCompletionCommand):
         directory = None if opts is None else opts.get('directory', None)
 
         # __fish_complete_directories does not respect __fish_stripprefix
-        # which is used inside list/key_value_list/prefix
+        # which is used inside list/key_value_list/key_value_pair/prefix
         use_filedir = (
             'list' in trace or
             'key_value_list' in trace or
+            'key_value_pair' in trace or
             'prefix' in trace
         )
 
@@ -266,24 +268,6 @@ class FishCompleteValueList(FishCompletionCommand):
             super().__init__(ctxt, [complete_list_func, separator, func])
 
 
-def _make_key_value_pair_arguments(ctxt, trace, completer, values):
-    args = []
-    q = shell.quote
-
-    for key, desc, complete in values:
-        if not complete:
-            func = 'false'
-        elif complete[0] == 'none':
-            func = 'true'
-        else:
-            obj = completer.complete_from_def(ctxt, trace, complete)
-            func = obj.get_function()
-
-        args.append('%s %s %s' % (q(key), q(desc or ''), q(func)))
-
-    return args
-
-
 class FishCompleteKeyValueList(FishCompletionCommand):
     '''Used for completing a list of key-value pairs.'''
 
@@ -292,7 +276,28 @@ class FishCompleteKeyValueList(FishCompletionCommand):
 
     def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
         trace.append('key_value_list')
-        args = _make_key_value_pair_arguments(ctxt, trace, completer, values)
+
+        args = []
+
+        for definition in utils.get_key_value_list_definitions(values):
+            if not definition.completer:
+                func = 'false'
+            elif definition.completer[0] == 'none':
+                func = 'true'
+            else:
+                obj = completer.complete_from_def(ctxt, trace, definition.completer)
+                func = obj.get_function()
+
+            excludes = []
+            if not definition.repeatable:
+                excludes.append(definition.key)
+            excludes.extend(definition.excludes)
+
+            args.append('%s %s %s %s' % (
+                shell.quote(definition.key),
+                shell.quote(definition.description or ''),
+                shell.quote(func),
+                shell.quote(' '.join(excludes))))
 
         code = '%s %s %s \\\n%s' % (
             ctxt.helpers.use_function('key_value_list'),
@@ -314,7 +319,20 @@ class FishCompleteKeyValuePair(FishCompletionCommand):
 
     def __init__(self, ctxt, trace, completer, value_separator, values):
         trace.append('key_value_pair')
-        args = _make_key_value_pair_arguments(ctxt, trace, completer, values)
+
+        args = []
+        q = shell.quote
+
+        for key, desc, complete in values:
+            if not complete:
+                func = 'false'
+            elif complete[0] == 'none':
+                func = 'true'
+            else:
+                obj = completer.complete_from_def(ctxt, trace, complete)
+                func = obj.get_function()
+
+            args.append('%s %s %s' % (q(key), q(desc or ''), q(func)))
 
         code = '%s %s \\\n%s' % (
             ctxt.helpers.use_function('key_value_pair'),

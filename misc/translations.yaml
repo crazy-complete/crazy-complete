@@ -10,8 +10,8 @@ invalid_type_expected_types:          ['types']
 invalid_value:                        []
 invalid_value_expected_values:        ['values']
 list_cannot_be_empty:                 []
-list_must_contain_at_least_two_items: []
-list_must_contain_exact_three_items:  []
+list_must_contain_at_least_n_items:   ['n']
+list_must_contain_exact_n_items:      ['n']
 missing_arg:                          []
 missing_definition_of_program:        ['program']
 multiple_definition_of_program:       ['program']
@@ -47,8 +47,8 @@ invalid_type_expected_types:          "Invalid type. Expected: {types}"
 invalid_value:                        "Invalid value"
 invalid_value_expected_values:        "Invalid value. Expected: {values}"
 list_cannot_be_empty:                 "List cannot be empty"
-list_must_contain_at_least_two_items: "List must contain at least two items"
-list_must_contain_exact_three_items:  "List must contain exactly three items"
+list_must_contain_at_least_n_items:   "List must contain at least {n} items"
+list_must_contain_exact_n_items:      "List must contain exactly {n} items"
 missing_arg:                          "Missing required argument"
 missing_definition_of_program:        "Missing definition of program `{program}`"
 multiple_definition_of_program:       "Multiple definition of program `{program}`"
@@ -84,8 +84,8 @@ invalid_type_expected_types:          "Ungültiger Typ. Erwartet: {types}"
 invalid_value:                        "Ungültiger Wert"
 invalid_value_expected_values:        "Ungültiger Wert. Erwartet: {values}"
 list_cannot_be_empty:                 "Liste darf nicht leer sein"
-list_must_contain_at_least_two_items: "Liste muss mindestens zwei Elemente enthalten"
-list_must_contain_exact_three_items:  "Liste muss exakt 3 Elemente enthalten"
+list_must_contain_at_least_n_items:   "Liste muss mindestens {n} Elemente enthalten"
+list_must_contain_exact_n_items:      "Liste muss exakt {n} Elemente enthalten"
 missing_arg:                          "Fehlendes benötigtes Argument"
 missing_definition_of_program:        "Fehlende Definition des Programms `{program}`"
 multiple_definition_of_program:       "Mehrfache Definition des Programms `{program}`"
