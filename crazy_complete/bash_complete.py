@@ -466,11 +466,26 @@ class BashCompleter(shell.ShellCompleter):
     def ip_address(self, ctxt, _trace, type_='all'):
         func = bash_versions.ip_addresses(ctxt)
 
+        if type_ == 'ipv4':
+            return BashCompletionFunc(ctxt, [func])
+
         if type_ == 'ipv6':
             return BashCompletionFunc(ctxt, [func, '-6'])
 
-        if type_ == 'ipv4':
-            return BashCompletionFunc(ctxt, [func])
+        if type_ == 'ipv4+':
+            code = f'{func}\n'
+            code += 'COMPREPLY+=($(compgen -W 0.0.0.0 -- "$cur"))'
+            return BashCompletionCode(ctxt, code)
+
+        if type_ == 'ipv6+':
+            code = f'{func} -6\n'
+            code += 'COMPREPLY+=($(compgen -W :: -- "$cur"))'
+            return BashCompletionCode(ctxt, code)
+
+        if type_ == 'all+':
+            code = f'{func} -a\n'
+            code += 'COMPREPLY+=($(compgen -W "0.0.0.0 ::" -- "$cur"))'
+            return BashCompletionCode(ctxt, code)
 
         return BashCompletionFunc(ctxt, [func, '-a'])
 

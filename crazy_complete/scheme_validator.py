@@ -569,8 +569,10 @@ def _check_ip_address(_ctxt, arguments):
     arguments.require_no_more()
     _check_type(type_, (str,), "type")
 
-    if type_.value not in ('ipv4', 'ipv6', 'all'):
-        allowed = 'ipv4, ipv6, all'
+    allowed = ('ipv4', 'ipv6', 'all', 'ipv4+', 'ipv6+', 'all+')
+
+    if type_.value not in allowed:
+        allowed =  ', '.join(allowed)
         msg = '%s: %s' % ('type', m.invalid_value_expected_values(allowed))
         raise _error(msg, type_)
 

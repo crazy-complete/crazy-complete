@@ -226,7 +226,7 @@
 3_30_25-key-value-list-duplicate-key     | line 6, column 8: foo: -o: key_value_list: definition[1]: key: Duplicate key
 3_31_00-ip-address-too-many-args         | line 4, column 15: foo: -o: ip_address: Too many arguments
 3_31_01-ip-address-arg-wrong-type        | line 4, column 30: foo: -o: ip_address: type: Invalid type. Expected: string
-3_31_02-ip-address-arg-wrong-value       | line 4, column 30: foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all
+3_31_02-ip-address-arg-wrong-value       | line 4, column 30: foo: -o: ip_address: type: Invalid value. Expected: ipv4, ipv6, all, ipv4+, ipv6+, all+
 3_32_00-key-value-pair-missing-args      | line 4, column 15: foo: -o: key_value_pair: Missing required argument: value_separator
 3_32_01-key-value-pair-missing-args-1    | line 4, column 15: foo: -o: key_value_pair: Missing required argument: values
 3_32_02-key-value-pair-too-many-args     | line 4, column 15: foo: -o: key_value_pair: Too many arguments

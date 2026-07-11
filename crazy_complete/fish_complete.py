@@ -598,13 +598,24 @@ class FishCompleter(shell.ShellCompleter):
     def ip_address(self, ctxt, _trace, type_='all'):
         func = '__fish_print_addresses'
 
+        if type_ == 'ipv4':
+            cmd = f"{func} | string match -e '.'"
+            return FishCompletionRawCommand(ctxt, cmd)
+
         if type_ == 'ipv6':
             cmd = f"{func} | string match -e ':'"
             return FishCompletionRawCommand(ctxt, cmd)
 
-        if type_ == 'ipv4':
-            cmd = f"{func} | string match -e '.'"
+        if type_ == 'ipv4+':
+            cmd = f"{func} --all | string match -e '.'"
             return FishCompletionRawCommand(ctxt, cmd)
+
+        if type_ == 'ipv6+':
+            cmd = f"{func} --all | string match -e ':'"
+            return FishCompletionRawCommand(ctxt, cmd)
+
+        if type_ == 'all+':
+            return FishCompletionCommand(ctxt, [func, '--all'])
 
         return FishCompletionCommand(ctxt, [func])
 

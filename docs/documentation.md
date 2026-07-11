@@ -941,11 +941,17 @@ s -- seconds  m -- minutes  h -- hours
 
 > Complete a bound ip address
 
-By default, both IPv4 and IPv6 addresses are completed.
+The first argument is the type of ip addresses to be completed:
 
-To complete only IPv4 addresses, pass "ipv4" as argument.
+- `ipv4`: IPv4 addresses
+- `ipv6`: IPv6 addresses
+- `all`:  Both IPv4 and IPv6 addresses
 
-To complete only IPv6 addresses, pass "ipv6" as argument.
+Append `+` to include the unspecified address of the selected family:
+
+- `ipv4+`: Includes 0.0.0.0
+- `ipv6+`: Includes ::
+- `all+`:  Includes both 0.0.0.0 and ::
 
 
 ```yaml
@@ -953,8 +959,10 @@ prog: "example"
 options:
   - option_strings: ["--ip-address"]
     complete: ["ip_address"]
+
   - option_strings: ["--ip-address-v4"]
     complete: ["ip_address", "ipv4"]
+
   - option_strings: ["--ip-address-v6"]
     complete: ["ip_address", "ipv6"]
 ```

@@ -559,6 +559,15 @@ class ZshCompleter(shell.ShellCompleter):
         if type_ == 'ipv6':
             return ZshComplFunc(ctxt, ['_bind_addresses', '-6'])
 
+        if type_ == 'ipv4+':
+            return ZshComplFunc(ctxt, ['_bind_addresses', '-40'])
+
+        if type_ == 'ipv6+':
+            return ZshComplFunc(ctxt, ['_bind_addresses', '-60'])
+
+        if type_ == 'all+':
+            return ZshComplFunc(ctxt, ['_bind_addresses', '-0'])
+
         return ZshComplFunc(ctxt, ['_bind_addresses'])
 
     # =========================================================================
