@@ -318,12 +318,66 @@ _EXEC = ShellFunction('exec', r'''
 local item='' desc='' describe=()
 
 while IFS=$'\t' read -r item desc; do
+  item="${item//\\/\\\\}"
   item="${item//:/\\:}"
+  desc="${desc//\\/\\\\}"
   [[ -n "$desc" ]] && describe+=("$item:$desc") || describe+=("$item")
 done < <(eval "$1")
 
 _describe '' describe
 ''')
+
+_KEY_VALUE_PAIR_EXEC = ShellFunction('key_value_pair_exec', r'''
+local sep="$1"
+local func="$2"
+local key='' desc=''
+local -a args=()
+
+while IFS=$'\t' read -r key desc; do
+  desc="${desc//\\/\\\\}"
+  desc="${desc//:/\\:}"
+  desc="${desc//\[/\\[}"
+  desc="${desc//\]/\\]}"
+
+  if [[ "${key[-1]}" == '=' ]]; then
+    key="${key:0:-1}"
+    args+=("${key}[$desc]:::{exec '$func $key'}")
+  else
+    args+=("${key}[$desc]")
+  fi
+done < <(eval "$func")
+
+_values -S "$sep" '' "${args[@]}"
+''', ['exec'])
+
+_KEY_VALUE_LIST_EXEC = ShellFunction('key_value_list_exec', r'''
+local sep1="$1"
+local sep2="$2"
+local func="$3"
+local key='' desc='' excludes=''
+local -a args=()
+
+while IFS=$'\t' read -r key desc excludes; do
+  desc="${desc//\\/\\\\}"
+  desc="${desc//:/\\:}"
+  desc="${desc//\[/\\[}"
+  desc="${desc//\]/\\]}"
+
+  [[ -n "$excludes" ]] && excludes="($excludes)"
+
+  if [[ "${key: -1:1}" == '=' ]]; then
+    key="${key:0:-1}"
+    args+=("${excludes}${key}[$desc]: :{exec '$func $key'}")
+  elif [[ "${key: -2:2}" == '=?' ]]; then
+    key="${key:0:-2}"
+    args+=("${excludes}${key}[$desc]:: :{exec '$func $key'}")
+  else
+    args+=("${excludes}${key}[$desc]")
+  fi
+done < <(eval "$func")
+
+_values -s "$sep1" -S "$sep2" '' "${args[@]}"
+''', ['exec'])
 
 _HISTORY = ShellFunction('history', r'''
 [[ -f "$HISTFILE" ]] || return
@@ -436,6 +490,8 @@ class ZshHelpers(GeneralHelpers):
         super().__init__(config, function_prefix, ShellFunction)
         self.add_function(_QUERY)
         self.add_function(_EXEC)
+        self.add_function(_KEY_VALUE_PAIR_EXEC)
+        self.add_function(_KEY_VALUE_LIST_EXEC)
         self.add_function(_PREFIX)
         self.add_function(_HISTORY)
         self.add_function(_PATH_FILES_RELATIVE)

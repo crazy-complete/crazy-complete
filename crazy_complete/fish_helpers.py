@@ -687,6 +687,124 @@ else
 end
 ''', ['get_completing_arg'])
 
+_KEY_VALUE_PAIR_EXEC = FishFunction('key_value_pair_exec', r'''
+set -l sep $argv[1]
+set -l func $argv[2]
+set -l comp (get_completing_arg)
+set -l split (string split -m1 -- $sep $comp)
+
+if test (count $split) -eq 2
+  set -l value
+  set -g __fish_stripprefix "^.*"(string escape --style=regex -- $sep)
+  for value in ($func $split[1])
+    printf '%s%s%s\n' $split[1] $sep $value
+  end
+  set -e __fish_stripprefix
+else
+  $func
+end
+''', ['get_completing_arg'])
+
+_KEY_VALUE_LIST_EXEC = FishFunction('key_value_list_exec', r'''
+set -l sep1 $argv[1]
+set -l sep2 $argv[2]
+set -l func $argv[3]
+set -l comp (get_completing_arg)
+set -l pairs (string split -- $sep1 $comp)
+
+set -l keys
+set -l descriptions
+set -l takes_arg
+set -l excludes
+
+set -l line
+set -l i
+
+for line in ($func)
+  set -l split (string split -- \t $line)
+  set -l key $split[1]
+  set -l non_repeatable_exclude ''
+
+  if string match -qr -- '=$' $key
+    set key (string sub -e -1 -- $key)
+    set -a takes_arg true
+  else if string match -qr -- '=\?$' $key
+    set key (string sub -e -2 -- $key)
+    set -a takes_arg false
+  else
+    set -a takes_arg false
+  end
+
+  if string match -q -- '\**' $key
+    set key (string sub -s 2 -- $key)
+  else
+    set non_repeatable_exclude " $key"
+  end
+
+  set -a keys $key
+  set -a descriptions $split[2]
+  set -a excludes "$split[3]$non_repeatable_exclude"
+end
+
+set -l remaining (seq 1 (count $keys))
+
+set -l pair
+for pair in $pairs
+  set -l split (string split -m1 -- $sep2 $pair)
+  set i (contains -i -- $split[1] $keys)
+
+  if test $status -eq 0
+    set -l exclude
+    for exclude in (string split -n -- ' ' $excludes[$i])
+      set i (contains -i -- $exclude $keys)
+      if test $status -eq 0
+        set remaining (string match -v $i -- $remaining)
+      end
+    end
+  end
+end
+
+if test -z "$comp" || test (string sub -s -1 -l 1 -- $comp) = $sep1
+  for i in $remaining
+    if test "$takes_arg[$i]" = false
+      printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
+    else
+      printf '%s%s%s\t%s\n' "$comp" $keys[$i] $sep2 "$descriptions[$i]"
+    end
+  end
+  return
+end
+
+set -l pair $pairs[-1]
+set -l split (string split -m1 -- $sep2 $pair)
+
+switch $pair
+  case "*$sep2*"
+    set -l value_len (string length -- $split[2])
+
+    if test $value_len -gt 0
+      set comp (string sub -e -$value_len -- $comp)
+    end
+
+    set -g __fish_stripprefix "^.*"(string escape --style=regex -- $sep)
+    for value in ($func $split[1])
+      printf '%s%s\n' $comp $value
+    end
+    set -e __fish_stripprefix
+  case '*'
+    set -l key_len (string length -- $split[1])
+    set comp (string sub -e -$key_len -- $comp)
+
+    for i in $remaining
+      if test "$takes_arg[$i]" = false
+        printf '%s%s\t%s\n' "$comp" $keys[$i] "$descriptions[$i]"
+      else
+        printf '%s%s%s\t%s\n' "$comp" $keys[$i] $sep2 "$descriptions[$i]"
+      end
+    end
+end
+''', ['get_completing_arg'])
+
 _HISTORY = FishFunction('history', r'''
 builtin history | command grep -E -o -- $argv[1]
 ''')
@@ -881,6 +999,8 @@ class FishHelpers(GeneralHelpers):
         self.add_function(_PREFIX)
         self.add_function(_KEY_VALUE_LIST)
         self.add_function(_KEY_VALUE_PAIR)
+        self.add_function(_KEY_VALUE_LIST_EXEC)
+        self.add_function(_KEY_VALUE_PAIR_EXEC)
         self.add_function(_HISTORY)
         self.add_function(_DATE_FORMAT)
         self.add_function(_NUMBER)

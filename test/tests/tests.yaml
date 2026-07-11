@@ -12,6 +12,8 @@ wrapper: {"args": ["--input-type=yaml"], "definition_file": "wrapper.yaml"}
 list: {"args": ["--input-type=yaml"], "definition_file": "list.yaml"}
 key_value_list: {"args": ["--input-type=yaml"], "definition_file": "key_value_list.yaml"}
 key_value_pair: {"args": ["--input-type=yaml"], "definition_file": "key_value_pair.yaml"}
+key_value_pair_exec: {"args": ["--input-type=yaml", "--include-file=include.key_value_pair_exec.$shell"], "definition_file": "key_value_pair_exec.yaml"}
+key_value_list_exec: {"args": ["--input-type=yaml", "--include-file=include.key_value_list_exec.$shell"], "definition_file": "key_value_list_exec.yaml"}
 complex: {"args": ["--input-type=yaml"], "definition_file": "complex.yaml"}
 long_opt_arg_sep: {"args": ["--input-type=yaml"], "definition_file": "long_opt_arg_sep.yaml"}
 ---
@@ -2444,3 +2446,275 @@ fish_expected: |
   > crazy-complete-test -o with_sep=value=foo
 zsh_expected: |
   > crazy-complete-test -o with_sep=value=foo
+---
+number: 156
+definition_file: "key_value_pair_exec"
+description: "key_value_pair_exec: Check -o"
+send: "crazy-complete-test -o "
+bash_expected: |
+  > crazy-complete-test -o
+  animal=  async    special
+  > crazy-complete-test -o
+fish_expected: |
+  > crazy-complete-test -o
+  animal=  (select an animal)  special  (special chars: []'"$`\)
+  async    (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o
+  animal   -- select an animal
+  async    -- set async mode
+  special  -- special chars: []'"$`\
+---
+number: 157
+definition_file: "key_value_pair_exec"
+description: "key_value_pair_exec: Check -o a"
+send: "crazy-complete-test -o a"
+bash_expected: |
+  > crazy-complete-test -o a
+  animal=  async
+  > crazy-complete-test -o a
+fish_expected: |
+  > crazy-complete-test -o a
+  animal=  (select an animal)  async  (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o a
+  animal  -- select an animal
+  async   -- set async mode
+---
+number: 158
+definition_file: "key_value_pair_exec"
+description: "key_value_pair_exec: Check -o an"
+send: "crazy-complete-test -o an"
+bash_expected: |
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+zsh_expected: |
+  > crazy-complete-test -o animal=
+---
+number: 159
+definition_file: "key_value_pair_exec"
+description: "key_value_pair_exec: Check -o animal="
+send: "crazy-complete-test -o animal="
+bash_expected: |
+  > crazy-complete-test -o animal=
+  cat      dog      horse    special
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+  animal=cat  (a cat)  animal=horse    (a horse)
+  animal=dog  (a dog)  animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 160
+definition_file: "key_value_pair_exec"
+description: "key_value_pair_exec: Check -o 'animal="
+send: "crazy-complete-test -o 'animal="
+bash_expected: |
+  > crazy-complete-test -o 'animal=
+  animal=cat      animal=dog      animal=horse    animal=special
+  > crazy-complete-test -o 'animal=
+fish_expected: |
+  > crazy-complete-test -o 'animal=
+  'animal=cat  (a cat)  'animal=horse    (a horse)
+  'animal=dog  (a dog)  'animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o 'animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 161
+definition_file: "key_value_pair_exec"
+description: "key_value_pair_exec: Check -o \"animal="
+send: "crazy-complete-test -o \"animal="
+bash_expected: |
+  > crazy-complete-test -o "animal=
+  animal=cat      animal=dog      animal=horse    animal=special
+  > crazy-complete-test -o "animal=
+fish_expected: |
+  > crazy-complete-test -o "animal=
+  "animal=cat  (a cat)  "animal=horse    (a horse)
+  "animal=dog  (a dog)  "animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o "animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 162
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o"
+send: "crazy-complete-test -o "
+bash_expected: |
+  > crazy-complete-test -o
+  animal      async       exclusive   optional    repeatable  special
+  > crazy-complete-test -o
+fish_expected: |
+  > crazy-complete-test -o
+  animal=    (select an animal)  optional    (optional argument)
+  async      (set async mode)    repeatable  (repeatable option)
+  exclusive  (disable options)   special     (special chars: []'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o
+  animal      -- select an animal
+  async       -- set async mode
+  exclusive   -- disable options
+  optional    -- optional argument
+  repeatable  -- repeatable option
+  special     -- special chars: []'"$`\
+---
+number: 163
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o a"
+send: "crazy-complete-test -o a"
+bash_expected: |
+  > crazy-complete-test -o a
+  animal  async
+  > crazy-complete-test -o a
+fish_expected: |
+  > crazy-complete-test -o a
+  animal=  (select an animal)  async  (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o a
+  animal  -- select an animal
+  async   -- set async mode
+---
+number: 164
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o an"
+send: "crazy-complete-test -o an"
+bash_expected: |
+  > crazy-complete-test -o animal
+fish_expected: |
+  > crazy-complete-test -o animal=
+zsh_expected: |
+  > crazy-complete-test -o animal=
+---
+number: 165
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o animal="
+send: "crazy-complete-test -o animal="
+bash_expected: |
+  > crazy-complete-test -o animal=
+  cat      dog      horse    special
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+  animal=cat  (a cat)  animal=horse    (a horse)
+  animal=dog  (a dog)  animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 166
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o optional="
+send: "crazy-complete-test -o optional="
+bash_expected: |
+  > crazy-complete-test -o optional=
+  cat      dog      horse    special
+  > crazy-complete-test -o optional=
+fish_expected: |
+  > crazy-complete-test -o optional=
+  optional=cat  (a cat)  optional=horse    (a horse)
+  optional=dog  (a dog)  optional=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o optional=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 167
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o 'animal="
+send: "crazy-complete-test -o 'animal="
+bash_expected: |
+  > crazy-complete-test -o 'animal=
+  animal=cat      animal=dog      animal=horse    animal=special
+  > crazy-complete-test -o 'animal=
+fish_expected: |
+  > crazy-complete-test -o 'animal=
+  'animal=cat  (a cat)  'animal=horse    (a horse)
+  'animal=dog  (a dog)  'animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o 'animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 168
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o \"animal="
+send: "crazy-complete-test -o \"animal="
+bash_expected: |
+  > crazy-complete-test -o "animal=
+  animal=cat      animal=dog      animal=horse    animal=special
+  > crazy-complete-test -o "animal=
+fish_expected: |
+  > crazy-complete-test -o "animal=
+  "animal=cat  (a cat)  "animal=horse    (a horse)
+  "animal=dog  (a dog)  "animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o "animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 169
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o exclusive,"
+send: "crazy-complete-test -o exclusive,"
+bash_expected: |
+  > crazy-complete-test -o exclusive,
+  exclusive,optional    exclusive,repeatable  exclusive,special
+  > crazy-complete-test -o exclusive,
+fish_expected: |
+  > crazy-complete-test -o exclusive,
+  …xclusive,optional    (optional argument)
+  …xclusive,repeatable  (repeatable option)
+  …xclusive,special     (special chars: []'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o exclusive,
+  optional    -- optional argument
+  repeatable  -- repeatable option
+  special     -- special chars: []'"$`\
+---
+number: 170
+definition_file: "key_value_list_exec"
+description: "key_value_list_exec: Check -o repeatable,"
+send: "crazy-complete-test -o repeatable,"
+bash_expected: |
+  > crazy-complete-test -o repeatable,
+  repeatable,animal      repeatable,exclusive   repeatable,repeatable
+  repeatable,async       repeatable,optional    repeatable,special
+  > crazy-complete-test -o repeatable,
+fish_expected: |
+  > crazy-complete-test -o repeatable,
+  …peatable,animal=     (select an animal)
+  …peatable,async       (set async mode)
+  …peatable,exclusive   (disable options)
+  …peatable,optional    (optional argument)
+  …peatable,repeatable  (repeatable option)
+  …peatable,special     (special chars: []'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o repeatable,
+  animal      -- select an animal
+  async       -- set async mode
+  exclusive   -- disable options
+  optional    -- optional argument
+  repeatable  -- repeatable option
+  special     -- special chars: []'"$`\

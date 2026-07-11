@@ -241,6 +241,22 @@
 3_32_11-key-value-pair-complete-wrong-type | foo: -o: key_value_pair: definition[0]: completer: Invalid type. Expected: list|none
 3_32_12-key-value-pair-def-not-list      | foo: -o: key_value_pair: definition[0]: Invalid type. Expected: list
 3_32_13-key-value-pair-def-invalid-length | foo: -o: key_value_pair: definition[0]: List must contain exactly 3 items
+3_33_00-key-value-list-exec-missing-args | foo: -o: key_value_list_exec: Missing required argument: pair_separator
+3_33_01-key-value-list-exec-missing-args-1 | foo: -o: key_value_list_exec: Missing required argument: value_separator
+3_33_02-key-value-list-exec-missing-args-2 | foo: -o: key_value_list_exec: Missing required argument: command
+3_33_03-key-value-list-exec-sep1-wrong-type | foo: -o: key_value_list_exec: pair_separator: Invalid type. Expected: string
+3_33_04-key-value-list-exec-sep1-wrong-value | foo: -o: key_value_list_exec: pair_separator: Invalid length. Single character expected
+3_33_05-key-value-list-exec-sep1-empty   | foo: -o: key_value_list_exec: pair_separator: Invalid length. Single character expected
+3_33_06-key-value-list-exec-sep2-wrong-type | foo: -o: key_value_list_exec: value_separator: Invalid type. Expected: string
+3_33_07-key-value-list-exec-sep2-wrong-value | foo: -o: key_value_list_exec: value_separator: Invalid length. Single character expected
+3_33_08-key-value-list-exec-sep2-empty   | foo: -o: key_value_list_exec: value_separator: Invalid length. Single character expected
+3_33_09-key-value-list-exec-command-empty | foo: -o: key_value_list_exec: command: String cannot be empty
+3_34_00-key-value-pair-exec-missing-args | foo: -o: key_value_pair_exec: Missing required argument: value_separator
+3_34_01-key-value-pair-exec-missing-args-1 | foo: -o: key_value_pair_exec: Missing required argument: command
+3_34_02-key-value-pair-exec-sep-wrong-type | foo: -o: key_value_pair_exec: value_separator: Invalid type. Expected: string
+3_34_03-key-value-pair-exec-sep-wrong-value | foo: -o: key_value_pair_exec: value_separator: Invalid length. Single character expected
+3_34_04-key-value-pair-exec-sep-empty    | foo: -o: key_value_pair_exec: value_separator: Invalid length. Single character expected
+3_34_05-key-value-pair-exec-command-empty | foo: -o: key_value_pair_exec: command: String cannot be empty
 ======= Directory "05-misc" =======
 000-list                                 | Missing `prog` field
 001-multiple-repeatable-positionals      | foo: Too many repeatable positionals

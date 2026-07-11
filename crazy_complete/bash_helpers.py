@@ -421,6 +421,143 @@ elif array_contains "$key" "${!funcs[@]}"; then
 fi
 ''', ['dequote', 'array_contains', 'values'])
 
+_KEY_VALUE_PAIR_EXEC = ShellFunction('key_value_pair_exec', r'''
+local sep="$1"
+local func="$2"
+
+local strip_chars=''
+[[ "$COMP_WORDBREAKS" == *"$sep"* ]] && strip_chars+="$sep"
+[[ "${cur:0:1}" == '"' ]] && strip_chars=''
+[[ "${cur:0:1}" == "'" ]] && strip_chars=''
+local cur="$cur" break_pos in_quotes
+dequote "$cur" cur break_pos in_quotes
+
+local key="${cur%%"$sep"*}" value="${cur#*"$sep"}" cur_stripped="$cur"
+
+COMPREPLY=()
+
+if [[ "$cur" != *"$sep"* ]]; then
+  exec "$func"
+else
+  cur="$value"
+  exec "$func $key"
+
+  cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
+  if [[ -n "$strip_chars" ]]; then
+      cur_stripped="${cur_stripped##*[$strip_chars]}"
+  fi
+
+  for i in "${!COMPREPLY[@]}"; do
+    COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
+  done
+fi
+''', ['dequote', 'exec'])
+
+_KEY_VALUE_LIST_EXEC = ShellFunction('key_value_list_exec', r'''
+local sep1="$1"
+local sep2="$2"
+local func="$3"
+local -A excludes=()
+local -A takes_arg=()
+local key desc exclude non_repeatable_exclude
+
+while IFS=$'\t' read -r key desc exclude; do
+  local has_arg=false
+
+  if [[ "$key" == *'=' ]]; then
+    key="${key:0:-1}"
+    has_arg=true
+  elif [[ "$key" == *'=?' ]]; then
+    key="${key:0:-2}"
+  fi
+
+  if [[ "$key" == '*'* ]]; then
+    key="${key:1}"
+    non_repeatable_exclude=''
+  else
+    non_repeatable_exclude=" $key"
+  fi
+
+  takes_arg[$key]=$has_arg
+  excludes[$key]="$exclude$non_repeatable_exclude"
+done < <($func)
+
+local strip_chars=''
+[[ "$COMP_WORDBREAKS" == *"$sep1"* ]] && strip_chars+="$sep1"
+[[ "$COMP_WORDBREAKS" == *"$sep2"* ]] && strip_chars+="$sep2"
+[[ "${cur:0:1}" == '"' ]] && strip_chars=''
+[[ "${cur:0:1}" == "'" ]] && strip_chars=''
+local cur="$cur" break_pos in_quotes
+dequote "$cur" cur break_pos in_quotes
+
+if [[ -z "$cur" ]]; then
+  COMPREPLY=("${!excludes[@]}")
+  return
+fi
+
+local pair key value found_key cur_stripped="$cur"
+local -a tmp having_pairs having_keys remaining_keys
+
+IFS="$sep1" read -r -a having_pairs <<< "$cur"
+
+for pair in "${having_pairs[@]}"; do
+  key="${pair%%"$sep2"*}"
+  IFS=' ' read -r -a tmp <<< "${excludes[$key]}"
+  having_keys+=("${tmp[@]}")
+done
+
+for key in "${!excludes[@]}"; do
+  found_key=0
+
+  for having_key in "${having_keys[@]}"; do
+    if [[ "$key" == "$having_key" ]]; then
+      found_key=1
+      break
+    fi
+  done
+
+  if (( ! found_key )); then
+    remaining_keys+=("$key")
+  fi
+done
+
+COMPREPLY=()
+
+if [[ "${cur: -1}" == "$sep1" ]]; then
+  [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
+
+  for key in "${remaining_keys[@]}"; do
+    COMPREPLY+=("$cur_stripped$key")
+  done
+else
+  pair="${cur##*"$sep1"}"
+  if [[ "$pair" == *"$sep2"* ]]; then
+    key="${pair%%"$sep2"*}"
+    value="${pair#*"$sep2"}"
+    cur="$value"
+    exec "$func $key"
+
+    cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
+    if [[ -n "$strip_chars" ]]; then
+        cur_stripped="${cur_stripped##*[$strip_chars]}"
+    fi
+
+    for i in "${!COMPREPLY[@]}"; do
+      COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
+    done
+  else
+    [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
+    cur_stripped="${cur_stripped%"$pair"}"
+
+    for key in "${remaining_keys[@]}"; do
+      if [[ "$key" == "$pair"* ]]; then
+        COMPREPLY+=("$cur_stripped$key")
+      fi
+    done
+  fi
+fi
+''', ['dequote', 'exec'])
+
 _PREFIX_COMPREPLY = ShellFunction('prefix_compreply', r'''
 [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
 
@@ -670,6 +807,8 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_VALUE_LIST)
         self.add_function(_KEY_VALUE_LIST)
         self.add_function(_KEY_VALUE_PAIR)
+        self.add_function(_KEY_VALUE_LIST_EXEC)
+        self.add_function(_KEY_VALUE_PAIR_EXEC)
         self.add_function(_FILE_FILTER)
         self.add_function(_PREFIX_COMPREPLY)
         self.add_function(_HISTORY)

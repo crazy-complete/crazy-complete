@@ -345,6 +345,31 @@ def _check_exec(_ctxt, arguments):
     arguments.require_no_more()
 
 
+def _check_key_value_list_exec(_ctxt, arguments):
+    pair_separator = arguments.get_required_arg('pair_separator')
+    value_separator = arguments.get_required_arg('value_separator')
+    command = arguments.get_required_arg('command')
+    arguments.require_no_more()
+
+    _check_type(pair_separator, (str,), 'pair_separator')
+    _check_type(value_separator, (str,), 'value_separator')
+    _check_char(pair_separator, 'pair_separator')
+    _check_char(value_separator, 'value_separator')
+    _check_type(command, (str,), 'command')
+    _check_non_empty_string(command, 'command')
+
+
+def _check_key_value_pair_exec(_ctxt, arguments):
+    value_separator = arguments.get_required_arg('value_separator')
+    command = arguments.get_required_arg('command')
+    arguments.require_no_more()
+
+    _check_type(value_separator, (str,), 'value_separator')
+    _check_char(value_separator, 'value_separator')
+    _check_type(command, (str,), 'command')
+    _check_non_empty_string(command, 'command')
+
+
 def _check_value_list(_ctxt, arguments):
     options = arguments.get_required_arg('options')
     _check_type(options, (dict,), 'options')
@@ -586,52 +611,54 @@ def _check_float(ctxt, arguments):
 
 
 _COMMANDS = {
-    'alsa_card':          _check_void,
-    'alsa_device':        _check_void,
-    'charset':            _check_void,
-    'choices':            _check_choices,
-    'combine':            _check_combine,
-    'command':            _check_command,
-    'command_arg':        _check_command_arg,
-    'commandline_string': _check_void,
-    'date':               _check_date,
-    'date_format':        _check_void,
-    'directory':          _check_directory,
-    'directory_list':     _check_directory_list,
-    'environment':        _check_void,
-    'exec':               _check_exec,
-    'exec_fast':          _check_exec,
-    'exec_internal':      _check_exec,
-    'file':               _check_file,
-    'file_list':          _check_file_list,
-    'filesystem_type':    _check_void,
-    'float':              _check_float,
-    'gid':                _check_void,
-    'group':              _check_void,
-    'history':            _check_history,
-    'hostname':           _check_void,
-    'integer':            _check_integer,
-    'ip_address':         _check_ip_address,
-    'key_value_list':     _check_key_value_list,
-    'key_value_pair':     _check_key_value_pair,
-    'list':               _check_list,
-    'locale':             _check_void,
-    'login_shell':        _check_void,
-    'mime_file':          _check_mime_file,
-    'mountpoint':         _check_void,
-    'net_interface':      _check_void,
-    'none':               _check_none,
-    'pid':                _check_void,
-    'prefix':             _check_prefix,
-    'process':            _check_void,
-    'range':              _check_range,
-    'service':            _check_void,
-    'signal':             _check_void,
-    'timezone':           _check_void,
-    'uid':                _check_void,
-    'user':               _check_void,
-    'value_list':         _check_value_list,
-    'variable':           _check_void,
+    'alsa_card':                    _check_void,
+    'alsa_device':                  _check_void,
+    'charset':                      _check_void,
+    'choices':                      _check_choices,
+    'combine':                      _check_combine,
+    'command':                      _check_command,
+    'command_arg':                  _check_command_arg,
+    'commandline_string':           _check_void,
+    'date':                         _check_date,
+    'date_format':                  _check_void,
+    'directory':                    _check_directory,
+    'directory_list':               _check_directory_list,
+    'environment':                  _check_void,
+    'exec':                         _check_exec,
+    'exec_fast':                    _check_exec,
+    'exec_internal':                _check_exec,
+    'file':                         _check_file,
+    'file_list':                    _check_file_list,
+    'filesystem_type':              _check_void,
+    'float':                        _check_float,
+    'gid':                          _check_void,
+    'group':                        _check_void,
+    'history':                      _check_history,
+    'hostname':                     _check_void,
+    'integer':                      _check_integer,
+    'ip_address':                   _check_ip_address,
+    'key_value_list':               _check_key_value_list,
+    'key_value_list_exec':          _check_key_value_list_exec,
+    'key_value_pair':               _check_key_value_pair,
+    'key_value_pair_exec':          _check_key_value_pair_exec,
+    'list':                         _check_list,
+    'locale':                       _check_void,
+    'login_shell':                  _check_void,
+    'mime_file':                    _check_mime_file,
+    'mountpoint':                   _check_void,
+    'net_interface':                _check_void,
+    'none':                         _check_none,
+    'pid':                          _check_void,
+    'prefix':                       _check_prefix,
+    'process':                      _check_void,
+    'range':                        _check_range,
+    'service':                      _check_void,
+    'signal':                       _check_void,
+    'timezone':                     _check_void,
+    'uid':                          _check_void,
+    'user':                         _check_void,
+    'value_list':                   _check_value_list,
+    'variable':                     _check_void,
 }
 
 

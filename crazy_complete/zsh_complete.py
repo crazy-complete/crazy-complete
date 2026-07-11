@@ -487,6 +487,14 @@ class ZshCompleter(shell.ShellCompleter):
     def key_value_pair(self, ctxt, trace, value_separator, values):
         return ZshKeyValuePair(ctxt, trace, self, value_separator, values)
 
+    def key_value_list_exec(self, ctxt, _trace, pair_separator, value_separator, command):
+        func = ctxt.helpers.use_function('key_value_list_exec')
+        return ZshComplFunc(ctxt, [func, pair_separator, value_separator, command], needs_braces=True)
+
+    def key_value_pair_exec(self, ctxt, _trace, value_separator, command):
+        func = ctxt.helpers.use_function('key_value_pair_exec')
+        return ZshComplFunc(ctxt, [func, value_separator, command], needs_braces=True)
+
     def combine(self, ctxt, trace, commands):
         return ZshCompleteCombine(ctxt, trace, self, commands)
 

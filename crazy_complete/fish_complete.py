@@ -536,6 +536,14 @@ class FishCompleter(shell.ShellCompleter):
     def key_value_pair(self, ctxt, trace, value_separator, values):
         return FishCompleteKeyValuePair(ctxt, trace, self, value_separator, values)
 
+    def key_value_list_exec(self, ctxt, _trace, pair_separator, value_separator, command):
+        func = ctxt.helpers.use_function('key_value_list_exec')
+        return FishCompletionCommand(ctxt, [func, pair_separator, value_separator, command])
+
+    def key_value_pair_exec(self, ctxt, _trace, value_separator, command):
+        func = ctxt.helpers.use_function('key_value_pair_exec')
+        return FishCompletionCommand(ctxt, [func, value_separator, command])
+
     def combine(self, ctxt, trace, commands):
         return FishCompleteCombine(ctxt, trace, self, commands)
 
