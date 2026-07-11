@@ -15,18 +15,6 @@ Root test directory
   - **Usage**: To run all tests, simply execute `./run.sh`
     Any additional options are passed to `./tests/run.py`.
 
-- **./install-completions.sh**
-
-  - Installs or uninstalls system-wide completion files for `tests/crazy-complete-test`
-
-  - Used for interactive testing
-
-  - **Usage**: `./install-completions.sh {install|uninstall}`
-
-    - To install the completion files, run `./install-completions.sh install`
-
-    - To uninstall the completion files, run `./install-completion.sh uninstall`
-
 Test subdirectories
 -------------------
 
@@ -46,20 +34,25 @@ Test subdirectories
       This driver has been disabled, because the Fish shell started using
       the `kitty` protocol which is not supported by `pyte`.
 
-  - **Usage**: `./tests/run.py [-t=<NUM>] [-w=<SECONDS>] [-d={pyte,tmux}] [-f]`
+  - **Usage**: `./tests/run.py [OPTIONS]`
 
-    - `-d|--driver`:
+    - `-d|--driver <DRIVER>`:
       As stated above, this option is used to specify the execution method.
 
-    - `-t|--threads`:
+    - `-t|--threads <NUM>`:
       Sets how many threads per shell shall be used while testing.
       The default is `1` to ensure there are no problems even on slow systems.
       However, a value of `5` is recommended on normal systems.
 
-    - `-w|--wait`:
+    - `-w|--wait <SECONDS>`:
       Sets how many seconds to wait for completion output per test.
       The default is `5` to ensure there are no problems even on slow systems.
       However, a value of `1` is recommended on normal systems.
+
+    - `-s|--select <DEFINITION_FILE>`:
+      Execute only tests that use the specified definition file.
+      Useful for developing or debugging a specific feature without having to
+      run all tests.
 
     - `-f|--fast`:
       Makes the tests run even faster at the cost of corectness for some tests.

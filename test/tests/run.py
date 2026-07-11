@@ -47,6 +47,8 @@ argp.add_argument('-t', '--threads', default=1, type=int,
     help='Set the number of threads per shell')
 argp.add_argument('-w', '--wait', default=OUTPUT_WAIT, type=float,
     help='Set how many seconds to wait for terminal output')
+argp.add_argument('-s', '--select', action='append',
+    help='Select tests by definition file')
 opts = argp.parse_args()
 
 OUTPUT_WAIT = opts.wait
@@ -326,8 +328,9 @@ def tests_worker_thread(thread_id, shell, input_queue, result_queue):
         pass
 
 class Tester():
-    def __init__(self, tests):
+    def __init__(self, tests, selected):
         self.tests = tests
+        self.selected = selected
         self.result_queue = queue.Queue()
         self.input_queues = {}
         self.threads = []
@@ -336,8 +339,12 @@ class Tester():
     def run(self):
         for shell in SHELLS:
             self.input_queues[shell] = queue.Queue()
+
             for test in self.tests.tests:
-                self.input_queues[shell].put(test)
+                if not self.selected or test.definition_file in self.selected:
+                    self.input_queues[shell].put(test)
+                else:
+                    test.set_result(shell, test.get_expected(shell))
 
         for thread_id in range(opts.threads):
             for shell in SHELLS:
@@ -371,9 +378,9 @@ class Tester():
 
         if not test.passed(shell):
             self.num_failed += 1
-            print_err("Test #%02d (%-4s - %s) failed" % (test.number, shell, test.description))
+            print_err("Test #%03d (%-4s - %s) failed" % (test.number, shell, test.description))
         else:
-            print_err("Test #%02d (%-4s - %s) OK" % (test.number, shell, test.description))
+            print_err("Test #%03d (%-4s - %s) OK" % (test.number, shell, test.description))
 
 # =============================================================================
 # Main
@@ -384,7 +391,7 @@ with open(TESTS_INFILE, 'r') as fh:
 
 tests.enumerate_tests()
 tests.generate_completion_files()
-tester = Tester(tests)
+tester = Tester(tests, opts.select)
 tester.run()
 tests.write_tests_file(TESTS_OUTFILE)
 if tester.num_failed:
