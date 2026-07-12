@@ -1,7 +1,7 @@
 main: {"args": ["--input-type=python", "--include-file=include.$shell"], "definition_file": "crazy-complete-test"}
-when: {"args": ["--input-type=yaml"], "definition_file": "when-test.yaml"}
-groups: {"args": ["--input-type=yaml"], "definition_file": "groups-test.yaml"}
-combine: {"args": ["--input-type=yaml"], "definition_file": "combine-test.yaml"}
+when: {"args": ["--input-type=yaml"], "definition_file": "when.yaml"}
+groups: {"args": ["--input-type=yaml"], "definition_file": "groups.yaml"}
+combine: {"args": ["--input-type=yaml"], "definition_file": "combine.yaml"}
 inherit-on: {"args": ["--input-type=yaml", "--inherit-options=True"], "definition_file": "inherit-options.yaml"}
 inherit-off: {"args": ["--input-type=yaml", "--inherit-options=False"], "definition_file": "inherit-options.yaml"}
 capture: {"args": ["--input-type=yaml", "--include-file=include.capture.$shell"], "definition_file": "capture.yaml"}
