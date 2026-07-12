@@ -102,10 +102,9 @@ def _add_parsed_when(commandline):
             try:
                 option.when_parsed = when.parse_when(option.when)
             except CrazyError as e:
-                raise CrazyError('%s: %s: when: %s: %s' % (
+                raise CrazyError('%s: %s: when: %s' % (
                     commandline.get_command_path(),
                     option.get_option_strings_key('|'),
-                    option.when,
                     e)) from e
         else:
             option.when_parsed = None
@@ -115,11 +114,10 @@ def _add_parsed_when(commandline):
             try:
                 positional.when_parsed = when.parse_when(positional.when)
             except CrazyError as e:
-                raise CrazyError('%s: %s: %s: when: %s: %s' % (
+                raise CrazyError('%s: %s: %s: when: %s' % (
                     commandline.get_command_path(),
                     positional.number,
                     positional.metavar,
-                    positional.when,
                     e)) from e
         else:
             positional.when_parsed = None

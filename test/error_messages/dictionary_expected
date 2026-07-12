@@ -46,7 +46,7 @@
 191-hidden-but-repeatable                | Option ['-o'] has both hidden and repeatable set to True
 200-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|tuple|None. Received: False (bool)
 210-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
-211-when-wrong-value                     | foo: -o: when: invalid: Invalid command: 'invalid'
+211-when-wrong-value                     | foo: -o: when: Invalid command: 'invalid'
 220-metavar-but-no-complete              | Option ['-o'] has metavar set, but has no complete
 230-optional-arg-but-no-complete         | Option ['-o'] has optional_arg=True, but has no complete
 240-capture-wrong-type                   | Parameter `capture` has an invalid type. Expected types: str|None. Received: False (bool)
@@ -64,7 +64,7 @@
 230-repeatable-wrong-type                | Parameter `repeatable` has an invalid type. Expected types: bool. Received: 'wrong' (str)
 240-complete-wrong-type                  | Parameter `complete` has an invalid type. Expected types: list|tuple|None. Received: 'wrong' (str)
 250-when-wrong-type                      | Parameter `when` has an invalid type. Expected types: str|None. Received: False (bool)
-251-when-wrong-value                     | foo: 1: None: when: invalid: Invalid command: 'invalid'
+251-when-wrong-value                     | foo: 1: None: when: Invalid command: 'invalid'
 260-capture-wrong-type                   | Parameter `capture` has an invalid type. Expected types: str|None. Received: False (bool)
 261-capture-empty                        | Invalid variable name: ''
 262-capture-wrong-value                  | Invalid variable name: ''
@@ -263,3 +263,24 @@
 002-positional-after-repeatable          | foo: Positional argument found after a repeatable positional argument
 003-positional-after-repeatable          | foo: Positional argument found after a repeatable positional argument
 004-repeatable-and-subcommands           | foo: Repeatable positional arguments cannot be used together with subcommands
+======= Directory "06-when" =======
+00_00-when-has-option-missing-args       | foo: -o: when: has_option: Missing required argument: options
+01_00-when-option-is-missing-args        | foo: -o: when: option_is: Missing required argument: options
+01_01-when-option-is-missing-args-1      | foo: -o: when: option_is: Missing required argument: values
+01_02-when-option-is-missing-args-2      | foo: -o: when: option_is: Missing required argument: values
+02_00-when-positional-count-missing-args | foo: -o: when: positional_count: Missing required argument: operator
+02_01-when-positional-count-missing-args-1 | foo: -o: when: positional_count: Missing required argument: number
+02_02-when-positional-count-invalid-operator | foo: -o: when: positional_count: operator: Invalid value. Expected: ==, !=, <=, >=, <, >
+02_03-when-positional-count-invalid-number | foo: -o: when: positional_count: number: Invalid value
+03_00-when-positional-contains-missing-args | foo: -o: when: positional_contains: Missing required argument: number
+03_01-when-positional-contains-missing-args-1 | foo: -o: when: positional_contains: Missing required argument: values
+03_02-when-positional-contains-invalid-number | foo: -o: when: positional_contains: number: Invalid value
+09_00-when-syntax-double-and             | foo: -o: when: Unexpected `&&`
+09_01-when-syntax-double-or              | foo: -o: when: Unexpected `||`
+09_02-when-syntax-not-and                | foo: -o: when: Unexpected `!`
+09_03-when-syntax-not-or                 | foo: -o: when: Unexpected `!`
+09_04-when-syntax-unmatched-open-paren   | foo: -o: when: Unclosed `(`
+09_05-when-syntax-unmatched-close-paren  | foo: -o: when: Unexpected `)`
+09_06-when-syntax-empty-paren            | foo: -o: when: Unexpected `)`
+09_07-when-syntax-bare-and               | foo: -o: when: Unexpected `&&`
+09_08-when-syntax-bare-or                | foo: -o: when: Unexpected `||`

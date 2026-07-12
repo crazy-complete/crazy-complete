@@ -1,0 +1,5 @@
+prog: "foo"
+options:
+  - option_strings: ['-o']
+    when: 'positional_contains 1 foo || || positional_contains 1 foo foo'
+

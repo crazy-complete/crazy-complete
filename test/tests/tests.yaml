@@ -1045,7 +1045,7 @@ zsh_expected: |
 ---
 number: 68
 definition_file: "when"
-description: "Check positional_contains (2)"
+description: "Check positional_contains"
 send: "crazy-complete-test positionals foo --"
 bash_expected: |
   > crazy-complete-test positionals foo --

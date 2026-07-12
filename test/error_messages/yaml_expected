@@ -263,3 +263,24 @@
 002-positional-after-repeatable          | line 6, column 5: foo: Positional argument found after a repeatable positional argument
 003-positional-after-repeatable          | line 3, column 5: foo: Positional argument found after a repeatable positional argument
 004-repeatable-and-subcommands           | line 1, column 1: foo: Repeatable positional arguments cannot be used together with subcommands
+======= Directory "06-when" =======
+00_00-when-has-option-missing-args       | line 4, column 11: foo: -o: when: has_option: Missing required argument: options
+01_00-when-option-is-missing-args        | line 4, column 11: foo: -o: when: option_is: Missing required argument: options
+01_01-when-option-is-missing-args-1      | line 4, column 11: foo: -o: when: option_is: Missing required argument: values
+01_02-when-option-is-missing-args-2      | line 4, column 11: foo: -o: when: option_is: Missing required argument: values
+02_00-when-positional-count-missing-args | line 4, column 11: foo: -o: when: positional_count: Missing required argument: operator
+02_01-when-positional-count-missing-args-1 | line 4, column 11: foo: -o: when: positional_count: Missing required argument: number
+02_02-when-positional-count-invalid-operator | line 4, column 11: foo: -o: when: positional_count: operator: Invalid value. Expected: ==, !=, <=, >=, <, >
+02_03-when-positional-count-invalid-number | line 4, column 11: foo: -o: when: positional_count: number: Invalid value
+03_00-when-positional-contains-missing-args | line 4, column 11: foo: -o: when: positional_contains: Missing required argument: number
+03_01-when-positional-contains-missing-args-1 | line 4, column 11: foo: -o: when: positional_contains: Missing required argument: values
+03_02-when-positional-contains-invalid-number | line 4, column 11: foo: -o: when: positional_contains: number: Invalid value
+09_00-when-syntax-double-and             | line 4, column 11: foo: -o: when: Unexpected `&&`
+09_01-when-syntax-double-or              | line 4, column 11: foo: -o: when: Unexpected `||`
+09_02-when-syntax-not-and                | line 4, column 11: foo: -o: when: Unexpected `!`
+09_03-when-syntax-not-or                 | line 4, column 11: foo: -o: when: Unexpected `!`
+09_04-when-syntax-unmatched-open-paren   | line 4, column 11: foo: -o: when: Unclosed `(`
+09_05-when-syntax-unmatched-close-paren  | line 4, column 11: foo: -o: when: Unexpected `)`
+09_06-when-syntax-empty-paren            | line 4, column 11: foo: -o: when: Unexpected `)`
+09_07-when-syntax-bare-and               | line 4, column 11: foo: -o: when: Unexpected `&&`
+09_08-when-syntax-bare-or                | line 4, column 11: foo: -o: when: Unexpected `||`

@@ -4,6 +4,7 @@
 '''Functions for parsing the `when` attribute.'''
 
 from . import shell_parser
+from . import messages as m
 from .errors import CrazyError
 
 
@@ -27,10 +28,12 @@ class OptionIs:
                 self.values.append(arg)
 
         if not self.options:
-            raise CrazyError('OptionIs: Empty options')
+            msg = 'option_is: %s: %s' % (m.missing_arg(), 'options')
+            raise CrazyError(msg)
 
         if not self.values:
-            raise CrazyError('OptionIs: Empty values')
+            msg = 'option_is: %s: %s' % (m.missing_arg(), 'values')
+            raise CrazyError(msg)
 
 
 class HasOption:
@@ -40,37 +43,57 @@ class HasOption:
         self.options = args
 
         if not self.options:
-            raise CrazyError('HasOption: Empty options')
+            msg = 'has_option: %s: %s' % (m.missing_arg(), 'options')
+            raise CrazyError(msg)
 
 
 class PositionalCount:
     '''Class for holding `positional_count`.'''
 
-    def __init__(self, args):
-        if len(args) != 2:
-            raise CrazyError('PositionalCount: Expects exactly two arguments')
+    OPERATORS = ('==', '!=', '<=', '>=', '<', '>')
 
-        self.operator = args[0]
-        if self.operator not in ('==', '!=', '<=', '>=', '<', '>'):
-            raise CrazyError('PositionalCount: Invalid operator')
+    def __init__(self, args):
+        if len(args) > 2:
+            msg = 'positional_count: %s' % (m.too_many_arguments())
+            raise CrazyError(msg)
+
+        try:
+            self.operator = args[0]
+        except IndexError:
+            msg = 'positional_count: %s: %s' % (m.missing_arg(), 'operator')
+            raise CrazyError(msg)
+
+        if self.operator not in self.OPERATORS:
+            msg = 'positional_count: operator: %s' % (
+                m.invalid_value_expected_values(', '.join(self.OPERATORS)))
+            raise CrazyError(msg)
 
         try:
             self.number = int(args[1])
         except ValueError:
-            raise CrazyError('PositionalCount: Invalid number')
+            msg = 'positional_count: number: %s' % (m.invalid_value())
+            raise CrazyError(msg)
+        except IndexError:
+            msg = 'positional_count: %s: %s' % (m.missing_arg(), 'number')
+            raise CrazyError(msg)
 
 
 class PositionalContains:
     '''Class for holding `positional_contains`.'''
 
     def __init__(self, args):
-        if len(args) < 2:
-            raise CrazyError('PositionalContains: Expects at least two arguments')
-
         try:
             self.number = int(args.pop(0))
         except ValueError:
-            raise CrazyError('PositionalContains: Invalid number')
+            msg = 'positional_contains: number: %s' % (m.invalid_value())
+            raise CrazyError(msg)
+        except IndexError:
+            msg = 'positional_contains: %s: %s' % (m.missing_arg(), 'number')
+            raise CrazyError(msg)
+
+        if len(args) == 0:
+            msg = 'positional_contains: %s: %s' % (m.missing_arg(), 'values')
+            raise CrazyError(msg)
 
         self.values = args
 
@@ -114,5 +137,9 @@ def needs_braces(tokens):
 def parse_when(s):
     '''Parse `when` string and return an object.'''
 
-    tokens = shell_parser.parse(s)
+    try:
+        tokens = shell_parser.parse(s)
+    except ValueError as e:
+        raise CrazyError(str(e))
+
     return replace_commands(tokens)
