@@ -220,42 +220,47 @@ class ZshKeyValueList(ZshComplFunc):
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
-    def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
+    def __init__(self, ctxt, trace, completer, pair_separator, value_separator,
+                 values, condition_func):
         trace.append('key_value_list')
         spec = []
 
         for definition in utils.get_key_value_list_definitions(values):
-            key = escape_colon(definition.key)
-
+            desc = ''
             if definition.description:
                 desc = shell.quote('[%s]' % escape_square_brackets(definition.description))
-            else:
-                desc = ''
 
+            excludes = ''
             if definition.excludes:
                 excludes = shell.quote('(%s)' % ' '.join(definition.excludes))
-            else:
-                excludes = ''
 
+            repeatable = ''
             if definition.repeatable:
                 repeatable = "'*'"
-            else:
-                repeatable = ''
 
+            condition = ''
+            if condition_func is not None:
+                condition = '$c %s && ' % (definition.key)
+
+            key = escape_colon(definition.key)
             if not definition.completer:
-                spec.append(f'{excludes}{repeatable}{key}{desc}')
+                spec.append(f'{condition}a+=({excludes}{repeatable}{key}{desc})')
             elif definition.completer[0] == 'none':
-                spec.append(f'{excludes}{repeatable}{key}{desc}:::')
+                spec.append(f'{condition}a+=({excludes}{repeatable}{key}{desc}:::)')
             else:
                 compl_obj = completer.complete_from_def(ctxt, trace, definition.completer)
                 action = compl_obj.get_action_string()
-                spec.append(f'{excludes}{repeatable}{key}{desc}:::{action}')
+                spec.append(f'{condition}a+=({excludes}{repeatable}{key}{desc}:::{action})')
 
-        code = '_values -s %s -S %s %s \\\n%s' % (
+
+        code = 'local -a a=()\n'
+        if condition_func is not None:
+            code += 'local c=%s\n' % shell.quote(condition_func)
+        code += '%s\n' % '\n'.join(spec)
+        code += '_values -s %s -S %s %s "${a[@]}"' % (
             shell.quote(pair_separator),
             shell.quote(value_separator),
             shell.quote(ctxt.option.metavar or ''),
-            indent(' \\\n'.join(spec), 2)
         )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
@@ -269,31 +274,38 @@ class ZshKeyValuePair(ZshComplFunc):
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
-    def __init__(self, ctxt, trace, completer, value_separator, values):
+    def __init__(self, ctxt, trace, completer, value_separator, values,
+                 condition_func):
         trace.append('key_value_pair')
         spec = []
 
         for key, desc, complete in values:
-            key = escape_colon(key)
-
             if desc:
                 desc = shell.quote('[%s]' % escape_square_brackets(desc))
             else:
                 desc = ''
 
+            condition = ''
+            if condition_func is not None:
+                condition = '$c %s && ' % shell.quote(key)
+
+            key = escape_colon(key)
             if not complete:
-                spec.append(f'{key}{desc}')
+                spec.append(f'{condition}a+=({key}{desc})')
             elif complete[0] == 'none':
-                spec.append(f'{key}{desc}:::')
+                spec.append(f'{condition}a+=({key}{desc}:::)')
             else:
                 compl_obj = completer.complete_from_def(ctxt, trace, complete)
                 action = compl_obj.get_action_string()
-                spec.append(f'{key}{desc}:::{action}')
+                spec.append(f'{condition}a+=({key}{desc}:::{action})')
 
-        code = '_values -S %s %s \\\n%s' % (
+        code = 'local -a a=()\n'
+        if condition_func is not None:
+            code += 'local c=%s\n' % shell.quote(condition_func)
+        code += '%s\n' % '\n'.join(spec)
+        code += '_values -S %s %s "${a[@]}"' % (
             shell.quote(value_separator),
-            shell.quote(ctxt.option.metavar or ''),
-            indent(' \\\n'.join(spec), 2)
+            shell.quote(ctxt.option.metavar or '')
         )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
@@ -481,11 +493,11 @@ class ZshCompleter(shell.ShellCompleter):
 
         return ZshComplFunc(ctxt, ['_sequence', '-s', separator, '-d', values_func])
 
-    def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
-        return ZshKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
+    def key_value_list(self, ctxt, trace, pair_separator, value_separator, values, condition_func=None):
+        return ZshKeyValueList(ctxt, trace, self, pair_separator, value_separator, values, condition_func)
 
-    def key_value_pair(self, ctxt, trace, value_separator, values):
-        return ZshKeyValuePair(ctxt, trace, self, value_separator, values)
+    def key_value_pair(self, ctxt, trace, value_separator, values, condition_func=None):
+        return ZshKeyValuePair(ctxt, trace, self, value_separator, values, condition_func)
 
     def key_value_list_exec(self, ctxt, _trace, pair_separator, value_separator, command):
         func = ctxt.helpers.use_function('key_value_list_exec')

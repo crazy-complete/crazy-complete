@@ -274,7 +274,8 @@ class FishCompleteKeyValueList(FishCompletionCommand):
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
-    def __init__(self, ctxt, trace, completer, pair_separator, value_separator, values):
+    def __init__(self, ctxt, trace, completer, pair_separator, value_separator,
+                 values, condition_func):
         trace.append('key_value_list')
 
         args = []
@@ -293,17 +294,25 @@ class FishCompleteKeyValueList(FishCompletionCommand):
                 excludes.append(definition.key)
             excludes.extend(definition.excludes)
 
-            args.append('%s %s %s %s' % (
+            condition = ''
+            if condition_func is not None:
+                condition = '$c %s && ' % (shell.quote(definition.key))
+
+            args.append('%sset -a a %s %s %s %s' % (
+                condition,
                 shell.quote(definition.key),
                 shell.quote(definition.description or ''),
                 shell.quote(func),
                 shell.quote(' '.join(excludes))))
 
-        code = '%s %s %s \\\n%s' % (
+        code = 'set -l a\n'
+        if condition_func is not None:
+            code += 'set -l c %s\n' % shell.quote(condition_func)
+        code += '%s\n' % '\n'.join(args)
+        code += '%s %s %s $a' % (
             ctxt.helpers.use_function('key_value_list'),
             shell.quote(pair_separator),
             shell.quote(value_separator),
-            indent(' \\\n'.join(args), 2)
         )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
@@ -317,11 +326,11 @@ class FishCompleteKeyValuePair(FishCompletionCommand):
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
-    def __init__(self, ctxt, trace, completer, value_separator, values):
+    def __init__(self, ctxt, trace, completer, value_separator, values,
+                 condition_func):
         trace.append('key_value_pair')
 
         args = []
-        q = shell.quote
 
         for key, desc, complete in values:
             if not complete:
@@ -332,12 +341,23 @@ class FishCompleteKeyValuePair(FishCompletionCommand):
                 obj = completer.complete_from_def(ctxt, trace, complete)
                 func = obj.get_function()
 
-            args.append('%s %s %s' % (q(key), q(desc or ''), q(func)))
+            condition = ''
+            if condition_func is not None:
+                condition = '$c %s && ' % shell.quote(condition_func)
 
-        code = '%s %s \\\n%s' % (
+            args.append('%sset -a a %s %s %s' % (
+                condition,
+                shell.quote(key),
+                shell.quote(desc or ''),
+                shell.quote(func)))
+
+        code = 'set -l a\n'
+        if condition_func is not None:
+            code += 'set -l c %s\n' % shell.quote(condition_func)
+        code += '%s\n' % '\n'.join(args)
+        code += '%s %s $a' % (
             ctxt.helpers.use_function('key_value_pair'),
             shell.quote(value_separator),
-            indent(' \\\n'.join(args), 2)
         )
 
         func = ctxt.helpers.add_dynamic_func(ctxt, code)
@@ -530,11 +550,11 @@ class FishCompleter(shell.ShellCompleter):
     def value_list(self, ctxt, _trace, opts):
         return FishCompleteValueList(ctxt, opts)
 
-    def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
-        return FishCompleteKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
+    def key_value_list(self, ctxt, trace, pair_separator, value_separator, values, condition_func=None):
+        return FishCompleteKeyValueList(ctxt, trace, self, pair_separator, value_separator, values, condition_func)
 
-    def key_value_pair(self, ctxt, trace, value_separator, values):
-        return FishCompleteKeyValuePair(ctxt, trace, self, value_separator, values)
+    def key_value_pair(self, ctxt, trace, value_separator, values, condition_func=None):
+        return FishCompleteKeyValuePair(ctxt, trace, self, value_separator, values, condition_func)
 
     def key_value_list_exec(self, ctxt, _trace, pair_separator, value_separator, command):
         func = ctxt.helpers.use_function('key_value_list_exec')

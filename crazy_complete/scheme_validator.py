@@ -400,17 +400,21 @@ def _check_key_value_list(ctxt, arguments):
     pair_separator = arguments.get_required_arg('pair_separator')
     value_separator = arguments.get_required_arg('value_separator')
     values = arguments.get_required_arg('values')
+    condition_func = arguments.get_optional_arg(None)
     arguments.require_no_more()
 
     _check_type(pair_separator, (str,), 'pair_separator')
     _check_type(value_separator, (str,), 'value_separator')
     _check_type(values, (list,), 'values')
+    _check_type(condition_func, (str, NoneType), 'condition_func')
 
     ctxt.trace.append('key_value_list')
 
     _check_char(pair_separator, 'pair_separator')
     _check_char(value_separator, 'value_separator')
     _check_non_empty_list(values, 'values')
+    if condition_func.value is not None:
+        _check_non_empty_string(condition_func, 'condition_func')
 
     defined_keys = set()
 
@@ -469,15 +473,19 @@ def _check_key_value_list(ctxt, arguments):
 def _check_key_value_pair(ctxt, arguments):
     value_separator = arguments.get_required_arg('value_separator')
     values = arguments.get_required_arg('values')
+    condition_func = arguments.get_optional_arg(None)
     arguments.require_no_more()
 
     _check_type(value_separator, (str,), 'value_separator')
     _check_type(values, (list,), 'values')
+    _check_type(condition_func, (str, NoneType), 'condition_func')
 
     ctxt.trace.append('key_value_pair')
 
     _check_char(value_separator, 'value_separator')
     _check_non_empty_list(values, 'values')
+    if condition_func.value is not None:
+        _check_non_empty_string(condition_func, 'condition_func')
 
     for i, compldef in enumerate(values.value):
         index = f'definition[{i}]'

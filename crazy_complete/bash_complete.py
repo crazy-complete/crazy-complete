@@ -162,8 +162,8 @@ class BashCompleteKeyValueList(BashCompletionCode):
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
-    def __init__(self, ctxt, trace, completer,
-                 pair_separator, value_separator, values):
+    def __init__(self, ctxt, trace, completer, pair_separator, value_separator,
+                 values, condition_func):
         args = []
 
         for definition in utils.get_key_value_list_definitions(values):
@@ -180,18 +180,24 @@ class BashCompleteKeyValueList(BashCompletionCode):
                 excludes.append(definition.key)
             excludes.extend(definition.excludes)
 
-            args.append('%s %s %s' % (
+            condition = ''
+            if condition_func is not None:
+                condition = '$c %s && ' % shell.quote(definition.key)
+
+            args.append('%sa+=(%s %s %s)' % (
+                condition,
                 shell.quote(definition.key),
                 shell.quote(func),
                 shell.quote(' '.join(excludes))))
 
-        args = ' \\\n'.join(args)
-
-        code = '%s %s %s \\\n%s' % (
+        code = 'local -a a=()\n'
+        if condition_func is not None:
+            code += 'local c=%s\n' % shell.quote(condition_func)
+        code += '%s\n' % '\n'.join(args)
+        code += '%s %s %s "${a[@]}"' % (
             ctxt.helpers.use_function('key_value_list'),
             shell.quote(pair_separator),
-            shell.quote(value_separator),
-            indent(args, 2)
+            shell.quote(value_separator)
         )
 
         super().__init__(ctxt, code)
@@ -203,25 +209,35 @@ class BashCompleteKeyValuePair(BashCompletionCode):
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
 
-    def __init__(self, ctxt, trace, completer, value_separator, values):
-        funcs = {}
+    def __init__(self, ctxt, trace, completer, value_separator, values,
+                 condition_func):
+        args = []
 
         for key, _desc, complete in values:
             if not complete:
-                funcs[key] = 'false'
+                func = 'false'
             elif complete[0] == 'none':
-                funcs[key] = 'true'
+                func = 'true'
             else:
                 obj = completer.complete_from_def(ctxt, trace, complete)
-                funcs[key] = obj.get_function()
+                func = obj.get_function()
 
-        q = shell.quote
-        args = ' \\\n'.join('%s %s' % (q(k), q(f)) for k, f in funcs.items())
+            condition = ''
+            if condition_func is not None:
+                condition = '$c %s && ' % shell.quote(key)
 
-        code = '%s %s \\\n%s' % (
+            args.append('%sa+=(%s %s)' % (
+                condition,
+                shell.quote(key),
+                shell.quote(func)))
+
+        code = 'local -a a=()\n'
+        if condition_func is not None:
+            code += 'local c=%s\n' % shell.quote(condition_func)
+        code += '%s\n' % '\n'.join(args)
+        code += '%s %s "${a[@]}"' % (
             ctxt.helpers.use_function('key_value_pair'),
             shell.quote(value_separator),
-            indent(args, 2)
         )
 
         super().__init__(ctxt, code)
@@ -390,11 +406,11 @@ class BashCompleter(shell.ShellCompleter):
 
         return BashCompletionFunc(ctxt, args + values)
 
-    def key_value_list(self, ctxt, trace, pair_separator, value_separator, values):
-        return BashCompleteKeyValueList(ctxt, trace, self, pair_separator, value_separator, values)
+    def key_value_list(self, ctxt, trace, pair_separator, value_separator, values, condition_func=None):
+        return BashCompleteKeyValueList(ctxt, trace, self, pair_separator, value_separator, values, condition_func)
 
-    def key_value_pair(self, ctxt, trace, value_separator, values):
-        return BashCompleteKeyValuePair(ctxt, trace, self, value_separator, values)
+    def key_value_pair(self, ctxt, trace, value_separator, values, condition_func=None):
+        return BashCompleteKeyValuePair(ctxt, trace, self, value_separator, values, condition_func)
 
     def key_value_list_exec(self, ctxt, _trace, pair_separator, value_separator, command):
         func = ctxt.helpers.use_function('key_value_list_exec')

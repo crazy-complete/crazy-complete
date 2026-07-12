@@ -10,3 +10,15 @@ options:
       ['file',     null,                    ["file", {"directory": "%TEST_DIR%/test_data"}]],
       ['with_sep', 'values containing sep', ['choices', ['value=foo']]],
     ]]
+
+  - option_strings: ["--condition"]
+    complete: ["key_value_pair", '=', [
+      ['async',    'set async mode',        null],
+      ['nocomp',   'no completer',          ["none"]],
+      ['animal',   'select an animal',      ["choices", ["cat", "dog", "horse"]]],
+      ['number',   'select a number',       ["choices", {"0": "zero", "1": "one", "2": "two"}]],
+      ['proc',     'select a process',      ['combine', [["pid"], ['process']]]],
+      ['file',     null,                    ["file", {"directory": "%TEST_DIR%/test_data"}]],
+      ['with_sep', 'values containing sep', ['choices', ['value=foo']]],
+      ['disabled', 'disabled option',       null]
+    ], '_key_value_pair_condition']
