@@ -97,7 +97,7 @@ def make_commands(tokens):
     '''Parse tokens.
 
     Input:
-        [Literal("foo"), Literal("bar"), '&&' Literal("baz")]
+        [Literal("foo"), Literal("bar"), '&&', Literal("baz")]
 
     Output:
         [Command(["foo", "bar"]), '&&', Command(["baz"])]

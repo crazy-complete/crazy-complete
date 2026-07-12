@@ -83,6 +83,7 @@ class MasterCompletionFunction(MasterCompletionFunctionBase):
             opts = self.get_all_option_strings(option)
             completion_code = self.complete(option)
             cond = bash_when.generate_when_conditions(
+                self.generator.ctxt,
                 self.generator.commandline,
                 self.generator.variable_manager,
                 option.when)

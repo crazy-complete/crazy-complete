@@ -18,6 +18,16 @@ options:
 
 ---
 
+prog: "crazy-complete-test positionals"
+options:
+  - option_strings: ['--if-positional-count']
+    when: 'positional_count >= 2'
+
+  - option_strings: ['--if-positional-contains']
+    when: 'positional_contains 2 foo bar'
+
+---
+
 prog: "crazy-complete-test multiple-when"
 options:
   - option_strings: ['--files']

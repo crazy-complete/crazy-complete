@@ -47,6 +47,7 @@ def _generate_positionals_with_when(generator):
         r = '(( %s )) && ' % condition
         if positional.when:
             r += '%s && ' % bash_when.generate_when_conditions(
+                generator.ctxt,
                 generator.commandline,
                 generator.variable_manager,
                 positional.when)

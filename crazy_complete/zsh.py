@@ -210,7 +210,7 @@ class ZshCompletionFunction:
             r += ')\n'
 
         for arg in args_with_when:
-            when_cmd = zsh_when.generate_when_conditions(self.query, arg.when)
+            when_cmd = zsh_when.generate_when_conditions(self.ctxt, self.query, arg.when)
             r += '%s &&\\\n' % when_cmd
             r += '  args+=(%s)\n' % arg.option_spec
 

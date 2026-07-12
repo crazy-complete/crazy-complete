@@ -164,7 +164,7 @@ class FishCompletionGenerator:
                     definition.old_options):
                 continue
 
-            definition.conditions.add(Not(PositionalNum('>=', positional)))
+            definition.conditions.add(Not(PositionalNum('>=', positional - 1)))
 
     def visit(self, callback):
         '''Execute callback for generator objects.'''
@@ -220,7 +220,7 @@ class FishCompletionGenerator:
         # ensures that we're in the right (sub)command.
         if not self.commandline.inherit_options and self.subcommands:
             positional = self.subcommands.get_positional_num()
-            definition.conditions.add(PositionalNum('==', positional))
+            definition.conditions.add(PositionalNum('==', positional - 1))
 
         definition.conditions.extend(_get_positional_contains(option))
         definition.conditions.add_when(option.when_parsed)
@@ -249,7 +249,7 @@ class FishCompletionGenerator:
 
         positional_num = positional.get_positional_num()
         operator = '>=' if positional.repeatable else '=='
-        definition.conditions.add(PositionalNum(operator, positional_num))
+        definition.conditions.add(PositionalNum(operator, positional_num - 1))
 
         return definition
 
@@ -266,7 +266,7 @@ class FishCompletionGenerator:
         )
 
         positional_num = positional.get_positional_num()
-        definition.conditions.add(PositionalNum('==', positional_num))
+        definition.conditions.add(PositionalNum('==', positional_num - 1))
         definition.conditions.extend(_get_positional_contains(positional))
         return definition
 

@@ -51,12 +51,6 @@ _QUERY = ShellFunction('query', r'''
 #
 # ===========================================================================
 
-__zsh_query_contains() {
-  local arg='' key="$1"; shift
-  for arg; do [[ "$key" == "$arg" ]] && return 0; done
-  return 1
-}
-
 local cmd="$1"; shift
 
 case "$cmd" in
@@ -90,7 +84,7 @@ case "$cmd" in
 #endif
     for (( i=0; i <= ${#HAVING_OPTIONS[@]}; ++i )); do
       local option="${HAVING_OPTIONS[$i]}"
-      if __zsh_query_contains "$option" "$@"; then
+      if array_contains "$option" "$@"; then
         printf "%s\n" "${OPTION_VALUES[$i]}"
       fi
     done
@@ -114,12 +108,12 @@ case "$cmd" in
 
 #endif
     for option in "${HAVING_OPTIONS[@]}"; do
-      __zsh_query_contains "$option" "$@" && return 0
+      array_contains "$option" "$@" && return 0
     done
 
 #ifdef with_incomplete
     (( with_incomplete )) && \
-      __zsh_query_contains "$INCOMPLETE_OPTION" "$@" && return 0
+      array_contains "$INCOMPLETE_OPTION" "$@" && return 0
 
 #endif
     return 1;;
@@ -146,9 +140,9 @@ case "$cmd" in
 #endif
     for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
       local option="${HAVING_OPTIONS[$i]}"
-      if __zsh_query_contains "$option" "${cmd_option_is_options[@]}"; then
+      if array_contains "$option" "${cmd_option_is_options[@]}"; then
         local value="${OPTION_VALUES[$i]}"
-        __zsh_query_contains "$value" "${cmd_option_is_values[@]}" && return 0
+        array_contains "$value" "${cmd_option_is_values[@]}" && return 0
       fi
     done
 
@@ -226,7 +220,7 @@ for ((; argi <= ${#args[@]}; ++argi)); do
       OPTION_VALUES+=("${arg#*=}");;
     --*)
 #ifdef long_options
-      if __zsh_query_contains "$arg" "${long_opts_with_arg[@]}"; then
+      if array_contains "$arg" "${long_opts_with_arg[@]}"; then
         if $have_trailing_arg; then
           HAVING_OPTIONS+=("$arg")
           OPTION_VALUES+=("${args[$((++argi))]}")
@@ -245,12 +239,12 @@ for ((; argi <= ${#args[@]}; ++argi)); do
 #ifdef old_options
       if [[ "$arg" == *=* ]]; then
         local option="${arg%%=*}" value="${arg#*=}"
-        if __zsh_query_contains "$option" "${old_opts_with_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
+        if array_contains "$option" "${old_opts_with_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("$value")
           continue
         fi
-      elif __zsh_query_contains "$arg" "${old_opts_with_arg[@]}"; then
+      elif array_contains "$arg" "${old_opts_with_arg[@]}"; then
         if $have_trailing_arg; then
           HAVING_OPTIONS+=("$arg")
           OPTION_VALUES+=("${args[$((++argi))]}")
@@ -260,7 +254,7 @@ for ((; argi <= ${#args[@]}; ++argi)); do
 #endif
         fi
         continue
-      elif __zsh_query_contains "$arg" "${old_opts_without_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
+      elif array_contains "$arg" "${old_opts_without_arg[@]}" "${old_opts_with_optional_arg[@]}"; then
         HAVING_OPTIONS+=("$arg")
         OPTION_VALUES+=("")
         continue
@@ -273,10 +267,10 @@ for ((; argi <= ${#args[@]}; ++argi)); do
         local option="-${arg:$i:1}"
         local trailing_chars="${arg:$((i+1))}"
 
-        if __zsh_query_contains "$option" "${short_opts_without_arg[@]}"; then
+        if array_contains "$option" "${short_opts_without_arg[@]}"; then
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("")
-        elif __zsh_query_contains "$option" "${short_opts_with_arg[@]}"; then
+        elif array_contains "$option" "${short_opts_with_arg[@]}"; then
           if [[ -n "$trailing_chars" ]]; then
             HAVING_OPTIONS+=("$option")
             OPTION_VALUES+=("$trailing_chars")
@@ -290,7 +284,7 @@ for ((; argi <= ${#args[@]}; ++argi)); do
           fi
 
           continue 2
-        elif __zsh_query_contains "$option" "${short_opts_with_optional_arg[@]}"; then
+        elif array_contains "$option" "${short_opts_with_optional_arg[@]}"; then
           HAVING_OPTIONS+=("$option")
           OPTION_VALUES+=("$trailing_chars") # may be empty
           continue 2
@@ -302,6 +296,12 @@ for ((; argi <= ${#args[@]}; ++argi)); do
       POSITIONALS+=("$arg");;
   esac
 done
+''', ['array_contains'])
+
+_ARRAY_CONTAINS = ShellFunction('array_contains', r'''
+local arg='' key="$1"; shift
+for arg; do [[ "$key" == "$arg" ]] && return 0; done
+return 1
 ''')
 
 _PREFIX = ShellFunction('prefix', r'''
@@ -488,6 +488,7 @@ class ZshHelpers(GeneralHelpers):
 
     def __init__(self, config, function_prefix):
         super().__init__(config, function_prefix, ShellFunction)
+        self.add_function(_ARRAY_CONTAINS)
         self.add_function(_QUERY)
         self.add_function(_EXEC)
         self.add_function(_KEY_VALUE_PAIR_EXEC)

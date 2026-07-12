@@ -110,7 +110,7 @@ def generate(generator):
 
         when = None
         if option.when is not None:
-            when = bash_when.generate_when_conditions(commandline, variable_manager, option.when)
+            when = bash_when.generate_when_conditions(generator.ctxt, commandline, variable_manager, option.when)
 
         options.append(_Option(option, conditions, when))
 

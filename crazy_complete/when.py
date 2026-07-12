@@ -43,6 +43,38 @@ class HasOption:
             raise CrazyError('HasOption: Empty options')
 
 
+class PositionalCount:
+    '''Class for holding `positional_count`.'''
+
+    def __init__(self, args):
+        if len(args) != 2:
+            raise CrazyError('PositionalCount: Expects exactly two arguments')
+
+        self.operator = args[0]
+        if self.operator not in ('==', '!=', '<=', '>=', '<', '>'):
+            raise CrazyError('PositionalCount: Invalid operator')
+
+        try:
+            self.number = int(args[1])
+        except ValueError:
+            raise CrazyError('PositionalCount: Invalid number')
+
+
+class PositionalContains:
+    '''Class for holding `positional_contains`.'''
+
+    def __init__(self, args):
+        if len(args) < 2:
+            raise CrazyError('PositionalContains: Expects at least two arguments')
+
+        try:
+            self.number = int(args.pop(0))
+        except ValueError:
+            raise CrazyError('PositionalContains: Invalid number')
+
+        self.values = args
+
+
 def replace_commands(tokens):
     '''Replaced `shell_parser.Command` objects by condition objects.'''
 
@@ -56,6 +88,10 @@ def replace_commands(tokens):
                 r.append(OptionIs(args))
             elif cmd == 'has_option':
                 r.append(HasOption(args))
+            elif cmd == 'positional_count':
+                r.append(PositionalCount(args))
+            elif cmd == 'positional_contains':
+                r.append(PositionalContains(args))
             else:
                 raise CrazyError(f"Invalid command: {cmd!r}")
         else:

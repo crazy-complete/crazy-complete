@@ -10,7 +10,8 @@ from . import shell
 class ConditionGenerator:
     '''Class for generating conditions.'''
 
-    def __init__(self, commandline, variable_manager):
+    def __init__(self, ctxt, commandline, variable_manager):
+        self.ctxt = ctxt
         self.commandline = commandline
         self.variable_manager = variable_manager
 
@@ -25,6 +26,12 @@ class ConditionGenerator:
 
             elif isinstance(obj, when.HasOption):
                 r.append(self._gen_has_option(obj))
+
+            elif isinstance(obj, when.PositionalCount):
+                r.append(self._gen_positional_count(obj))
+
+            elif isinstance(obj, when.PositionalContains):
+                r.append(self._gen_positional_contains(obj))
 
             elif obj in ('&&', '||', '!'):
                 r.append(obj)
@@ -80,10 +87,19 @@ class ConditionGenerator:
 
         return '{ %s; }' % ' || '.join(conditions)
 
+    def _gen_positional_count(self, obj):
+        return f'(( ${{#POSITIONALS[@]}} {obj.operator} {obj.number} ))'
 
-def generate_when_conditions(commandline, variable_manager, when_):
+    def _gen_positional_contains(self, obj):
+        func = self.ctxt.helpers.use_function('array_contains')
+        index = obj.number - 1
+        values = shell.join_quoted(obj.values)
+        return f'{func} "${{POSITIONALS[{index}]}}" {values}'
+
+
+def generate_when_conditions(ctxt, commandline, variable_manager, when_):
     '''Generate when condition code.'''
 
     tokens = when.parse_when(when_)
-    generator = ConditionGenerator(commandline, variable_manager)
+    generator = ConditionGenerator(ctxt, commandline, variable_manager)
     return generator.generate(tokens)

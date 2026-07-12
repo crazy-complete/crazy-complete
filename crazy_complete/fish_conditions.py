@@ -131,7 +131,7 @@ class PositionalNum(Condition):
     def get_code(self, ctxt):
         ctxt.helpers.use_function('num_of_positionals')
         op = self.TEST_OPERATORS[self.operator]
-        return make_condition_command('$num_of_positionals', [op, str(self.number - 1)])
+        return make_condition_command('$num_of_positionals', [op, str(self.number)])
 
 
 class PositionalContains(Condition):
@@ -165,6 +165,12 @@ def replace_commands(tokens):
 
         elif isinstance(obj, when.HasOption):
             r.append(HasOption(obj.options))
+
+        elif isinstance(obj, when.PositionalCount):
+            r.append(PositionalNum(obj.operator, obj.number))
+
+        elif isinstance(obj, when.PositionalContains):
+            r.append(PositionalContains(obj.number, obj.values))
 
         elif isinstance(obj, str):
             r.append(obj)

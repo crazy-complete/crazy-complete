@@ -7,17 +7,23 @@ from . import when
 from . import shell
 
 
-def _generate(query, tokens):
+def _generate(ctxt, query, tokens):
     '''Turn tokens/objects into condition code.'''
 
     r = []
 
     for obj in tokens:
         if isinstance(obj, when.OptionIs):
-            r.append(_generate_option_is(query, obj))
+            r.append(_generate_option_is(ctxt, query, obj))
 
         elif isinstance(obj, when.HasOption):
-            r.append(_generate_has_option(query, obj))
+            r.append(_generate_has_option(ctxt, query, obj))
+
+        elif isinstance(obj, when.PositionalCount):
+            r.append(_generate_positional_count(ctxt, query, obj))
+
+        elif isinstance(obj, when.PositionalContains):
+            r.append(_generate_positional_contains(ctxt, query, obj))
 
         elif obj in ('&&', '||', '!'):
             r.append(obj)
@@ -37,20 +43,30 @@ def _generate(query, tokens):
     return ' '.join(r)
 
 
-def _generate_option_is(query, obj):
+def _generate_option_is(_ctxt, query, obj):
     func = query.use('option_is')
     args = [func, 'option_is', *obj.options, '--', *obj.values]
     return shell.join_quoted(args)
 
 
-def _generate_has_option(query, obj):
+def _generate_has_option(_ctxt, query, obj):
     func = query.use('has_option')
     args = [func, 'has_option', *obj.options]
     return shell.join_quoted(args)
 
 
-def generate_when_conditions(query, when_):
+def _generate_positional_count(_ctxt, _query, obj):
+    return f'(( ${{#POSITIONALS[@]}} {obj.operator} {obj.number} ))'
+
+
+def _generate_positional_contains(ctxt, _query, obj):
+    func = ctxt.helpers.use_function('array_contains')
+    values = shell.join_quoted(obj.values)
+    return f'{func} "${{POSITIONALS[{obj.number}]}}" {values}'
+
+
+def generate_when_conditions(ctxt, query, when_):
     '''Generate when condition code.'''
 
     tokens = when.parse_when(when_)
-    return _generate(query, tokens)
+    return _generate(ctxt, query, tokens)

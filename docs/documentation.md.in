@@ -204,6 +204,45 @@ options:
 [...]
 ```
 
+### positional\_count
+
+> Checks the number of given positionals on the command line.
+
+**Example:**
+
+```yaml
+# This activates --conditional if one or more positionals are given on the command line
+
+[...]
+options:
+  - option_strings: ["--conditional"]
+    when: "positional_count >= 1"
+
+positionals:
+  - number: 1
+    repeatable: true
+[...]
+```
+
+### positional\_contains
+
+> Checks if a positional has a specific value.
+
+**Example:**
+
+```yaml
+# This activates --conditional if positional number 1 is either "foo" or "bar"
+
+[...]
+options:
+  - option_strings: ["--conditional"]
+    when: "positional_contains 1 foo bar"
+
+positionals:
+  - number: 1
+[...]
+```
+
 ### Multiple conditions
 
 > Multiple conditions can be combined using the logical operators `&&` (**AND**) and `||` (**OR**).
