@@ -310,7 +310,7 @@ if [[ "$PREFIX" == "$1"* ]]; then
   IPREFIX="$IPREFIX$1"
   $2
 else
-  compadd -- "$1"
+  compadd -S '' -- "$1"
 fi
 ''')
 
