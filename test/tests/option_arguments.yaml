@@ -1,0 +1,20 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ['-f']
+
+  - option_strings: ['--option', '-option', '-O']
+    complete: ['key_value_list', ',', '=', [
+      ['flag', null, null],
+      ['mode', null, ['choices', ['strict', 'relaxed']]]
+    ]]
+
+# Test argument extraction for Fish shell completions.
+#
+# Some completers need access to the argument currently being completed and
+# therefore call `commandline -ct`. This command outputs the entire
+# command-line token rather than just the option's argument (for example
+# `-ovalue`, `--option=value`, or `-option=value`).
+#
+# Crazy-complete provides `get_completing_arg` to extract the actual argument
+# of the option before passing it to the completer. These tests verify that
+# `get_completing_arg` behaves correctly for the different option syntaxes.
