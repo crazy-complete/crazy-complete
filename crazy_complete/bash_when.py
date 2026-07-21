@@ -73,13 +73,10 @@ class ConditionGenerator:
         conditions = []
 
         for o in self.commandline.get_options_by_option_strings(obj.options):
-            cond = '(( ${#%s[@]} ))' % self.variable_manager.capture_variable(o)
+            cond = '${#%s[@]}' % self.variable_manager.capture_variable(o)
             conditions.append(cond)
 
-        if len(conditions) == 1:
-            return conditions[0]
-
-        return '{ %s; }' % ' || '.join(conditions)
+        return f'(( {" + ".join(conditions)} ))'
 
     def _gen_positional_count(self, obj):
         return f'(( ${{#POSITIONALS[@]}} {obj.operator} {obj.number} ))'
