@@ -51,24 +51,18 @@ class ConditionGenerator:
         return ' '.join(r)
 
     def _gen_option_is(self, obj):
+        variables = []
         conditions = []
+        array_contains_func = self.ctxt.helpers.use_function('array_contains')
 
         for o in self.commandline.get_options_by_option_strings(obj.options):
-            have_option = '(( ${#%s[@]} ))' % self.variable_manager.capture_variable(o)
-            value_equals = []
+            variables.append(self.variable_manager.capture_variable(o))
 
-            for value in obj.values:
-                value_equals.append('[[ "${%s[-1]}" == %s ]]' % (
-                    self.variable_manager.capture_variable(o),
-                    shell.quote(value)
-                ))
+        variables = ' '.join('"${%s[@]}"' % v for v in variables)
 
-            if len(value_equals) == 1:
-                cond = '{ %s && %s; }' % (have_option, value_equals[0])
-            else:
-                cond = '{ %s && { %s; } }' % (have_option, ' || '.join(value_equals))
-
-            conditions.append(cond)
+        for value in obj.values:
+            value = shell.quote(value)
+            conditions.append(f'{array_contains_func} {value} {variables}')
 
         if len(conditions) == 1:
             return conditions[0]
