@@ -332,7 +332,7 @@ end
 
 set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
 set -l options $argv[1..$(math $eof_string - 1)]
-set -l values $argv[$eof_string..]
+set -l values $argv[$(math $eof_string + 1)..]
 #ifdef nocase
 set -l option_values $__QUERY_CACHE_OPTION_VALUES
 $nocase && set values (string lower -- $values)
