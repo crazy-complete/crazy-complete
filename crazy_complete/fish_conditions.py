@@ -177,7 +177,7 @@ class PositionalNum(Condition):
 class PositionalContains(Condition):
     '''Checks if a positional contains a specific value.'''
 
-    def __init__(self, number, values):
+    def __init__(self, number, values, ignore_case=False):
         if not isinstance(number, int):
             raise InternalError(f'number: Invalid type: {number}')
 
@@ -186,12 +186,17 @@ class PositionalContains(Condition):
 
         self.number = number
         self.values = values
+        self.ignore_case = ignore_case
 
     def get_code(self, ctxt):
         ctxt.helpers.use_function('positional_contains')
-        values = self.values
-        number = str(self.number)
-        return make_condition_command('$positional_contains', [number, *values])
+        args = [str(self.number), *self.values]
+
+        if self.ignore_case:
+            ctxt.helpers.use_function('positional_contains', 'nocase')
+            args.insert(0, '-i')
+
+        return make_condition_command('$positional_contains', args)
 
 
 def replace_commands(tokens):
@@ -213,7 +218,7 @@ def replace_commands(tokens):
             r.append(PositionalNum(obj.operator, obj.number))
 
         elif isinstance(obj, when.PositionalContains):
-            r.append(PositionalContains(obj.number, obj.values))
+            r.append(PositionalContains(obj.number, obj.values, obj.ignore_case))
 
         elif isinstance(obj, str):
             r.append(obj)

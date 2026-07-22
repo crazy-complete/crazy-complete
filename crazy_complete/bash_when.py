@@ -97,7 +97,11 @@ class ConditionGenerator:
         func = self.ctxt.helpers.use_function('array_contains')
         index = obj.number - 1
         values = shell.join_quoted(obj.values)
-        return f'{func} "${{POSITIONALS[{index}]}}" {values}'
+
+        if obj.ignore_case:
+            return f'{func} "${{POSITIONALS[{index}],,}}" {values.lower()}'
+        else:
+            return f'{func} "${{POSITIONALS[{index}]}}" {values}'
 
     def _gen_variables(self, options, any_options):
         variables = []

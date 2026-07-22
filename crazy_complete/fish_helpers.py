@@ -248,11 +248,16 @@ end
 ''')
 
 _POSITIONAL_CONTAINS = FishFunction('positional_contains', r'''
-# positional_contains <NUM> <WORDS>
+# positional_contains [-i] <NUM> <WORDS>
 #
 # Checks if the positional argument number NUM is one of WORDS.
 # NUM counts from one.
 #
+#ifdef nocase
+set -l nocase false
+if test "$argv[1]" = -i; set nocase true; set -e argv[1]; end
+
+#endif
 #ifdef DEBUG
 if test (count $argv) -eq 0
   echo '%FUNCNAME%: missing number' >&2
@@ -262,7 +267,15 @@ end
 #endif
 set -l positional_num $argv[1]
 set -e argv[1]
+#ifdef nocase
+if $nocase
+  contains -- (string lower -- $__QUERY_CACHE_POSITIONALS[$positional_num] $argv)
+else
+  contains -- $__QUERY_CACHE_POSITIONALS[$positional_num] $argv
+end
+#else
 contains -- $__QUERY_CACHE_POSITIONALS[$positional_num] $argv
+#endif
 ''', ['query_init'])
 
 _HAS_OPTION = FishFunction('has_option', r'''

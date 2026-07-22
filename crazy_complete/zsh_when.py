@@ -90,7 +90,11 @@ def _generate_positional_count(_ctxt, _query, obj):
 def _generate_positional_contains(ctxt, _query, obj):
     func = ctxt.helpers.use_function('array_contains')
     values = shell.join_quoted(obj.values)
-    return f'{func} "${{POSITIONALS[{obj.number}]}}" {values}'
+
+    if obj.ignore_case:
+        return f'{func} "${{(L)POSITIONALS[{obj.number}]}}" {values.lower()}'
+    else:
+        return f'{func} "${{POSITIONALS[{obj.number}]}}" {values}'
 
 
 def generate_when_conditions(ctxt, query, when_):

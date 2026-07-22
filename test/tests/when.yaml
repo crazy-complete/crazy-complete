@@ -26,6 +26,9 @@ options:
   - option_strings: ['--if-positional-contains']
     when: 'positional_contains 2 foo bar'
 
+  - option_strings: ['--if-positional-contains-nocase']
+    when: 'positional_contains -i 2 foo bar'
+
 ---
 
 prog: "crazy-complete-test multiple-when"

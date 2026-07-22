@@ -1050,11 +1050,12 @@ description: "Check positional_contains"
 send: "crazy-complete-test positionals foo --"
 bash_expected: |
   > crazy-complete-test positionals foo --
-  --if-positional-contains  --if-positional-count
+  --if-positional-contains         --if-positional-count
+  --if-positional-contains-nocase
   > crazy-complete-test positionals foo --if-positional-co
 fish_expected: |
   > crazy-complete-test positionals foo --if-positional-co
-  …tional-contains  …tional-count
+  …tional-contains  …tional-contains-nocase  …tional-count
 zsh_expected: |
   > crazy-complete-test positionals foo --if-positional-co
 ---
@@ -3093,3 +3094,17 @@ fish_expected: |
   > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex
 zsh_expected: |
   > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex
+---
+number: 199
+definition_file: "when"
+description: "Check positional_contains (ignoring case)"
+send: "crazy-complete-test positionals FOO --"
+bash_expected: |
+  > crazy-complete-test positionals FOO --
+  --if-positional-contains-nocase  --if-positional-count
+  > crazy-complete-test positionals FOO --if-positional-co
+fish_expected: |
+  > crazy-complete-test positionals FOO --if-positional-co
+  …tional-contains-nocase  …tional-count
+zsh_expected: |
+  > crazy-complete-test positionals FOO --if-positional-co

@@ -156,6 +156,12 @@ class PositionalContains:
     '''Class for holding `positional_contains`.'''
 
     def __init__(self, args):
+        self.ignore_case = False
+
+        if args and args[0] == '-i':
+            self.ignore_case = True
+            args.pop(0)
+
         try:
             self.number = int(args.pop(0))
         except ValueError:
