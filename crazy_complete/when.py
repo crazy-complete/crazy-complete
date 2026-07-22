@@ -6,6 +6,7 @@
 from . import shell_parser
 from . import messages as m
 from .errors import CrazyError
+from .str_utils import is_valid_option_string
 
 
 # pylint: disable=too-few-public-methods
@@ -31,6 +32,11 @@ class OptionIs:
                 self.options.append(arg)
             elif has_end_of_options:
                 self.values.append(arg)
+
+        for option in self.options:
+            if not is_valid_option_string(option):
+                msg = 'option_is: %s: %s' % (m.invalid_value(), option)
+                raise CrazyError(msg)
 
         if not self.options:
             msg = 'option_is: %s: %s' % (m.missing_arg(), 'options')

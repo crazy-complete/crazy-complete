@@ -265,6 +265,7 @@
 01_00-when-option-is-missing-args        | line 4, column 11: foo: -o: when: option_is: Missing required argument: options
 01_01-when-option-is-missing-args-1      | line 4, column 11: foo: -o: when: option_is: Missing required argument: values
 01_02-when-option-is-missing-args-2      | line 4, column 11: foo: -o: when: option_is: Missing required argument: values
+01_03-when-option-is-invalid-option      | line 4, column 11: foo: -o: when: option_is: Invalid value: invalid
 02_00-when-positional-count-missing-args | line 4, column 11: foo: -o: when: positional_count: Missing required argument: operator
 02_01-when-positional-count-missing-args-1 | line 4, column 11: foo: -o: when: positional_count: Missing required argument: number
 02_02-when-positional-count-invalid-operator | line 4, column 11: foo: -o: when: positional_count: operator: Invalid value. Expected: ==, !=, <=, >=, <, >
