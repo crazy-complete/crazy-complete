@@ -89,7 +89,7 @@ class HasHiddenOption(Condition):
 class OptionIs(Condition):
     '''Checks if an option has a specific value.'''
 
-    def __init__(self, option_strings, values, ignore_case=False):
+    def __init__(self, option_strings, values, ignore_case, any_options):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
 
@@ -99,22 +99,27 @@ class OptionIs(Condition):
         self.option_strings = option_strings
         self.values = values
         self.ignore_case = ignore_case
+        self.any_options = any_options
 
     def get_code(self, ctxt):
-        args = [*self.option_strings, '--', *self.values]
+        args = ['--', *self.option_strings, '--', *self.values]
+        ctxt.helpers.use_function('option_is')
+
+        if self.any_options:
+            ctxt.helpers.use_function('option_is', 'any')
+            args.insert(0, '-a')
 
         if self.ignore_case:
-            ctxt.helpers.use_function('option_is_nocase')
-            return make_condition_command('$option_is_nocase', args)
-        else:
-            ctxt.helpers.use_function('option_is')
-            return make_condition_command('$option_is', args)
+            ctxt.helpers.use_function('option_is', 'nocase')
+            args.insert(0, '-i')
+
+        return make_condition_command('$option_is', args)
 
 
 class OptionMatch(Condition):
     '''Checks if an option's value matches a regex'''
 
-    def __init__(self, option_strings, regex, ignore_case=False):
+    def __init__(self, option_strings, regex, ignore_case, any_options):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
 
@@ -124,15 +129,21 @@ class OptionMatch(Condition):
         self.option_strings = option_strings
         self.regex = regex
         self.ignore_case = ignore_case
+        self.any_options = any_options
 
     def get_code(self, ctxt):
         ctxt.helpers.use_function('option_match')
         args = ['--', *self.option_strings, '--', self.regex]
 
+        if self.any_options:
+            ctxt.helpers.use_function('option_match', 'any')
+            args.insert(0, '-a')
+
         if self.ignore_case:
-            return make_condition_command('$option_match', ['-i', *args])
-        else:
-            return make_condition_command('$option_match', args)
+            ctxt.helpers.use_function('option_match', 'nocase')
+            args.insert(0, '-i')
+
+        return make_condition_command('$option_match', args)
 
 
 class PositionalNum(Condition):
@@ -190,10 +201,10 @@ def replace_commands(tokens):
 
     for obj in tokens:
         if isinstance(obj, when.OptionIs):
-            r.append(OptionIs(obj.options, obj.values, obj.ignore_case))
+            r.append(OptionIs(obj.options, obj.values, obj.ignore_case, obj.any))
 
         elif isinstance(obj, when.OptionMatch):
-            r.append(OptionMatch(obj.options, obj.regex, obj.ignore_case))
+            r.append(OptionMatch(obj.options, obj.regex, obj.ignore_case, obj.any))
 
         elif isinstance(obj, when.HasOption):
             r.append(HasOption(obj.options))

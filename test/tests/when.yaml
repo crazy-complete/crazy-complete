@@ -82,3 +82,22 @@ options:
 
   - option_strings: ['--if-arg-is-regex-nocase']
     when: 'option_match NOCASE --arg -- "reg(ex)?"'
+
+---
+
+prog: "crazy-complete-test any"
+options:
+  - option_strings: ['--arg']
+    complete: ['none']
+
+  - option_strings: ['--if-arg-is-foo']
+    when: 'option_is --arg -- foo'
+
+  - option_strings: ['--if-any-arg-is-foo']
+    when: 'option_is ANY --arg -- foo'
+
+  - option_strings: ['--if-arg-is-regex']
+    when: 'option_match --arg -- "reg(ex)?"'
+
+  - option_strings: ['--if-any-arg-is-regex']
+    when: 'option_match ANY --arg -- "reg(ex)?"'

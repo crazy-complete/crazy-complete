@@ -47,27 +47,34 @@ def _generate(ctxt, query, tokens):
 
 
 def _generate_option_is(ctxt, query, obj):
+    func = query.use('option_is')
+    args = ['--', *obj.options, '--', *obj.values]
+
+    if obj.any:
+        query.use('any')
+        args.insert(0, '-a')
+
     if obj.ignore_case:
-        query.use() # option_is_nocase also needs query!
-        func = ctxt.helpers.use_function('option_is_nocase')
-        args = [func, *obj.options, '--', *obj.values]
-        return shell.join_quoted(args)
-    else:
-        func = query.use('option_is')
-        args = [func, 'option_is', *obj.options, '--', *obj.values]
-        return shell.join_quoted(args)
+        query.use('nocase')
+        args.insert(0, '-i')
+
+    return shell.join_quoted([func, 'option_is'] + args)
 
 
 def _generate_option_match(ctxt, query, obj):
     query.use() # option_match also needs query!
     func = ctxt.helpers.use_function('option_match')
+    args = ['--', *obj.options, '--', obj.regex]
+
+    if obj.any:
+        ctxt.helpers.use_function('option_match', 'any')
+        args.insert(0, '-a')
 
     if obj.ignore_case:
-        args = [func, '-i', '--', *obj.options, '--', obj.regex]
-    else:
-        args = [func, '--', *obj.options, '--', obj.regex]
+        ctxt.helpers.use_function('option_match', 'nocase')
+        args.insert(0, '-i')
 
-    return shell.join_quoted(args)
+    return shell.join_quoted([func] + args)
 
 
 def _generate_has_option(_ctxt, query, obj):

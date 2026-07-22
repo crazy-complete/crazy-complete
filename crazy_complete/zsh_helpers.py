@@ -35,14 +35,14 @@ _QUERY = ShellFunction('query', r'''
 #     option includes an argument. If 'WITH_INCOMPLETE' is specified, it also
 #     returns true for options missing their arguments.
 #
-#   option_is <OPTIONS...> -- <VALUES...>
+#   option_is [-a] [-i] -- <OPTIONS...> -- <VALUES...>
 #     Checks if one option in OPTIONS has a value of VALUES.
 #
 # EXAMPLE
 #   local POSITIONALS HAVING_OPTIONS OPTION_VALUES
 #   query init '-f,-a=,-optional=?' program_name -f -optional -a foo bar
 #   query has_option -f
-#   query option_is -a -- foo
+#   query option_is -- -a -- foo
 #
 #   Here, -f is a flag, -a takes an argument, and -optional takes an optional
 #   argument.
@@ -121,10 +121,24 @@ case "$cmd" in
 #ifdef option_is
   option_is)
     local i=0 dash_dash_pos=0 cmd_option_is_options=() cmd_option_is_values=()
+    local nocase=0 any=0
+
+    while (( $# )); do
+#ifdef any
+      [[ "$1" == "-a" ]] && { any=1; shift; continue; }
+#endif
+#ifdef nocase
+      [[ "$1" == "-i" ]] && { nocase=1; shift; continue; }
+#endif
+      [[ "$1" == "--" ]] && { shift; break; }
+    done
 
     dash_dash_pos=${@[(i)--]}
     cmd_option_is_options=("${@:1:$((dash_dash_pos - 1))}")
     cmd_option_is_values=("${@:$((dash_dash_pos + 1))}")
+#ifdef nocase
+    (( nocase )) && cmd_option_is_values=("${(L)cmd_option_is_values[@]}")
+#endif
 
 #ifdef DEBUG
     if (( ${#cmd_option_is_options[@]} == 0 )); then
@@ -139,10 +153,17 @@ case "$cmd" in
 
 #endif
     for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
-      local option="${HAVING_OPTIONS[$i]}"
-      if array_contains "$option" "${cmd_option_is_options[@]}"; then
+      if array_contains "${HAVING_OPTIONS[$i]}" "${cmd_option_is_options[@]}"; then
         local value="${OPTION_VALUES[$i]}"
+#ifdef nocase
+        (( nocase )) && value="${(L)value}"
+#endif
         array_contains "$value" "${cmd_option_is_values[@]}" && return 0
+#ifdef any
+        (( any )) || return 1
+#else
+        return 1
+#endif
       fi
     done
 
@@ -304,47 +325,19 @@ for arg; do [[ "$key" == "$arg" ]] && return 0; done
 return 1
 ''')
 
-_ARRAY_CONTAINS_NOCASE = ShellFunction('array_contains_nocase', r'''
-local arg='' key="${1:l}"; shift
-for arg; do [[ "$key" == "${arg:l}" ]] && return 0; done
-return 1
-''')
+_OPTION_MATCH = ShellFunction('option_match', r'''
+local i=0 dash_dash_pos=0 options=() regex='' nocase=0 any=0
 
-_OPTION_IS_NOCASE = ShellFunction('option_is_nocase', r'''
-local i=0 dash_dash_pos=0 options=() values=()
-
-dash_dash_pos=${@[(i)--]}
-options=("${@:1:$((dash_dash_pos - 1))}")
-values=("${@:$((dash_dash_pos + 1))}")
-
-#ifdef DEBUG
-if (( ${#options[@]} == 0 )); then
-  echo "%FUNCNAME%: missing options" >&2
-  return 1
-fi
-
-if (( ${#values[@]} == 0 )); then
-  echo "%FUNCNAME%: missing values" >&2
-  return 1
-fi
-
+while (( $# )); do
+#ifdef any
+  [[ "$1" == '-a' ]] && { any=1; shift; continue; }
 #endif
-for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
-  local option="${HAVING_OPTIONS[$i]}"
-  if array_contains "$option" "${options[@]}"; then
-    local value="${OPTION_VALUES[$i]}"
-    array_contains_nocase "$value" "${values[@]}" && return 0
-  fi
+#ifdef nocase
+  [[ "$1" == '-i' ]] && { nocase=1; shift; continue; }
+#endif
+  [[ "$1" == '--' ]] && { shift; break; }
 done
 
-return 1
-''', ['array_contains', 'array_contains_nocase'])
-
-_OPTION_MATCH = ShellFunction('option_match', r'''
-local i=0 dash_dash_pos=0 options=() regex='' nocase=0
-
-[[ "$1" == '-i' ]] && { nocase=1; shift; }
-[[ "$1" == '--' ]] && { shift; }
 dash_dash_pos=${@[(i)--]}
 options=("${@:1:$((dash_dash_pos - 1))}")
 regex="${@:$((dash_dash_pos + 1)):1}"
@@ -362,12 +355,20 @@ fi
 
 #endif
 for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
-  local option="${HAVING_OPTIONS[$i]}"
-  if array_contains "$option" "${options[@]}"; then
+  if array_contains "${HAVING_OPTIONS[$i]}" "${options[@]}"; then
+#ifdef nocase
     if (( nocase ));
     then [[ "${(L)OPTION_VALUES[$i]}" =~ "${(L)regex}" ]] && return 0
     else [[ "${OPTION_VALUES[$i]}" =~ "${regex}" ]] && return 0
     fi
+#else
+    [[ "${OPTION_VALUES[$i]}" =~ "${regex}" ]] && return 0
+#endif
+#ifdef any
+    (( any )) || return 1
+#else
+    return 1
+#endif
   fi
 done
 
@@ -559,9 +560,7 @@ class ZshHelpers(GeneralHelpers):
     def __init__(self, config, function_prefix):
         super().__init__(config, function_prefix, ShellFunction)
         self.add_function(_ARRAY_CONTAINS)
-        self.add_function(_ARRAY_CONTAINS_NOCASE)
         self.add_function(_QUERY)
-        self.add_function(_OPTION_IS_NOCASE)
         self.add_function(_OPTION_MATCH)
         self.add_function(_EXEC)
         self.add_function(_KEY_VALUE_PAIR_EXEC)

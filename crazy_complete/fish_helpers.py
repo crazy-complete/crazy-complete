@@ -309,13 +309,35 @@ return 1
 ''', ['query_init'])
 
 _OPTION_IS = FishFunction('option_is', r'''
-# option_is <OPTIONS...> -- <VALUES...>
+# option_is [-a] [-i] -- <OPTIONS...> -- <VALUES...>
 #
 # Checks if any option in OPTIONS has a value of VALUES.
 #
+#ifdef any
+set -l any false
+#endif
+#ifdef nocase
+set -l nocase false
+#endif
+
+while set -q argv[1]
+#ifdef any
+  if test "$argv[1]" = -a; set any true; set -e argv[1]; continue; end
+#endif
+#ifdef nocase
+  if test "$argv[1]" = -i; set nocase true; set -e argv[1]; continue; end
+#endif
+  if test "$argv[1]" = --; set -e argv[1]; break; end
+end
+
 set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
 set -l options $argv[1..$(math $eof_string - 1)]
 set -l values $argv[$eof_string..]
+#ifdef nocase
+set -l option_values $__QUERY_CACHE_OPTION_VALUES
+$nocase && set values (string lower -- $values)
+$nocase && set option_values (string lower -- $option_values)
+#endif
 
 #ifdef DEBUG
 if test (count $options) -eq 0
@@ -331,43 +353,18 @@ end
 #endif
 set -l i (count $__QUERY_CACHE_HAVING_OPTIONS)
 while test $i -ge 1
-  contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options && \
-  contains -- $__QUERY_CACHE_OPTION_VALUES[$i]  $values  && \
-  return 0
-
-  set i (math $i - 1)
-end
-
-return 1
-''', ['query_init'])
-
-_OPTION_IS_NOCASE = FishFunction('option_is_nocase', r'''
-# option_is_nocase <OPTIONS...> -- <VALUES...>
-#
-# Checks if any option in OPTIONS has a value of VALUES (ignoring case).
-#
-set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
-set -l options $argv[1..$(math $eof_string - 1)]
-set -l values (string lower -- $argv[$eof_string..])
-set -l __QUERY_CACHE_OPTION_VALUES (string lower -- $__QUERY_CACHE_OPTION_VALUES)
-
-#ifdef DEBUG
-if test (count $options) -eq 0
-  echo '%FUNCNAME%: missing options' >&2
-  return 1
-end
-
-if test (count $values) -eq 0
-  echo '%FUNCNAME%: missing values' >&2
-  return 1
-end
-
+  if contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options
+#ifdef nocase
+    contains -- $option_values[$i] $values && return 0
+#else
+    contains -- $__QUERY_CACHE_OPTION_VALUES[$i] $values && return 0
 #endif
-set -l i (count $__QUERY_CACHE_HAVING_OPTIONS)
-while test $i -ge 1
-  contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options && \
-  contains -- $__QUERY_CACHE_OPTION_VALUES[$i]  $values  && \
-  return 0
+#ifdef any
+    $any || return 1
+#else
+    return 1
+#endif
+  end
 
   set i (math $i - 1)
 end
@@ -376,13 +373,27 @@ return 1
 ''', ['query_init'])
 
 _OPTION_MATCH = FishFunction('option_match', r'''
-# option_match <OPTIONS...> -- <REGEX>
+# option_match [-a] [-i] -- <OPTIONS...> -- <REGEX>
 #
 # Checks if any option in OPTIONS has a value that matches REGEX.
 #
-set -l match_arg ''
-if test "$argv[1]" = '-i'; set match_arg 'i'; set -e argv[1]; end
-if test "$argv[1]" = '--'; set -e argv[1]; end
+#ifdef any
+set -l any false
+#endif
+#ifdef nocase
+set -l nocase ''
+#endif
+
+while set -q argv[1]
+#ifdef any
+  if test "$argv[1]" = -a; set any true; set -e argv[1]; continue; end
+#endif
+#ifdef nocase
+  if test "$argv[1]" = -i; set nocase i; set -e argv[1]; continue; end
+#endif
+  if test "$argv[1]" = --; set -e argv[1]; break; end
+end
+
 set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
 set -l options $argv[1..$(math $eof_string - 1)]
 set -l regex $argv[(math $eof_string + 1)]
@@ -401,9 +412,18 @@ end
 #endif
 set -l i (count $__QUERY_CACHE_HAVING_OPTIONS)
 while test $i -ge 1
-  contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options && \
-  string match -rq$match_arg -- $regex $__QUERY_CACHE_OPTION_VALUES[$i] && \
-  return 0
+  if contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options
+#ifdef nocase
+    string match -rq$nocase -- $regex $__QUERY_CACHE_OPTION_VALUES[$i] && return 0
+#else
+    string match -rq -- $regex $__QUERY_CACHE_OPTION_VALUES[$i] && return 0
+#endif
+#ifdef any
+    $any || return 1
+#else
+    return 1
+#endif
+  end
 
   set i (math $i - 1)
 end
@@ -1058,7 +1078,6 @@ class FishHelpers(GeneralHelpers):
         self.add_function(_POSITIONAL_CONTAINS)
         self.add_function(_HAS_OPTION)
         self.add_function(_OPTION_IS)
-        self.add_function(_OPTION_IS_NOCASE)
         self.add_function(_OPTION_MATCH)
         self.add_function(_NUM_OF_POSITIONALS)
         self.add_function(_POSITIONAL_POSITION)

@@ -54,7 +54,7 @@ class ConditionGenerator:
         return ' '.join(r)
 
     def _gen_option_is(self, obj):
-        variables = []
+        variables = self._gen_variables(obj.options, obj.any)
         conditions = []
 
         if obj.ignore_case:
@@ -62,14 +62,9 @@ class ConditionGenerator:
         else:
             func = self.ctxt.helpers.use_function('array_contains')
 
-        for o in self.commandline.get_options_by_option_strings(obj.options):
-            variables.append(self.variable_manager.capture_variable(o))
-
-        variables = ' '.join('"${%s[@]}"' % v for v in variables)
-
         for value in obj.values:
             value = shell.quote(value)
-            conditions.append(f'{func} {value} {variables}')
+            conditions.append(f'{func} {value} {" ".join(variables)}')
 
         if len(conditions) == 1:
             return conditions[0]
@@ -77,19 +72,14 @@ class ConditionGenerator:
         return '{ %s; }' % ' || '.join(conditions)
 
     def _gen_option_match(self, obj):
-        variables = []
         regex = shell.quote(obj.regex)
         func = self.ctxt.helpers.use_function('array_match')
-
-        for o in self.commandline.get_options_by_option_strings(obj.options):
-            variables.append(self.variable_manager.capture_variable(o))
-
-        variables = ' '.join('"${%s[@]}"' % v for v in variables)
+        variables = self._gen_variables(obj.options, obj.any)
 
         if obj.ignore_case:
-            return f'{func} -i -- {regex} {variables}'
+            return f'{func} -i -- {regex} {" ".join(variables)}'
         else:
-            return f'{func} -- {regex} {variables}'
+            return f'{func} -- {regex} {" ".join(variables)}'
 
     def _gen_has_option(self, obj):
         conditions = []
@@ -108,6 +98,17 @@ class ConditionGenerator:
         index = obj.number - 1
         values = shell.join_quoted(obj.values)
         return f'{func} "${{POSITIONALS[{index}]}}" {values}'
+
+    def _gen_variables(self, options, any_options):
+        variables = []
+
+        for o in self.commandline.get_options_by_option_strings(options):
+            variables.append(self.variable_manager.capture_variable(o))
+
+        if any_options:
+            return ['"${%s[@]}"' % v for v in variables]
+        else:
+            return ['"${%s[@]: -1:1}"' % v for v in variables]
 
 
 def generate_when_conditions(ctxt, commandline, variable_manager, when_):

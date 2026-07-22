@@ -3043,3 +3043,53 @@ fish_expected: |
   > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase
 zsh_expected: |
   > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase
+---
+number: 195
+definition_file: "when"
+description: "when: any: check --arg foo"
+send: "crazy-complete-test any --arg foo --"
+bash_expected: |
+  > crazy-complete-test any --arg foo --
+  --if-any-arg-is-foo  --if-arg-is-foo
+  > crazy-complete-test any --arg foo --if-a
+fish_expected: |
+  > crazy-complete-test any --arg foo --if-a
+  --if-any-arg-is-foo  --if-arg-is-foo
+zsh_expected: |
+  > crazy-complete-test any --arg foo --if-a
+---
+number: 196
+definition_file: "when"
+description: "when: any: check --arg foo --arg override"
+send: "crazy-complete-test any --arg foo --arg override --"
+bash_expected: |
+  > crazy-complete-test any --arg foo --arg override --if-any-arg-is-foo
+fish_expected: |
+  > crazy-complete-test any --arg foo --arg override --if-any-arg-is-foo
+zsh_expected: |
+  > crazy-complete-test any --arg foo --arg override --if-any-arg-is-foo
+---
+number: 197
+definition_file: "when"
+description: "when: any: check --arg regex"
+send: "crazy-complete-test any --arg regex --"
+bash_expected: |
+  > crazy-complete-test any --arg regex --
+  --if-any-arg-is-regex  --if-arg-is-regex
+  > crazy-complete-test any --arg regex --if-a
+fish_expected: |
+  > crazy-complete-test any --arg regex --if-a
+  --if-any-arg-is-regex  --if-arg-is-regex
+zsh_expected: |
+  > crazy-complete-test any --arg regex --if-a
+---
+number: 198
+definition_file: "when"
+description: "when: any: check --arg regex --arg override"
+send: "crazy-complete-test any --arg regex --arg override --"
+bash_expected: |
+  > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex
+fish_expected: |
+  > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex
+zsh_expected: |
+  > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex

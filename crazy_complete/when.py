@@ -19,11 +19,20 @@ class OptionIs:
         self.options = []
         self.values = []
         self.ignore_case = False
+        self.any = False
         has_end_of_options = False
 
-        if args and args[0].lower() == 'nocase':
-            self.ignore_case = True
-            args.pop(0)
+        while args:
+            lower = args[0].lower()
+
+            if lower == 'nocase':
+                self.ignore_case = True
+                args.pop(0)
+            elif lower == 'any':
+                self.any = True
+                args.pop(0)
+            else:
+                break
 
         for arg in args:
             if not has_end_of_options:
@@ -55,11 +64,20 @@ class OptionMatch:
         self.options = []
         self.regex = None
         self.ignore_case = False
+        self.any = False
         has_end_of_options = False
 
-        if args and args[0].lower() == 'nocase':
-            self.ignore_case = True
-            args.pop(0)
+        while args:
+            lower = args[0].lower()
+
+            if lower == 'nocase':
+                self.ignore_case = True
+                args.pop(0)
+            elif lower == 'any':
+                self.any = True
+                args.pop(0)
+            else:
+                break
 
         for arg in args:
             if not has_end_of_options:
