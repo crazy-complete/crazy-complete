@@ -17,7 +17,12 @@ class OptionIs:
     def __init__(self, args):
         self.options = []
         self.values = []
+        self.ignore_case = False
         has_end_of_options = False
+
+        if args and args[0].lower() == 'nocase':
+            self.ignore_case = True
+            args.pop(0)
 
         for arg in args:
             if arg == '--':

@@ -89,7 +89,7 @@ class HasHiddenOption(Condition):
 class OptionIs(Condition):
     '''Checks if an option has a specific value.'''
 
-    def __init__(self, option_strings, values):
+    def __init__(self, option_strings, values, ignore_case=False):
         if not is_list_type(option_strings):
             raise InternalError('option_strings: Invalid type')
 
@@ -98,12 +98,17 @@ class OptionIs(Condition):
 
         self.option_strings = option_strings
         self.values = values
+        self.ignore_case = ignore_case
 
     def get_code(self, ctxt):
-        ctxt.helpers.use_function('option_is')
-        options = self.option_strings
-        values = self.values
-        return make_condition_command('$option_is', [*options, '--', *values])
+        args = [*self.option_strings, '--', *self.values]
+
+        if self.ignore_case:
+            ctxt.helpers.use_function('option_is_nocase')
+            return make_condition_command('$option_is_nocase', args)
+        else:
+            ctxt.helpers.use_function('option_is')
+            return make_condition_command('$option_is', args)
 
 
 class PositionalNum(Condition):
@@ -161,7 +166,7 @@ def replace_commands(tokens):
 
     for obj in tokens:
         if isinstance(obj, when.OptionIs):
-            r.append(OptionIs(obj.options, obj.values))
+            r.append(OptionIs(obj.options, obj.values, obj.ignore_case))
 
         elif isinstance(obj, when.HasOption):
             r.append(HasOption(obj.options))

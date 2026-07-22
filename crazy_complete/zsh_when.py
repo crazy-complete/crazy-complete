@@ -43,10 +43,16 @@ def _generate(ctxt, query, tokens):
     return ' '.join(r)
 
 
-def _generate_option_is(_ctxt, query, obj):
-    func = query.use('option_is')
-    args = [func, 'option_is', *obj.options, '--', *obj.values]
-    return shell.join_quoted(args)
+def _generate_option_is(ctxt, query, obj):
+    if obj.ignore_case:
+        query.use() # option_is_nocase also needs query!
+        func = ctxt.helpers.use_function('option_is_nocase')
+        args = [func, *obj.options, '--', *obj.values]
+        return shell.join_quoted(args)
+    else:
+        func = query.use('option_is')
+        args = [func, 'option_is', *obj.options, '--', *obj.values]
+        return shell.join_quoted(args)
 
 
 def _generate_has_option(_ctxt, query, obj):

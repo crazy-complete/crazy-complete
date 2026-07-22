@@ -53,7 +53,11 @@ class ConditionGenerator:
     def _gen_option_is(self, obj):
         variables = []
         conditions = []
-        array_contains_func = self.ctxt.helpers.use_function('array_contains')
+
+        if obj.ignore_case:
+            func = self.ctxt.helpers.use_function('array_contains_nocase')
+        else:
+            func = self.ctxt.helpers.use_function('array_contains')
 
         for o in self.commandline.get_options_by_option_strings(obj.options):
             variables.append(self.variable_manager.capture_variable(o))
@@ -62,7 +66,7 @@ class ConditionGenerator:
 
         for value in obj.values:
             value = shell.quote(value)
-            conditions.append(f'{array_contains_func} {value} {variables}')
+            conditions.append(f'{func} {value} {variables}')
 
         if len(conditions) == 1:
             return conditions[0]

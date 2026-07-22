@@ -341,6 +341,40 @@ end
 return 1
 ''', ['query_init'])
 
+_OPTION_IS_NOCASE = FishFunction('option_is_nocase', r'''
+# option_is_nocase <OPTIONS...> -- <VALUES...>
+#
+# Checks if any option in OPTIONS has a value of VALUES (ignoring case).
+#
+set -l eof_string (contains -i -- -- $argv || math (count $argv) + 1)
+set -l options $argv[1..$(math $eof_string - 1)]
+set -l values (string lower -- $argv[$eof_string..])
+set -l __QUERY_CACHE_OPTION_VALUES (string lower -- $__QUERY_CACHE_OPTION_VALUES)
+
+#ifdef DEBUG
+if test (count $options) -eq 0
+  echo '%FUNCNAME%: missing options' >&2
+  return 1
+end
+
+if test (count $values) -eq 0
+  echo '%FUNCNAME%: missing values' >&2
+  return 1
+end
+
+#endif
+set -l i (count $__QUERY_CACHE_HAVING_OPTIONS)
+while test $i -ge 1
+  contains -- $__QUERY_CACHE_HAVING_OPTIONS[$i] $options && \
+  contains -- $__QUERY_CACHE_OPTION_VALUES[$i]  $values  && \
+  return 0
+
+  set i (math $i - 1)
+end
+
+return 1
+''', ['query_init'])
+
 _NUM_OF_POSITIONALS = FishFunction('num_of_positionals', r'''
 # num_of_positionals [<OPERATOR> <NUMBER>]
 #
@@ -988,6 +1022,7 @@ class FishHelpers(GeneralHelpers):
         self.add_function(_POSITIONAL_CONTAINS)
         self.add_function(_HAS_OPTION)
         self.add_function(_OPTION_IS)
+        self.add_function(_OPTION_IS_NOCASE)
         self.add_function(_NUM_OF_POSITIONALS)
         self.add_function(_POSITIONAL_POSITION)
         self.add_function(_CAPTURE_OPTION)

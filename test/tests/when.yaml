@@ -67,3 +67,12 @@ options:
   - option_strings: ['--if-arg-is-double-quote']
     when: "option_is --arg -- '\"'"
 
+---
+
+prog: "crazy-complete-test advanced"
+options:
+  - option_strings: ['--arg']
+    complete: ['none']
+
+  - option_strings: ['--if-arg-is-foo-or-bar-nocase']
+    when: 'option_is NOCASE --arg -- foo bar'

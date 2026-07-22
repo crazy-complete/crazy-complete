@@ -304,6 +304,42 @@ for arg; do [[ "$key" == "$arg" ]] && return 0; done
 return 1
 ''')
 
+_ARRAY_CONTAINS_NOCASE = ShellFunction('array_contains_nocase', r'''
+local arg='' key="${1:l}"; shift
+for arg; do [[ "$key" == "${arg:l}" ]] && return 0; done
+return 1
+''')
+
+_OPTION_IS_NOCASE = ShellFunction('option_is_nocase', r'''
+local i=0 dash_dash_pos=0 options=() values=()
+
+dash_dash_pos=${@[(i)--]}
+options=("${@:1:$((dash_dash_pos - 1))}")
+values=("${@:$((dash_dash_pos + 1))}")
+
+#ifdef DEBUG
+if (( ${#options[@]} == 0 )); then
+  echo "%FUNCNAME%: missing options" >&2
+  return 1
+fi
+
+if (( ${#values[@]} == 0 )); then
+  echo "%FUNCNAME%: missing values" >&2
+  return 1
+fi
+
+#endif
+for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
+  local option="${HAVING_OPTIONS[$i]}"
+  if array_contains "$option" "${options[@]}"; then
+    local value="${OPTION_VALUES[$i]}"
+    array_contains_nocase "$value" "${values[@]}" && return 0
+  fi
+done
+
+return 1
+''', ['array_contains', 'array_contains_nocase'])
+
 _PREFIX = ShellFunction('prefix', r'''
 if [[ "$PREFIX" == "$1"* ]]; then
   PREFIX="${PREFIX#"$1"}"
@@ -489,7 +525,9 @@ class ZshHelpers(GeneralHelpers):
     def __init__(self, config, function_prefix):
         super().__init__(config, function_prefix, ShellFunction)
         self.add_function(_ARRAY_CONTAINS)
+        self.add_function(_ARRAY_CONTAINS_NOCASE)
         self.add_function(_QUERY)
+        self.add_function(_OPTION_IS_NOCASE)
         self.add_function(_EXEC)
         self.add_function(_KEY_VALUE_PAIR_EXEC)
         self.add_function(_KEY_VALUE_LIST_EXEC)

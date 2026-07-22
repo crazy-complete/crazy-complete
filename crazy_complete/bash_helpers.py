@@ -230,6 +230,12 @@ for w; do [[ "$search" == "$w" ]] && return 0; done
 return 1
 ''')
 
+_ARRAY_CONTAINS_NOCASE = ShellFunction('array_contains_nocase', r'''
+local w='' search="${1,,}"; shift;
+for w; do [[ "$search" == "${w,,}" ]] && return 0; done
+return 1
+''')
+
 _VALUE_LIST = ShellFunction('value_list', r'''
 #ifdef duplicates
 local duplicates=0
@@ -798,6 +804,7 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_PREFIX)
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
         self.add_function(_ARRAY_CONTAINS)
+        self.add_function(_ARRAY_CONTAINS_NOCASE)
         self.add_function(_GET_LAST_BREAK_POSITION)
         self.add_function(_PARSE_LINE)
         self.add_function(_GET_PREFIX_SUFFIX_LEN)

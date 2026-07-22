@@ -309,7 +309,8 @@ def generate_completion(commandline, config=None):
         block.add("set -l P '%s'" % prepare)
 
         for func in ["positional_contains", "has_option", "option_is",
-                        "num_of_positionals", "positional_position"]:
+                     "option_is_nocase", "num_of_positionals",
+                     "positional_position"]:
             if helpers.is_used(func):
                 block.add(f"set -l {func} '{helpers.use_function(func)}'")
 

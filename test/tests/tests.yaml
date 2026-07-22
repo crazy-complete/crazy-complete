@@ -2985,3 +2985,36 @@ fish_expected: |
   > crazy-complete-test --option=mode=strict,flag
 zsh_expected: |
   > crazy-complete-test --option=mode=strict,flag,
+---
+number: 190
+definition_file: "when"
+description: "when: advanced: check --"
+send: "crazy-complete-test advanced --"
+bash_expected: |
+  > crazy-complete-test advanced --arg=
+fish_expected: |
+  > crazy-complete-test advanced --arg
+zsh_expected: |
+  > crazy-complete-test advanced --arg=
+---
+number: 191
+definition_file: "when"
+description: "when: advanced: check --arg FOO"
+send: "crazy-complete-test advanced --arg FOO --"
+bash_expected: |
+  > crazy-complete-test advanced --arg FOO --if-arg-is-foo-or-bar-nocase
+fish_expected: |
+  > crazy-complete-test advanced --arg FOO --if-arg-is-foo-or-bar-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg FOO --if-arg-is-foo-or-bar-nocase
+---
+number: 192
+definition_file: "when"
+description: "when: advanced: check --arg BAR"
+send: "crazy-complete-test advanced --arg BAR --"
+bash_expected: |
+  > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
+fish_expected: |
+  > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
