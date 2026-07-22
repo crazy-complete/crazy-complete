@@ -26,11 +26,12 @@ class OptionIs:
             args.pop(0)
 
         for arg in args:
-            if arg == '--':
-                has_end_of_options = True
-            elif not has_end_of_options:
-                self.options.append(arg)
-            elif has_end_of_options:
+            if not has_end_of_options:
+                if arg == '--':
+                    has_end_of_options = True
+                else:
+                    self.options.append(arg)
+            else:
                 self.values.append(arg)
 
         for option in self.options:
