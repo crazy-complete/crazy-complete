@@ -111,6 +111,30 @@ class OptionIs(Condition):
             return make_condition_command('$option_is', args)
 
 
+class OptionMatch(Condition):
+    '''Checks if an option's value matches a regex'''
+
+    def __init__(self, option_strings, regex, ignore_case=False):
+        if not is_list_type(option_strings):
+            raise InternalError('option_strings: Invalid type')
+
+        if not isinstance(regex, str):
+            raise InternalError('regex: Invalid type')
+
+        self.option_strings = option_strings
+        self.regex = regex
+        self.ignore_case = ignore_case
+
+    def get_code(self, ctxt):
+        ctxt.helpers.use_function('option_match')
+        args = ['--', *self.option_strings, '--', self.regex]
+
+        if self.ignore_case:
+            return make_condition_command('$option_match', ['-i', *args])
+        else:
+            return make_condition_command('$option_match', args)
+
+
 class PositionalNum(Condition):
     '''Check the number of positionals.'''
 
@@ -167,6 +191,9 @@ def replace_commands(tokens):
     for obj in tokens:
         if isinstance(obj, when.OptionIs):
             r.append(OptionIs(obj.options, obj.values, obj.ignore_case))
+
+        elif isinstance(obj, when.OptionMatch):
+            r.append(OptionMatch(obj.options, obj.regex, obj.ignore_case))
 
         elif isinstance(obj, when.HasOption):
             r.append(HasOption(obj.options))

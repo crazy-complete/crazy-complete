@@ -76,3 +76,9 @@ options:
 
   - option_strings: ['--if-arg-is-foo-or-bar-nocase']
     when: 'option_is NOCASE --arg -- foo bar'
+
+  - option_strings: ['--if-arg-is-regex']
+    when: 'option_match --arg -- "reg(ex)?"'
+
+  - option_strings: ['--if-arg-is-regex-nocase']
+    when: 'option_match NOCASE --arg -- "reg(ex)?"'

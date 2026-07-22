@@ -24,6 +24,9 @@ class ConditionGenerator:
             if isinstance(obj, when.OptionIs):
                 r.append(self._gen_option_is(obj))
 
+            elif isinstance(obj, when.OptionMatch):
+                r.append(self._gen_option_match(obj))
+
             elif isinstance(obj, when.HasOption):
                 r.append(self._gen_has_option(obj))
 
@@ -72,6 +75,21 @@ class ConditionGenerator:
             return conditions[0]
 
         return '{ %s; }' % ' || '.join(conditions)
+
+    def _gen_option_match(self, obj):
+        variables = []
+        regex = shell.quote(obj.regex)
+        func = self.ctxt.helpers.use_function('array_match')
+
+        for o in self.commandline.get_options_by_option_strings(obj.options):
+            variables.append(self.variable_manager.capture_variable(o))
+
+        variables = ' '.join('"${%s[@]}"' % v for v in variables)
+
+        if obj.ignore_case:
+            return f'{func} -i -- {regex} {variables}'
+        else:
+            return f'{func} -- {regex} {variables}'
 
     def _gen_has_option(self, obj):
         conditions = []

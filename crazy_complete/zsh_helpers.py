@@ -340,6 +340,40 @@ done
 return 1
 ''', ['array_contains', 'array_contains_nocase'])
 
+_OPTION_MATCH = ShellFunction('option_match', r'''
+local i=0 dash_dash_pos=0 options=() regex='' nocase=0
+
+[[ "$1" == '-i' ]] && { nocase=1; shift; }
+[[ "$1" == '--' ]] && { shift; }
+dash_dash_pos=${@[(i)--]}
+options=("${@:1:$((dash_dash_pos - 1))}")
+regex="${@:$((dash_dash_pos + 1)):1}"
+
+#ifdef DEBUG
+if (( ${#options[@]} == 0 )); then
+  echo "%FUNCNAME%: missing options" >&2
+  return 1
+fi
+
+if (( ${#regex} == 0 )); then
+  echo "%FUNCNAME%: missing regex" >&2
+  return 1
+fi
+
+#endif
+for (( i=${#HAVING_OPTIONS[@]}; i > 0; --i )); do
+  local option="${HAVING_OPTIONS[$i]}"
+  if array_contains "$option" "${options[@]}"; then
+    if (( nocase ));
+    then [[ "${(L)OPTION_VALUES[$i]}" =~ "${(L)regex}" ]] && return 0
+    else [[ "${OPTION_VALUES[$i]}" =~ "${regex}" ]] && return 0
+    fi
+  fi
+done
+
+return 1
+''', ['array_contains'])
+
 _PREFIX = ShellFunction('prefix', r'''
 if [[ "$PREFIX" == "$1"* ]]; then
   PREFIX="${PREFIX#"$1"}"
@@ -528,6 +562,7 @@ class ZshHelpers(GeneralHelpers):
         self.add_function(_ARRAY_CONTAINS_NOCASE)
         self.add_function(_QUERY)
         self.add_function(_OPTION_IS_NOCASE)
+        self.add_function(_OPTION_MATCH)
         self.add_function(_EXEC)
         self.add_function(_KEY_VALUE_PAIR_EXEC)
         self.add_function(_KEY_VALUE_LIST_EXEC)

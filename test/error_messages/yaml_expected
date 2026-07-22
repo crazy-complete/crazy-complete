@@ -273,6 +273,12 @@
 03_00-when-positional-contains-missing-args | line 4, column 11: foo: -o: when: positional_contains: Missing required argument: number
 03_01-when-positional-contains-missing-args-1 | line 4, column 11: foo: -o: when: positional_contains: Missing required argument: values
 03_02-when-positional-contains-invalid-number | line 4, column 11: foo: -o: when: positional_contains: number: Invalid value
+04_00-when-option-match-missing-args     | line 4, column 11: foo: -o: when: option_match: Missing required argument: options
+04_01-when-option-match-missing-args-1   | line 4, column 11: foo: -o: when: option_match: Missing required argument: regex
+04_02-when-option-match-missing-args-2   | line 4, column 11: foo: -o: when: option_match: Missing required argument: regex
+04_03-when-option-match-invalid-option   | line 4, column 11: foo: -o: when: option_match: Invalid value: invalid
+04_04-when-option-match-invalid-regex    | line 4, column 11: foo: -o: when: option_match: Not an extended regular expression: [invalid
+04_05-when-option-match-too-many-args    | line 4, column 11: foo: -o: when: option_match: Too many arguments: invalid
 09_00-when-syntax-double-and             | line 4, column 11: foo: -o: when: Unexpected `&&`
 09_01-when-syntax-double-or              | line 4, column 11: foo: -o: when: Unexpected `||`
 09_02-when-syntax-not-and                | line 4, column 11: foo: -o: when: Unexpected `!`

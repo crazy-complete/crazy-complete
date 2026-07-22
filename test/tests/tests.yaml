@@ -3018,3 +3018,28 @@ fish_expected: |
   > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
 zsh_expected: |
   > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
+---
+number: 193
+definition_file: "when"
+description: "when: advanced: check --arg regex"
+send: "crazy-complete-test advanced --arg regex --"
+bash_expected: |
+  > crazy-complete-test advanced --arg regex --
+  --if-arg-is-regex         --if-arg-is-regex-nocase
+  > crazy-complete-test advanced --arg regex --if-arg-is-regex
+fish_expected: |
+  > crazy-complete-test advanced --arg regex --if-arg-is-regex
+  …-is-regex  …-is-regex-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg regex --if-arg-is-regex
+---
+number: 194
+definition_file: "when"
+description: "when: advanced: check --arg REGEX"
+send: "crazy-complete-test advanced --arg REGEX --"
+bash_expected: |
+  > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase
+fish_expected: |
+  > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase

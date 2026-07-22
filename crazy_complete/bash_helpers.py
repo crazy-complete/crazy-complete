@@ -236,6 +236,18 @@ for w; do [[ "$search" == "${w,,}" ]] && return 0; done
 return 1
 ''')
 
+_ARRAY_MATCH = ShellFunction('array_match', r'''
+local shopt_arg='-u'
+[[ "$1" == "-i" ]] && { shopt_arg='-s'; shift; }
+[[ "$1" == "--" ]] && shift
+local w='' regex="$1"; shift
+(
+  shopt $shopt_arg nocasematch
+  for w; do [[ "$w" =~ $regex ]] && return 0; done
+  return 1
+)
+''')
+
 _VALUE_LIST = ShellFunction('value_list', r'''
 #ifdef duplicates
 local duplicates=0
@@ -805,6 +817,7 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
         self.add_function(_ARRAY_CONTAINS)
         self.add_function(_ARRAY_CONTAINS_NOCASE)
+        self.add_function(_ARRAY_MATCH)
         self.add_function(_GET_LAST_BREAK_POSITION)
         self.add_function(_PARSE_LINE)
         self.add_function(_GET_PREFIX_SUFFIX_LEN)

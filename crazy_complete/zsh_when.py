@@ -16,6 +16,9 @@ def _generate(ctxt, query, tokens):
         if isinstance(obj, when.OptionIs):
             r.append(_generate_option_is(ctxt, query, obj))
 
+        elif isinstance(obj, when.OptionMatch):
+            r.append(_generate_option_match(ctxt, query, obj))
+
         elif isinstance(obj, when.HasOption):
             r.append(_generate_has_option(ctxt, query, obj))
 
@@ -53,6 +56,18 @@ def _generate_option_is(ctxt, query, obj):
         func = query.use('option_is')
         args = [func, 'option_is', *obj.options, '--', *obj.values]
         return shell.join_quoted(args)
+
+
+def _generate_option_match(ctxt, query, obj):
+    query.use() # option_match also needs query!
+    func = ctxt.helpers.use_function('option_match')
+
+    if obj.ignore_case:
+        args = [func, '-i', '--', *obj.options, '--', obj.regex]
+    else:
+        args = [func, '--', *obj.options, '--', obj.regex]
+
+    return shell.join_quoted(args)
 
 
 def _generate_has_option(_ctxt, query, obj):

@@ -6,7 +6,7 @@
 from . import shell_parser
 from . import messages as m
 from .errors import CrazyError
-from .str_utils import is_valid_option_string
+from .str_utils import is_valid_option_string, is_valid_extended_regex
 
 
 # pylint: disable=too-few-public-methods
@@ -45,6 +45,50 @@ class OptionIs:
 
         if not self.values:
             msg = 'option_is: %s: %s' % (m.missing_arg(), 'values')
+            raise CrazyError(msg)
+
+
+class OptionMatch:
+    '''Class for holding `option_match`.'''
+
+    def __init__(self, args):
+        self.options = []
+        self.regex = None
+        self.ignore_case = False
+        has_end_of_options = False
+
+        if args and args[0].lower() == 'nocase':
+            self.ignore_case = True
+            args.pop(0)
+
+        for arg in args:
+            if not has_end_of_options:
+                if arg == '--':
+                    has_end_of_options = True
+                else:
+                    self.options.append(arg)
+            else:
+                if self.regex is not None:
+                    msg = 'option_match: %s: %s' % (m.too_many_arguments(), arg)
+                    raise CrazyError(msg)
+
+                self.regex = arg
+
+        for option in self.options:
+            if not is_valid_option_string(option):
+                msg = 'option_match: %s: %s' % (m.invalid_value(), option)
+                raise CrazyError(msg)
+
+        if not self.options:
+            msg = 'option_match: %s: %s' % (m.missing_arg(), 'options')
+            raise CrazyError(msg)
+
+        if not self.regex:
+            msg = 'option_match: %s: %s' % (m.missing_arg(), 'regex')
+            raise CrazyError(msg)
+
+        if not is_valid_extended_regex(self.regex):
+            msg = 'option_match: %s: %s' % (m.not_an_extended_regex(), self.regex)
             raise CrazyError(msg)
 
 
@@ -121,6 +165,8 @@ def replace_commands(tokens):
 
             if cmd == 'option_is':
                 r.append(OptionIs(args))
+            elif cmd == 'option_match':
+                r.append(OptionMatch(args))
             elif cmd == 'has_option':
                 r.append(HasOption(args))
             elif cmd == 'positional_count':
