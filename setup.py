@@ -14,7 +14,6 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3',
         'Programming Language :: Unix Shell',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -25,7 +24,7 @@ setup(
         'Topic :: System :: Shells',
         'Topic :: Utilities',
     ],
-    license='GPL-3.0',
+    license='GPL-3.0-or-later',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     python_requires='>=3.0',
