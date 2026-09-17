@@ -1,7 +1,7 @@
 # Maintainer: Benjamin Abendroth <braph93@gmx.de>
 
 pkgname=python-crazy-complete
-pkgver=0.3.8
+pkgver=0.3.9
 pkgrel=1
 pkgdesc='Generate shell completion files for all major shells'
 arch=('any')

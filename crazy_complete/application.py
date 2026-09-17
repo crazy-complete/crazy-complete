@@ -69,7 +69,7 @@ p.add_argument(
 ).complete('file')
 
 p.add_argument(
-    '--version', action='version', version='%(prog)s 0.3.8',
+    '--version', action='version', version='%(prog)s 0.3.9',
     help='Show program version')
 
 p.add_argument(
