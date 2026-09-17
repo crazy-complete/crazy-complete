@@ -3,7 +3,7 @@ Crazy-Complete Documentation
 
 This documentation provides an overview of how to define shell completion for commands using crazy-complete.
 
-- [Generating a Defintion File from Help](#generating-a-definition-file-from-help)
+- [Generating a Definition File from Help](#generating-a-definition-file-from-help)
 - [Defining a Command](#defining-a-command)
 - [Defining an Option](#defining-an-option)
 - [Defining a Positional Argument](#defining-a-positional-argument)
@@ -117,7 +117,7 @@ positionals:
 
 ### Using Aliases
 
-Aliases / defines can be handy if completers are reused or to keep the defintion file clean.
+Aliases / defines can be handy if completers are reused or to keep the definition file clean.
 
 **NOTE:** Every defined string is replaced throughout the YAML document, regardless of its context.
 

@@ -3,7 +3,7 @@ Crazy-Complete Documentation
 
 This documentation provides an overview of how to define shell completion for commands using crazy-complete.
 
-- [Generating a Defintion File from Help](#generating-a-definition-file-from-help)
+- [Generating a Definition File from Help](#generating-a-definition-file-from-help)
 - [Defining a Command](#defining-a-command)
 - [Defining an Option](#defining-an-option)
 - [Defining a Positional Argument](#defining-a-positional-argument)
@@ -117,7 +117,7 @@ positionals:
 
 ### Using Aliases
 
-Aliases / defines can be handy if completers are reused or to keep the defintion file clean.
+Aliases / defines can be handy if completers are reused or to keep the definition file clean.
 
 **NOTE:** Every defined string is replaced throughout the YAML document, regardless of its context.
 
@@ -153,89 +153,97 @@ help: "<SUBCOMMAND DESCRIPTION>"
 
 ### Meta commands
 
-| Command                             | Description                                               |
-| ----------------------------------- | --------------------------------------------------------- |
-| [combine](#combine)                 | Combine multiple completers                               |
-| [key\_value\_list](#key_value_list) | Complete a comma-separated list of key=value pairs        |
-| [key\_value\_pair](#key_value_pair) | Complete a single key=value pair                          |
-| [list](#list)                       | Complete a comma-separated list of any completer          |
-| [none](#none)                       | No completion, but specifies that an argument is required |
-| [prefix](#prefix)                   | Prefix completion by a string                             |
+| Command                             | Description                                             |
+| ----------------------------------- | ------------------------------------------------------- |
+| [combine](#combine)                 | Combine multiple completers                             |
+| [key\_value\_list](#key_value_list) | Complete comma-separated lists of key=value pairs       |
+| [key\_value\_pair](#key_value_pair) | Complete single key=value pairs                         |
+| [list](#list)                       | Complete comma-separated lists using a completer        |
+| [none](#none)                       | No completion, but specify that an argument is required |
+| [prefix](#prefix)                   | Prefix completions with a string                        |
 
 ---
 
 ### Built-in commands
 
-| Command                                    | Description                                    |
-| ------------------------------------------ | ---------------------------------------------- |
-| [choices](#choices)                        | Complete from a set of words                   |
-| [command](#command)                        | Complete a command                             |
-| [command\_arg](#command_arg)               | Complete arguments of a command                |
-| [commandline\_string](#commandline_string) | Complete a command line as a string            |
-| [date](#date)                              | Complete a date string                         |
-| [date\_format](#date_format)               | Complete a date format string                  |
-| [directory](#directory)                    | Complete a directory                           |
-| [directory\_list](#directory_list)         | Complete a comma-separated list of directories |
-| [environment](#environment)                | Complete a shell environment variable name     |
-| [file](#file)                              | Complete a file                                |
-| [file\_list](#file_list)                   | Complete a comma-separated list of files       |
-| [filesystem\_type](#filesystem_type)       | Complete a filesystem type                     |
-| [float](#float)                            | Complete a floating point number               |
-| [gid](#gid)                                | Complete a group id                            |
-| [group](#group)                            | Complete a group                               |
-| [history](#history)                        | Complete based on a shell's history            |
-| [hostname](#hostname)                      | Complete a hostname                            |
-| [integer](#integer)                        | Complete an integer                            |
-| [ip\_address](#ip_address)                 | Complete a bound ip address                    |
-| [mime\_file](#mime_file)                   | Complete a file based on it's MIME-type        |
-| [pid](#pid)                                | Complete a PID                                 |
-| [process](#process)                        | Complete a process name                        |
-| [range](#range)                            | Complete a range of integers                   |
-| [service](#service)                        | Complete a SystemD service                     |
-| [signal](#signal)                          | Complete signal names                          |
-| [uid](#uid)                                | Complete a user id                             |
-| [user](#user)                              | Complete a username                            |
-| [value\_list](#value_list)                 | Complete a comma-separated list of values      |
-| [variable](#variable)                      | Complete a shell variable name                 |
+| Command                                    | Description                                   |
+| ------------------------------------------ | --------------------------------------------- |
+| [choices](#choices)                        | Complete from a predefined set of values      |
+| [command](#command)                        | Complete command names                        |
+| [command\_arg](#command_arg)               | Complete command arguments                    |
+| [commandline\_string](#commandline_string) | Complete command lines as strings             |
+| [date](#date)                              | Complete date strings                         |
+| [date\_format](#date_format)               | Complete date format strings                  |
+| [directory](#directory)                    | Complete directory names                      |
+| [directory\_list](#directory_list)         | Complete comma-separated lists of directories |
+| [environment](#environment)                | Complete environment variable names           |
+| [file](#file)                              | Complete file names                           |
+| [file\_list](#file_list)                   | Complete comma-separated lists of files       |
+| [filesystem\_type](#filesystem_type)       | Complete filesystem types                     |
+| [float](#float)                            | Complete floating-point values                |
+| [gid](#gid)                                | Complete group IDs                            |
+| [group](#group)                            | Complete group names                          |
+| [history](#history)                        | Complete based on a shell's history           |
+| [hostname](#hostname)                      | Complete hostnames                            |
+| [integer](#integer)                        | Complete integer values                       |
+| [ip\_address](#ip_address)                 | Complete local IP addresses                   |
+| [mime\_file](#mime_file)                   | Complete files by MIME type                   |
+| [pid](#pid)                                | Complete process IDs                          |
+| [process](#process)                        | Complete process names                        |
+| [range](#range)                            | Complete sequences of integers                |
+| [service](#service)                        | Complete systemd service names                |
+| [signal](#signal)                          | Complete signal names                         |
+| [uid](#uid)                                | Complete user IDs                             |
+| [user](#user)                              | Complete user names                           |
+| [value\_list](#value_list)                 | Complete comma-separated lists of values      |
+| [variable](#variable)                      | Complete shell variable names                 |
 
 ---
 
 ### User-defined commands
 
-| Command                                        | Description                                                                             |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [exec](#exec)                                  | Complete by the output of a command or function                                         |
-| [exec\_fast](#exec_fast)                       | Complete by the output of a command or function (fast and unsafe)                       |
-| [exec\_internal](#exec_internal)               | Complete by a function that uses the shell's internal completion mechanisms             |
-| [key\_value\_list\_exec](#key_value_list_exec) | Complete a comma-separted list of key=value pairs (dynamically generated by a function) |
-| [key\_value\_pair\_exec](#key_value_pair_exec) | Complete a key=value pair (dynamically generated by a function)                         |
+| Command                                        | Description                                                                |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| [exec](#exec)                                  | Complete values from the output of a command or function                   |
+| [exec\_fast](#exec_fast)                       | Complete values from the output of a command or function (fast and unsafe) |
+| [exec\_internal](#exec_internal)               | Use the shell's internal completion mechanisms                             |
+| [key\_value\_list\_exec](#key_value_list_exec) | Complete dynamically generated comma-separted lists of key=value pairs     |
+| [key\_value\_pair\_exec](#key_value_pair_exec) | Complete dynamically generated a key=value pairs                           |
 
 ---
 
 ### Bonus commands
 
-| Command                          | Description                  |
-| -------------------------------- | ---------------------------- |
-| [alsa\_card](#alsa_card)         | Complete an ALSA card        |
-| [alsa\_device](#alsa_device)     | Complete an ALSA device      |
-| [charset](#charset)              | Complete a charset           |
-| [locale](#locale)                | Complete a locale            |
-| [login\_shell](#login_shell)     | Complete a login shell       |
-| [mountpoint](#mountpoint)        | Complete a mountpoint        |
-| [net\_interface](#net_interface) | Complete a network interface |
-| [timezone](#timezone)            | Complete a timezone          |
+| Command                          | Description                 |
+| -------------------------------- | --------------------------- |
+| [alsa\_card](#alsa_card)         | Complete ALSA cards         |
+| [alsa\_device](#alsa_device)     | Complete ALSA devices       |
+| [charset](#charset)              | Complete character sets     |
+| [locale](#locale)                | Complete locales            |
+| [login\_shell](#login_shell)     | Complete login shells       |
+| [mountpoint](#mountpoint)        | Complete mount points       |
+| [net\_interface](#net_interface) | Complete network interfaces |
+| [timezone](#timezone)            | Complete timezones          |
 
 ---
 
 ### alsa\_card
 
-> Complete an ALSA card
+> Complete ALSA cards
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['alsa_card']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--alsa-card"]
-    complete: ["alsa_card"]
+  - option_strings: ['--alsa-card']
+    complete: ['alsa_card']
 ```
 
 ```
@@ -245,19 +253,27 @@ options:
 
 **SEE ALSO**
 
-- [alsa\_device](#alsa_device): For completing an ALSA device
+- [alsa\_device](#alsa_device): For completing ALSA devices
 
 ---
 
 ### alsa\_device
 
-> Complete an ALSA device
+> Complete ALSA devices
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['alsa_device']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--alsa-device"]
-    complete: ["alsa_device"]
+  - option_strings: ['--alsa-device']
+    complete: ['alsa_device']
 ```
 
 ```
@@ -267,19 +283,27 @@ hw:0  hw:1
 
 **SEE ALSO**
 
-- [alsa\_card](#alsa_card): For completing an ALSA card
+- [alsa\_card](#alsa_card): For completing ALSA cards
 
 ---
 
 ### charset
 
-> Complete a charset
+> Complete character sets
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['charset']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--charset"]
-    complete: ["charset"]
+  - option_strings: ['--charset']
+    complete: ['charset']
 ```
 
 ```
@@ -291,13 +315,21 @@ ANSI_X3.110-1983  ANSI_X3.4-1968    ARMSCII-8         ASMO_449
 
 ### locale
 
-> Complete a locale
+> Complete locales
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['locale']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--locale"]
-    complete: ["locale"]
+  - option_strings: ['--locale']
+    complete: ['locale']
 ```
 
 ```
@@ -310,13 +342,21 @@ de_DE.UTF-8  deutsch  en_US  en_US.iso88591  en_US.UTF-8  german  POSIX
 
 ### login\_shell
 
-> Complete a login shell
+> Complete login shells
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['login_shell']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--login-shell"]
-    complete: ["login_shell"]
+  - option_strings: ['--login-shell']
+    complete: ['login_shell']
 ```
 
 ```
@@ -329,13 +369,21 @@ options:
 
 ### mountpoint
 
-> Complete a mountpoint
+> Complete mount points
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['mountpoint']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--mountpoint"]
-    complete: ["mountpoint"]
+  - option_strings: ['--mountpoint']
+    complete: ['mountpoint']
 ```
 
 ```
@@ -348,13 +396,21 @@ options:
 
 ### net\_interface
 
-> Complete a network interface
+> Complete network interfaces
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['net_interface']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--net-interface"]
-    complete: ["net_interface"]
+  - option_strings: ['--net-interface']
+    complete: ['net_interface']
 ```
 
 ```
@@ -365,19 +421,27 @@ eno1  enp1s0  lo  wlo1  wlp2s0
 
 **SEE ALSO**
 
-- [ip\_address](#ip_address): For completing an ip address
+- [ip\_address](#ip_address): For completing IP addresses
 
 ---
 
 ### timezone
 
-> Complete a timezone
+> Complete timezones
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['timezone']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--timezone"]
-    complete: ["timezone"]
+  - option_strings: ['--timezone']
+    complete: ['timezone']
 ```
 
 ```
@@ -390,65 +454,98 @@ Brussels    Bucharest   Budapest    Busingen
 
 ### choices
 
-> Complete from a set of words
+> Complete from a predefined set of values
 
-Items can be a list or a dictionary.
- 
-If a dictionary is supplied, the keys are used as items and the values are used
-as description.
+**SYNOPSIS**
+
+```yaml
+['choices', <ITEMS>]
+```
+
+**PARAMETERS**
+
+`ITEMS`:
+  A list or dictionary containing the values to offer for completion.
+
+  If a list is supplied, all items are offered without descriptions.
+
+  If a dictionary is supplied, the keys are used as completion values and the
+  values are used as descriptions.
 
 
 **NOTES**
 
 - If the completion suggestions should appear in their original order, set `nosort` to `true`
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--choices-1"]
-    complete: ["choices", ["Item 1", "Item 2"]]
+  - option_strings: ['--choices-1']
+    complete: ['choices', ['Item 1', 'Item 2']]
 
-  - option_strings: ["--choices-2"]
-    complete: ["choices", {"Item 1": "Description 1", "Item 2": "Description 2"}]
+  - option_strings: ['--choices-2']
+    complete: ['choices', {'Item 1': 'Description 1', 'Item 2': 'Description 2'}]
 
-  - option_strings: ["--choices-keep-order"]
-    complete: ["choices", ["zebra", "cat", "monkey"]]
+  - option_strings: ['--choices-keep-order']
+    complete: ['choices', ['zebra', 'cat', 'monkey']]
     nosort: true
 ```
 
 ```
 ~ > example --choices-2=<TAB>
 Item 1  (Description 1)  Item 2  (Description 2)
+
+~ > example --choices-keep-order=<TAB>
+zebra    cat    monkey
 ```
 
 ---
 
 ### command
 
-> Complete a command
+> Complete command names
+
+**SYNOPSIS**
+
+```yaml
+['command']
+
+['command', <OPTIONS>]
+```
+
+**PARAMETERS**
 
 This completer provides completion suggestions for executable commands available in the system's `$PATH`.
  
-`$PATH` can be modified using these options:
- 
-`{"path": "<directory>:..."}`: Overrides the default `$PATH` entirely.
- 
-`{"path_append": "<directory>:..."}`: Appends to the default `$PATH`.
- 
-`{"path_prepend": "<directory>:..."}`: Prepends to the default `$PATH`.
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
+
+  - `path`:
+    Override the default `$PATH` used for searching executables.
+
+  - `path_append`:
+    Append directories to the default `$PATH`.
+
+  - `path_prepend`:
+    Prepend directories to the default `$PATH`.
 
 
 **NOTES**
 
 - `path_append` and `path_prepend` can be used together, but both are mutually exclusive with `path`.
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--command"]
-    complete: ["command"]
-  - option_strings: ["--command-sbin"]
-    complete: ["command", {"path_append": "/sbin:/usr/sbin"}]
+  - option_strings: ['--command']
+    complete: ['command']
+
+  - option_strings: ['--command-sbin']
+    complete: ['command', {'path_append': '/sbin:/usr/sbin'}]
 ```
 
 ```
@@ -460,13 +557,19 @@ base32    base64    basename  basenc    bash      bashbug
 
 - [command\_arg](#command_arg): For completing arguments of a command
 
-- [commandline\_string](#commandline_string): For completing a command line as a string
+- [commandline\_string](#commandline_string): For completing command lines as strings
 
 ---
 
 ### command\_arg
 
-> Complete arguments of a command
+> Complete command arguments
+
+**SYNOPSIS**
+
+```yaml
+['command_arg']
+```
 
 **NOTES**
 
@@ -474,14 +577,16 @@ base32    base64    basename  basenc    bash      bashbug
 
 - This completer requires `repeatable: true`.
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 positionals:
   - number: 1
-    complete: ["command"]
+    complete: ['command']
 
   - number: 2
-    complete: ["command_arg"]
+    complete: ['command_arg']
     repeatable: true
 ```
 
@@ -492,21 +597,29 @@ base32    base64    basename  basenc    bash      bashbug
 
 **SEE ALSO**
 
-- [command](#command): For completing a command
+- [command](#command): For completing command names
 
-- [commandline\_string](#commandline_string): For completing a command line as a string
+- [commandline\_string](#commandline_string): For completing command lines as strings
 
 ---
 
 ### commandline\_string
 
-> Complete a command line as a string
+> Complete command lines as strings
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['commandline_string']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--commandline"]
-    complete: ["commandline_string"]
+  - option_strings: ['--commandline']
+    complete: ['commandline_string']
 ```
 
 ```
@@ -514,24 +627,41 @@ options:
 base32    base64    basename  basenc    bash      bashbug
 ```
 
+**SEE ALSO**
+
+- [command](#command): For completing command names
+
+- [command\_arg](#command_arg): For completing command arguments
+
 ---
 
 ### date
 
-> Complete a date string
+> Complete date strings
 
-The argument is the date format as described in `strftime(3)`.
+**SYNOPSIS**
+
+```yaml
+['date', <FORMAT>]
+```
+
+**PARAMETERS**
+
+`FORMAT`:
+  The date format as described in `strftime(3)`.
 
 
 **NOTES**
 
 - This completer is currently only implemented in **Zsh**.
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--date"]
-    complete: ["date", '%Y-%m-%d']
+  - option_strings: ['--date']
+    complete: ['date', '%Y-%m-%d']
 ```
 
 ```
@@ -548,23 +678,31 @@ Mo  Tu  We  Th  Fr  Sa  Su
 
 **SEE ALSO**
 
-- [date\_format](#date_format): For completing a date format string
+- [date\_format](#date_format): For completing date format strings
 
 ---
 
 ### date\_format
 
-> Complete a date format string
+> Complete date format strings
+
+**SYNOPSIS**
+
+```yaml
+['date_format']
+```
 
 **NOTES**
 
 - This completer is currently only implemented in **Fish** and **Zsh**.
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--date-format"]
-    complete: ["date_format"]
+  - option_strings: ['--date-format']
+    complete: ['date_format']
 ```
 
 ```
@@ -582,24 +720,40 @@ e     -- day of month ( 1-31)
 
 **SEE ALSO**
 
-- [date](#date): For completing a date
+- [date](#date): For completing dates
 
 ---
 
 ### directory
 
-> Complete a directory
+> Complete directory names
 
-You can restrict completion to a specific directory by adding `{"directory": ...}`.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['directory']
+
+['directory', <OPTIONS>]
+```
+
+**PARAMETERS**
+
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
+
+  - `directory`: Restrict completion to directories inside the specified directory.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--directory"]
-    complete: ["directory"]
-  - option_strings: ["--directory-tmp"]
-    complete: ["directory", {"directory": "/tmp"}]
+  - option_strings: ['--directory']
+    complete: ['directory']
+
+  - option_strings: ['--directory-tmp']
+    complete: ['directory', {'directory': '/tmp'}]
 ```
 
 ```
@@ -609,28 +763,46 @@ dir1/  dir2/
 
 **SEE ALSO**
 
-- [directory\_list](#directory_list): For completing a comma-separated list of directories
+- [directory\_list](#directory_list): For completing comma-separated lists of directories
 
 ---
 
 ### directory\_list
 
-> Complete a comma-separated list of directories
+> Complete comma-separated lists of directories
+
+**SYNOPSIS**
+
+```yaml
+['directory_list']
+
+['directory_list', <OPTIONS>]
+```
+
+**PARAMETERS**
 
 This is an alias for `['list', ['directory']]`.
 
-You can restrict completion to a specific directory by adding `{"directory": ...}`.
- 
-The separator can be changed by adding `{"separator": ...}`
- 
-By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
 
+  - `directory`:
+    Restrict completion to directories inside the specified directory.
+
+  - `duplicates`:
+    Allow duplicate values to be offered for completion. Defaults to `false`.
+
+  - `separator`:
+    The separator used between list elements. Defaults to `,`.
+
+
+**EXAMPLE**
 
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--directory-list"]
-    complete: ["directory_list"]
+  - option_strings: ['--directory-list']
+    complete: ['directory_list']
 ```
 
 ```
@@ -640,23 +812,31 @@ directory3  directory4
 
 **SEE ALSO**
 
-- [list](#list): For completion a comma-separated list of any completer
+- [list](#list): For completion comma-separated lists using a completer
 
-- [directory](#directory): For completing a directory
+- [directory](#directory): For completing directory names
 
-- [file\_list](#file_list): For completing a comma-separated list of files
+- [file\_list](#file_list): For completing comma-separated lists of files
 
 ---
 
 ### environment
 
-> Complete a shell environment variable name
+> Complete environment variable names
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['environment']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--environment"]
-    complete: ["environment"]
+  - option_strings: ['--environment']
+    complete: ['environment']
 ```
 
 ```
@@ -665,81 +845,128 @@ XDG_RUNTIME_DIR  XDG_SEAT  XDG_SESSION_CLASS  XDG_SESSION_ID
 XDG_SESSION_TYPE XDG_VTNR
 ```
 
+**SEE ALSO**
+
+- [variable](#variable): For completing shell variable names
+
 ---
 
 ### file
 
-> Complete a file
+> Complete file names
 
-You can restrict completion to a specific directory by adding `{"directory": ...}`.
- 
-You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
- 
-You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
-Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
-
-You can ignore files by adding a list of Bash globs using `{"ignore_globs": [...]}`
-
-**NOTE:** Restricting completion to specific file extensions only makes sense if the program being completed actually expects files of those types.
-On Unix-like systems, file extensions generally have no inherent meaning -- they are purely conventional and not required for determining file types.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['file']
+
+['file', <OPTIONS>]
+```
+
+**PARAMETERS**
+
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
+
+  - `directory`: Restrict completion to files inside the specified directory.
+
+  - `extensions`: A list of file extensions to offer for completion.
+
+  - `fuzzy`:
+    Enable fuzzy extension matching.
+    By default, files must end with one of the specified extensions.
+    With fuzzy matching enabled, files with additional suffixes are also matched, for example `foo.txt.1`.
+  
+  - `ignore_globs`:
+    A list of Bash globs for files that should not be offered for completion.
+
+**NOTE:** Restricting completion to specific file extensions only makes sense
+if the program being completed actually expects files of those types. On
+Unix-like systems, file extensions generally have no inherent meaning and are
+only conventions.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--file"]
-    complete: ["file"]
+  - option_strings: ['--file']
+    complete: ['file']
 
-  - option_strings: ["--file-tmp"]
-    complete: ["file", {"directory": "/tmp"}]
+  - option_strings: ['--file-tmp']
+    complete: ['file', {'directory': '/tmp'}]
 
-  - option_strings: ["--file-ext"]
-    complete: ["file", {"extensions": ["c", "cpp"]}]
+  - option_strings: ['--file-ext']
+    complete: ['file', {'extensions': ['c', 'cpp']}]
 
-  - option_strings: ["--file-ignore"]
-    complete: ["file", {"ignore_globs": ["*.[tT][xX][tT]", "*.c++"]}]
+  - option_strings: ['--file-ignore']
+    complete: ['file', {'ignore_globs': ['*.[tT][xX][tT]', '*.c++']}]
 ```
 
 ```
 ~ > example --file=<TAB>
 dir1/  dir2/  file1  file2
+
 ~ > example --file-ext=<TAB>
 dir1/  dir2/  file.c  file.cpp
 ```
 
 **SEE ALSO**
 
-- [file\_list](#file_list): For completing a comma-separated list of files
+- [file\_list](#file_list): For completing comma-separated lists of files
 
-- [mime\_file](#mime_file): For completing a file based on it's MIME-type
+- [mime\_file](#mime_file): For completing files by MIME type
 
 ---
 
 ### file\_list
 
-> Complete a comma-separated list of files
+> Complete comma-separated lists of files
+
+**SYNOPSIS**
+
+```yaml
+['file_list']
+
+['file_list', <OPTIONS>]
+```
+
+**PARAMETERS**
 
 This is an alias for `['list', ['file']]`.
 
-You can restrict completion to a specific directory by adding `{"directory": ...}`.
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
 
-You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
+  - `directory`:
+    Restrict completion to files inside the specified directory.
 
-You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
-Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
+  - `extensions`:
+    A list of file extensions to offer for completion.
 
-You can ignore files by adding a list of Bash globs using `{"ignore_globs": [...]}`
+  - `fuzzy`:
+    Enable fuzzy extension matching. By default, files must end with one of
+    the specified extensions. With fuzzy matching enabled, files with
+    additional suffixes are also matched, for example `foo.txt.1`.
 
-By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+  - `ignore_globs`:
+    A list of Bash globs for files that should not be offered for completion.
 
-The separator can be changed by adding `{"separator": ...}`
+  - `duplicates`:
+    Allow duplicate values to be offered for completion. Defaults to `false`.
 
+  - `separator`:
+    The separator used between list elements. Defaults to `,`.
+
+
+**EXAMPLE**
 
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--file-list"]
-    complete: ["file_list"]
+  - option_strings: ['--file-list']
+    complete: ['file_list']
 ```
 
 ```
@@ -749,23 +976,31 @@ file3  file4
 
 **SEE ALSO**
 
-- [list](#list): For completing a comma-separted list using any completer
+- [list](#list): For completing comma-separted lists using a completer
 
-- [file](#file): For completing a file
+- [file](#file): For completing file names
 
-- [directory\_list](#directory_list): For completing a comma-separated list of directories
+- [directory\_list](#directory_list): For completing comma-separated lists of directories
 
 ---
 
 ### filesystem\_type
 
-> Complete a filesystem type
+> Complete filesystem types
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['filesystem_type']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--filesystem-type"]
-    complete: ["filesystem_type"]
+  - option_strings: ['--filesystem-type']
+    complete: ['filesystem_type']
 ```
 
 ```
@@ -779,22 +1014,37 @@ cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
 
 ### float
 
-> Complete a floating point number
+> Complete floating-point values
 
-A min value can be specified by using `{"min": <VALUE>}`.
-
-A max value can be specified by using `{"max": <VALUE>}`.
-
-A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
-
-A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['float']
+
+['float', <OPTIONS>]
+```
+
+**PARAMETERS**
+
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
+
+  - `min`: The minimum allowed value.
+
+  - `max`: The maximum allowed value.
+
+  - `suffixes`: A dictionary of suffixes and their descriptions. The suffix is appended to the completed value.
+
+  - `help`: The help text shown during completion. If not specified, the `help` attribute of the option is used.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--time"]
-    complete: ["float", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
+  - option_strings: ['--time']
+    complete: ['float', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}}]
 ```
 
 ```
@@ -804,19 +1054,27 @@ s -- seconds  m -- minutes  h -- hours
 
 **SEE ALSO**
 
-- [integer](#integer): For completing an integer
+- [integer](#integer): For completing integer values
 
 ---
 
 ### gid
 
-> Complete a group id
+> Complete group IDs
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['gid']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--gid"]
-    complete: ["gid"]
+  - option_strings: ['--gid']
+    complete: ['gid']
 ```
 
 ```
@@ -834,34 +1092,42 @@ options:
 
 **SEE ALSO**
 
-- [group](#group): For completing a group name
+- [group](#group): For completing group names
 
 ---
 
 ### group
 
-> Complete a group
+> Complete group names
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['group']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--group"]
-    complete: ["group"]
+  - option_strings: ['--group']
+    complete: ['group']
 ```
 
 ```
 ~ > example --group=<TAB>
-adm                     audio                   avahi
-bin                     braph                   colord
-daemon                  dbus                    dhcpcd
-disk                    floppy                  ftp
-games                   git                     groups
+adm           audio        avahi
+bin           braph        colord
+daemon        dbus         dhcpcd
+disk          floppy       ftp
+games         git          groups
 [...]
 ```
 
 **SEE ALSO**
 
-- [gid](#gid): For completing a group id
+- [gid](#gid): For completing group IDs
 
 ---
 
@@ -869,32 +1135,52 @@ games                   git                     groups
 
 > Complete based on a shell's history
 
-The argument is an extended regular expression passed to `grep -E`.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['history', <REGEX>]
+```
+
+**PARAMETERS**
+
+`REGEX`:
+  An extended regular expression used to filter history entries.
+  The regular expression is passed to `grep -E`.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--history"]
-    complete: ["history", '[a-zA-Z0-9]+@[a-zA-Z0-9]+']
+  - option_strings: ['--history']
+    complete: ['history', '[a-zA-Z0-9]+@[a-zA-Z0-9]+']
 ```
 
 ```
 ~ > example --history=<TAB>
-foo@bar mymail@myprovider
+foo@bar  mymail@myprovider
 ```
 
 ---
 
 ### hostname
 
-> Complete a hostname
+> Complete hostnames
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['hostname']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--hostname"]
-    complete: ["hostname"]
+  - option_strings: ['--hostname']
+    complete: ['hostname']
 ```
 
 ```
@@ -902,26 +1188,45 @@ options:
 localhost
 ```
 
+**SEE ALSO**
+
+- [ip\_address](#ip_address): For completing local IP addresses
+
 ---
 
 ### integer
 
-> Complete an integer
+> Complete integer values
 
-A min value can be specified by using `{"min": <VALUE>}`.
-
-A max value can be specified by using `{"max": <VALUE>}`.
-
-A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
-
-A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['integer']
+
+['integer', <OPTIONS>]
+```
+
+**PARAMETERS**
+
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
+
+  - `min`: The minimum allowed value.
+
+  - `max`: The maximum allowed value.
+
+  - `suffixes`: A dictionary of suffixes and their descriptions. The suffix is appended to the completed value.
+
+  - `help`: The help text shown during completion. If not specified, the `help` attribute of the option is used.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--time"]
-    complete: ["integer", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
+  - option_strings: ['--time']
+    complete: ['integer', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}}]
 ```
 
 ```
@@ -931,40 +1236,51 @@ s -- seconds  m -- minutes  h -- hours
 
 **SEE ALSO**
 
-- [float](#float): For completing a floating point number
+- [float](#float): For completing floating-point values
 
-- [range](#range): For completing a range of integers
+- [range](#range): For completing sequences of integers
 
 ---
 
 ### ip\_address
 
-> Complete a bound ip address
+> Complete local IP addresses
 
-The first argument is the type of ip addresses to be completed:
-
-- `ipv4`: IPv4 addresses
-- `ipv6`: IPv6 addresses
-- `all`:  Both IPv4 and IPv6 addresses
-
-Append `+` to include the unspecified address of the selected family:
-
-- `ipv4+`: Includes 0.0.0.0
-- `ipv6+`: Includes ::
-- `all+`:  Includes both 0.0.0.0 and ::
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['ip_address', <TYPE>]
+```
+
+**PARAMETERS**
+
+`TYPE`:
+  The type of ip addresses to complete:
+
+  - `ipv4`: IPv4 addresses
+  - `ipv6`: IPv6 addresses
+  - `all`:  Both IPv4 and IPv6 addresses
+
+  Append `+` to include the unspecified address of the selected family:
+
+  - `ipv4+`: Includes `0.0.0.0`
+  - `ipv6+`: Includes `::`
+  - `all+`:  Includes both 0.0.0.0 and `::`
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--ip-address"]
-    complete: ["ip_address"]
+  - option_strings: ['--ip-address']
+    complete: ['ip_address']
 
-  - option_strings: ["--ip-address-v4"]
-    complete: ["ip_address", "ipv4"]
+  - option_strings: ['--ip-address-v4']
+    complete: ['ip_address', 'ipv4']
 
-  - option_strings: ["--ip-address-v6"]
-    complete: ["ip_address", "ipv6"]
+  - option_strings: ['--ip-address-v6']
+    complete: ['ip_address', 'ipv6']
 ```
 
 ```
@@ -980,22 +1296,36 @@ options:
 
 **SEE ALSO**
 
-- [net\_interface](#net_interface): For completing a network interface
+- [net\_interface](#net_interface): For completing network interfaces
+
+- [hostname](#hostname): For completing hostnames
 
 ---
 
 ### mime\_file
 
-> Complete a file based on it's MIME-type
+> Complete files by MIME type
 
-This completer takes an extended regex passed to `grep -E` to filter the results.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['mime_file', <MIME_REGEX>]
+```
+
+**PARAMETERS**
+
+`MIME_REGEX`:
+  An extended regular expression used to match MIME types.
+  The expression is passed to `grep -E` to filter the results.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--image"]
-    complete: ["mime_file", 'image/']
+  - option_strings: ['--image']
+    complete: ['mime_file', 'image/']
 ```
 
 ```
@@ -1007,13 +1337,21 @@ dir1/  dir2/  img.png  img.jpg
 
 ### pid
 
-> Complete a PID
+> Complete process IDs
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['pid']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--pid"]
-    complete: ["pid"]
+  - option_strings: ['--pid']
+    complete: ['pid']
 ```
 
 ```
@@ -1025,19 +1363,27 @@ options:
 
 **SEE ALSO**
 
-- [process](#process): For completing a process name
+- [process](#process): For completing process names
 
 ---
 
 ### process
 
-> Complete a process name
+> Complete process names
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['process']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--process"]
-    complete: ["process"]
+  - option_strings: ['--process']
+    complete: ['process']
 ```
 
 ```
@@ -1049,26 +1395,50 @@ systemd-journald  systemd-logind  systemd-udevd
 
 **SEE ALSO**
 
-- [pid](#pid): For completing a PID
+- [pid](#pid): For completing process IDs
 
 ---
 
 ### range
 
-> Complete a range of integers
+> Complete sequences of integers
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['range', <START>, <STOP>]
+
+['range', <START>, <STOP>, <STEP>]
+```
+
+**PARAMETERS**
+
+`START`:
+  The first value of the range.
+
+`STOP`:
+  The last value of the range.
+
+`STEP`:
+  The increment between values. Defaults to `1`.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--range-1"]
-    complete: ["range", 1, 9]
-  - option_strings: ["--range-2"]
-    complete: ["range", 1, 9, 2]
+  - option_strings: ['--range-1']
+    complete: ['range', 1, 9]
+
+  - option_strings: ['--range-2']
+    complete: ['range', 1, 9, 2]
 ```
 
 ```
 ~ > example --range-1=<TAB>
 1  2  3  4  5  6  7  8  9
+
 ~ > example --range-2=<TAB>
 1  3  5  7  9
 ```
@@ -1077,13 +1447,21 @@ options:
 
 ### service
 
-> Complete a SystemD service
+> Complete systemd service names
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['service']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--service"]
-    complete: ["service"]
+  - option_strings: ['--service']
+    complete: ['service']
 ```
 
 ```
@@ -1098,11 +1476,19 @@ TODO
 
 > Complete signal names
 
+**SYNOPSIS**
+
 ```yaml
-prog: "example"
+['signal']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--signal"]
-    complete: ["signal"]
+  - option_strings: ['--signal']
+    complete: ['signal']
 ```
 
 ```
@@ -1123,13 +1509,21 @@ INT     -- Terminal interrupt signal
 
 ### uid
 
-> Complete a user id
+> Complete user IDs
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['uid']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--uid"]
-    complete: ["uid"]
+  - option_strings: ['--uid']
+    complete: ['uid']
 ```
 
 ```
@@ -1148,62 +1542,92 @@ options:
 
 **SEE ALSO**
 
-- [user](#user): For completing a user name
+- [user](#user): For completing user names
 
 ---
 
 ### user
 
-> Complete a username
+> Complete user names
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['user']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--user"]
-    complete: ["user"]
+  - option_strings: ['--user']
+    complete: ['user']
 ```
 
 ```
 ~ > example --user=<TAB>
-avahi                   bin                     braph
-colord                  daemon                  dbus
-dhcpcd                  ftp                     git
+avahi         bin          braph
+colord        daemon       dbus
+dhcpcd        ftp          git
 [...]
 ```
 
 **SEE ALSO**
 
-- [uid](#uid): For completing a user id
+- [uid](#uid): For completing user IDs
 
 ---
 
 ### value\_list
 
-> Complete a comma-separated list of values
+> Complete comma-separated lists of values
 
-Complete one or more items from a list of items. Similar to `mount -o`.
- 
-Arguments are supplied by adding `{"values": ...}`.
- 
-A separator can be supplied by adding `{"separator": ...}` (the default is `","`).
- 
-By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['value_list', <OPTIONS>]
+```
+
+**PARAMETERS**
+
+`OPTIONS`:
+  A dictionary containing additional options for configuring the completion.
+
+  - `values`:
+    A list or dictionary containing the values to offer for completion.
+
+    If a list is supplied, all values are offered without descriptions.
+
+    If a dictionary is supplied, the keys are used as completion values and
+    the values are used as descriptions.
+
+  - `separator`:
+    The separator used between list elements. Defaults to `,`.
+
+  - `duplicates`:
+    Allow duplicate values to be offered for completion. Defaults to `false`.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--value-list-1"]
-    complete: ["value_list", {"values": ["exec", "noexec"]}]
-  - option_strings: ["--value-list-2"]
-    complete: ["value_list", {"values": {"one": "Description 1", "two": "Description 2"}}]
+  - option_strings: ['--value-list-1']
+    complete: ['value_list', {'values': ['exec', 'noexec']}]
+
+  - option_strings: ['--value-list-2']
+    complete: ['value_list', {'values': {'one': 'Description 1', 'two': 'Description 2'}}]
 ```
 
 ```
 ~ > example --value-list-1=<TAB>
 exec    noexec
+
 ~ > example --value-list-1=exec,<TAB>
 noexec
+
 ~ > example --value-list-2=<TAB>
 one  -- Description 1
 two  -- Description 2
@@ -1211,21 +1635,29 @@ two  -- Description 2
 
 **SEE ALSO**
 
-- [list](#list): For completing a comma-separated list of any completer
+- [list](#list): For completing comma-separated lists using a completer
 
-- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
+- [key\_value\_list](#key_value_list): For completing comma-separated lists of key=value pairs
 
 ---
 
 ### variable
 
-> Complete a shell variable name
+> Complete shell variable names
+
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['variable']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--variable"]
-    complete: ["variable"]
+  - option_strings: ['--variable']
+    complete: ['variable']
 ```
 
 ```
@@ -1235,7 +1667,7 @@ HOME      HOSTNAME  HOSTTYPE
 
 **SEE ALSO**
 
-- [environment](#environment): For completing an environment variable
+- [environment](#environment): For completing environment variable names
 
 ---
 
@@ -1243,20 +1675,31 @@ HOME      HOSTNAME  HOSTTYPE
 
 > Combine multiple completers
 
-With `combine` multiple completers can be combined into one.
-
-It takes a list of completers as its argument.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['combine', <COMPLETERS>]
+```
+
+**PARAMETERS**
+
+Combines multiple completers into a single completer.
+
+`COMPLETERS`:
+  A list of completers to combine.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--combine"]
-    complete: ["combine", [["user"], ["pid"]]]
+  - option_strings: ['--combine']
+    complete: ['combine', [['user'], ['pid']]]
 ```
 
 ```
-~ > example --user-list=avahi,daemon,<TAB>
+~ > example --combine=avahi,daemon,<TAB>
 1439404  3488332  3571716           3607235                 4134206
 alpm     avahi    bin               braph                   daemon
 root     rtkit    systemd-coredump  systemd-journal-remote  systemd-network
@@ -1267,35 +1710,70 @@ root     rtkit    systemd-coredump  systemd-journal-remote  systemd-network
 
 ### key\_value\_list
 
-> Complete a comma-separated list of key=value pairs
+> Complete comma-separated lists of key=value pairs
 
-The first argument is the separator used for delimiting the key-value pairs.
+**SYNOPSIS**
 
-The second argument is the separator used for delimiting the value from the key.
+```yaml
+['key_value_list', <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, <DEFINITIONS>]
 
-The third argument is a list of definitions, like:
+['key_value_list', <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, <DEFINITIONS>, <CONDITION_FUNCTION>]
+```
 
-  `[ [<key>, <description>, <completer>], ... ]`
+**PARAMETERS**
 
+`PAIR_SEPARATOR`:
+  The separator used to separate individual key-value pairs.
+
+`VALUE_SEPARATOR`:
+  The separator used to separate a key from its value.
+
+`DEFINITIONS`:
+  A list of key definitions.
+
+  Each definition has one of the following forms:
+
+  `[<KEY>, <DESCRIPTION>, <COMPLETER>]`
+  
   -- OR --
+  
+  `[<KEY>, <DESCRIPTION>, <COMPLETER>, <EXCLUDES>]`
+  
+  `KEY`:
+    The name of the key.
+    Prefix the name with `*` to allow the key to be completed multiple times.
 
-  `[ [<key>, <description>, <completer>, <excludes>], ... ]`
+  `DESCRIPTION`:
+    A description shown during completion.
+    Use `null` to omit the description.
 
-`excludes` is a list of keys that should no longer be offered once a key has been used.
+  `COMPLETER`:
+    The completer used for the value of the key.
+    Use `null` if the key does not take an argument.
+    Use `['none']` if the key takes an argument but cannot be completed.
+
+  `EXCLUDES`:
+    A list of keys that should no longer be offered for completion once this key has been used.
+
+`CONDITION_FUNCTION`:
+  A command or function that determines whether a key should be offered for
+  completion.
+
+  It is invoked with the key as its first argument. If it exits with status `0`,
+  the key is offered for completion. Any non-zero exit status suppresses the
+  key.
 
 By default, each key is offered for completion only once.
 To allow a key to be completed multiple times, prefix its name with `*`.
 
-If a key does not take an argument, use `null` as completer.
 
-If a key does take an argument but cannot be completed, use `['none']` as completer.
-
+**EXAMPLE**
 
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--key-value-list"]
-    complete: ["key_value_list", ",", "=", [
+  - option_strings: ['--key-value-list']
+    complete: ['key_value_list', ',', '=', [
       ['flag',        'An option flag', null],
       ['nodesc',      null, null],
       ['nocomp',      'An option with arg but without completer', ['none']],
@@ -1303,8 +1781,8 @@ options:
       ['*repeatable', 'This option is repeatable', null],
       ['exclusive',   'This option disables other options', null, ['flag', 'nodesc', 'nocomp']],
       ['check',       'Specify file name conversions', ['choices', {
-        'relaxed': "convert to lowercase before lookup",
-        'strict': "no conversion"
+        'relaxed': 'convert to lowercase before lookup',
+        'strict': 'no conversion'
       }]]
     ]]
 ```
@@ -1314,125 +1792,192 @@ options:
 bin                     braph
 colord                  dbus
 dhcpcd                  git
+[...]
 ```
 
 **SEE ALSO**
 
-- [list](#list): For completing a comma-separated list of any completer
+- [list](#list): For completing comma-separated lists using a completer
 
-- [value\_list](#value_list): For completing a comma-separated list of values
+- [value\_list](#value_list): For completing comma-separated lists of values
 
-- [key\_value\_pair](#key_value_pair): For completing a single key=value pair
+- [key\_value\_pair](#key_value_pair): For completing single key=value pairs
 
-- [key\_value\_list\_exec](#key_value_list_exec): For completing a comma-separated list of key=value pairs (dynamically generated by a function)
+- [key\_value\_list\_exec](#key_value_list_exec): For completing comma-separated lists of key=value pairs (dynamically generated by a function)
 
 ---
 
 ### key\_value\_pair
 
-> Complete a single key=value pair
+> Complete single key=value pairs
 
-The first argument is the separator used for delimiting the value from the key.
-
-The second argument is a list of key-description-completer definitions, like:
-
-  `[ [<key>, <description>, <completer>], ... ]`
-
-If a key does not take an argument, use `null` as completer.
-
-If a key does take an argument but cannot be completed, use `['none']` as completer.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['key_value_pair', <VALUE_SEPARATOR>, <DEFINITIONS>]
+
+['key_value_pair', <VALUE_SEPARATOR>, <DEFINITIONS>, <CONDITION_FUNCTION>]
+```
+
+**PARAMETERS**
+
+`VALUE_SEPARATOR`:
+  The separator used to separate a key from its value.
+
+`DEFINITIONS`:
+  A list of key definitions.
+
+  Each definition has the following form:
+
+  `[<KEY>, <DESCRIPTION>, <COMPLETER>]`
+
+  `KEY`:
+    The name of the key.
+    Prefix the name with `*` to allow the key to be completed multiple times.
+
+  `DESCRIPTION`:
+    A description shown during completion.
+    Use `null` to omit the description.
+
+  `COMPLETER`:
+    The completer used for the value of the key.
+    Use `null` if the key does not take an argument.
+    Use `['none']` if the key takes an argument but cannot be completed.
+
+`CONDITION_FUNCTION`:
+  A command or function that determines whether a key should be offered for
+  completion.
+
+  It is invoked with the key as its first argument. If it exits with status `0`,
+  the key is offered for completion. Any non-zero exit status suppresses the
+  key.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--key-value-pair"]
-    complete: ["key_value_pair", "=", [
+  - option_strings: ['--key-value-pair']
+    complete: ['key_value_pair', '=', [
       ['flag',   'An option flag', null],
       ['nodesc', null, null],
       ['nocomp', 'An option with arg but without completer', ['none']],
       ['user',   'Takes a username',  ['user']],
       ['check',  'Specify file name conversions', ['choices', {
-        'relaxed': "convert to lowercase before lookup",
-        'strict': "no conversion"
+        'relaxed': 'convert to lowercase before lookup',
+        'strict': 'no conversion'
       }]]
     ]]
 ```
 
 ```
 ~ > example --key-value-pair <TAB>
-animal  -- select an animal
-async   -- set async mode
-nocomp  -- no completer
-number  -- select a number
-proc    -- select a process
-user    -- sel
+check     -- Specify file name conversions
+flag      -- An option flag
+nocomp    -- An option with arg but without completer
+user      -- Takes a username
+nodesc
 
 ~ > example --key-value-pair user=<TAB>
-bin                     braph
-colord                  dbus
-dhcpcd                  git
+bin        braph
+colord     dbus
+dhcpcd     git
+[...]
 ```
 
 **SEE ALSO**
 
-- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
+- [key\_value\_list](#key_value_list): For completing comma-separated lists of key=value pairs
 
-- [key\_value\_pair\_exec](#key_value_pair_exec): For completing a single key=value pair (dynamically generated by a function)
+- [key\_value\_pair\_exec](#key_value_pair_exec): For completing single key=value pairs (dynamically generated by a function)
 
 ---
 
 ### list
 
-> Complete a comma-separated list of any completer
+> Complete comma-separated lists using a completer
 
-The separator can be changed by adding `{"separator": ...}`.
-
-By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['list', <COMPLETER>]
+
+['list', <COMPLETER>, <OPTIONS>]
+```
+
+**PARAMETERS**
+
+`COMPLETER`:
+  The completer used to generate the list elements.
+
+`OPTIONS`:
+  A dictionary containing additional options for configuring the list completion.
+
+  - `separator`: The separator used between list elements. Defaults to `,`
+
+  - `duplicates`: Allow duplicate values to be offered for completion. Defaults to `false`
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--user-list"]
-    complete: ["list", ["user"]]
-  - option_strings: ["--option-list"]
-    complete: ["list", ["choices", ["setuid", "async", "block"]], {"separator": ":"}]
+  - option_strings: ['--user-list']
+    complete: ['list', ['user']]
+
+  - option_strings: ['--option-list']
+    complete: ['list', ['choices', ['setuid', 'async', 'block']], {'separator': ':', 'duplicates': true}]
 ```
 
 ```
 ~ > example --user-list=avahi,daemon,<TAB>
-bin                     braph
-colord                  dbus
-dhcpcd                  git
+bin       braph
+colord    dbus
+dhcpcd    git
+[...]
+
+~ > example --option-list=setuid:<TAB>
+setuid     async    block
 ```
 
 **SEE ALSO**
 
-- [value\_list](#value_list): For completing a comma-separated list of values
+- [value\_list](#value_list): For completing comma-separated lists of values
 
-- [file\_list](#file_list): For completing a comma-separated list of files
+- [file\_list](#file_list): For completing comma-separated lists of files
 
-- [directory\_list](#directory_list): For completing a comma-separated list of directories
+- [directory\_list](#directory_list): For completing comma-separated lists of directories
 
-- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
+- [key\_value\_list](#key_value_list): For completing comma-separated lists of key=value pairs
 
 ---
 
 ### none
 
-> No completion, but specifies that an argument is required
+> No completion, but specify that an argument is required
+
+**SYNOPSIS**
+
+```yaml
+['none']
+```
+
+**PARAMETERS**
 
 Disables autocompletion for an option but still marks it as requiring an argument.
 
 Without specifying `complete`, the option would not take an argument.
 
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--none"]
-    complete: ["none"]
+  - option_strings: ['--none']
+    complete: ['none']
 ```
 
 ```
@@ -1444,18 +1989,30 @@ options:
 
 ### prefix
 
-> Prefix completion by a string
+> Prefix completions with a string
 
-The first argument is the prefix that should be used.
-
-The second argument is a completer.
-
+**SYNOPSIS**
 
 ```yaml
-prog: "example"
+['prefix', <PREFIX>, <COMPLETER>]
+```
+
+**PARAMETERS**
+
+`PREFIX`:
+  The string to prepend to each completion candidate.
+
+`COMPLETER`:
+  The completer used to generate the completion candidates.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
 options:
-  - option_strings: ["--prefix"]
-    complete: ["prefix", "input:", ['file']]
+  - option_strings: ['--prefix']
+    complete: ['prefix', 'input:', ['file']]
 ```
 
 ```
@@ -1470,30 +2027,39 @@ options:
 
 ### exec
 
-> Complete by the output of a command or function
+> Complete values from the output of a command or function
 
-The output must be in form of:
+**SYNOPSIS**
+
+```yaml
+['exec', <COMMAND>]
+```
+
+**PARAMETERS**
+
+`COMMAND`:
+  The command or function to execute. Its output must be formatted as tab-separated values:
 
 ```
-<item_1>\t<description_1>\n
-<item_2>\t<description_2>\n
+<ITEM_1>\t<DESCRIPTION_1>
+<ITEM_2>\t<DESCRIPTION_2>
 [...]
 ```
 
-An item and its description are delimited by a tabulator.
- 
-These pairs are delimited by a newline.
+Each line represents one completion candidate. The item and its description are separated by a tab character.
 
 
 **NOTES**
 
 - Functions can be put inside a file and included with `--include-file`
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--exec"]
-    complete: ["exec", "printf '%s\\t%s\\n' 'Item 1' 'Description 1' 'Item 2' 'Description 2'"]
+  - option_strings: ['--exec']
+    complete: ['exec', "printf '%s\\t%s\\n' 'Item 1' 'Description 1' 'Item 2' 'Description 2'"]
 ```
 
 ```
@@ -1505,31 +2071,43 @@ Item 1  (Description 1)  Item 2  (Description 2)
 
 - [exec\_fast](#exec_fast): Faster implementation of exec
 
+- [exec\_internal](#exec_internal): Use the shell's internal completion mechanisms
+
 ---
 
 ### exec\_fast
 
-> Complete by the output of a command or function (fast and unsafe)
+> Complete values from the output of a command or function (fast and unsafe)
 
-Faster version of exec for handling large amounts of data.
- 
-This implementation requires that the items of the parsed output do not include
-special shell characters or whitespace.
+**SYNOPSIS**
+
+```yaml
+['exec_fast', <COMMAND>]
+```
+
+**PARAMETERS**
+
+Faster version of `exec` for handling large amounts of data.
+
+Unlike `exec`, this implementation does not safely handle arbitrary output.
+Completion items must not contain whitespace or special shell characters.
 
 
 **NOTES**
 
 - Functions can be put inside a file and included with `--include-file`
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--exec-fast"]
-    complete: ["exec_fast", "printf '%s\\t%s\\n' 1 one 2 two"]
+  - option_strings: ['--exec-fast']
+    complete: ['exec_fast', "printf '%s\\t%s\\n' 1 one 2 two"]
 ```
 
 ```
-~ > example --exec-internal=<TAB>
+~ > example --exec-fast=<TAB>
 1  -- one
 2  -- one
 ```
@@ -1538,7 +2116,15 @@ options:
 
 ### exec\_internal
 
-> Complete by a function that uses the shell's internal completion mechanisms
+> Use the shell's internal completion mechanisms
+
+**SYNOPSIS**
+
+```yaml
+['exec_internal', <COMMAND>]
+```
+
+**PARAMETERS**
 
 Execute a function that internally modifies the completion state.
 
@@ -1548,7 +2134,7 @@ For **Bash**, it might look like:
 
 ```sh
 my_completion_func() {
-    COMPREPLY=( $(compgen -W "read write append" -- "$cur") )
+    COMPREPLY=( $(compgen -W 'read write append' -- '$cur') )
 }
 ```
 
@@ -1582,11 +2168,13 @@ end
 
 - Functions can be put inside a file and included with `--include-file`
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["--exec-internal"]
-    complete: ["exec_internal", "my_completion_func"]
+  - option_strings: ['--exec-internal']
+    complete: ['exec_internal', 'my_completion_func']
 ```
 
 ```
@@ -1600,37 +2188,59 @@ write   -- Write data from a file
 
 ### key\_value\_list\_exec
 
-> Complete a comma-separted list of key=value pairs (dynamically generated by a function)
+> Complete dynamically generated comma-separted lists of key=value pairs
 
-The first argument is the separator used for delimiting the key-value pairs.
+**SYNOPSIS**
 
-The second argument is the separator used for delimiting the value from the key.
-
-The third argument is a command for generating the available options and their
-possible values.
-
-If the command is called without any arguments, then a list of available keys
-is expected.
-The output must be in form of:
-
-```
-[*]<key_1>[=][?]\t<description_1>\t<excludes>\n
-[*]<key_2>[=][?]\t<description_2>\t<excludes>\n
-[...]
+```yaml
+['key_value_list_exec', <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, <COMMAND>]
 ```
 
-If the command is called with one argument, then a list of completions for
-the given key is expected.
+**PARAMETERS**
 
-```
-<item_1>\t<description_1>\n
-<item_2>\t<description_2>\n
-[...]
-```
+`PAIR_SEPARATOR`:
+  The separator used to separate individual key-value pairs.
+
+`VALUE_SEPARATOR`:
+  The separator used to separate a key from its value.
+
+`COMMAND`:
+  The command or function used to generate the available keys and values.
+
+  If invoked without arguments, it must output the available keys in the
+  following format:
+
+  ```
+  [*]<KEY_1>[=][?]\t<DESCRIPTION_1>\t<EXCLUDES>
+  [*]<KEY_2>[=][?]\t<DESCRIPTION_2>\t<EXCLUDES>
+  [...]
+  ```
+
+  Prefixing a key with `*` marks it as repeatable.
+
+  Appending `=` to a key indicates that it requires a value.
+
+  Appending `=?` to a key indicates that it requires an optional value.
+
+  `EXCLUDES` is a space-separated list of keys that should no longer be
+  offered once the current key has been used.
+
+  If invoked with a single argument, the argument is the selected key.
+  The command must output the possible values for that key in the following
+  format:
+
+  ```
+  <ITEM_1>\t<DESCRIPTION_1>
+  <ITEM_2>\t<DESCRIPTION_2>
+  [...]
+  ```
+
+  Each line represents one completion candidate. The item and its description
+  are separated by a tab character.
 
 Example function:
 
-```
+```sh
 _complete_key_value_list() {
   if (( $# == 0 )); then
     printf '%s\t%s\t%s\n'                                 \
@@ -1640,7 +2250,7 @@ _complete_key_value_list() {
       '*repeatable' 'a repeatable option'              '' \
       'excludes'    'disable options'                  'flag argument'
   else
-    case "$1" in
+    case '$1' in
       argument|optional)
         printf '%s\t%s\n'     \
           'foo' 'a foo value' \
@@ -1655,11 +2265,13 @@ _complete_key_value_list() {
 
 - Functions can be put inside a file and included with `--include-file`
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["-o"]
-    complete: ["key_value_list_exec", ",", "=", "_complete_key_value_list"]
+  - option_strings: ['-o']
+    complete: ['key_value_list_exec', ',', '=', '_complete_key_value_list']
 ```
 
 ```
@@ -1681,51 +2293,62 @@ repeatable  -- a repeatable option
 
 **SEE ALSO**
 
-- [key\_value\_list](#key_value_list): For completing a comma-separated list of key=value pairs
+- [key\_value\_list](#key_value_list): For completing comma-separated lists of key=value pairs
 
 ---
 
 ### key\_value\_pair\_exec
 
-> Complete a key=value pair (dynamically generated by a function)
+> Complete dynamically generated a key=value pairs
 
-The first argument is the separator used for delimiting the value from the key.
+**SYNOPSIS**
 
-The second argument is a command for generating the available options and their
-possible values.
-
-The third argument is a command for generating the available options and their
-possible values.
-
-If the command is called without any arguments, then a list of available keys
-is expected.
-The output must be in form of:
-
-```
-<key_1>[=]\t<description_1>\n
-<key_2>[=]\t<description_2>\n
-[...]
+```yaml
+['key_value_pair_exec', <VALUE_SEPARATOR>, <COMMAND>]
 ```
 
-If the command is called with one argument, then a list of completions for
-the given key is expected.
+**PARAMETERS**
 
-```
-<item_1>\t<description_1>\n
-<item_2>\t<description_2>\n
-[...]
-```
+`VALUE_SEPARATOR`:
+  The separator used to separate a key from its value.
+
+`COMMAND`:
+  The command or function used to generate the available keys and values.
+
+  If invoked without arguments, it must output the available keys in the
+  following format:
+
+  ```
+  <KEY_1>[=]\t<DESCRIPTION_1>
+  <KEY_2>[=]\t<DESCRIPTION_2>
+  [...]
+  ```
+
+  Appending `=` to a key indicates that it requires a value.
+
+  If invoked with a single argument, the argument is the selected key. The
+  command must output the possible values for that key in the following
+  format:
+
+  ```
+  <ITEM_1>\t<DESCRIPTION_1>
+  <ITEM_2>\t<DESCRIPTION_2>
+  [...]
+  ```
+
+  Each line represents one completion candidate. The item and its description
+  are separated by a tab character.
 
 Example function:
 
-```
+```sh
 _complete_key_value_pair() {
   if (( $# == 0 )); then
     printf '%s\t%s\n'    \
       'flag'    'a flag' \
       'option=' 'option with value'
   else
-    case "$1" in
+    case '$1' in
       option)
         printf '%s\t%s\n'     \
           'foo' 'a foo value' \
@@ -1740,11 +2363,13 @@ _complete_key_value_pair() {
 
 - Functions can be put inside a file and included with `--include-file`
 
+**EXAMPLE**
+
 ```yaml
-prog: "example"
+prog: 'example'
 options:
-  - option_strings: ["-o"]
-    complete: ["key_value_pair_exec", "=", "_complete_key_value_pair"]
+  - option_strings: ['-o']
+    complete: ['key_value_pair_exec', '=', '_complete_key_value_pair']
 ```
 
 ```
@@ -1759,7 +2384,7 @@ bar     -- a bar value
 
 **SEE ALSO**
 
-- [key\_value\_pair](#key_value_pair): For completing a single key=value pair
+- [key\_value\_pair](#key_value_pair): For completing single key=value pairs
 
 ### Options
 

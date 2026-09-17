@@ -96,7 +96,7 @@ class Command:
         yaml.safe_load(self.definition)
 
         if self.synopsis is None:
-            self.synopsis = f'["{self.command}"]'
+            self.synopsis = f"['{self.command}']"
 
         if self.output is None:
             raise Exception(f"No output: {self.command}")
@@ -219,7 +219,12 @@ def make_markup_summary_table(header, commands, pre_text=None):
 def make_markup_command(command):
     r =  [f'### {escape_underscore(command.command)}']
     r += [f'> {command.short}']
+
+    r += ['**SYNOPSIS**']
+    r += [f'```yaml\n{command.synopsis.strip()}\n```']
+
     if command.long:
+        r += ['**PARAMETERS**']
         r += [command.long]
 
     notes = list(command.notes)
@@ -230,6 +235,7 @@ def make_markup_command(command):
         r += ['**NOTES**']
         r += [f'- {l}' for l in notes]
 
+    r += ['**EXAMPLE**']
     r += [f'```yaml\n{command.definition.strip()}\n```']
     if command.output:
         r += [f'```\n{command.output.strip()}\n```']

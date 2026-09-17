@@ -1,15 +1,15 @@
 command: 'none'
 category: 'meta'
-short: 'No completion, but specifies that an argument is required'
+short: 'No completion, but specify that an argument is required'
 long: |
   Disables autocompletion for an option but still marks it as requiring an argument.
   
   Without specifying `complete`, the option would not take an argument.
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--none"]
-      complete: ["none"]
+    - option_strings: ['--none']
+      complete: ['none']
 output: |
   ~ > example --none=<TAB>
   <NO OUTPUT>
@@ -19,21 +19,23 @@ output: |
 command: 'prefix'
 category: 'meta'
 synopsis: |
-  ["prefix", <PREFIX>, <COMPLETER>]
-short: 'Prefix completion by a string'
+  ['prefix', <PREFIX>, <COMPLETER>]
+short: 'Prefix completions with a string'
 long: |
-  The first argument is the prefix that should be used.
-
-  The second argument is a completer.
+  `PREFIX`:
+    The string to prepend to each completion candidate.
+  
+  `COMPLETER`:
+    The completer used to generate the completion candidates.
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--prefix"]
-      complete: ["prefix", "input:", ['file']]
+    - option_strings: ['--prefix']
+      complete: ['prefix', 'input:', ['file']]
 output: |
   ~ > example --prefix=<TAB>
   ~ > example --prefix=input:
-
+  
   ~ > example --prefix=input:<TAB>
   ~ > example --prefix=input:file1.txt
 
@@ -41,20 +43,21 @@ output: |
 
 command: 'combine'
 synopsis: |
-  ["combine", [<COMPLETER>, <COMPLETER>, ...]]
+  ['combine', <COMPLETERS>]
 category: 'meta'
 short: 'Combine multiple completers'
 long: |
-  With `combine` multiple completers can be combined into one.
-
-  It takes a list of completers as its argument.
+  Combines multiple completers into a single completer.
+  
+  `COMPLETERS`:
+    A list of completers to combine.
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--combine"]
-      complete: ["combine", [["user"], ["pid"]]]
+    - option_strings: ['--combine']
+      complete: ['combine', [['user'], ['pid']]]
 output: |
-  ~ > example --user-list=avahi,daemon,<TAB>
+  ~ > example --combine=avahi,daemon,<TAB>
   1439404  3488332  3571716           3607235                 4134206
   alpm     avahi    bin               braph                   daemon
   root     rtkit    systemd-coredump  systemd-journal-remote  systemd-network
@@ -63,72 +66,108 @@ output: |
 ---
 
 command: 'list'
-short: 'Complete a comma-separated list of any completer'
+short: 'Complete comma-separated lists using a completer'
 synopsis: |
-  ["list", <COMPLETER>]
+  ['list', <COMPLETER>]
   
-  ["list", <COMPLETER>, <OPTIONS>]
+  ['list', <COMPLETER>, <OPTIONS>]
 category: 'meta'
 long: |
-  The separator can be changed by adding `{"separator": ...}`.
+  `COMPLETER`:
+    The completer used to generate the list elements.
   
-  By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the list completion.
+  
+    - `separator`: The separator used between list elements. Defaults to `,`
+  
+    - `duplicates`: Allow duplicate values to be offered for completion. Defaults to `false`
 also:
-  value_list: "For completing a comma-separated list of values"
-  file_list: "For completing a comma-separated list of files"
-  directory_list: "For completing a comma-separated list of directories"
-  key_value_list: "For completing a comma-separated list of key=value pairs"
+  value_list: 'For completing comma-separated lists of values'
+  file_list: 'For completing comma-separated lists of files'
+  directory_list: 'For completing comma-separated lists of directories'
+  key_value_list: 'For completing comma-separated lists of key=value pairs'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--user-list"]
-      complete: ["list", ["user"]]
-    - option_strings: ["--option-list"]
-      complete: ["list", ["choices", ["setuid", "async", "block"]], {"separator": ":"}]
+    - option_strings: ['--user-list']
+      complete: ['list', ['user']]
+  
+    - option_strings: ['--option-list']
+      complete: ['list', ['choices', ['setuid', 'async', 'block']], {'separator': ':', 'duplicates': true}]
 output: |
   ~ > example --user-list=avahi,daemon,<TAB>
-  bin                     braph
-  colord                  dbus
-  dhcpcd                  git
+  bin       braph
+  colord    dbus
+  dhcpcd    git
+  [...]
+  
+  ~ > example --option-list=setuid:<TAB>
+  setuid     async    block
 
 ---
 
 command: 'key_value_list'
 category: 'meta'
 synopsis: |
-  ["key_value_list", <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, [<DEFINITION...>]]
-short: 'Complete a comma-separated list of key=value pairs'
+  ['key_value_list', <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, <DEFINITIONS>]
+  
+  ['key_value_list', <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, <DEFINITIONS>, <CONDITION_FUNCTION>]
+short: 'Complete comma-separated lists of key=value pairs'
 long: |
-  The first argument is the separator used for delimiting the key-value pairs.
+  `PAIR_SEPARATOR`:
+    The separator used to separate individual key-value pairs.
   
-  The second argument is the separator used for delimiting the value from the key.
+  `VALUE_SEPARATOR`:
+    The separator used to separate a key from its value.
   
-  The third argument is a list of definitions, like:
+  `DEFINITIONS`:
+    A list of key definitions.
   
-    `[ [<key>, <description>, <completer>], ... ]`
-
+    Each definition has one of the following forms:
+  
+    `[<KEY>, <DESCRIPTION>, <COMPLETER>]`
+    
     -- OR --
-
-    `[ [<key>, <description>, <completer>, <excludes>], ... ]`
-
-  `excludes` is a list of keys that should no longer be offered once a key has been used.
-
+    
+    `[<KEY>, <DESCRIPTION>, <COMPLETER>, <EXCLUDES>]`
+    
+    `KEY`:
+      The name of the key.
+      Prefix the name with `*` to allow the key to be completed multiple times.
+  
+    `DESCRIPTION`:
+      A description shown during completion.
+      Use `null` to omit the description.
+  
+    `COMPLETER`:
+      The completer used for the value of the key.
+      Use `null` if the key does not take an argument.
+      Use `['none']` if the key takes an argument but cannot be completed.
+  
+    `EXCLUDES`:
+      A list of keys that should no longer be offered for completion once this key has been used.
+  
+  `CONDITION_FUNCTION`:
+    A command or function that determines whether a key should be offered for
+    completion.
+  
+    It is invoked with the key as its first argument. If it exits with status `0`,
+    the key is offered for completion. Any non-zero exit status suppresses the
+    key.
+  
   By default, each key is offered for completion only once.
   To allow a key to be completed multiple times, prefix its name with `*`.
-
-  If a key does not take an argument, use `null` as completer.
-  
-  If a key does take an argument but cannot be completed, use `['none']` as completer.
 also:
-  list: "For completing a comma-separated list of any completer"
-  value_list: "For completing a comma-separated list of values"
-  key_value_pair: "For completing a single key=value pair"
-  key_value_list_exec: "For completing a comma-separated list of key=value pairs (dynamically generated by a function)"
+  list: 'For completing comma-separated lists using a completer'
+  value_list: 'For completing comma-separated lists of values'
+  key_value_pair: 'For completing single key=value pairs'
+  key_value_list_exec: 'For completing comma-separated lists of key=value pairs (dynamically generated by a function)'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--key-value-list"]
-      complete: ["key_value_list", ",", "=", [
+    - option_strings: ['--key-value-list']
+      complete: ['key_value_list', ',', '=', [
         ['flag',        'An option flag', null],
         ['nodesc',      null, null],
         ['nocomp',      'An option with arg but without completer', ['none']],
@@ -136,8 +175,8 @@ definition: |
         ['*repeatable', 'This option is repeatable', null],
         ['exclusive',   'This option disables other options', null, ['flag', 'nodesc', 'nocomp']],
         ['check',       'Specify file name conversions', ['choices', {
-          'relaxed': "convert to lowercase before lookup",
-          'strict': "no conversion"
+          'relaxed': 'convert to lowercase before lookup',
+          'strict': 'no conversion'
         }]]
       ]]
 output: |
@@ -145,80 +184,107 @@ output: |
   bin                     braph
   colord                  dbus
   dhcpcd                  git
+  [...]
 
 ---
 
 command: 'key_value_pair'
 category: 'meta'
 synopsis: |
-  ["key_value_pair", <VALUE_SEPARATOR>, [<DEFINITION...>]]
-short: 'Complete a single key=value pair'
+  ['key_value_pair', <VALUE_SEPARATOR>, <DEFINITIONS>]
+  
+  ['key_value_pair', <VALUE_SEPARATOR>, <DEFINITIONS>, <CONDITION_FUNCTION>]
+short: 'Complete single key=value pairs'
 long: |
-  The first argument is the separator used for delimiting the value from the key.
+  `VALUE_SEPARATOR`:
+    The separator used to separate a key from its value.
   
-  The second argument is a list of key-description-completer definitions, like:
+  `DEFINITIONS`:
+    A list of key definitions.
   
-    `[ [<key>, <description>, <completer>], ... ]`
+    Each definition has the following form:
   
-  If a key does not take an argument, use `null` as completer.
+    `[<KEY>, <DESCRIPTION>, <COMPLETER>]`
   
-  If a key does take an argument but cannot be completed, use `['none']` as completer.
+    `KEY`:
+      The name of the key.
+      Prefix the name with `*` to allow the key to be completed multiple times.
+  
+    `DESCRIPTION`:
+      A description shown during completion.
+      Use `null` to omit the description.
+  
+    `COMPLETER`:
+      The completer used for the value of the key.
+      Use `null` if the key does not take an argument.
+      Use `['none']` if the key takes an argument but cannot be completed.
+  
+  `CONDITION_FUNCTION`:
+    A command or function that determines whether a key should be offered for
+    completion.
+  
+    It is invoked with the key as its first argument. If it exits with status `0`,
+    the key is offered for completion. Any non-zero exit status suppresses the
+    key.
 also:
-  key_value_list: "For completing a comma-separated list of key=value pairs"
-  key_value_pair_exec: "For completing a single key=value pair (dynamically generated by a function)"
+  key_value_list: 'For completing comma-separated lists of key=value pairs'
+  key_value_pair_exec: 'For completing single key=value pairs (dynamically generated by a function)'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--key-value-pair"]
-      complete: ["key_value_pair", "=", [
+    - option_strings: ['--key-value-pair']
+      complete: ['key_value_pair', '=', [
         ['flag',   'An option flag', null],
         ['nodesc', null, null],
         ['nocomp', 'An option with arg but without completer', ['none']],
         ['user',   'Takes a username',  ['user']],
         ['check',  'Specify file name conversions', ['choices', {
-          'relaxed': "convert to lowercase before lookup",
-          'strict': "no conversion"
+          'relaxed': 'convert to lowercase before lookup',
+          'strict': 'no conversion'
         }]]
       ]]
 output: |
   ~ > example --key-value-pair <TAB>
-  animal  -- select an animal
-  async   -- set async mode
-  nocomp  -- no completer
-  number  -- select a number
-  proc    -- select a process
-  user    -- sel
+  check     -- Specify file name conversions
+  flag      -- An option flag
+  nocomp    -- An option with arg but without completer
+  user      -- Takes a username
+  nodesc
   
   ~ > example --key-value-pair user=<TAB>
-  bin                     braph
-  colord                  dbus
-  dhcpcd                  git
+  bin        braph
+  colord     dbus
+  dhcpcd     git
+  [...]
 
 ---
 
 command: 'integer'
 category: 'basic'
 synopsis: |
-  ["integer"]
+  ['integer']
   
-  ["integer", <OPTIONS>]
-short: 'Complete an integer'
+  ['integer', <OPTIONS>]
+short: 'Complete integer values'
 long: |
-  A min value can be specified by using `{"min": <VALUE>}`.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
   
-  A max value can be specified by using `{"max": <VALUE>}`.
+    - `min`: The minimum allowed value.
   
-  A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
-
-  A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
+    - `max`: The maximum allowed value.
+  
+    - `suffixes`: A dictionary of suffixes and their descriptions. The suffix is appended to the completed value.
+  
+    - `help`: The help text shown during completion. If not specified, the `help` attribute of the option is used.
 also:
-  float: "For completing a floating point number"
-  range: "For completing a range of integers"
+  float: 'For completing floating-point values'
+  range: 'For completing sequences of integers'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--time"]
-      complete: ["integer", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
+    - option_strings: ['--time']
+      complete: ['integer', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}}]
 output: |
   ~ > example --integer=3<TAB>
   s -- seconds  m -- minutes  h -- hours
@@ -228,25 +294,28 @@ output: |
 command: 'float'
 category: 'basic'
 synopsis: |
-  ["float"]
+  ['float']
   
-  ["float", <OPTIONS>]
-short: 'Complete a floating point number'
+  ['float', <OPTIONS>]
+short: 'Complete floating-point values'
 long: |
-  A min value can be specified by using `{"min": <VALUE>}`.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
   
-  A max value can be specified by using `{"max": <VALUE>}`.
+    - `min`: The minimum allowed value.
   
-  A list of suffixes can be specified by using `{"suffixes": {"<SUFFIX>": "<DESCRIPTION", ...}}`
-
-  A help text can be set by using `{"help": "<TEXT>"}`. If not supplied, the `help` attribute of the option is used.
+    - `max`: The maximum allowed value.
+  
+    - `suffixes`: A dictionary of suffixes and their descriptions. The suffix is appended to the completed value.
+  
+    - `help`: The help text shown during completion. If not specified, the `help` attribute of the option is used.
 also:
-  integer: "For completing an integer"
+  integer: 'For completing integer values'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--time"]
-      complete: ["float", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]
+    - option_strings: ['--time']
+      complete: ['float', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}}]
 output: |
   ~ > example --time=3.0<TAB>
   s -- seconds  m -- minutes  h -- hours
@@ -256,214 +325,263 @@ output: |
 command: 'file'
 category: 'basic'
 synopsis: |
-  ["file"]
+  ['file']
   
-  ["file", <OPTIONS>]
-short: 'Complete a file'
+  ['file', <OPTIONS>]
+short: 'Complete file names'
 long: |
-  You can restrict completion to a specific directory by adding `{"directory": ...}`.
-   
-  You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
-   
-  You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
-  Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
-  
-  You can ignore files by adding a list of Bash globs using `{"ignore_globs": [...]}`
-  
-  **NOTE:** Restricting completion to specific file extensions only makes sense if the program being completed actually expects files of those types.
-  On Unix-like systems, file extensions generally have no inherent meaning -- they are purely conventional and not required for determining file types.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
+
+    - `directory`: Restrict completion to files inside the specified directory.
+
+    - `extensions`: A list of file extensions to offer for completion.
+
+    - `fuzzy`:
+      Enable fuzzy extension matching.
+      By default, files must end with one of the specified extensions.
+      With fuzzy matching enabled, files with additional suffixes are also matched, for example `foo.txt.1`.
+    
+    - `ignore_globs`:
+      A list of Bash globs for files that should not be offered for completion.
+
+  **NOTE:** Restricting completion to specific file extensions only makes sense
+  if the program being completed actually expects files of those types. On
+  Unix-like systems, file extensions generally have no inherent meaning and are
+  only conventions.
 also:
-  file_list: 'For completing a comma-separated list of files'
-  mime_file: "For completing a file based on it's MIME-type"
+  file_list: 'For completing comma-separated lists of files'
+  mime_file: 'For completing files by MIME type'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--file"]
-      complete: ["file"]
+    - option_strings: ['--file']
+      complete: ['file']
   
-    - option_strings: ["--file-tmp"]
-      complete: ["file", {"directory": "/tmp"}]
+    - option_strings: ['--file-tmp']
+      complete: ['file', {'directory': '/tmp'}]
   
-    - option_strings: ["--file-ext"]
-      complete: ["file", {"extensions": ["c", "cpp"]}]
+    - option_strings: ['--file-ext']
+      complete: ['file', {'extensions': ['c', 'cpp']}]
   
-    - option_strings: ["--file-ignore"]
-      complete: ["file", {"ignore_globs": ["*.[tT][xX][tT]", "*.c++"]}]
+    - option_strings: ['--file-ignore']
+      complete: ['file', {'ignore_globs': ['*.[tT][xX][tT]', '*.c++']}]
 output: |
-   ~ > example --file=<TAB>
-   dir1/  dir2/  file1  file2
-   ~ > example --file-ext=<TAB>
-   dir1/  dir2/  file.c  file.cpp
+  ~ > example --file=<TAB>
+  dir1/  dir2/  file1  file2
+  
+  ~ > example --file-ext=<TAB>
+  dir1/  dir2/  file.c  file.cpp
 
 ---
 
 command: 'directory'
 category: 'basic'
 synopsis: |
-  ["directory"]
+  ['directory']
   
-  ["directory", <OPTIONS>]
-short: 'Complete a directory'
+  ['directory', <OPTIONS>]
+short: 'Complete directory names'
 long: |
-  You can restrict completion to a specific directory by adding `{"directory": ...}`.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
+  
+    - `directory`: Restrict completion to directories inside the specified directory.
 also:
-  directory_list: 'For completing a comma-separated list of directories'
+  directory_list: 'For completing comma-separated lists of directories'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--directory"]
-      complete: ["directory"]
-    - option_strings: ["--directory-tmp"]
-      complete: ["directory", {"directory": "/tmp"}]
+    - option_strings: ['--directory']
+      complete: ['directory']
+  
+    - option_strings: ['--directory-tmp']
+      complete: ['directory', {'directory': '/tmp'}]
 output: |
-   ~ > example --directory=<TAB>
-   dir1/  dir2/
+  ~ > example --directory=<TAB>
+  dir1/  dir2/
 
 ---
 
 command: 'file_list'
 category: 'basic'
 synopsis: |
-  ["file_list"]
+  ['file_list']
   
-  ["file_list", <OPTIONS>]
-short: 'Complete a comma-separated list of files'
+  ['file_list', <OPTIONS>]
+short: 'Complete comma-separated lists of files'
 long: |
   This is an alias for `['list', ['file']]`.
   
-  You can restrict completion to a specific directory by adding `{"directory": ...}`.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
   
-  You can restrict completion to specific extensions by adding `{"extensions": [...]}`.
+    - `directory`:
+      Restrict completion to files inside the specified directory.
   
-  You can make matching extensions *fuzzy* by adding `{"fuzzy": true}`.
-  Fuzzy means that the files do not have to end with the exact extension. For example `foo.txt.1`.
+    - `extensions`:
+      A list of file extensions to offer for completion.
   
-  You can ignore files by adding a list of Bash globs using `{"ignore_globs": [...]}`
+    - `fuzzy`:
+      Enable fuzzy extension matching. By default, files must end with one of
+      the specified extensions. With fuzzy matching enabled, files with
+      additional suffixes are also matched, for example `foo.txt.1`.
   
-  By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+    - `ignore_globs`:
+      A list of Bash globs for files that should not be offered for completion.
   
-  The separator can be changed by adding `{"separator": ...}`
+    - `duplicates`:
+      Allow duplicate values to be offered for completion. Defaults to `false`.
+  
+    - `separator`:
+      The separator used between list elements. Defaults to `,`.
 also:
-  list: 'For completing a comma-separted list using any completer'
-  file: 'For completing a file'
-  directory_list: 'For completing a comma-separated list of directories'
+  list: 'For completing comma-separted lists using a completer'
+  file: 'For completing file names'
+  directory_list: 'For completing comma-separated lists of directories'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--file-list"]
-      complete: ["file_list"]
+    - option_strings: ['--file-list']
+      complete: ['file_list']
 output: |
-   ~ > example --file-list=file1,file2,<TAB>
-   file3  file4
+  ~ > example --file-list=file1,file2,<TAB>
+  file3  file4
 
 ---
 
 command: 'directory_list'
 category: 'basic'
 synopsis: |
-  ["directory_list"]
+  ['directory_list']
   
-  ["directory_list", <OPTIONS>]
-short: 'Complete a comma-separated list of directories'
+  ['directory_list', <OPTIONS>]
+short: 'Complete comma-separated lists of directories'
 long: |
   This is an alias for `['list', ['directory']]`.
-
-  You can restrict completion to a specific directory by adding `{"directory": ...}`.
-   
-  The separator can be changed by adding `{"separator": ...}`
-   
-  By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+  
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
+  
+    - `directory`:
+      Restrict completion to directories inside the specified directory.
+  
+    - `duplicates`:
+      Allow duplicate values to be offered for completion. Defaults to `false`.
+  
+    - `separator`:
+      The separator used between list elements. Defaults to `,`.
 also:
-  list: 'For completion a comma-separated list of any completer'
-  directory: 'For completing a directory'
-  file_list: 'For completing a comma-separated list of files'
+  list: 'For completion comma-separated lists using a completer'
+  directory: 'For completing directory names'
+  file_list: 'For completing comma-separated lists of files'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--directory-list"]
-      complete: ["directory_list"]
+    - option_strings: ['--directory-list']
+      complete: ['directory_list']
 output: |
-   ~ > example --directory-list=directory1,directory2,<TAB>
-   directory3  directory4
+  ~ > example --directory-list=directory1,directory2,<TAB>
+  directory3  directory4
 
 ---
 
 command: 'mime_file'
 category: 'basic'
 synopsis: |
-  ["mime_file", <MIME_REGEX>]
-short: "Complete a file based on it's MIME-type"
+  ['mime_file', <MIME_REGEX>]
+short: 'Complete files by MIME type'
 long: |
-  This completer takes an extended regex passed to `grep -E` to filter the results.
+  `MIME_REGEX`:
+    An extended regular expression used to match MIME types.
+    The expression is passed to `grep -E` to filter the results.
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--image"]
-      complete: ["mime_file", 'image/']
+    - option_strings: ['--image']
+      complete: ['mime_file', 'image/']
 output: |
-   ~ > example --image=<TAB>
-   dir1/  dir2/  img.png  img.jpg
+  ~ > example --image=<TAB>
+  dir1/  dir2/  img.png  img.jpg
 
 ---
 
 command: 'choices'
 category: 'basic'
 synopsis: |
-  ["choices", <ITEMS>]
-short: 'Complete from a set of words'
+  ['choices', <ITEMS>]
+short: 'Complete from a predefined set of values'
 long: |
-  Items can be a list or a dictionary.
-   
-  If a dictionary is supplied, the keys are used as items and the values are used
-  as description.
+  `ITEMS`:
+    A list or dictionary containing the values to offer for completion.
+  
+    If a list is supplied, all items are offered without descriptions.
+  
+    If a dictionary is supplied, the keys are used as completion values and the
+    values are used as descriptions.
 notes:
-  - "If the completion suggestions should appear in their original order, set `nosort` to `true`"
+  - 'If the completion suggestions should appear in their original order, set `nosort` to `true`'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--choices-1"]
-      complete: ["choices", ["Item 1", "Item 2"]]
+    - option_strings: ['--choices-1']
+      complete: ['choices', ['Item 1', 'Item 2']]
   
-    - option_strings: ["--choices-2"]
-      complete: ["choices", {"Item 1": "Description 1", "Item 2": "Description 2"}]
+    - option_strings: ['--choices-2']
+      complete: ['choices', {'Item 1': 'Description 1', 'Item 2': 'Description 2'}]
   
-    - option_strings: ["--choices-keep-order"]
-      complete: ["choices", ["zebra", "cat", "monkey"]]
+    - option_strings: ['--choices-keep-order']
+      complete: ['choices', ['zebra', 'cat', 'monkey']]
       nosort: true
 output: |
   ~ > example --choices-2=<TAB>
   Item 1  (Description 1)  Item 2  (Description 2)
+  
+  ~ > example --choices-keep-order=<TAB>
+  zebra    cat    monkey
 
 ---
 
 command: 'value_list'
 category: 'basic'
 synopsis: |
-  ["value_list", <OPTIONS>]
-short: 'Complete a comma-separated list of values'
+  ['value_list', <OPTIONS>]
+short: 'Complete comma-separated lists of values'
 long: |
-  Complete one or more items from a list of items. Similar to `mount -o`.
-   
-  Arguments are supplied by adding `{"values": ...}`.
-   
-  A separator can be supplied by adding `{"separator": ...}` (the default is `","`).
-   
-  By default, duplicate values are not offered for completion. This can be changed by adding `{"duplicates": true}`.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
+  
+    - `values`:
+      A list or dictionary containing the values to offer for completion.
+  
+      If a list is supplied, all values are offered without descriptions.
+  
+      If a dictionary is supplied, the keys are used as completion values and
+      the values are used as descriptions.
+  
+    - `separator`:
+      The separator used between list elements. Defaults to `,`.
+
+    - `duplicates`:
+      Allow duplicate values to be offered for completion. Defaults to `false`.
 also:
-  list: "For completing a comma-separated list of any completer"
-  key_value_list: "For completing a comma-separated list of key=value pairs"
+  list: 'For completing comma-separated lists using a completer'
+  key_value_list: 'For completing comma-separated lists of key=value pairs'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--value-list-1"]
-      complete: ["value_list", {"values": ["exec", "noexec"]}]
-    - option_strings: ["--value-list-2"]
-      complete: ["value_list", {"values": {"one": "Description 1", "two": "Description 2"}}]
+    - option_strings: ['--value-list-1']
+      complete: ['value_list', {'values': ['exec', 'noexec']}]
+  
+    - option_strings: ['--value-list-2']
+      complete: ['value_list', {'values': {'one': 'Description 1', 'two': 'Description 2'}}]
 output: |
   ~ > example --value-list-1=<TAB>
   exec    noexec
+  
   ~ > example --value-list-1=exec,<TAB>
   noexec
+  
   ~ > example --value-list-2=<TAB>
   one  -- Description 1
   two  -- Description 2
@@ -473,29 +591,29 @@ output: |
 command: 'exec'
 category: 'custom'
 synopsis: |
-  ["exec", <COMMAND>]
-short: 'Complete by the output of a command or function'
+  ['exec', <COMMAND>]
+short: 'Complete values from the output of a command or function'
 long: |
-  The output must be in form of:
-
+  `COMMAND`:
+    The command or function to execute. Its output must be formatted as tab-separated values:
+  
   ```
-  <item_1>\t<description_1>\n
-  <item_2>\t<description_2>\n
+  <ITEM_1>\t<DESCRIPTION_1>
+  <ITEM_2>\t<DESCRIPTION_2>
   [...]
   ```
-  
-  An item and its description are delimited by a tabulator.
-   
-  These pairs are delimited by a newline.
+
+  Each line represents one completion candidate. The item and its description are separated by a tab character.
 also:
-  exec_fast: "Faster implementation of exec"
+  exec_fast: 'Faster implementation of exec'
+  exec_internal: "Use the shell's internal completion mechanisms"
 notes:
-  - "Functions can be put inside a file and included with `--include-file`"
+  - 'Functions can be put inside a file and included with `--include-file`'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--exec"]
-      complete: ["exec", "printf '%s\\t%s\\n' 'Item 1' 'Description 1' 'Item 2' 'Description 2'"]
+    - option_strings: ['--exec']
+      complete: ['exec', "printf '%s\\t%s\\n' 'Item 1' 'Description 1' 'Item 2' 'Description 2'"]
 output: |
   ~ > example --exec=<TAB>
   Item 1  (Description 1)  Item 2  (Description 2)
@@ -505,22 +623,22 @@ output: |
 command: 'exec_fast'
 category: 'custom'
 synopsis: |
-  ["exec_fast", <COMMAND>]
-short: 'Complete by the output of a command or function (fast and unsafe)'
+  ['exec_fast', <COMMAND>]
+short: 'Complete values from the output of a command or function (fast and unsafe)'
 long: |
-  Faster version of exec for handling large amounts of data.
-   
-  This implementation requires that the items of the parsed output do not include
-  special shell characters or whitespace.
+  Faster version of `exec` for handling large amounts of data.
+  
+  Unlike `exec`, this implementation does not safely handle arbitrary output.
+  Completion items must not contain whitespace or special shell characters.
 notes:
-  - "Functions can be put inside a file and included with `--include-file`"
+  - 'Functions can be put inside a file and included with `--include-file`'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--exec-fast"]
-      complete: ["exec_fast", "printf '%s\\t%s\\n' 1 one 2 two"]
+    - option_strings: ['--exec-fast']
+      complete: ['exec_fast', "printf '%s\\t%s\\n' 1 one 2 two"]
 output: |
-  ~ > example --exec-internal=<TAB>
+  ~ > example --exec-fast=<TAB>
   1  -- one
   2  -- one
 
@@ -529,8 +647,8 @@ output: |
 command: 'exec_internal'
 category: 'custom'
 synopsis: |
-  ["exec_internal", <COMMAND>]
-short: "Complete by a function that uses the shell's internal completion mechanisms"
+  ['exec_internal', <COMMAND>]
+short: "Use the shell's internal completion mechanisms"
 long: |
   Execute a function that internally modifies the completion state.
   
@@ -540,7 +658,7 @@ long: |
   
   ```sh
   my_completion_func() {
-      COMPREPLY=( $(compgen -W "read write append" -- "$cur") )
+      COMPREPLY=( $(compgen -W 'read write append' -- '$cur') )
   }
   ```
   
@@ -569,12 +687,12 @@ long: |
   end
   ```
 notes:
-  - "Functions can be put inside a file and included with `--include-file`"
+  - 'Functions can be put inside a file and included with `--include-file`'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--exec-internal"]
-      complete: ["exec_internal", "my_completion_func"]
+    - option_strings: ['--exec-internal']
+      complete: ['exec_internal', 'my_completion_func']
 output: |
   ~ > example --exec-internal=<TAB>
   append  -- Append data to a file
@@ -586,46 +704,49 @@ output: |
 command: 'key_value_pair_exec'
 category: 'custom'
 synopsis: |
-  ["key_value_pair_exec", <VALUE_SEPARATOR>, <COMMAND>]
-short: 'Complete a key=value pair (dynamically generated by a function)'
+  ['key_value_pair_exec', <VALUE_SEPARATOR>, <COMMAND>]
+short: 'Complete dynamically generated a key=value pairs'
 long: |
-  The first argument is the separator used for delimiting the value from the key.
+  `VALUE_SEPARATOR`:
+    The separator used to separate a key from its value.
   
-  The second argument is a command for generating the available options and their
-  possible values.
+  `COMMAND`:
+    The command or function used to generate the available keys and values.
   
-  The third argument is a command for generating the available options and their
-  possible values.
+    If invoked without arguments, it must output the available keys in the
+    following format:
+
+    ```
+    <KEY_1>[=]\t<DESCRIPTION_1>
+    <KEY_2>[=]\t<DESCRIPTION_2>
+    [...]
+    ```
   
-  If the command is called without any arguments, then a list of available keys
-  is expected.
-  The output must be in form of:
+    Appending `=` to a key indicates that it requires a value.
   
-  ```
-  <key_1>[=]\t<description_1>\n
-  <key_2>[=]\t<description_2>\n
-  [...]
-  ```
+    If invoked with a single argument, the argument is the selected key. The
+    command must output the possible values for that key in the following
+    format:
   
-  If the command is called with one argument, then a list of completions for
-  the given key is expected.
+    ```
+    <ITEM_1>\t<DESCRIPTION_1>
+    <ITEM_2>\t<DESCRIPTION_2>
+    [...]
+    ```
   
-  ```
-  <item_1>\t<description_1>\n
-  <item_2>\t<description_2>\n
-  [...]
-  ```
-  
+    Each line represents one completion candidate. The item and its description
+    are separated by a tab character.
+
   Example function:
   
-  ```
+  ```sh
   _complete_key_value_pair() {
     if (( $# == 0 )); then
       printf '%s\t%s\n'    \
         'flag'    'a flag' \
         'option=' 'option with value'
     else
-      case "$1" in
+      case '$1' in
         option)
           printf '%s\t%s\n'     \
             'foo' 'a foo value' \
@@ -635,14 +756,14 @@ long: |
   }
   ```
 also:
-  key_value_pair: "For completing a single key=value pair"
+  key_value_pair: 'For completing single key=value pairs'
 notes:
-  - "Functions can be put inside a file and included with `--include-file`"
+  - 'Functions can be put inside a file and included with `--include-file`'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["-o"]
-      complete: ["key_value_pair_exec", "=", "_complete_key_value_pair"]
+    - option_strings: ['-o']
+      complete: ['key_value_pair_exec', '=', '_complete_key_value_pair']
 output: |
   ~ > example -o <TAB>
   flag    -- a flag
@@ -657,38 +778,52 @@ output: |
 command: 'key_value_list_exec'
 category: 'custom'
 synopsis: |
-  ["key_value_list_exec", <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, <COMMAND>]
-short: 'Complete a comma-separted list of key=value pairs (dynamically generated by a function)'
+  ['key_value_list_exec', <PAIR_SEPARATOR>, <VALUE_SEPARATOR>, <COMMAND>]
+short: 'Complete dynamically generated comma-separted lists of key=value pairs'
 long: |
-  The first argument is the separator used for delimiting the key-value pairs.
+  `PAIR_SEPARATOR`:
+    The separator used to separate individual key-value pairs.
   
-  The second argument is the separator used for delimiting the value from the key.
+  `VALUE_SEPARATOR`:
+    The separator used to separate a key from its value.
+  
+  `COMMAND`:
+    The command or function used to generate the available keys and values.
+  
+    If invoked without arguments, it must output the available keys in the
+    following format:
 
-  The third argument is a command for generating the available options and their
-  possible values.
+    ```
+    [*]<KEY_1>[=][?]\t<DESCRIPTION_1>\t<EXCLUDES>
+    [*]<KEY_2>[=][?]\t<DESCRIPTION_2>\t<EXCLUDES>
+    [...]
+    ```
   
-  If the command is called without any arguments, then a list of available keys
-  is expected.
-  The output must be in form of:
+    Prefixing a key with `*` marks it as repeatable.
   
-  ```
-  [*]<key_1>[=][?]\t<description_1>\t<excludes>\n
-  [*]<key_2>[=][?]\t<description_2>\t<excludes>\n
-  [...]
-  ```
+    Appending `=` to a key indicates that it requires a value.
   
-  If the command is called with one argument, then a list of completions for
-  the given key is expected.
+    Appending `=?` to a key indicates that it requires an optional value.
   
-  ```
-  <item_1>\t<description_1>\n
-  <item_2>\t<description_2>\n
-  [...]
-  ```
+    `EXCLUDES` is a space-separated list of keys that should no longer be
+    offered once the current key has been used.
   
+    If invoked with a single argument, the argument is the selected key.
+    The command must output the possible values for that key in the following
+    format:
+  
+    ```
+    <ITEM_1>\t<DESCRIPTION_1>
+    <ITEM_2>\t<DESCRIPTION_2>
+    [...]
+    ```
+  
+    Each line represents one completion candidate. The item and its description
+    are separated by a tab character.
+
   Example function:
   
-  ```
+  ```sh
   _complete_key_value_list() {
     if (( $# == 0 )); then
       printf '%s\t%s\t%s\n'                                 \
@@ -698,7 +833,7 @@ long: |
         '*repeatable' 'a repeatable option'              '' \
         'excludes'    'disable options'                  'flag argument'
     else
-      case "$1" in
+      case '$1' in
         argument|optional)
           printf '%s\t%s\n'     \
             'foo' 'a foo value' \
@@ -708,14 +843,14 @@ long: |
   }
   ```
 also:
-  key_value_list: "For completing a comma-separated list of key=value pairs"
+  key_value_list: 'For completing comma-separated lists of key=value pairs'
 notes:
-  - "Functions can be put inside a file and included with `--include-file`"
+  - 'Functions can be put inside a file and included with `--include-file`'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["-o"]
-      complete: ["key_value_list_exec", ",", "=", "_complete_key_value_list"]
+    - option_strings: ['-o']
+      complete: ['key_value_list_exec', ',', '=', '_complete_key_value_list']
 output: |
   ~ > example -o <TAB>
   argument      -- option with an argument
@@ -737,20 +872,31 @@ output: |
 command: 'range'
 category: 'basic'
 synopsis: |
-  ["range", <START>, <STOP>]
+  ['range', <START>, <STOP>]
   
-  ["range", <START>, <STOP>, <STEP>]
-short: 'Complete a range of integers'
+  ['range', <START>, <STOP>, <STEP>]
+short: 'Complete sequences of integers'
+long: |
+  `START`:
+    The first value of the range.
+  
+  `STOP`:
+    The last value of the range.
+  
+  `STEP`:
+    The increment between values. Defaults to `1`.
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--range-1"]
-      complete: ["range", 1, 9]
-    - option_strings: ["--range-2"]
-      complete: ["range", 1, 9, 2]
+    - option_strings: ['--range-1']
+      complete: ['range', 1, 9]
+  
+    - option_strings: ['--range-2']
+      complete: ['range', 1, 9, 2]
 output: |
   ~ > example --range-1=<TAB>
   1  2  3  4  5  6  7  8  9
+  
   ~ > example --range-2=<TAB>
   1  3  5  7  9
 
@@ -760,10 +906,10 @@ command: 'signal'
 category: 'basic'
 short: 'Complete signal names'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--signal"]
-      complete: ["signal"]
+    - option_strings: ['--signal']
+      complete: ['signal']
 output: |
   ~ > example --signal=<TAB>
   ABRT    -- Process abort signal
@@ -781,12 +927,14 @@ output: |
 
 command: 'hostname'
 category: 'basic'
-short: 'Complete a hostname'
+short: 'Complete hostnames'
+also:
+  ip_address: 'For completing local IP addresses'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--hostname"]
-      complete: ["hostname"]
+    - option_strings: ['--hostname']
+      complete: ['hostname']
 output: |
   ~ > example --hostname=<TAB>
   localhost
@@ -795,14 +943,14 @@ output: |
 
 command: 'process'
 category: 'basic'
-short: 'Complete a process name'
+short: 'Complete process names'
 also:
-  pid: 'For completing a PID'
+  pid: 'For completing process IDs'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--process"]
-      complete: ["process"]
+    - option_strings: ['--process']
+      complete: ['process']
 output: |
   ~ > example --process=s<TAB>
   scsi_eh_0         scsi_eh_1       scsi_eh_2      scsi_eh_3  scsi_eh_4
@@ -813,14 +961,14 @@ output: |
 
 command: 'pid'
 category: 'basic'
-short: 'Complete a PID'
+short: 'Complete process IDs'
 also:
-  process: 'For completing a process name'
+  process: 'For completing process names'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--pid"]
-      complete: ["pid"]
+    - option_strings: ['--pid']
+      complete: ['pid']
 output: |
   ~ > example --pid=<TAB>
   1       13      166     19      254     31      45
@@ -831,12 +979,12 @@ output: |
 
 command: 'filesystem_type'
 category: 'basic'
-short: 'Complete a filesystem type'
+short: 'Complete filesystem types'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--filesystem-type"]
-      complete: ["filesystem_type"]
+    - option_strings: ['--filesystem-type']
+      complete: ['filesystem_type']
 output: |
   ~ > example --filesystem-type=<TAB>
   adfs     autofs   bdev      bfs     binder     binfmt_misc  bpf
@@ -848,32 +996,37 @@ output: |
 command: 'command'
 category: 'basic'
 synopsis: |
-  ["command"]
+  ['command']
   
-  ["command", <OPTIONS>]
-short: 'Complete a command'
+  ['command', <OPTIONS>]
+short: 'Complete command names'
 long: |
   This completer provides completion suggestions for executable commands available in the system's `$PATH`.
    
-  `$PATH` can be modified using these options:
-   
-  `{"path": "<directory>:..."}`: Overrides the default `$PATH` entirely.
-   
-  `{"path_append": "<directory>:..."}`: Appends to the default `$PATH`.
-   
-  `{"path_prepend": "<directory>:..."}`: Prepends to the default `$PATH`.
+  `OPTIONS`:
+    A dictionary containing additional options for configuring the completion.
+  
+    - `path`:
+      Override the default `$PATH` used for searching executables.
+  
+    - `path_append`:
+      Append directories to the default `$PATH`.
+  
+    - `path_prepend`:
+      Prepend directories to the default `$PATH`.
 notes:
   - '`path_append` and `path_prepend` can be used together, but both are mutually exclusive with `path`.'
 also:
-  command_arg: "For completing arguments of a command"
-  commandline_string: 'For completing a command line as a string'
+  command_arg: 'For completing arguments of a command'
+  commandline_string: 'For completing command lines as strings'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--command"]
-      complete: ["command"]
-    - option_strings: ["--command-sbin"]
-      complete: ["command", {"path_append": "/sbin:/usr/sbin"}]
+    - option_strings: ['--command']
+      complete: ['command']
+  
+    - option_strings: ['--command-sbin']
+      complete: ['command', {'path_append': '/sbin:/usr/sbin'}]
 output: |
   ~ > example --command=bas<TAB>
   base32    base64    basename  basenc    bash      bashbug
@@ -882,21 +1035,21 @@ output: |
 
 command: 'command_arg'
 category: 'basic'
-short: 'Complete arguments of a command'
+short: 'Complete command arguments'
 notes:
   - 'This completer can only be used in combination with a previously defined `command` completer.'
   - 'This completer requires `repeatable: true`.'
 also:
-  command: 'For completing a command'
-  commandline_string: 'For completing a command line as a string'
+  command: 'For completing command names'
+  commandline_string: 'For completing command lines as strings'
 definition: |
-  prog: "example"
+  prog: 'example'
   positionals:
     - number: 1
-      complete: ["command"]
+      complete: ['command']
 
     - number: 2
-      complete: ["command_arg"]
+      complete: ['command_arg']
       repeatable: true
 output: |
   ~ > example sudo bas<TAB>
@@ -906,12 +1059,15 @@ output: |
 
 command: 'commandline_string'
 category: 'basic'
-short: 'Complete a command line as a string'
+short: 'Complete command lines as strings'
+also:
+  command: 'For completing command names'
+  command_arg: 'For completing command arguments'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--commandline"]
-      complete: ["commandline_string"]
+    - option_strings: ['--commandline']
+      complete: ['commandline_string']
 output: |
   ~ > example --commandline='sudo ba<TAB>
   base32    base64    basename  basenc    bash      bashbug
@@ -920,54 +1076,54 @@ output: |
 
 command: 'user'
 category: 'basic'
-short: 'Complete a username'
+short: 'Complete user names'
 also:
-  uid: 'For completing a user id'
+  uid: 'For completing user IDs'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--user"]
-      complete: ["user"]
+    - option_strings: ['--user']
+      complete: ['user']
 output: |
   ~ > example --user=<TAB>
-  avahi                   bin                     braph
-  colord                  daemon                  dbus
-  dhcpcd                  ftp                     git
+  avahi         bin          braph
+  colord        daemon       dbus
+  dhcpcd        ftp          git
   [...]
 
 ---
 
 command: 'group'
 category: 'basic'
-short: 'Complete a group'
+short: 'Complete group names'
 also:
-  gid: 'For completing a group id'
+  gid: 'For completing group IDs'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--group"]
-      complete: ["group"]
+    - option_strings: ['--group']
+      complete: ['group']
 output: |
   ~ > example --group=<TAB>
-  adm                     audio                   avahi
-  bin                     braph                   colord
-  daemon                  dbus                    dhcpcd
-  disk                    floppy                  ftp
-  games                   git                     groups
+  adm           audio        avahi
+  bin           braph        colord
+  daemon        dbus         dhcpcd
+  disk          floppy       ftp
+  games         git          groups
   [...]
 
 ---
 
 command: 'uid'
 category: 'basic'
-short: 'Complete a user id'
+short: 'Complete user IDs'
 also:
-  user: 'For completing a user name'
+  user: 'For completing user names'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--uid"]
-      complete: ["uid"]
+    - option_strings: ['--uid']
+      complete: ['uid']
 output: |
   ~ > example --uid=<TAB>
   0      -- root
@@ -985,14 +1141,14 @@ output: |
 
 command: 'gid'
 category: 'basic'
-short: 'Complete a group id'
+short: 'Complete group IDs'
 also:
-  group: 'For completing a group name'
+  group: 'For completing group names'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--gid"]
-      complete: ["gid"]
+    - option_strings: ['--gid']
+      complete: ['gid']
 output: |
   ~ > example --gid=<TAB>
   0      -- root
@@ -1009,12 +1165,12 @@ output: |
 
 command: 'service'
 category: 'basic'
-short: 'Complete a SystemD service'
+short: 'Complete systemd service names'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--service"]
-      complete: ["service"]
+    - option_strings: ['--service']
+      complete: ['service']
 output: |
   ~ > example --service=<TAB>
   TODO
@@ -1024,14 +1180,14 @@ output: |
 
 command: 'variable'
 category: 'basic'
-short: 'Complete a shell variable name'
+short: 'Complete shell variable names'
 also:
-  environment: 'For completing an environment variable'
+  environment: 'For completing environment variable names'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--variable"]
-      complete: ["variable"]
+    - option_strings: ['--variable']
+      complete: ['variable']
 output: |
   ~ > example --variable=HO<TAB>
   HOME      HOSTNAME  HOSTTYPE
@@ -1040,12 +1196,14 @@ output: |
 
 command: 'environment'
 category: 'basic'
-short: 'Complete a shell environment variable name'
+short: 'Complete environment variable names'
+also:
+  variable: 'For completing shell variable names'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--environment"]
-      complete: ["environment"]
+    - option_strings: ['--environment']
+      complete: ['environment']
 output: |
   ~ > example --environment=X<TAB>
   XDG_RUNTIME_DIR  XDG_SEAT  XDG_SESSION_CLASS  XDG_SESSION_ID
@@ -1056,36 +1214,39 @@ output: |
 command: 'history'
 category: 'basic'
 synopsis: |
-  ["history", <REGEX>]
+  ['history', <REGEX>]
 short: "Complete based on a shell's history"
 long: |
-  The argument is an extended regular expression passed to `grep -E`.
+  `REGEX`:
+    An extended regular expression used to filter history entries.
+    The regular expression is passed to `grep -E`.
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--history"]
-      complete: ["history", '[a-zA-Z0-9]+@[a-zA-Z0-9]+']
+    - option_strings: ['--history']
+      complete: ['history', '[a-zA-Z0-9]+@[a-zA-Z0-9]+']
 output: |
   ~ > example --history=<TAB>
-  foo@bar mymail@myprovider
+  foo@bar  mymail@myprovider
 
 ---
 
 command: 'date'
 category: 'basic'
 synopsis: |
-  ["date", <FORMAT>]
-short: 'Complete a date string'
+  ['date', <FORMAT>]
+short: 'Complete date strings'
 long: |
-  The argument is the date format as described in `strftime(3)`.
+  `FORMAT`:
+    The date format as described in `strftime(3)`.
 also:
-  date_format: "For completing a date format string"
+  date_format: 'For completing date format strings'
 implemented: ['Zsh']
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--date"]
-      complete: ["date", '%Y-%m-%d']
+    - option_strings: ['--date']
+      complete: ['date', '%Y-%m-%d']
 output: |
   ~ > example --date=<TAB>
   
@@ -1101,15 +1262,15 @@ output: |
 
 command: 'date_format'
 category: 'basic'
-short: 'Complete a date format string'
+short: 'Complete date format strings'
 also:
-  date: "For completing a date"
+  date: 'For completing dates'
 implemented: ['Fish', 'Zsh']
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--date-format"]
-      complete: ["date_format"]
+    - option_strings: ['--date-format']
+      complete: ['date_format']
 output: |
   ~ > example --date-format '%<TAB>
   a     -- abbreviated day name
@@ -1127,33 +1288,35 @@ output: |
 command: 'ip_address'
 category: 'basic'
 synopsis: |
-  ["ip_address", "<TYPE>"]
-short: 'Complete a bound ip address'
+  ['ip_address', <TYPE>]
+short: 'Complete local IP addresses'
 long: |
-  The first argument is the type of ip addresses to be completed:
+  `TYPE`:
+    The type of ip addresses to complete:
   
-  - `ipv4`: IPv4 addresses
-  - `ipv6`: IPv6 addresses
-  - `all`:  Both IPv4 and IPv6 addresses
+    - `ipv4`: IPv4 addresses
+    - `ipv6`: IPv6 addresses
+    - `all`:  Both IPv4 and IPv6 addresses
   
-  Append `+` to include the unspecified address of the selected family:
+    Append `+` to include the unspecified address of the selected family:
   
-  - `ipv4+`: Includes 0.0.0.0
-  - `ipv6+`: Includes ::
-  - `all+`:  Includes both 0.0.0.0 and ::
+    - `ipv4+`: Includes `0.0.0.0`
+    - `ipv6+`: Includes `::`
+    - `all+`:  Includes both 0.0.0.0 and `::`
 also:
-  net_interface: "For completing a network interface"
+  net_interface: 'For completing network interfaces'
+  hostname: 'For completing hostnames'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--ip-address"]
-      complete: ["ip_address"]
+    - option_strings: ['--ip-address']
+      complete: ['ip_address']
   
-    - option_strings: ["--ip-address-v4"]
-      complete: ["ip_address", "ipv4"]
+    - option_strings: ['--ip-address-v4']
+      complete: ['ip_address', 'ipv4']
   
-    - option_strings: ["--ip-address-v6"]
-      complete: ["ip_address", "ipv6"]
+    - option_strings: ['--ip-address-v6']
+      complete: ['ip_address', 'ipv6']
 output: |
   ~ > example --ip-address=<TAB>
   ::1    10.0.0.71   127.0.0.1   fe80::f567:7a1a:3c98:808d
@@ -1168,14 +1331,14 @@ output: |
 
 command: 'net_interface'
 category: 'bonus'
-short: 'Complete a network interface'
+short: 'Complete network interfaces'
 also:
-  ip_address: "For completing an ip address"
+  ip_address: 'For completing IP addresses'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--net-interface"]
-      complete: ["net_interface"]
+    - option_strings: ['--net-interface']
+      complete: ['net_interface']
 output: |
   ~ > example --net-interface=<TAB>
   eno1  enp1s0  lo  wlo1  wlp2s0
@@ -1185,12 +1348,12 @@ output: |
 
 command: 'mountpoint'
 category: 'bonus'
-short: 'Complete a mountpoint'
+short: 'Complete mount points'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--mountpoint"]
-      complete: ["mountpoint"]
+    - option_strings: ['--mountpoint']
+      complete: ['mountpoint']
 output: |
   ~ > example --mountpoint=<TAB>
   /  /boot  /home  /proc  /run  /sys  /tmp
@@ -1200,12 +1363,12 @@ output: |
 
 command: 'login_shell'
 category: 'bonus'
-short: 'Complete a login shell'
+short: 'Complete login shells'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--login-shell"]
-      complete: ["login_shell"]
+    - option_strings: ['--login-shell']
+      complete: ['login_shell']
 output: |
   ~ > example --login-shell=<TAB>
   /bin/bash   /bin/sh         /usr/bin/fish       /usr/bin/sh
@@ -1215,12 +1378,12 @@ output: |
 
 command: 'charset'
 category: 'bonus'
-short: 'Complete a charset'
+short: 'Complete character sets'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--charset"]
-      complete: ["charset"]
+    - option_strings: ['--charset']
+      complete: ['charset']
 output: |
   ~ > example --charset=A<TAB>
   ANSI_X3.110-1983  ANSI_X3.4-1968    ARMSCII-8         ASMO_449
@@ -1229,12 +1392,12 @@ output: |
 
 command: 'locale'
 category: 'bonus'
-short: 'Complete a locale'
+short: 'Complete locales'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--locale"]
-      complete: ["locale"]
+    - option_strings: ['--locale']
+      complete: ['locale']
 output: |
   ~ > example --locale=<TAB>
   C  C.UTF-8  de_DE  de_DE@euro  de_DE.iso88591  de_DE.iso885915@euro
@@ -1244,12 +1407,12 @@ output: |
 
 command: 'timezone'
 category: 'bonus'
-short: 'Complete a timezone'
+short: 'Complete timezones'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--timezone"]
-      complete: ["timezone"]
+    - option_strings: ['--timezone']
+      complete: ['timezone']
 output: |
   ~ > example --timezone=Europe/B<TAB>
   Belfast     Belgrade    Berlin      Bratislava
@@ -1259,14 +1422,14 @@ output: |
 
 command: 'alsa_card'
 category: 'bonus'
-short: 'Complete an ALSA card'
+short: 'Complete ALSA cards'
 also:
-  alsa_device: "For completing an ALSA device"
+  alsa_device: 'For completing ALSA devices'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--alsa-card"]
-      complete: ["alsa_card"]
+    - option_strings: ['--alsa-card']
+      complete: ['alsa_card']
 output: |
   ~ > example --alsa-card=<TAB>
   0  1
@@ -1275,14 +1438,14 @@ output: |
 
 command: 'alsa_device'
 category: 'bonus'
-short: 'Complete an ALSA device'
+short: 'Complete ALSA devices'
 also:
-  alsa_card: "For completing an ALSA card"
+  alsa_card: 'For completing ALSA cards'
 definition: |
-  prog: "example"
+  prog: 'example'
   options:
-    - option_strings: ["--alsa-device"]
-      complete: ["alsa_device"]
+    - option_strings: ['--alsa-device']
+      complete: ['alsa_device']
 output: |
   ~ > example --alsa-device=<TAB>
   hw:0  hw:1
