@@ -34,5 +34,3 @@ git clone https://github.com/crazy-complete/crazy-complete
 cd crazy-complete
 
 fpm -s python -t deb -d python3-yaml --python-scripts-executable=/usr/bin/python3 setup.py
-
-mv *.deb ..

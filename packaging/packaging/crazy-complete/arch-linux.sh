@@ -32,4 +32,8 @@ runuser -u nobody -- makepkg -d
 
 PACKAGE=$(ls | grep pkg.tar.zst | grep -v debug)
 
-mv "$PACKAGE" "$SCRIPT_DIR"
+rm -rf "$SCRIPT_DIR/crazy-complete"
+
+mkdir -p "$SCRIPT_DIR/crazy-complete"
+
+mv "$PACKAGE" "$SCRIPT_DIR/crazy-complete"

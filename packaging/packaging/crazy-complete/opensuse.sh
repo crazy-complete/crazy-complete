@@ -26,5 +26,3 @@ git clone https://github.com/crazy-complete/crazy-complete
 cd crazy-complete
 
 $FPM -s python -t rpm -d python313-PyYAML --python-bin /usr/bin/python3 --python-scripts-executable /usr/bin/python3 setup.py
-
-mv *.rpm ..
