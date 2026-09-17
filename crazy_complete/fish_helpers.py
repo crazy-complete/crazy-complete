@@ -61,6 +61,9 @@ set -l positionals
 set -l positionals_positions
 #endif
 set -l having_options
+#ifdef short_options
+set -l leading_stacked_short_options
+#endif
 set -l option_values
 set -l last_arg_is_option_argument false
 
@@ -106,6 +109,9 @@ set -l argi 2 # cmdline[1] is command name
 while test $argi -le $cmdline_count
   set -l arg "$cmdline[$argi]"
   set -l have_trailing_arg (test $argi -lt $cmdline_count && echo true || echo false)
+#ifdef short_options
+  set leading_stacked_short_options
+#endif
 
   switch $arg
     case '-'
@@ -181,6 +187,7 @@ while test $argi -le $cmdline_count
         if test "$option_type" = '0'
           set -a having_options $option
           set -a option_values ''
+          test $i -lt $arg_length && set -a leading_stacked_short_options $option
         else if test "$option_type" = '1'
           set end_of_parsing true
 
@@ -219,6 +226,9 @@ set -g __QUERY_CACHE_POSITIONALS_POSITIONS $positionals_positions
 #endif
 set -g __QUERY_CACHE_HAVING_OPTIONS $having_options
 set -g __QUERY_CACHE_OPTION_VALUES  $option_values
+#ifdef short_options
+set -g __QUERY_CACHE_LEADING_STACKED_OPTIONS $leading_stacked_short_options
+#endif
 
 set -l cmdline_last_arg (commandline -ct | string unescape)
 set -g __QUERY_CACHE_CURRENT_ARG $cmdline_last_arg
@@ -296,6 +306,10 @@ if test $argv[1] = 'WITH_INCOMPLETE'
 end
 
 #endif
+for option in $__QUERY_CACHE_LEADING_STACKED_OPTIONS
+  contains -- $option $argv && return 1
+end
+
 for option in $__QUERY_CACHE_HAVING_OPTIONS
   contains -- $option $argv && return 0
 end
