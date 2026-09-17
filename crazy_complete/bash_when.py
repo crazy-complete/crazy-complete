@@ -36,6 +36,9 @@ class ConditionGenerator:
             elif isinstance(obj, when.PositionalContains):
                 r.append(self._gen_positional_contains(obj))
 
+            elif isinstance(obj, when.PositionalMatch):
+                r.append(self._gen_positional_match(obj))
+
             elif obj in ('&&', '||', '!'):
                 r.append(obj)
 
@@ -102,6 +105,16 @@ class ConditionGenerator:
             return f'{func} "${{POSITIONALS[{index}],,}}" {values.lower()}'
         else:
             return f'{func} "${{POSITIONALS[{index}]}}" {values}'
+
+    def _gen_positional_match(self, obj):
+        func = self.ctxt.helpers.use_function('regex_match')
+        regex = shell.quote(obj.regex)
+        index = obj.number - 1
+
+        if obj.ignore_case:
+            return f'{func} -i -- "${{POSITIONALS[{index}]}}" {regex}'
+        else:
+            return f'{func} -- "${{POSITIONALS[{index}]}}" {regex}'
 
     def _gen_variables(self, options, any_options):
         variables = []

@@ -288,6 +288,34 @@ contains -- $__QUERY_CACHE_POSITIONALS[$positional_num] $argv
 #endif
 ''', ['query_init'])
 
+_POSITIONAL_MATCH = FishFunction('positional_match', r'''
+# positional_match [-i] <NUM> <REGEX>
+#
+# Checks if the positional argument number NUM matches REGEX.
+# NUM counts from one.
+#
+#ifdef nocase
+set -l nocase_opt ''
+if test "$argv[1]" = -i; set nocase_opt 'i'; set -e argv[1]; end
+
+#endif
+#ifdef DEBUG
+if test (count $argv) -eq 0
+  echo '%FUNCNAME%: missing number' >&2
+  return 1
+end
+
+#endif
+set -l positional_num $argv[1]
+set -l regex $argv[2]
+
+#ifdef nocase
+string match -qr$nocase_opt $regex $__QUERY_CACHE_POSITIONALS[$positional_num]
+#else
+string match -qr $regex $__QUERY_CACHE_POSITIONALS[$positional_num]
+#endif
+''', ['query_init'])
+
 _HAS_OPTION = FishFunction('has_option', r'''
 # has_option [WITH_INCOMPLETE] <OPTIONS>
 #
@@ -1103,6 +1131,7 @@ class FishHelpers(GeneralHelpers):
         super().__init__(config, function_prefix, FishFunction)
         self.add_function(_QUERY_INIT)
         self.add_function(_POSITIONAL_CONTAINS)
+        self.add_function(_POSITIONAL_MATCH)
         self.add_function(_HAS_OPTION)
         self.add_function(_OPTION_IS)
         self.add_function(_OPTION_MATCH)

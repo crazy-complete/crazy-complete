@@ -158,7 +158,7 @@ class PositionalContains:
     def __init__(self, args):
         self.ignore_case = False
 
-        if args and args[0] == '-i':
+        if args and args[0].lower() == 'nocase':
             self.ignore_case = True
             args.pop(0)
 
@@ -176,6 +176,42 @@ class PositionalContains:
             raise CrazyError(msg)
 
         self.values = args
+
+
+class PositionalMatch:
+    '''Class for holding `positional_match`.'''
+
+    def __init__(self, args):
+        self.number = None
+        self.regex = None
+        self.ignore_case = False
+
+        if args and args[0].lower() == 'nocase':
+            self.ignore_case = True
+            args.pop(0)
+
+        try:
+            self.number = int(args.pop(0))
+        except ValueError:
+            msg = 'positional_match: number: %s' % (m.invalid_value())
+            raise CrazyError(msg)
+        except IndexError:
+            msg = 'positional_match: %s: %s' % (m.missing_arg(), 'number')
+            raise CrazyError(msg)
+
+        try:
+            self.regex = args.pop(0)
+        except IndexError:
+            msg = 'positional_match: %s: %s' % (m.missing_arg(), 'regex')
+            raise CrazyError(msg)
+
+        if not is_valid_extended_regex(self.regex):
+            msg = 'positional_match: %s: %s' % (m.not_an_extended_regex(), self.regex)
+            raise CrazyError(msg)
+
+        if args:
+            msg = 'positional_match: %s' % m.too_many_arguments()
+            raise CrazyError(msg)
 
 
 def replace_commands(tokens):
@@ -197,6 +233,8 @@ def replace_commands(tokens):
                 r.append(PositionalCount(args))
             elif cmd == 'positional_contains':
                 r.append(PositionalContains(args))
+            elif cmd == 'positional_match':
+                r.append(PositionalMatch(args))
             else:
                 raise CrazyError(f"Invalid command: {cmd!r}")
         else:

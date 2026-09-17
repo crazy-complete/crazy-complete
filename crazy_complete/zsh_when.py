@@ -28,6 +28,9 @@ def _generate(ctxt, query, tokens):
         elif isinstance(obj, when.PositionalContains):
             r.append(_generate_positional_contains(ctxt, query, obj))
 
+        elif isinstance(obj, when.PositionalMatch):
+            r.append(_generate_positional_match(ctxt, query, obj))
+
         elif obj in ('&&', '||', '!'):
             r.append(obj)
 
@@ -95,6 +98,16 @@ def _generate_positional_contains(ctxt, _query, obj):
         return f'{func} "${{(L)POSITIONALS[{obj.number}]}}" {values.lower()}'
     else:
         return f'{func} "${{POSITIONALS[{obj.number}]}}" {values}'
+
+
+def _generate_positional_match(_ctxt, _query, obj):
+    index = obj.number
+    regex = shell.quote(obj.regex)
+
+    if obj.ignore_case:
+        return f'[[ "${{(L)POSITIONALS[{index}]}}" =~ {regex.lower()} ]]'
+    else:
+        return f'[[ "${{POSITIONALS[{index}]}}" =~ {regex} ]]'
 
 
 def generate_when_conditions(ctxt, query, when_):

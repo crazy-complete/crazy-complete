@@ -3108,3 +3108,37 @@ fish_expected: |
   …tional-contains-nocase  …tional-count
 zsh_expected: |
   > crazy-complete-test positionals FOO --if-positional-co
+---
+number: 200
+definition_file: "when"
+description: "Check positional_match"
+send: "crazy-complete-test positionals regex --"
+bash_expected: |
+  > crazy-complete-test positionals regex --
+  --if-positional-count         --if-positional-regex-nocase
+  --if-positional-regex
+  > crazy-complete-test positionals regex --if-positional-
+fish_expected: |
+  > crazy-complete-test positionals regex --if-positional-
+  …sitional-count  …sitional-regex  …sitional-regex-nocase
+zsh_tabs: 2
+zsh_expected: |
+  > crazy-complete-test positionals regex --if-positional-
+  --if-positional-count         --if-positional-regex-nocase
+  --if-positional-regex
+---
+number: 201
+definition_file: "when"
+description: "Check positional_match (ignoring case)"
+send: "crazy-complete-test positionals REGEX --"
+bash_expected: |
+  > crazy-complete-test positionals REGEX --
+  --if-positional-count         --if-positional-regex-nocase
+  > crazy-complete-test positionals REGEX --if-positional-
+fish_expected: |
+  > crazy-complete-test positionals REGEX --if-positional-
+  …sitional-count  …sitional-regex-nocase
+zsh_tabs: 2
+zsh_expected: |
+  > crazy-complete-test positionals REGEX --if-positional-
+  --if-positional-count         --if-positional-regex-nocase

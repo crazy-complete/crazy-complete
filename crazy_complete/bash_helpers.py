@@ -248,6 +248,13 @@ local w='' regex="$1"; shift
 )
 ''')
 
+_REGEX_MATCH = ShellFunction('regex_match', r'''
+local shopt_arg='-u'
+[[ "$1" == "-i" ]] && { shopt_arg='-s'; shift; }
+[[ "$1" == "--" ]] && shift
+(shopt $shopt_arg nocasematch; [[ "$1" =~ $2 ]]; )
+''')
+
 _VALUE_LIST = ShellFunction('value_list', r'''
 #ifdef duplicates
 local duplicates=0
@@ -818,6 +825,7 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_ARRAY_CONTAINS)
         self.add_function(_ARRAY_CONTAINS_NOCASE)
         self.add_function(_ARRAY_MATCH)
+        self.add_function(_REGEX_MATCH)
         self.add_function(_GET_LAST_BREAK_POSITION)
         self.add_function(_PARSE_LINE)
         self.add_function(_GET_PREFIX_SUFFIX_LEN)

@@ -199,6 +199,31 @@ class PositionalContains(Condition):
         return make_condition_command('$positional_contains', args)
 
 
+class PositionalMatch(Condition):
+    '''Checks if a positional matches a regular expression.'''
+
+    def __init__(self, number, regex, ignore_case=False):
+        if not isinstance(number, int):
+            raise InternalError(f'number: Invalid type: {number}')
+
+        if not isinstance(regex, str):
+            raise InternalError(f'regex: Invalid type: {regex}')
+
+        self.number = number
+        self.regex = regex
+        self.ignore_case = ignore_case
+
+    def get_code(self, ctxt):
+        ctxt.helpers.use_function('positional_match')
+        args = [str(self.number), self.regex]
+
+        if self.ignore_case:
+            ctxt.helpers.use_function('positional_match', 'nocase')
+            args.insert(0, '-i')
+
+        return make_condition_command('$positional_match', args)
+
+
 def replace_commands(tokens):
     '''Replace when objects by own condition objects.'''
 
@@ -219,6 +244,9 @@ def replace_commands(tokens):
 
         elif isinstance(obj, when.PositionalContains):
             r.append(PositionalContains(obj.number, obj.values, obj.ignore_case))
+
+        elif isinstance(obj, when.PositionalMatch):
+            r.append(PositionalMatch(obj.number, obj.regex, obj.ignore_case))
 
         elif isinstance(obj, str):
             r.append(obj)

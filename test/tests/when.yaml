@@ -27,7 +27,13 @@ options:
     when: 'positional_contains 2 foo bar'
 
   - option_strings: ['--if-positional-contains-nocase']
-    when: 'positional_contains -i 2 foo bar'
+    when: 'positional_contains NOCASE 2 foo bar'
+
+  - option_strings: ['--if-positional-regex']
+    when: 'positional_match 2 "reg(ex)?"'
+
+  - option_strings: ['--if-positional-regex-nocase']
+    when: 'positional_match NOCASE 2 "reg(ex)?"'
 
 ---
 
