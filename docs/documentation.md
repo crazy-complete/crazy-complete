@@ -2603,6 +2603,8 @@ activated.
 
 ### has\_option
 
+> **Syntax**: `has_option OPTION...`
+
 > Checks if one or more specified options have been provided on the command line.
 
 > **NOTE**: The options used inside the condition have also to be defined as options!
@@ -2623,7 +2625,13 @@ options:
 
 ### option\_is
 
-> Checks if one ore more specified options have been set to a specific value.
+> **Syntax**: `option_is [ANY] [NOCASE] OPTION... -- VALUE...`
+
+> Checks if one or more specified options have been set to a specific value.
+
+> If `ANY` is specified, the match succeeds if any of the found options matches; otherwise, only the last option is checked.
+
+> If `NOCASE` is specified, perform a case-insensitive match.
 
 > **NOTE**: The options used inside the condition have also to be defined as options!
 
@@ -2642,7 +2650,35 @@ options:
 [...]
 ```
 
+### option\_match
+
+> **Syntax**: `option_match [ANY] [NOCASE] OPTION... -- REGEX`
+
+> Checks if one or more specified options match an extended regular expression.
+
+> If `ANY` is specified, the match succeeds if any of the found options matches; otherwise, only the last option is checked.
+
+> If `NOCASE` is specified, perform a case-insensitive match.
+
+> **NOTE**: The options used inside the condition have also to be defined as options!
+
+**Example:**
+
+```yaml
+[...]
+options:
+  - option_strings: ["--conditional"]
+    when: "option_match NOCASE --foo --bar -- 'foo[0-9]+'"
+
+  - option_strings: ["--foo", "--bar"]
+    complete: ["none"]
+[...]
+```
+
+
 ### positional\_count
+
+> **Syntax**: `positional_count OPERATOR NUMBER`
 
 > Checks the number of given positionals on the command line.
 
@@ -2664,7 +2700,11 @@ positionals:
 
 ### positional\_contains
 
+> **Syntax**: `positional_contains [NOCASE] NUMBER VALUES...`
+
 > Checks if a positional has a specific value.
+
+> If `NOCASE` is specified, perform a case-insensitive match.
 
 **Example:**
 
@@ -2675,6 +2715,27 @@ positionals:
 options:
   - option_strings: ["--conditional"]
     when: "positional_contains 1 foo bar"
+
+positionals:
+  - number: 1
+[...]
+```
+
+### positional\_match
+
+> **Syntax**: `positional_match [NOCASE] NUMBER REGEX`
+
+> Checks if a positional matches an extended reguar expression.
+
+> If `NOCASE` is specified, perform a case-insensitive match.
+
+**Example:**
+
+```yaml
+[...]
+options:
+  - option_strings: ["--conditional"]
+    when: "positional_match NOCASE 1 'foo[0-9]+'"
 
 positionals:
   - number: 1
