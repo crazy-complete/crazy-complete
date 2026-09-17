@@ -69,16 +69,17 @@ Installation
 
 |Operating System       | Download                       | Command                                        |
 |-----------------------|--------------------------------|-------------------------------------------------
-|Arch Linux             | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/arch-linux-python-crazy-complete-0.3.8-1-any.pkg.tar.zst)       | `sudo pacman -U ./arch-linux-python-crazy-complete-0.3.8-1-any.pkg.tar.zst`         |
-|Debian Trixie          | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/debian-trixie-python-crazy-complete_0.3.8_all.deb)   | `sudo apt install ./debian-trixie-python-crazy-complete_0.3.8_all.deb`   |
-|Debian Bookworm        | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/debian-bookworm-python-crazy-complete_0.3.8_all.deb) | `sudo apt install ./debian-bookworm-python-crazy-complete_0.3.8_all.deb` |
-|Ubuntu Noble           | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/ubuntu-noble-python-crazy-complete_0.3.8_all.deb)    | `sudo apt install ./ubuntu-noble-python-crazy-complete_0.3.8_all.deb`    |
-|Ubuntu Jammy           | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/ubuntu-jammy-python-crazy-complete_0.3.8_all.deb)    | `sudo apt install ./ubuntu-jammy-python-crazy-complete_0.3.8_all.deb`    |
-|Linux Mint 22          | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/linux-mint-22-python-crazy-complete_0.3.8_all.deb)   | `sudo apt install ./linux-mint-22-python-crazy-complete_0.3.8_all.deb`   |
-|Linux Mint 21          | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/linux-mint-21-python-crazy-complete_0.3.8_all.deb)   | `sudo apt install ./linux-mint-21-python-crazy-complete_0.3.8_all.deb`   |
-|Fedora 44              | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/fedora-44-python-crazy-complete-0.3.8-1.noarch.rpm)       | `sudo dnf install ./fedora-44-python-crazy-complete-0.3.8-1.noarch.rpm`       |
-|Fedora 43              | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/fedora-43-python-crazy-complete-0.3.8-1.noarch.rpm)       | `sudo dnf install ./fedora-43-python-crazy-complete-0.3.8-1.noarch.rpm`       |
-|OpenSuse (Tumbleweed)  | [0.3.8](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.8/opensuse-python-crazy-complete-0.3.8-1.noarch.rpm)        | `sudo zypper install ./opensuse-python-crazy-complete-0.3.8-1.noarch.rpm`     |
+|Arch Linux             | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/arch-linux-python-crazy-complete-0.3.9-1-any.pkg.tar.zst)       | `sudo pacman -U ./arch-linux-python-crazy-complete-0.3.9-1-any.pkg.tar.zst`         |
+|Debian Trixie          | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/debian-trixie-python-crazy-complete_0.3.9_all.deb)   | `sudo apt install ./debian-trixie-python-crazy-complete_0.3.9_all.deb`   |
+|Debian Bookworm        | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/debian-bookworm-python-crazy-complete_0.3.9_all.deb) | `sudo apt install ./debian-bookworm-python-crazy-complete_0.3.9_all.deb` |
+|Ubuntu Resolute        | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/ubuntu-resolute-python-crazy-complete_0.3.9_all.deb) | `sudo apt install ./ubuntu-resolute-python-crazy-complete_0.3.9_all.deb` |
+|Ubuntu Noble           | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/ubuntu-noble-python-crazy-complete_0.3.9_all.deb)    | `sudo apt install ./ubuntu-noble-python-crazy-complete_0.3.9_all.deb`    |
+|Ubuntu Jammy           | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/ubuntu-jammy-python-crazy-complete_0.3.9_all.deb)    | `sudo apt install ./ubuntu-jammy-python-crazy-complete_0.3.9_all.deb`    |
+|Linux Mint 22          | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/linux-mint-22-python-crazy-complete_0.3.9_all.deb)   | `sudo apt install ./linux-mint-22-python-crazy-complete_0.3.9_all.deb`   |
+|Linux Mint 21          | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/linux-mint-21-python-crazy-complete_0.3.9_all.deb)   | `sudo apt install ./linux-mint-21-python-crazy-complete_0.3.9_all.deb`   |
+|Fedora 44              | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/fedora-44-python-crazy-complete-0.3.9-1.noarch.rpm)       | `sudo dnf install ./fedora-44-python-crazy-complete-0.3.9-1.noarch.rpm`       |
+|Fedora 43              | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/fedora-43-python-crazy-complete-0.3.9-1.noarch.rpm)       | `sudo dnf install ./fedora-43-python-crazy-complete-0.3.9-1.noarch.rpm`       |
+|OpenSuse (Tumbleweed)  | [0.3.9](https://github.com/crazy-complete/crazy-complete/releases/download/0.3.9/opensuse-python-crazy-complete-0.3.9-1.noarch.rpm)        | `sudo zypper install ./opensuse-python-crazy-complete-0.3.9-1.noarch.rpm`     |
 
 - For other Linux distributions:
   ```

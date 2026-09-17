@@ -17,6 +17,7 @@ def replace_package_data(content):
         'debian-bookworm':  'DEBIAN_BOOKWORM',
         'ubuntu-noble':     'UBUNTU_NOBLE',
         'ubuntu-jammy':     'UBUNTU_JAMMY',
+        'ubuntu-resolute':  'UBUNTU_RESOLUTE',
         'linux-mint-22':    'LINUX_MINT_22',
         'linux-mint-21':    'LINUX_MINT_21',
         'fedora-44':        'FEDORA_44',
