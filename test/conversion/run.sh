@@ -4,7 +4,8 @@ set -e
 
 cd "$(dirname "$0")"
 
-CRAZY_COMPLETE=../../crazy-complete
+export PYTHONPATH='../..'
+CRAZY_COMPLETE='python3 -m crazy_complete.main'
 TEST_FILE=../tests/crazy-complete-test
 
 set -x

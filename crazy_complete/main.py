@@ -22,14 +22,14 @@ import yaml
 import argparse
 import traceback
 
-from crazy_complete import application
-from crazy_complete.utils import print_err
+from . import application
+from .utils import print_err
 
 # "Import" argparse definitions for:
 #   crazy-complete --input-type=python bash "$(which crazy-complete)"
 p = application._crazy_complete_argument_parser
 
-if __name__ == '__main__':
+def main():
     app = application.Application()
 
     try:
@@ -64,3 +64,6 @@ if __name__ == '__main__':
         print_err('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         print_err()
         sys.exit(3)
+
+if __name__ == '__main__':
+    main()

@@ -4,11 +4,15 @@ from setuptools import setup
 
 setup(
     name='crazy-complete',
-    version='0.3.9',
+    version='0.3.10',
     author='Benjamin Abendroth',
     author_email='braph93@gmx.de',
     packages=['crazy_complete'],
-    scripts=['crazy-complete'],
+    entry_points = {
+        "console_scripts": [
+            "crazy-complete=crazy_complete.main:main",
+        ],
+    },
     description='Generate shell completion files for all major shells',
     url='https://github.com/crazy-complete/crazy-complete',
     classifiers=[
@@ -27,5 +31,8 @@ setup(
     license='GPL-3.0-or-later',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    python_requires='>=3.0',
+    python_requires='>=3.9',
+    install_requires=[
+        "PyYAML>=6.0",
+    ],
 )

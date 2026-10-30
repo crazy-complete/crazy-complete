@@ -1,3 +1,36 @@
+[project]
+name = "crazy-complete"
+version = "0.3.10"
+description = "Generate shell completion files for all major shells"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+authors = [{ name = "Benjamin Abendroth", email = "braph93@gmx.de" }]
+requires-python = ">=3.9"
+dependencies = ["PyYAML>=6.0"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Unix Shell",
+  "Operating System :: OS Independent",
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: User Interfaces",
+  "Topic :: Software Development :: Code Generators",
+  "Topic :: System :: Shells",
+  "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/crazy-complete/crazy-complete"
+
+[project.scripts]
+crazy-complete = "crazy_complete.main:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [tool.ruff.lint]
 # First four warning types are enabled by default.
 select = ["E4", "E7", "E9", "F", "C90", "I", "N", "D", "B"]
@@ -21,7 +54,6 @@ ignore = [
   "D212", # multi-line-summary-first-line
 ]
 # These don't seem to be especially important.
-exclude = ["completions/fpm/old/**", "crazy_complete/.trash.py"]
 pydocstyle.convention = "google"
 
 [tool.ruff.lint.per-file-ignores]

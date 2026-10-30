@@ -22,7 +22,7 @@ SHELLS              = ['bash', 'fish', 'zsh']
 TMUX_SESSION_PREFIX = 'crazy-complete-test'
 TESTS_INFILE        = 'tests.yaml'
 TESTS_OUTFILE       = 'tests.new.yaml'
-CRAZY_COMPLETE      = '../../crazy-complete'
+CRAZY_COMPLETE      = [sys.executable, '-m', 'crazy_complete.main']
 COMPLETIONS_OUTDIR  = 'output'
 TEMP_DIR            = 'tmp'
 OUTPUT_WAIT         = 5
@@ -33,6 +33,12 @@ OUTPUT_WAIT         = 5
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 CURRENT_DIRECTORY = os.path.abspath(os.getcwd())
+
+# =============================================================================
+# Override PYTHONPATH
+# =============================================================================
+
+os.environ['PYTHONPATH'] = '../..'
 
 # =============================================================================
 # Commandline parser
@@ -268,7 +274,7 @@ class Tests:
             fh.write('\n'.join(batch_commands))
 
         print_err('Running batch file ...')
-        args = [CRAZY_COMPLETE, '--batch', batch_file]
+        args = [*CRAZY_COMPLETE, '--batch', batch_file]
         subprocess.run(args, check=True)
         print_err('Finished running batch file ...')
 

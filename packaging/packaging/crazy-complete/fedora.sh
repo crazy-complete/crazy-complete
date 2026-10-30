@@ -25,4 +25,4 @@ git clone https://github.com/crazy-complete/crazy-complete
 
 cd crazy-complete
 
-fpm -s python -t rpm -d python3-yaml setup.py
+fpm -s python -t rpm -d python3-yaml --no-python-dependencies setup.py

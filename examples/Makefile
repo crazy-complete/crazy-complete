@@ -1,4 +1,4 @@
-CRAZY_COMPLETE ?= ../crazy-complete
+CRAZY_COMPLETE ?= PYTHONPATH=.. python3 -m crazy_complete.main
 
 all: bash fish zsh
 
