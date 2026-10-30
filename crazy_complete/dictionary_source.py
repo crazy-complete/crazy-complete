@@ -168,6 +168,9 @@ def dictionaries_to_commandline(dictionaries):
     root = CommandLine('root')
 
     for dictionary in dictionaries:
+        if not isinstance(dictionary, dict):
+            raise CrazyTypeError('<document>', 'dict', dictionary)
+
         _check_prog_in_dictionary(dictionary)
 
         path = dictionary['prog'].split()

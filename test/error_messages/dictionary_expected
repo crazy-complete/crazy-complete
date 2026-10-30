@@ -255,11 +255,13 @@
 34_04-key-value-pair-exec-sep-empty      | foo: -o: key_value_pair_exec: value_separator: Invalid length. Single character expected
 34_05-key-value-pair-exec-command-empty  | foo: -o: key_value_pair_exec: command: String cannot be empty
 ======= Directory "05-misc" =======
-00-list                                  | Missing `prog` field
+00-list                                  | Parameter `<document>` has an invalid type. Expected types: dict. Received: ['foo', 'bar'] (list)
 01-multiple-repeatable-positionals       | foo: Too many repeatable positionals
 02-positional-after-repeatable           | foo: Positional argument found after a repeatable positional argument
 03-positional-after-repeatable           | foo: Positional argument found after a repeatable positional argument
 04-repeatable-and-subcommands            | foo: Repeatable positional arguments cannot be used together with subcommands
+05-empty-document                        | Parameter `<document>` has an invalid type. Expected types: dict. Received: None (NoneType)
+06-document-is-string                    | Parameter `<document>` has an invalid type. Expected types: dict. Received: 'bar' (str)
 ======= Directory "06-when" =======
 00_00-when-has-option-missing-args       | foo: -o: when: has_option: Missing required argument: options
 01_00-when-option-is-missing-args        | foo: -o: when: option_is: Missing required argument: options

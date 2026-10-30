@@ -64,6 +64,10 @@ class ExtendedYAMLParser:
         elif isinstance(event, DocumentEndEvent):
             if self.current_stack:
                 self.data.append(self.current_stack.pop())
+            else:
+                # Special case: empty document
+                value = ValueWithTrace.from_yaml_event(None, self.src, event)
+                self.data.append(value)
         elif isinstance(event, MappingStartEvent):
             new_map = ValueWithTrace.from_yaml_event({}, self.src, event)
             self.add_to_current_structure(self.current_key, new_map)
