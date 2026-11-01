@@ -227,7 +227,8 @@ class FishCompleteDirectory(FishCompletionCommand):
             'list' in trace or
             'key_value_list' in trace or
             'key_value_pair' in trace or
-            'prefix' in trace
+            'prefix' in trace or
+            'suffix' in trace
         )
 
         if directory is not None:
@@ -611,9 +612,23 @@ class FishCompleter(shell.ShellCompleter):
     def prefix(self, ctxt, trace, prefix, command):
         obj = self.complete_from_def(ctxt, trace, command)
         func = obj.get_function()
-
         prefix_func = ctxt.helpers.use_function('prefix')
         return FishCompletionCommand(ctxt, [prefix_func, prefix, func])
+
+    def suffix(self, ctxt, trace, suffix, command):
+        obj = self.complete_from_def(ctxt, trace, command)
+        func = obj.get_function()
+        suffix_func = ctxt.helpers.use_function('suffix')
+        return FishCompletionCommand(ctxt, [suffix_func, suffix, func])
+
+    def filter(self, ctxt, trace, patterns, command):
+        obj = self.complete_from_def(ctxt, trace, command)
+        func = obj.get_function()
+        filter_func = ctxt.helpers.use_function('filter')
+
+        pattern = f'^({"|".join(bash_glob_to_regex(p) for p in patterns)})$'
+
+        return FishCompletionCommand(ctxt, [filter_func, pattern, func])
 
     def ip_address(self, ctxt, _trace, type_='all'):
         func = '__fish_print_addresses'

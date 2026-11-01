@@ -15,6 +15,8 @@ key_value_pair: {"args": ["--input-type=yaml", "--include-file=include.key_value
 key_value_pair_exec: {"args": ["--input-type=yaml", "--include-file=include.key_value_pair_exec.$shell"], "definition_file": "key_value_pair_exec.yaml"}
 key_value_list_exec: {"args": ["--input-type=yaml", "--include-file=include.key_value_list_exec.$shell"], "definition_file": "key_value_list_exec.yaml"}
 complex: {"args": ["--input-type=yaml"], "definition_file": "complex.yaml"}
+suffix: {"args": ["--input-type=yaml"], "definition_file": "suffix.yaml"}
+filter: {"args": ["--input-type=yaml"], "definition_file": "filter.yaml"}
 long_opt_arg_sep: {"args": ["--input-type=yaml"], "definition_file": "long_opt_arg_sep.yaml"}
 option_arguments: {"args": ["--input-type=yaml"], "definition_file": "option_arguments.yaml"}
 ---
@@ -3142,3 +3144,204 @@ zsh_tabs: 2
 zsh_expected: |
   > crazy-complete-test positionals REGEX --if-positional-
   --if-positional-count         --if-positional-regex-nocase
+---
+number: 202
+definition_file: "suffix"
+description: "Check simple suffix (1)"
+send: "crazy-complete-test --suffix "
+bash_expected: |
+  > crazy-complete-test --suffix
+  1.suffix  2.suffix  3.suffix
+  > crazy-complete-test --suffix
+fish_expected: |
+  > crazy-complete-test --suffix
+  1.suffix  2.suffix  3.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix
+  1  2  3
+---
+number: 203
+definition_file: "suffix"
+description: "Check simple suffix (2)"
+send: "crazy-complete-test --suffix 1"
+bash_expected: |
+  > crazy-complete-test --suffix 1.suffix
+fish_expected: |
+  > crazy-complete-test --suffix 1.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix 1.suffix
+---
+number: 204
+definition_file: "suffix"
+description: "Check list with suffix (1)"
+send: "crazy-complete-test --suffix-list 1"
+bash_expected: |
+  > crazy-complete-test --suffix-list 1.suffix
+fish_expected: |
+  > crazy-complete-test --suffix-list 1.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix-list 1.suffix
+---
+number: 205
+definition_file: "suffix"
+description: "Check list with suffix (2)"
+send: "crazy-complete-test --suffix-list 1.suffix,"
+bash_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,
+  1.suffix,2.suffix  1.suffix,3.suffix
+  > crazy-complete-test --suffix-list 1.suffix,
+fish_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,
+  1.suffix,2.suffix  1.suffix,3.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,
+  1  2  3
+---
+number: 206
+definition_file: "suffix"
+description: "Check list with suffix (3)"
+send: "crazy-complete-test --suffix-list 1.suffix,2"
+bash_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,2.suffix
+fish_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,2.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,2.suffix
+---
+number: 207
+definition_file: "suffix"
+description: "Check list with colon suffix (1)"
+send: "crazy-complete-test --colon-suffix-list 1:suffix,2"
+bash_expected: |
+  > crazy-complete-test --colon-suffix-list 1:suffix,2:suffix
+fish_expected: |
+  > crazy-complete-test --colon-suffix-list 1:suffix,2:suffix
+zsh_expected: |
+  > crazy-complete-test --colon-suffix-list 1:suffix,2:suffix
+---
+number: 208
+definition_file: "filter"
+description: "Check filter"
+send: "crazy-complete-test --filter "
+bash_expected: |
+  > crazy-complete-test --filter
+  111  2    3
+  > crazy-complete-test --filter
+fish_expected: |
+  > crazy-complete-test --filter
+  2  3  111
+zsh_expected: |
+  > crazy-complete-test --filter
+  111  2    3
+---
+number: 209
+definition_file: "filter"
+description: "Check filter (2)"
+send: "crazy-complete-test --filter-2 "
+bash_expected: |
+  > crazy-complete-test --filter-2
+  cherry  lemon
+  > crazy-complete-test --filter-2
+fish_expected: |
+  > crazy-complete-test --filter-2
+  cherry  lemon
+zsh_expected: |
+  > crazy-complete-test --filter-2
+  cherry  lemon
+---
+number: 210
+definition_file: "filter"
+description: "Check many filters"
+send: "crazy-complete-test --filter-many "
+bash_expected: |
+  > crazy-complete-test --filter-many
+  3  4
+  > crazy-complete-test --filter-many
+fish_expected: |
+  > crazy-complete-test --filter-many
+  3  4
+zsh_expected: |
+  > crazy-complete-test --filter-many
+  3  4
+---
+number: 211
+definition_file: "filter"
+description: "Check list with filter (1)"
+send: "crazy-complete-test --filter-list "
+bash_expected: |
+  > crazy-complete-test --filter-list
+  111  2    3
+  > crazy-complete-test --filter-list
+fish_expected: |
+  > crazy-complete-test --filter-list
+  2  3  111
+zsh_expected: |
+  > crazy-complete-test --filter-list
+  111  2    3
+---
+number: 212
+definition_file: "filter"
+description: "Check list with filter (2)"
+send: "crazy-complete-test --filter-list 1,"
+bash_expected: |
+  > crazy-complete-test --filter-list 1,
+  1,111  1,2    1,3
+  > crazy-complete-test --filter-list 1,
+fish_expected: |
+  > crazy-complete-test --filter-list 1,
+  1,2  1,3  1,111
+zsh_expected: |
+  > crazy-complete-test --filter-list 1,
+  111  2    3
+---
+number: 213
+definition_file: "filter"
+description: "Check list with filter (3)"
+send: "crazy-complete-test --filter-list-2 "
+bash_expected: |
+  > crazy-complete-test --filter-list-2
+  cherry  lemon
+  > crazy-complete-test --filter-list-2
+fish_expected: |
+  > crazy-complete-test --filter-list-2
+  cherry  lemon
+zsh_expected: |
+  > crazy-complete-test --filter-list-2
+  cherry  lemon
+---
+number: 214
+definition_file: "filter"
+description: "Check list with filter (4)"
+send: "crazy-complete-test --filter-list-2 apple,"
+bash_expected: |
+  > crazy-complete-test --filter-list-2 apple,
+  apple,cherry  apple,lemon
+  > crazy-complete-test --filter-list-2 apple,
+fish_expected: |
+  > crazy-complete-test --filter-list-2 apple,
+  apple,cherry  apple,lemon
+zsh_expected: |
+  > crazy-complete-test --filter-list-2 apple,
+  cherry  lemon
+---
+number: 215
+definition_file: "complex"
+description: "complex: Check list-prefix-suffix-filter (1)"
+send: "crazy-complete-test --list-prefix-suffix-filter "
+bash_expected: |
+  > crazy-complete-test --list-prefix-suffix-filter PRE
+fish_expected: |
+  > crazy-complete-test --list-prefix-suffix-filter PRE
+zsh_expected: |
+  > crazy-complete-test --list-prefix-suffix-filter PRE
+---
+number: 216
+definition_file: "complex"
+description: "complex: Check list-prefix-suffix-filter (2)"
+send: "crazy-complete-test --list-prefix-suffix-filter PREb"
+bash_expected: |
+  > crazy-complete-test --list-prefix-suffix-filter PREbananaSUF
+fish_expected: |
+  > crazy-complete-test --list-prefix-suffix-filter PREbananaSUF
+zsh_expected: |
+  > crazy-complete-test --list-prefix-suffix-filter PREbananaSUF

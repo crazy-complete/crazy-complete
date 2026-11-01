@@ -1,4 +1,12 @@
 prog: "crazy-complete-test"
+options:
+  - option_strings: ['--list-prefix-suffix-filter']
+    complete: ['list',
+                ['prefix', 'PRE',
+                  ['suffix', 'SUF',
+                    ['filter', ['a*'],
+                      ['choices', ['apple', 'banana', 'cherry']]]]]]
+
 positionals:
   - number: 1
     repeatable: true

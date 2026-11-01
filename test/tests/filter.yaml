@@ -1,0 +1,17 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ['--filter']
+    complete: ['filter', ['[1]'], ['choices', ['1', '111', '2', '3']]]
+
+  - option_strings: ['--filter-list']
+    complete: ['list', ['filter', ['[1]'], ['choices', ['1', '111', '2', '3']]]]
+
+  - option_strings: ['--filter-2']
+    complete: ['filter', ['*a*'], ['choices', ['apple', 'banana', 'cherry', 'lemon']]]
+
+  - option_strings: ['--filter-list-2']
+    complete: ['list', ['filter', ['*a*'], ['choices', ['apple', 'banana', 'cherry', 'lemon']]]]
+
+  - option_strings: ['--filter-many']
+    complete: ['filter', ['[1]', '[2]'], ['choices', ['1', '2', '3', '4']]]
+

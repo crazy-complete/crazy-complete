@@ -185,7 +185,7 @@ def _check_void(_ctxt, arguments):
 def _check_none(ctxt, arguments):
     arguments.require_no_more()
 
-    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'prefix'):
+    if ctxt.trace and ctxt.trace[-1] in ('combine', 'list', 'prefix', 'suffix', 'filter'):
         msg = m.completer_not_allowed_in('none', ctxt.trace[-1])
         raise _error(msg, arguments.args)
 
@@ -558,6 +558,41 @@ def _check_prefix(ctxt, arguments):
     _check_complete(ctxt, command)
 
 
+def _check_suffix(ctxt, arguments):
+    suffix = arguments.get_required_arg('suffix')
+    command = arguments.get_required_arg('command')
+    arguments.require_no_more()
+
+    _check_type(suffix, (str,), 'suffix')
+    _check_type(command, (list,), 'command')
+
+    ctxt.trace.append('suffix')
+    _check_complete(ctxt, command)
+
+
+def _check_filter(ctxt, arguments):
+    patterns = arguments.get_required_arg('patterns')
+    command = arguments.get_required_arg('command')
+    arguments.require_no_more()
+
+    _check_type(patterns, (list,), 'patterns')
+    _check_type(command, (list,), 'command')
+
+    _check_non_empty_list(patterns, 'patterns')
+
+    for pattern in patterns.value:
+        _check_type(pattern, (str,), 'pattern')
+        _check_non_empty_string(pattern, 'pattern')
+        try:
+            bash_glob_to_regex(pattern.value)
+            bash_glob_to_zsh_glob(pattern.value)
+        except ValueError as e:
+            raise _error('%s: %s' % ('pattern', e), pattern) from e
+
+    ctxt.trace.append('filter')
+    _check_complete(ctxt, command)
+
+
 def _check_history(_ctxt, arguments):
     pattern = arguments.get_required_arg("pattern")
     _check_type(pattern, (str,), "pattern")
@@ -640,6 +675,7 @@ _COMMANDS = {
     'file':                         _check_file,
     'file_list':                    _check_file_list,
     'filesystem_type':              _check_void,
+    'filter':                       _check_filter,
     'float':                        _check_float,
     'gid':                          _check_void,
     'group':                        _check_void,
@@ -664,6 +700,7 @@ _COMMANDS = {
     'range':                        _check_range,
     'service':                      _check_void,
     'signal':                       _check_void,
+    'suffix':                       _check_suffix,
     'timezone':                     _check_void,
     'uid':                          _check_void,
     'user':                         _check_void,

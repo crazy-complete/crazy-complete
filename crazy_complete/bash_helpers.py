@@ -583,6 +583,18 @@ else
 fi
 ''', ['dequote', 'exec'])
 
+_FILTER = ShellFunction('filter', r'''
+local item pattern copy=("${COMPREPLY[@]}")
+COMPREPLY=()
+for item in "${copy[@]}"; do
+  for pattern in "$@"; do
+    [[ "$item" == $pattern ]] && continue 2
+  done
+
+  COMPREPLY+=("$item")
+done
+''')
+
 _PREFIX_COMPREPLY = ShellFunction('prefix_compreply', r'''
 [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
 
@@ -652,6 +664,16 @@ if (( break_position < 0 )); then
   done
 fi
 ''', ['get_last_break_position', 'strip_prefix_keep_quoting'])
+
+_SUFFIX = ShellFunction('suffix', r'''
+local i suffix="$1" func="$2"
+
+$func
+
+for i in "${!COMPREPLY[@]}"; do
+  COMPREPLY[i]="${COMPREPLY[i]}$suffix"
+done
+''')
 
 _STRIP_PREFIX_KEEP_QUOTING = ShellFunction('strip_prefix_keep_quoting', r'''
 local p="$1" pi=0 plen=${#1}
@@ -820,7 +842,9 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_VALUES)
         self.add_function(_DEQUOTE)
         self.add_function(_DEQUOTE_WORDS)
+        self.add_function(_FILTER)
         self.add_function(_PREFIX)
+        self.add_function(_SUFFIX)
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
         self.add_function(_ARRAY_CONTAINS)
         self.add_function(_ARRAY_CONTAINS_NOCASE)

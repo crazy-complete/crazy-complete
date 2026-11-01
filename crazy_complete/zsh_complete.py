@@ -564,6 +564,21 @@ class ZshCompleter(shell.ShellCompleter):
         func = obj.get_function()
         return ZshComplFunc(ctxt, [prefix_func, prefix, func], needs_braces=True)
 
+    def suffix(self, ctxt, trace, suffix, command):
+        suffix_func = ctxt.helpers.use_function('suffix')
+        obj = self.complete_from_def(ctxt, trace, command)
+        func = obj.get_function()
+        return ZshComplFunc(ctxt, [suffix_func, suffix, func], needs_braces=True)
+
+    def filter(self, ctxt, trace, patterns, command):
+        filter_func = ctxt.helpers.use_function('filter')
+        obj = self.complete_from_def(ctxt, trace, command)
+        func = obj.get_function()
+
+        pattern = f'({" ".join(bash_glob_to_zsh_glob(p) for p in patterns)})'
+
+        return ZshComplFunc(ctxt, [filter_func, pattern, func], needs_braces=True)
+
     def ip_address(self, ctxt, _trace, type_='all'):
         if type_ == 'ipv4':
             return ZshComplFunc(ctxt, ['_bind_addresses', '-4'])

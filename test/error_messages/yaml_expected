@@ -254,6 +254,28 @@
 34_03-key-value-pair-exec-sep-wrong-value | line 4, column 39: foo: -o: key_value_pair_exec: value_separator: Invalid length. Single character expected
 34_04-key-value-pair-exec-sep-empty      | line 4, column 39: foo: -o: key_value_pair_exec: value_separator: Invalid length. Single character expected
 34_05-key-value-pair-exec-command-empty  | line 4, column 44: foo: -o: key_value_pair_exec: command: String cannot be empty
+35_00-prefix-missing-arg                 | line 4, column 15: foo: -o: prefix: Missing required argument: prefix
+35_01-prefix-missing-arg-2               | line 4, column 15: foo: -o: prefix: Missing required argument: command
+35_02-prefix-arg-wrong-type              | line 4, column 26: foo: -o: prefix: prefix: Invalid type. Expected: string
+35_03-prefix-too-many-args               | line 4, column 15: foo: -o: prefix: Too many arguments
+35_04-prefix-no-command                  | line 4, column 31: foo: -o: prefix: Missing required argument: command
+35_05-prefix-command-wrong-type          | line 4, column 31: foo: -o: prefix: command: Invalid type. Expected: list
+36_00-filter-missing-arg                 | line 4, column 15: foo: -o: filter: Missing required argument: patterns
+36_01-filter-missing-arg-2               | line 4, column 15: foo: -o: filter: Missing required argument: command
+36_02-filter-patterns-wrong-type         | line 4, column 26: foo: -o: filter: patterns: Invalid type. Expected: list
+36_03-filter-too-many-args               | line 4, column 15: foo: -o: filter: Too many arguments
+36_04-filter-no-command                  | line 4, column 37: foo: -o: filter: Missing required argument: command
+36_05-filter-patterns-empty              | line 4, column 26: foo: -o: filter: patterns: List cannot be empty
+36_06-filter-pattern-wrong-type          | line 4, column 27: foo: -o: filter: pattern: Invalid type. Expected: string
+36_07-filter-invalid-pattern-1           | line 4, column 27: foo: -o: filter: pattern: Unclosed character class
+36_08-filter-invalid-pattern-2           | line 4, column 27: foo: -o: filter: pattern: Extended glob of form *(...) not supported in zsh glob
+36_09-filter-command-wrong-type          | line 4, column 37: foo: -o: filter: command: Invalid type. Expected: list
+37_00-suffix-missing-arg                 | line 4, column 15: foo: -o: suffix: Missing required argument: suffix
+37_01-suffix-missing-arg-2               | line 4, column 15: foo: -o: suffix: Missing required argument: command
+37_02-suffix-arg-wrong-type              | line 4, column 26: foo: -o: suffix: suffix: Invalid type. Expected: string
+37_03-suffix-too-many-args               | line 4, column 15: foo: -o: suffix: Too many arguments
+37_04-suffix-no-command                  | line 4, column 31: foo: -o: suffix: Missing required argument: command
+37_05-suffix-command-wrong-type          | line 4, column 31: foo: -o: suffix: command: Invalid type. Expected: list
 ======= Directory "05-misc" =======
 00-list                                  | line 1, column 1: Invalid type. Expected: dictionary
 01-multiple-repeatable-positionals       | line 6, column 5: foo: Too many repeatable positionals

@@ -1,0 +1,10 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ['--suffix']
+    complete: ['suffix', '.suffix', ['choices', ['1', '2', '3']]]
+
+  - option_strings: ['--suffix-list']
+    complete: ['list', ['suffix', '.suffix', ['choices', ['1', '2', '3']]]]
+
+  - option_strings: ['--colon-suffix-list']
+    complete: ['list', ['suffix', ':suffix', ['choices', ['1', '2', '3']]]]

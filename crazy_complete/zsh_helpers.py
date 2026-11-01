@@ -375,6 +375,23 @@ done
 return 1
 ''', ['array_contains'])
 
+_COMPADD_WRAPPER = ShellFunction('compadd_wrapper', r'''
+local args=()
+[[ -v _COMPADD_WRAPPER_FILTER ]] && args+=( -F "$_COMPADD_WRAPPER_FILTER" )
+[[ -v _COMPADD_WRAPPER_SUFFIX ]] && args+=( -S "$_COMPADD_WRAPPER_SUFFIX" )
+builtin compadd "${args[@]}" "$@"
+''')
+
+_FILTER = ShellFunction('filter', r'''
+local _COMPADD_WRAPPER_FILTER="$1" func="$2"
+{
+  function compadd() { compadd_wrapper "$@"; }
+  $func
+} always {
+  unfunction compadd 2>/dev/null
+}
+''', ['compadd_wrapper'])
+
 _PREFIX = ShellFunction('prefix', r'''
 if [[ "$PREFIX" == "$1"* ]]; then
   PREFIX="${PREFIX#"$1"}"
@@ -384,6 +401,16 @@ else
   compadd -S '' -- "$1"
 fi
 ''')
+
+_SUFFIX = ShellFunction('suffix', r'''
+local _COMPADD_WRAPPER_SUFFIX="$1" func="$2"
+{
+  function compadd() { compadd_wrapper "$@"; }
+  $func
+} always {
+  unfunction compadd 2>/dev/null
+}
+''', ['compadd_wrapper'])
 
 _EXEC = ShellFunction('exec', r'''
 local item='' desc='' describe=()
@@ -565,7 +592,10 @@ class ZshHelpers(GeneralHelpers):
         self.add_function(_EXEC)
         self.add_function(_KEY_VALUE_PAIR_EXEC)
         self.add_function(_KEY_VALUE_LIST_EXEC)
+        self.add_function(_COMPADD_WRAPPER)
+        self.add_function(_FILTER)
         self.add_function(_PREFIX)
+        self.add_function(_SUFFIX)
         self.add_function(_HISTORY)
         self.add_function(_PATH_FILES_RELATIVE)
         self.add_function(_MIME_FILE)

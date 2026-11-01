@@ -1010,6 +1010,46 @@ COMMANDS = [{'also': {'alsa_device': 'For completing ALSA devices'},
             'devtmpfs\n'
             '[...]\n',
   'short': 'Complete filesystem types'},
+ {'also': None,
+  'category': 'meta',
+  'command': 'filter',
+  'definition': "prog: 'example'\n"
+                'options:\n'
+                "  - option_strings: ['--filter']\n"
+                "    complete: ['filter', ['a*'], ['choices', ['apple', "
+                "'banana', 'cherry']]]\n",
+  'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n"
+                        '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33m--filter\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n"
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mfilter\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33ma*\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m],\x1b[37m "
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mchoices\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mapple\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mbanana\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mcherry\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m]]]\x1b[37m\x1b[39;49;00m\n",
+  'implemented': None,
+  'long': '`GLOB_PATTERNS`:\n'
+          '  A list of Bash glob patterns that are used for removing the '
+          'candidates.\n'
+          '\n'
+          '`COMPLETER`:\n'
+          '  The completer used to generate the completion candidates.\n',
+  'long_colored': '\x1b[33m`GLOB_PATTERNS`\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                  '  A list of Bash glob patterns that are used for removing '
+                  'the candidates.\x1b[37m\x1b[39;49;00m\n'
+                  '\n'
+                  '\x1b[33m`COMPLETER`\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                  '  The completer used to generate the completion '
+                  'candidates.\x1b[37m\x1b[39;49;00m\n',
+  'notes': ['For filtering files or directories, use the `ignore_globs` option '
+            'of the `file`/`directory` completer'],
+  'output': '~ > example --filter=<TAB>\nbanana  cherry\n',
+  'short': 'Filters (removes) completion candidates from a completer'},
  {'also': {'integer': 'For completing integer values'},
   'category': 'basic',
   'command': 'float',
@@ -2586,6 +2626,41 @@ COMMANDS = [{'also': {'alsa_device': 'For completing ALSA devices'},
             'INT     -- Terminal interrupt signal\n'
             '[...]\n',
   'short': 'Complete signal names'},
+ {'also': None,
+  'category': 'meta',
+  'command': 'suffix',
+  'definition': "prog: 'example'\n"
+                'options:\n'
+                "  - option_strings: ['--suffix']\n"
+                "    complete: ['suffix', '.suffix', ['file']]\n",
+  'definition_colored': '\x1b[94mprog\x1b[39;49;00m:\x1b[37m '
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33mexample\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[37m\x1b[39;49;00m\n"
+                        '\x1b[94moptions\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                        '\x1b[37m  \x1b[39;49;00m-\x1b[37m '
+                        '\x1b[39;49;00m\x1b[94moption_strings\x1b[39;49;00m:\x1b[37m '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33m--suffix\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m]\x1b[37m\x1b[39;49;00m\n"
+                        '\x1b[37m    '
+                        '\x1b[39;49;00m\x1b[94mcomplete\x1b[39;49;00m:\x1b[37m '
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33msuffix\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m\x1b[33m.suffix\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m,\x1b[37m "
+                        "\x1b[39;49;00m[\x1b[33m'\x1b[39;49;00m\x1b[33mfile\x1b[39;49;00m\x1b[33m'\x1b[39;49;00m]]\x1b[37m\x1b[39;49;00m\n",
+  'implemented': None,
+  'long': '`SUFFIX`:\n'
+          '  The string to append to each completion candidate.\n'
+          '\n'
+          '`COMPLETER`:\n'
+          '  The completer used to generate the completion candidates.\n',
+  'long_colored': '\x1b[33m`SUFFIX`\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                  '  The string to append to each completion '
+                  'candidate.\x1b[37m\x1b[39;49;00m\n'
+                  '\n'
+                  '\x1b[33m`COMPLETER`\x1b[39;49;00m:\x1b[37m\x1b[39;49;00m\n'
+                  '  The completer used to generate the completion '
+                  'candidates.\x1b[37m\x1b[39;49;00m\n',
+  'notes': [],
+  'output': '~ > example --suffix=file1<TAB>\n'
+            '~ > example --suffix=file1.suffix\n',
+  'short': 'Append suffix to completions'},
  {'also': None,
   'category': 'bonus',
   'command': 'timezone',

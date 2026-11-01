@@ -479,6 +479,20 @@ class BashCompleter(shell.ShellCompleter):
         prefix_func = ctxt.helpers.use_function('prefix')
         return BashCompletionFunc(ctxt, [prefix_func, prefix, func])
 
+    def suffix(self, ctxt, trace, suffix, command):
+        obj = self.complete_from_def(ctxt, trace, command)
+        func = obj.get_function()
+        suffix_func = ctxt.helpers.use_function('suffix')
+        return BashCompletionFunc(ctxt, [suffix_func, suffix, func])
+
+    def filter(self, ctxt, trace, patterns, command):
+        obj = self.complete_from_def(ctxt, trace, command)
+        filter_func = ctxt.helpers.use_function('filter')
+
+        code = f'{obj.get_code()}\n'
+        code += f'{filter_func} {shell.join_quoted(patterns)}'
+        return BashCompletionCode(ctxt, code)
+
     def ip_address(self, ctxt, _trace, type_='all'):
         func = bash_versions.ip_addresses(ctxt)
 

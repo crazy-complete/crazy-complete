@@ -163,14 +163,16 @@ help: "<SUBCOMMAND DESCRIPTION>"
 
 ### Meta commands
 
-| Command                             | Description                                             |
-| ----------------------------------- | ------------------------------------------------------- |
-| [combine](#combine)                 | Combine multiple completers                             |
-| [key\_value\_list](#key_value_list) | Complete comma-separated lists of key=value pairs       |
-| [key\_value\_pair](#key_value_pair) | Complete single key=value pairs                         |
-| [list](#list)                       | Complete comma-separated lists using a completer        |
-| [none](#none)                       | No completion, but specify that an argument is required |
-| [prefix](#prefix)                   | Prefix completions with a string                        |
+| Command                             | Description                                              |
+| ----------------------------------- | -------------------------------------------------------- |
+| [combine](#combine)                 | Combine multiple completers                              |
+| [filter](#filter)                   | Filters (removes) completion candidates from a completer |
+| [key\_value\_list](#key_value_list) | Complete comma-separated lists of key=value pairs        |
+| [key\_value\_pair](#key_value_pair) | Complete single key=value pairs                          |
+| [list](#list)                       | Complete comma-separated lists using a completer         |
+| [none](#none)                       | No completion, but specify that an argument is required  |
+| [prefix](#prefix)                   | Prefix completions with a string                         |
+| [suffix](#suffix)                   | Append suffix to completions                             |
 
 ---
 
@@ -1718,6 +1720,45 @@ root     rtkit    systemd-coredump  systemd-journal-remote  systemd-network
 
 ---
 
+### filter
+
+> Filters (removes) completion candidates from a completer
+
+**SYNOPSIS**
+
+```yaml
+['filter', <GLOB_PATTERNS>, <COMPLETER>]
+```
+
+**PARAMETERS**
+
+`GLOB_PATTERNS`:
+  A list of Bash glob patterns that are used for removing the candidates.
+
+`COMPLETER`:
+  The completer used to generate the completion candidates.
+
+
+**NOTES**
+
+- For filtering files or directories, use the `ignore_globs` option of the `file`/`directory` completer
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--filter']
+    complete: ['filter', ['a*'], ['choices', ['apple', 'banana', 'cherry']]]
+```
+
+```
+~ > example --filter=<TAB>
+banana  cherry
+```
+
+---
+
 ### key\_value\_list
 
 > Complete comma-separated lists of key=value pairs
@@ -2031,6 +2072,41 @@ options:
 
 ~ > example --prefix=input:<TAB>
 ~ > example --prefix=input:file1.txt
+```
+
+---
+
+### suffix
+
+> Append suffix to completions
+
+**SYNOPSIS**
+
+```yaml
+['suffix', <SUFFIX>, <COMPLETER>]
+```
+
+**PARAMETERS**
+
+`SUFFIX`:
+  The string to append to each completion candidate.
+
+`COMPLETER`:
+  The completer used to generate the completion candidates.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--suffix']
+    complete: ['suffix', '.suffix', ['file']]
+```
+
+```
+~ > example --suffix=file1<TAB>
+~ > example --suffix=file1.suffix
 ```
 
 ---

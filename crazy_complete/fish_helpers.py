@@ -687,6 +687,20 @@ switch $comp
 end
 ''', ['get_completing_arg'])
 
+_FILTER = FishFunction('filter', r'''
+set -l pattern $argv[1]
+set -l func $argv[2]
+set -l line
+set -l split
+
+$func | while read line
+  set split (string split -m1 -- \t "$line")
+  if not string match -qr -- $pattern "$split[1]"
+    printf "%s\t%s\n" "$split[1]" "$split[2]"
+  end
+end
+''')
+
 _PREFIX = FishFunction('prefix', r'''
 set -l comp (get_completing_arg)
 set -l prefix_escaped (string escape --style=regex -- $argv[1])
@@ -698,6 +712,18 @@ else
   printf "%s\n" $argv[1]
 end
 ''', ['get_completing_arg'])
+
+_SUFFIX = FishFunction('suffix', r'''
+set -l suffix $argv[1]
+set -l func $argv[2]
+set -l line
+set -l split
+
+$func | while read line
+  set split (string split -m1 -- \t "$line")
+  printf "%s\t%s\n" "$split[1]$suffix" "$split[2]"
+end
+''')
 
 _KEY_VALUE_LIST = FishFunction('key_value_list', r'''
 set -l sep1 $argv[1]
@@ -1142,7 +1168,9 @@ class FishHelpers(GeneralHelpers):
         self.add_function(_GET_COMPLETING_ARG)
         self.add_function(_FILEDIR)
         self.add_function(_LIST)
+        self.add_function(_FILTER)
         self.add_function(_PREFIX)
+        self.add_function(_SUFFIX)
         self.add_function(_KEY_VALUE_LIST)
         self.add_function(_KEY_VALUE_PAIR)
         self.add_function(_KEY_VALUE_LIST_EXEC)

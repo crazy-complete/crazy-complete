@@ -41,6 +41,52 @@ output: |
 
 ---
 
+command: 'suffix'
+category: 'meta'
+synopsis: |
+  ['suffix', <SUFFIX>, <COMPLETER>]
+short: 'Append suffix to completions'
+long: |
+  `SUFFIX`:
+    The string to append to each completion candidate.
+  
+  `COMPLETER`:
+    The completer used to generate the completion candidates.
+definition: |
+  prog: 'example'
+  options:
+    - option_strings: ['--suffix']
+      complete: ['suffix', '.suffix', ['file']]
+output: |
+  ~ > example --suffix=file1<TAB>
+  ~ > example --suffix=file1.suffix
+
+---
+
+command: 'filter'
+category: 'meta'
+synopsis: |
+  ['filter', <GLOB_PATTERNS>, <COMPLETER>]
+short: 'Filters (removes) completion candidates from a completer'
+long: |
+  `GLOB_PATTERNS`:
+    A list of Bash glob patterns that are used for removing the candidates.
+  
+  `COMPLETER`:
+    The completer used to generate the completion candidates.
+notes:
+  - "For filtering files or directories, use the `ignore_globs` option of the `file`/`directory` completer"
+definition: |
+  prog: 'example'
+  options:
+    - option_strings: ['--filter']
+      complete: ['filter', ['a*'], ['choices', ['apple', 'banana', 'cherry']]]
+output: |
+  ~ > example --filter=<TAB>
+  banana  cherry
+
+---
+
 command: 'combine'
 synopsis: |
   ['combine', <COMPLETERS>]
