@@ -11,6 +11,7 @@ import argparse
 from .errors import CrazyError
 from . import bash, fish, zsh
 from . import argparse_source, json_source, yaml_source
+from . import completely
 from . import argparse_mod  # .complete()
 from . import help_converter
 from . import utils
@@ -81,7 +82,8 @@ p.add_argument(
     help='Specify the variable name of the ArgumentParser object (for --input-type=python)')
 
 p.add_argument(
-    '--input-type', choices=('yaml', 'json', 'python', 'help', 'auto'), default='auto',
+    '--input-type', choices=('yaml', 'json', 'python', 'help', 'completely', 'auto'),
+    default='auto',
     help='Specify input file type')
 
 p.add_argument(
@@ -224,11 +226,11 @@ def load_definition_file(opts):
 
         if extension == '':
             msg = ('File has no extension. '
-                   'Please supply --input-type=json|yaml|help|python')
+                   'Please supply --input-type=json|yaml|help|python|completely')
             raise CrazyError(msg)
 
         msg = (f'Unknown file extension `{extension}`. '
-               'Please supply --input-type=json|yaml|help|python')
+               'Please supply --input-type=json|yaml|help|python|completely')
         raise CrazyError(msg)
 
     if opts.input_type == 'json':
@@ -242,6 +244,9 @@ def load_definition_file(opts):
             opts.definition_file,
             opts.parser_variable,
             parser_blacklist=[_crazy_complete_argument_parser])
+
+    if opts.input_type == 'completely':
+        return completely.load_from_file(opts.definition_file)
 
     raise AssertionError("Should not be reached")
 

@@ -9,3 +9,4 @@ set -x
 ./tests/run.py "$@"
 ./error_messages/run.py
 ./conversion/run.sh
+./completely/run.sh

@@ -1,0 +1,4 @@
+prog: "combine"
+options:
+  - option_strings: ["-o"]
+    complete: ["combine", [["directory"], ["signal"]]]

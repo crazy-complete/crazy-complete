@@ -77,3 +77,17 @@ Test subdirectories
      ensuring user feedback is clear and helpful.
 
    - **Usage**: `./error_messages/run.py`
+
+- **./completely/run.sh**
+
+  - Tests for the `completely` input type.
+    For every `*.input.yaml` file this script runs crazy-complete
+    in `yaml` mode with `--input-type=completely` and compares the result
+    against the matching `*.expected.yaml` file.
+
+  - **Usage**: `./completely/run.sh [OPTIONS]`
+
+    - `--update`:
+      Instead of checking against the expected files, this writes the current
+      crazy-complete output to the matching `*.expected.yaml`.
+      Use this to (re)generate the expected files after a change.

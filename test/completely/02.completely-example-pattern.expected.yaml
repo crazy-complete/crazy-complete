@@ -1,0 +1,48 @@
+prog: "mygit"
+options:
+  - option_strings: ["-h", "--help"]
+
+  - option_strings: ["-v", "--version"]
+
+  - option_strings: ["--config"]
+    metavar: "file"
+    complete: ["file"]
+---
+prog: "mygit clone"
+options:
+  - option_strings: ["--depth"]
+    metavar: "depth"
+    complete: ["choices", ["1", "10", "100"]]
+
+positionals:
+  - number: 1
+    metavar: "source"
+    complete: ["exec", "git branch --format='%(refname:short)' 2>/dev/null"]
+
+  - number: 2
+    metavar: "dest"
+    complete: ["directory"]
+---
+prog: "mygit init"
+options:
+  - option_strings: ["--bare"]
+
+positionals:
+  - number: 1
+    metavar: "directory"
+    complete: ["directory"]
+---
+prog: "mygit status"
+options:
+  - option_strings: ["--help"]
+
+  - option_strings: ["--branch", "-b"]
+    metavar: "branch"
+    complete: ["exec", "git branch --format='%(refname:short)' 2>/dev/null"]
+
+  - option_strings: ["--format"]
+    metavar: "format"
+    complete: ["choices", ["short", "long"]]
+
+  - option_strings: ["--verbose"]
+    repeatable: true

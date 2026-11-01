@@ -1,0 +1,22 @@
+mygit:
+- -h
+- -v
+- --help
+- --version
+- init
+- status
+
+mygit init:
+- --bare
+- <directory>
+
+mygit status:
+- --help
+- --verbose
+- --branch
+- -b
+
+mygit status*--branch: &branches
+- $(git branch --format='%(refname:short)' 2>/dev/null)
+
+mygit status*-b: *branches

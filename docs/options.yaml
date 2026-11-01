@@ -18,10 +18,13 @@ short: 'Show a manual for a help topic'
 options: ['--input-type']
 metavar: 'TYPE'
 default: 'auto'
-choices: ['yaml', 'json', 'python', 'help', 'auto']
+choices: ['yaml', 'json', 'python', 'help', 'completely', 'auto']
 short: 'Specify input file type. If "auto", input type is determined by the file extension'
 long: |
   For security reasons, reading python files must be explicitly enabled.
+
+  The `completely` input type reads completion configs from the
+  `completely` tool (pattern, flat or nested format).
 
 ---
 

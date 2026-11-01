@@ -1,0 +1,29 @@
+patterns:
+  - mygit [root options]
+  - mygit [root options] clone [clone options] <source> <dest>
+  - mygit init [init options] <directory>
+  - mygit status [status options]
+
+options:
+  root:
+    - -h|--help
+    - -v|--version
+    - --config <file>
+  clone:
+    - --depth <depth>
+  init:
+    - --bare
+  status:
+    - --help
+    - --branch|-b <branch>
+    - --format <format>
+    - --verbose (repeatable)
+
+tokens:
+  file: +file
+  source: $(git branch --format='%(refname:short)' 2>/dev/null)
+  dest: +directory
+  depth: [1, 10, 100]
+  directory: +directory
+  branch: $(git branch --format='%(refname:short)' 2>/dev/null)
+  format: [short, long]

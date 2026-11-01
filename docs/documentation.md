@@ -4,6 +4,7 @@ Crazy-Complete Documentation
 This documentation provides an overview of how to define shell completion for commands using crazy-complete.
 
 - [Generating a Definition File from Help](#generating-a-definition-file-from-help)
+- [Generating a Definition File from a Completely Config](#generating-a-definition-file-from-a-completely-config)
 - [Defining a Command](#defining-a-command)
 - [Defining an Option](#defining-an-option)
 - [Defining a Positional Argument](#defining-a-positional-argument)
@@ -29,6 +30,15 @@ crazy-complete --input-type=help yaml help_file
 # or
 
 grep --help | crazy-complete --input-type=help yaml /dev/stdin
+```
+
+## Generating a Definition File from a Completely Config
+
+Completion definitions from the [`completely`](https://github.com/bashly-framework/completely)
+tool (pattern, flat or nested format) can be read directly:
+
+```
+crazy-complete --input-type=completely yaml completely.yaml
 ```
 
 ## Defining a Command
@@ -2406,11 +2416,14 @@ bar     -- a bar value
 
 ---
 
-**--input-type=TYPE** *(yaml, json, python, help, auto)*
+**--input-type=TYPE** *(yaml, json, python, help, completely, auto)*
 
 > Specify input file type. If "auto", input type is determined by the file extension
 
 For security reasons, reading python files must be explicitly enabled.
+
+The `completely` input type reads completion configs from the
+`completely` tool (pattern, flat or nested format).
 
 This option defaults to `auto`.
 

@@ -1,0 +1,29 @@
+prog: "mygit"
+options:
+  - option_strings: ["-h"]
+
+  - option_strings: ["-v"]
+
+  - option_strings: ["--help"]
+
+  - option_strings: ["--version"]
+---
+prog: "mygit init"
+options:
+  - option_strings: ["--bare"]
+
+positionals:
+  - number: 1
+    complete: ["directory"]
+---
+prog: "mygit status"
+options:
+  - option_strings: ["--help"]
+
+  - option_strings: ["--verbose"]
+
+  - option_strings: ["--branch"]
+    complete: ["exec", "git branch --format='%(refname:short)' 2>/dev/null"]
+
+  - option_strings: ["-b"]
+    complete: ["exec", "git branch --format='%(refname:short)' 2>/dev/null"]

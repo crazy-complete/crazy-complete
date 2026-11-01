@@ -1,0 +1,6 @@
+combine:
+- -o
+
+combine*-o:
+- <directory>
+- <signal>
