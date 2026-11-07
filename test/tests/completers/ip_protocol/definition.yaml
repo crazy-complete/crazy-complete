@@ -1,0 +1,10 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ["--protocol"]
+    complete: ["ip_protocol", "${name}", "${description}"]
+
+  - option_strings: ["--protocol-number"]
+    complete: ["ip_protocol", "${number}", "${name}"]
+
+  - option_strings: ["--protocol-name"]
+    complete: ["ip_protocol", "${name}", "${number} - ${description}"]

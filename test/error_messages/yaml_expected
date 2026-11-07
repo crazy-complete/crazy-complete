@@ -283,6 +283,15 @@
 38_04-color-list-item-wrong-type         | line 4, column 26: foo: -o: color: types[0]: Invalid type. Expected: string
 38_05-color-list-item-empty              | line 4, column 26: foo: -o: color: types[0]: String cannot be empty
 38_06-color-invalid-value                | line 4, column 26: foo: -o: color: types[0]: Invalid value. Expected: names, xterm256, ansi_fg, ansi_fg+bright, ansi_bg, ansi_bg+bright, hex
+39_00-ip-protocol-missing-value          | line 4, column 15: foo: -o: ip_protocol: Missing required argument: value
+39_01-ip-protocol-missing-description    | line 4, column 15: foo: -o: ip_protocol: Missing required argument: description
+39_02-ip-protocol-value-unknown-placeholder | line 4, column 31: foo: -o: ip_protocol: value: Invalid value. Expected: `${name}`, `${number}`, `${alias}`, `${description}`
+39_03-ip-protocol-description-unknown-placeholder | line 4, column 42: foo: -o: ip_protocol: description: Invalid value. Expected: `${name}`, `${number}`, `${alias}`, `${description}`
+39_04-ip-protocol-value-empty            | line 4, column 31: foo: -o: ip_protocol: value: String cannot be empty
+39_05-ip-protocol-description-empty      | line 4, column 42: foo: -o: ip_protocol: description: String cannot be empty
+39_06-ip-protocol-value-wrong-type       | line 4, column 31: foo: -o: ip_protocol: value: Invalid type. Expected: string
+39_07-ip-protocol-description-wrong-type | line 4, column 42: foo: -o: ip_protocol: description: Invalid type. Expected: string
+39_08-ip-protocol-too-many-args          | line 4, column 15: foo: -o: ip_protocol: Too many arguments
 ======= Directory "05-misc" =======
 00-list                                  | line 1, column 1: Invalid type. Expected: dictionary
 01-multiple-repeatable-positionals       | line 6, column 5: foo: Too many repeatable positionals

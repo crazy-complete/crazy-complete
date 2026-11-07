@@ -1,0 +1,111 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check protocol (prefix 'i')"
+send: "crazy-complete-test --protocol i"
+bash_expected: |
+  > crazy-complete-test --protocol i
+  icmp        igmp        ipcomp      ipv6        ipv6-nonxt  isis
+  idpr-cmtp   igp         ipencap     ipv6-frag   ipv6-opts   iso-tp4
+  idrp        ip          ipip        ipv6-icmp   ipv6-route
+  > crazy-complete-test --protocol i
+fish_expected: |
+  > crazy-complete-test --protocol i
+  icmp               (internet control message protocol)
+  idpr-cmtp             (IDPR Control Message Transport)
+  idrp                   (Inter-Domain Routing Protocol)
+  igmp                       (Internet Group Management)
+  igp             (any private interior gateway (Cisco))
+  ip         (internet protocol, pseudo protocol number)
+  ipcomp               (IP Payload Compression Protocol)
+  ipencap  (IP encapsulated in IP (officially \`\`IP''))
+  ipip             (IP-within-IP Encapsulation Protocol)
+  ipv6                    (Internet Protocol, version 6)
+  ipv6-frag                   (Fragment Header for IPv6)
+  ipv6-icmp                              (ICMP for IPv6)
+  ipv6-nonxt                   (No Next Header for IPv6)
+  ipv6-opts               (Destination Options for IPv6)
+  ipv6-route                   (Routing Header for IPv6)
+  isis                                 (IS-IS over IPv4)
+  iso-tp4      (ISO Transport Protocol class 4 [RFC905])
+zsh_expected: |
+  > crazy-complete-test --protocol i
+  icmp        -- internet control message protocol
+  idpr-cmtp   -- IDPR Control Message Transport
+  idrp        -- Inter-Domain Routing Protocol
+  igmp        -- Internet Group Management
+  igp         -- any private interior gateway (Cisco)
+  ip          -- internet protocol, pseudo protocol number
+  ipcomp      -- IP Payload Compression Protocol
+  ipencap     -- IP encapsulated in IP (officially ``IP'')
+  ipip        -- IP-within-IP Encapsulation Protocol
+  ipv6        -- Internet Protocol, version 6
+  ipv6-frag   -- Fragment Header for IPv6
+  ipv6-icmp   -- ICMP for IPv6
+  ipv6-nonxt  -- No Next Header for IPv6
+  ipv6-opts   -- Destination Options for IPv6
+  ipv6-route  -- Routing Header for IPv6
+  isis        -- IS-IS over IPv4
+  iso-tp4     -- ISO Transport Protocol class 4 [RFC905]
+---
+number: 2
+description: "Check protocol number view (prefix '1')"
+send: "crazy-complete-test --protocol-number 1"
+bash_expected: |
+  > crazy-complete-test --protocol-number 1
+  1    108  115  124  133  136  138  140  142  17
+  103  112  12   132  135  137  139  141  143
+  > crazy-complete-test --protocol-number 1
+fish_expected: |
+  > crazy-complete-test --protocol-number 1
+  1      (icmp)  112  (vrrp)  135  (mobility-header)  140     (shim6)
+  12      (pup)  115  (l2tp)  136          (udplite)  141      (wesp)
+  103     (pim)  124  (isis)  137       (mpls-in-ip)  142      (rohc)
+  17      (udp)  132  (sctp)  138            (manet)  143  (ethernet)
+  108  (ipcomp)  133    (fc)  139              (hip)
+zsh_expected: |
+  > crazy-complete-test --protocol-number 1
+  1    -- icmp
+  103  -- pim
+  108  -- ipcomp
+  112  -- vrrp
+  115  -- l2tp
+  12   -- pup
+  124  -- isis
+  132  -- sctp
+  133  -- fc
+  135  -- mobility-header
+  136  -- udplite
+  137  -- mpls-in-ip
+  138  -- manet
+  139  -- hip
+  140  -- shim6
+  141  -- wesp
+  142  -- rohc
+  143  -- ethernet
+  17   -- udp
+---
+number: 3
+description: "Check protocol name view (prefix 'ipv6')"
+send: "crazy-complete-test --protocol-name ipv6"
+bash_expected: |
+  > crazy-complete-test --protocol-name ipv6
+  ipv6        ipv6-frag   ipv6-icmp   ipv6-nonxt  ipv6-opts   ipv6-route
+  > crazy-complete-test --protocol-name ipv6
+fish_expected: |
+  > crazy-complete-test --protocol-name ipv6
+  ipv6       (41 - Internet Protocol, version 6)
+  ipv6-frag      (44 - Fragment Header for IPv6)
+  ipv6-icmp                 (58 - ICMP for IPv6)
+  ipv6-nonxt      (59 - No Next Header for IPv6)
+  ipv6-opts  (60 - Destination Options for IPv6)
+  ipv6-route      (43 - Routing Header for IPv6)
+zsh_expected: |
+  > crazy-complete-test --protocol-name ipv6
+  ipv6        -- 41 - Internet Protocol, version 6
+  ipv6-frag   -- 44 - Fragment Header for IPv6
+  ipv6-icmp   -- 58 - ICMP for IPv6
+  ipv6-nonxt  -- 59 - No Next Header for IPv6
+  ipv6-opts   -- 60 - Destination Options for IPv6
+  ipv6-route  -- 43 - Routing Header for IPv6

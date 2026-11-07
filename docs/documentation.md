@@ -202,6 +202,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [hostname](#hostname)                      | Complete hostnames                            |
 | [integer](#integer)                        | Complete integer values                       |
 | [ip\_address](#ip_address)                 | Complete local IP addresses                   |
+| [ip\_protocol](#ip_protocol)               | Complete IP protocols                         |
 | [locale](#locale)                          | Complete locales                              |
 | [login\_shell](#login_shell)               | Complete login shells                         |
 | [mime\_file](#mime_file)                   | Complete files by MIME type                   |
@@ -1248,6 +1249,80 @@ options:
 - [net\_interface](#net_interface): For completing network interfaces
 
 - [hostname](#hostname): For completing hostnames
+
+---
+
+### ip\_protocol
+
+> Complete IP protocols
+
+**SYNOPSIS**
+
+```yaml
+['ip_protocol', <VALUE>, <DESCRIPTION>]
+```
+
+**PARAMETERS**
+
+Completes the IP header protocols as they appear in `/etc/protocols`.
+
+`VALUE`:
+  Format string expanding to the completed value.
+
+`DESCRIPTION`:
+  Format string expanding to the description shown during completion.
+
+Format strings may contain the following placeholders:
+
+  - `${name}`: Protocol name
+  - `${description}`: Protocol description
+  - `${number}`: IP protocol number
+  - `${alias}`: Protocol alias
+
+A literal dollar sign is written as `$$`.
+
+  If several protocols expand to the same value, their descriptions are
+  joined with a comma.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--protocol']
+    complete: ['ip_protocol', '${name}', '${description}']
+
+  - option_strings: ['--protocol-number']
+    complete: ['ip_protocol', '${number}', '${name}']
+
+  - option_strings: ['--protocol-name']
+    complete: ['ip_protocol', '${name}', '${number} - ${description}']
+```
+
+```
+~ > example --protocol=<TAB>
+ip      (internet protocol, pseudo protocol number)
+hopopt  (IPv6 Hop-by-Hop Option [RFC1883])
+icmp    (internet control message protocol)
+[ ... ]
+
+~ > example --protocol-number=<TAB>
+0  (ip, hopopt)  29     (iso-tp4)  58   (ipv6-icmp)
+1        (icmp)  33        (dccp)  59  (ipv6-nonxt)
+[...]
+
+~ > example --protocol-name=<TAB>
+ah                 (51 - Authentication Header [RFC2402])
+ax.25                                 (93 - AX.25 frames)
+dccp   (33 - Datagram Congestion Control Prot. [RFC4340])
+ddp                     (37 - Datagram Delivery Protocol)
+[...]
+```
+
+**SEE ALSO**
+
+- [choices](#choices): For completing from a custom set of values
 
 ---
 
