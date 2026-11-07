@@ -1,0 +1,70 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check simple suffix (1)"
+send: "crazy-complete-test --suffix "
+bash_expected: |
+  > crazy-complete-test --suffix
+  1.suffix  2.suffix  3.suffix
+  > crazy-complete-test --suffix
+fish_expected: |
+  > crazy-complete-test --suffix
+  1.suffix  2.suffix  3.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix
+  1  2  3
+---
+number: 2
+description: "Check simple suffix (2)"
+send: "crazy-complete-test --suffix 1"
+bash_expected: |
+  > crazy-complete-test --suffix 1.suffix
+fish_expected: |
+  > crazy-complete-test --suffix 1.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix 1.suffix
+---
+number: 3
+description: "Check list with suffix (1)"
+send: "crazy-complete-test --suffix-list 1"
+bash_expected: |
+  > crazy-complete-test --suffix-list 1.suffix
+fish_expected: |
+  > crazy-complete-test --suffix-list 1.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix-list 1.suffix
+---
+number: 4
+description: "Check list with suffix (2)"
+send: "crazy-complete-test --suffix-list 1.suffix,"
+bash_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,
+  1.suffix,2.suffix  1.suffix,3.suffix
+  > crazy-complete-test --suffix-list 1.suffix,
+fish_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,
+  1.suffix,2.suffix  1.suffix,3.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,
+  1  2  3
+---
+number: 5
+description: "Check list with suffix (3)"
+send: "crazy-complete-test --suffix-list 1.suffix,2"
+bash_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,2.suffix
+fish_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,2.suffix
+zsh_expected: |
+  > crazy-complete-test --suffix-list 1.suffix,2.suffix
+---
+number: 6
+description: "Check list with colon suffix (1)"
+send: "crazy-complete-test --colon-suffix-list 1:suffix,2"
+bash_expected: |
+  > crazy-complete-test --colon-suffix-list 1:suffix,2:suffix
+fish_expected: |
+  > crazy-complete-test --colon-suffix-list 1:suffix,2:suffix
+zsh_expected: |
+  > crazy-complete-test --colon-suffix-list 1:suffix,2:suffix

@@ -1,0 +1,9 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ["--range-1"]
+    help: "Complete a range"
+    complete: ["range", 1, 9]
+
+  - option_strings: ["--range-2"]
+    help: "Complete a range"
+    complete: ["range", 1, 9, 2]

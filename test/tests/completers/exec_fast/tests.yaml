@@ -1,0 +1,15 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --exec-fast"
+send: "crazy-complete-test --exec-fast "
+bash_expected: |
+  > crazy-complete-test --exec-fast
+  Item_1  Item_2
+  > crazy-complete-test --exec-fast Item_
+fish_expected: |
+  > crazy-complete-test --exec-fast Item_
+  Item_1  (Description 1)  Item_2  (Description 2)
+zsh_expected: |
+  > crazy-complete-test --exec-fast Item_

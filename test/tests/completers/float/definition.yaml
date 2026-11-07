@@ -1,0 +1,5 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ["--float"]
+    help: "Complete a float"
+    complete: ["float", {"suffixes": {"s": "seconds", "m": "minutes", "h": "hours"}}]

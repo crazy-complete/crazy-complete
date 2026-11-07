@@ -1,0 +1,98 @@
+args: ["--input-type=yaml", "--include-file=completers/key_value_pair_exec/include.$shell"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "key_value_pair_exec: Check -o"
+send: "crazy-complete-test -o "
+bash_expected: |
+  > crazy-complete-test -o
+  animal=  async    special
+  > crazy-complete-test -o
+fish_expected: |
+  > crazy-complete-test -o
+  animal=  (select an animal)  special  (special chars: []'"$`\)
+  async      (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o
+  animal   -- select an animal
+  async    -- set async mode
+  special  -- special chars: []'"$`\
+---
+number: 2
+description: "key_value_pair_exec: Check -o a"
+send: "crazy-complete-test -o a"
+bash_expected: |
+  > crazy-complete-test -o a
+  animal=  async
+  > crazy-complete-test -o a
+fish_expected: |
+  > crazy-complete-test -o a
+  animal=  (select an animal)  async  (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o a
+  animal  -- select an animal
+  async   -- set async mode
+---
+number: 3
+description: "key_value_pair_exec: Check -o an"
+send: "crazy-complete-test -o an"
+bash_expected: |
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+zsh_expected: |
+  > crazy-complete-test -o animal=
+---
+number: 4
+description: "key_value_pair_exec: Check -o animal="
+send: "crazy-complete-test -o animal="
+bash_expected: |
+  > crazy-complete-test -o animal=
+  cat      dog      horse    special
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+  animal=cat  (a cat)  animal=horse     (a horse)
+  animal=dog  (a dog)  animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 5
+description: "key_value_pair_exec: Check -o 'animal="
+send: "crazy-complete-test -o 'animal="
+bash_expected: |
+  > crazy-complete-test -o 'animal=
+  animal=cat      animal=dog      animal=horse    animal=special
+  > crazy-complete-test -o 'animal=
+fish_expected: |
+  > crazy-complete-test -o 'animal=
+  'animal=cat  (a cat)  'animal=horse     (a horse)
+  'animal=dog  (a dog)  'animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o 'animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\
+---
+number: 6
+description: "key_value_pair_exec: Check -o \"animal="
+send: "crazy-complete-test -o \"animal="
+bash_expected: |
+  > crazy-complete-test -o "animal=
+  animal=cat      animal=dog      animal=horse    animal=special
+  > crazy-complete-test -o "animal=
+fish_expected: |
+  > crazy-complete-test -o "animal=
+  "animal=cat  (a cat)  "animal=horse     (a horse)
+  "animal=dog  (a dog)  "animal=special  (:[]'"$`\)
+zsh_expected: |
+  > crazy-complete-test -o "animal=
+  cat      -- a cat
+  dog      -- a dog
+  horse    -- a horse
+  special  -- :[]'"$`\

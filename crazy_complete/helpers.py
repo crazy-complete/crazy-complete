@@ -93,6 +93,9 @@ def make_completion_funcname_for_context(ctxt, prefix):
 class GeneralHelpers:
     '''Class for including functions in the generation process.'''
 
+    # Each concrete subclass provides its own dict of registered builtin functions.
+    _functions: dict
+
     def __init__(self, config, prog, function_class):
         self.config = config
         self.function_prefix = config.function_prefix.replace('$PROG', prog)
@@ -102,7 +105,6 @@ class GeneralHelpers:
         self.dynamic_functions_code_to_funcname = {}
 
         # Builtin functins
-        self.functions = {}
         self.used_functions = {}  # funcname:set(defines)
         self.global_defines = set()
 
@@ -147,12 +149,13 @@ class GeneralHelpers:
     # Builtin functions
     # =========================================================================
 
-    def add_function(self, function):
+    @classmethod
+    def add_function(cls, function):
         '''Add a function to the function repository.'''
 
         assert isinstance(function, FunctionBase)
 
-        self.functions[function.funcname] = function
+        cls._functions[function.funcname] = function
 
     def define(self, name):
         '''Define a macro on global scope.'''
@@ -162,7 +165,7 @@ class GeneralHelpers:
     def use_function(self, function_name, *defines):
         '''Use a function from the function repository.'''
 
-        if function_name not in self.functions:
+        if function_name not in type(self)._functions:
             raise KeyError('No such function: %r' % function_name)
 
         if function_name not in self.used_functions:
@@ -171,7 +174,7 @@ class GeneralHelpers:
             self.used_functions[function_name].update(defines)
 
         # Add dependencies
-        for function in self.functions[function_name].dependencies:
+        for function in type(self)._functions[function_name].dependencies:
             self.use_function(function)
 
         return self.get_real_function_name(function_name)
@@ -192,7 +195,7 @@ class GeneralHelpers:
         r = []
 
         for funcname, defines in self.used_functions.items():
-            function = self.functions[funcname]
+            function = type(self)._functions[funcname]
             realname = self.get_real_function_name(funcname)
             code = function.get_code(realname, self.global_defines | defines)
 

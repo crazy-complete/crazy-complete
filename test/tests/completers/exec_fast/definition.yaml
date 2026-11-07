@@ -1,0 +1,5 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ["--exec-fast"]
+    help: "Parse output (fast)"
+    complete: ["exec_fast", "printf \"%s\\t%s\\n\" \"Item_1\" \"Description 1\" \"Item_2\" \"Description 2\""]

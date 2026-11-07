@@ -27,6 +27,9 @@ Homepage = "https://github.com/crazy-complete/crazy-complete"
 [project.scripts]
 crazy-complete = "crazy_complete.main:main"
 
+[tool.setuptools.packages.find]
+include = ["crazy_complete", "crazy_complete.completers", "crazy_complete.completely"]
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"

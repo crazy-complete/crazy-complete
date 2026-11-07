@@ -1,0 +1,22 @@
+args: ["--input-type=yaml", "--inherit-options=False"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check if options are not inherited"
+send: "crazy-complete-test subcommand --"
+bash_expected: |
+  > crazy-complete-test subcommand --sub-bar=
+fish_expected: |
+  > crazy-complete-test subcommand --sub-bar
+zsh_expected: |
+  > crazy-complete-test subcommand --sub-bar=
+---
+number: 2
+description: "Check if options are not inherited (2)"
+send: "crazy-complete-test subcommand lastcommand --"
+bash_expected: |
+  > crazy-complete-test subcommand lastcommand --last-option=
+fish_expected: |
+  > crazy-complete-test subcommand lastcommand --last-option
+zsh_expected: |
+  > crazy-complete-test subcommand lastcommand --last-option=

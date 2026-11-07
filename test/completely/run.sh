@@ -11,7 +11,7 @@ for file in *.input.yaml; do
   outfile="${base}.output.yaml"
   expected="${base}.expected.yaml"
 
-  if [[ "$1" == "--update" ]]; then
+  if [ "$1" = "--update" ]; then
     python3 -m crazy_complete.main --input-type completely yaml "$file" -o "$expected"
   else
     python3 -m crazy_complete.main --input-type completely yaml "$file" -o "$outfile"

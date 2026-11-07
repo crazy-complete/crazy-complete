@@ -1,0 +1,17 @@
+args: ["--input-type=yaml", "--include-file=completers/exec_internal/include.$shell"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --exec-internal"
+send: "crazy-complete-test --exec-internal "
+bash_expected: |
+  > crazy-complete-test --exec-internal
+  one    three  two
+  > crazy-complete-test --exec-internal
+fish_expected: |
+  > crazy-complete-test --exec-internal
+  one    (Execute internal code)  two  (Execute internal code)
+  three  (Execute internal code)
+zsh_expected: |
+  > crazy-complete-test --exec-internal
+  one    three  two

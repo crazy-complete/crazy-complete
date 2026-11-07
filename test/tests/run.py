@@ -6,11 +6,12 @@ import time
 import json
 import shlex
 import yaml
-import queue
 import argparse
-import threading
 import subprocess
+import threading
+import difflib
 from collections import OrderedDict
+from concurrent.futures import ThreadPoolExecutor
 
 from shells import BashShell, FishShell, ZshShell
 
@@ -20,8 +21,8 @@ from shells import BashShell, FishShell, ZshShell
 
 SHELLS              = ['bash', 'fish', 'zsh']
 TMUX_SESSION_PREFIX = 'crazy-complete-test'
-TESTS_INFILE        = 'tests.yaml'
-TESTS_OUTFILE       = 'tests.new.yaml'
+TESTS_FILENAME      = 'tests.yaml'
+RESULTS_FILENAME    = 'tests.new.yaml'
 CRAZY_COMPLETE      = [sys.executable, '-m', 'crazy_complete.main']
 COMPLETIONS_OUTDIR  = 'output'
 TEMP_DIR            = 'tmp'
@@ -49,12 +50,14 @@ argp.add_argument('-f', '--fast', action='store_true', default=False,
     help='Enable fast testing mode. For tests where the input matches the expected output, these tests will always pass')
 argp.add_argument('-d', '--driver', default='tmux', choices=['pyte', 'tmux'],
     help='Select driver for tests')
-argp.add_argument('-t', '--threads', default=1, type=int,
-    help='Set the number of threads per shell')
 argp.add_argument('-w', '--wait', default=OUTPUT_WAIT, type=float,
     help='Set how many seconds to wait for terminal output')
 argp.add_argument('-s', '--select', action='append',
-    help='Select tests by definition file')
+    help='Select test directories to run')
+argp.add_argument('-t', '--threaded', action='store_true', default=False,
+    help='Run each shell of a test-file in its own thread (the three shells of one file run concurrently)')
+argp.add_argument('-p', '--parallel', default=1, type=int,
+    help='Max number of test-files to run in parallel (default 1); <= 0 runs all files at once')
 opts = argp.parse_args()
 
 OUTPUT_WAIT = opts.wait
@@ -63,8 +66,11 @@ OUTPUT_WAIT = opts.wait
 # Helper functions
 # =============================================================================
 
+PRINT_LOCK = threading.Lock()
+
 def print_err(*args):
-    print(*args, file=sys.stderr)
+    with PRINT_LOCK:
+        print(*args, file=sys.stderr)
 
 def run(args, env=None):
     result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
@@ -81,6 +87,16 @@ def indent(string, num_spaces):
 
 def make_yaml_block_string(s):
     return "|\n%s" % indent(s, 2)
+
+def generate_diff(base_file, new_file):
+    with open(base_file) as f:
+        a = [line.rstrip('\n') for line in f]
+    if os.path.exists(new_file):
+        with open(new_file) as f:
+            b = [line.rstrip('\n') for line in f]
+    else:
+        b = []
+    return '\n'.join(difflib.unified_diff(a, b, fromfile=base_file, tofile=new_file, lineterm=''))
 
 # =============================================================================
 # Import driver depending on command line arguments
@@ -114,8 +130,8 @@ if not os.path.exists('/usr/share/bash-completion/bash_completion'):
 
 class Test:
     def __init__(self, data):
-        self.number = data.get('number', None) 
-        self.definition_file = data['definition_file']
+        self.number = data.get('number', None)
+        self.definition_file = data.get('definition_file')
         self.description = data['description']
         self.comment = data.get('comment', None)
         self.send = data['send']
@@ -179,7 +195,8 @@ class Test:
         r = OrderedDict()
 
         r['number']          = str(self.number)
-        r['definition_file'] = json.dumps(self.definition_file)
+        if self.definition_file is not None:
+            r['definition_file'] = json.dumps(self.definition_file)
         r['description']     = json.dumps(self.description)
         if self.comment:
             r['comment']     = json.dumps(self.comment)
@@ -198,24 +215,10 @@ class Test:
 
         return '\n'.join('%s: %s' % key_value for key_value in r.items())
 
-
 class Tests:
     def __init__(self, tests):
         self.definition_files = tests.pop(0)
         self.tests = [Test(data) for data in tests]
-
-    def enumerate_tests(self):
-        number = 1
-        for test in self.tests:
-            test.number = number
-            number += 1
-
-    def find_test_by_number(self, num):
-        for test in self.tests:
-            if test.number == num:
-                return test
-
-        raise Exception(f"No test with number {num} found")
 
     def write_tests_file(self, outfile):
         r = []
@@ -231,58 +234,77 @@ class Tests:
         r = '\n---\n'.join(r)
 
         with open(outfile, 'w') as fh:
-            fh.write(r)
+            fh.write(r + '\n')
 
-    def generate_completion_files(self):
-        try:
-            os.mkdir(COMPLETIONS_OUTDIR)
-        except FileExistsError:
-            if not os.path.isdir(COMPLETIONS_OUTDIR):
-                raise NotADirectoryError(COMPLETIONS_OUTDIR) from None
+    def generate_completion_files(self, directory):
+        temp_directory = '%s/%s' % (TEMP_DIR, directory)
+        os.makedirs(temp_directory, exist_ok=True)
 
-        try:
-            os.mkdir(TEMP_DIR)
-        except FileExistsError:
-            if not os.path.isdir(TEMP_DIR):
-                raise NotADirectoryError(TEMP_DIR) from None
-
-        batch_file = '%s/%s' % (TEMP_DIR, 'batch.txt')
         batch_commands = []
+        name = os.path.basename(directory.rstrip('/'))
 
-        for file, args in self.definition_files.items():
-            definition_file = args['definition_file']
-            temp_definition_file = f'{TEMP_DIR}/{definition_file}'
+        definition_file = self.definition_files['definition_file']
+        args_list = self.definition_files['args']
+        temp_definition_file = '%s/%s' % (temp_directory, definition_file)
 
-            with open(definition_file, 'r', encoding='UTF-8') as fh:
-                content = fh.read()
-                content = content.replace('%TEST_DIR%', CURRENT_DIRECTORY)
+        with open('%s/%s' % (directory, definition_file), 'r', encoding='UTF-8') as fh:
+            content = fh.read()
+            content = content.replace('%TEST_DIR%', CURRENT_DIRECTORY)
 
-            with open(temp_definition_file, 'w', encoding='UTF-8') as fh:
-                fh.write(content)
+        with open(temp_definition_file, 'w', encoding='UTF-8') as fh:
+            fh.write(content)
 
-            for shell in SHELLS:
-                cmd =  ['--debug', '--zsh-compdef=False']
-                for arg in args['args']:
-                    cmd += [arg.replace('$shell', shell)]
-                cmd += ['-o', f'{COMPLETIONS_OUTDIR}/{file}.{shell}']
-                cmd += [shell, temp_definition_file]
-                cmd = ' '.join(shlex.quote(arg) for arg in cmd)
-                batch_commands.append(cmd)
+        for shell in SHELLS:
+            cmd =  ['--debug', '--zsh-compdef=False']
+            cmd += [arg.replace('$shell', shell) for arg in args_list]
+            cmd += ['-o', f'{COMPLETIONS_OUTDIR}/{name}.{shell}']
+            cmd += [shell, temp_definition_file]
+            cmd = ' '.join(shlex.quote(arg) for arg in cmd)
+            batch_commands.append(cmd)
 
-        with open(batch_file, 'w', encoding='utf-8') as fh:
-            print_err("Writing batch file '%s' ..." % batch_file)
-            fh.write('\n'.join(batch_commands))
+        return batch_commands
 
-        print_err('Running batch file ...')
-        args = [*CRAZY_COMPLETE, '--batch', batch_file]
-        subprocess.run(args, check=True)
-        print_err('Finished running batch file ...')
+# =============================================================================
+# Test directories
+# =============================================================================
 
-def tests_worker_thread(thread_id, shell, input_queue, result_queue):
-    if opts.driver == 'tmux':
-        term = TmuxTerminal(f'{TMUX_SESSION_PREFIX}-{shell}-{thread_id}')
-    elif opts.driver == 'pyte':
-        term = PyteTerminal()
+def get_test_directories(selected):
+    directories = []
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if d not in (COMPLETIONS_OUTDIR, TEMP_DIR)]
+        if TESTS_FILENAME in files:
+            rel = os.path.relpath(root, '.')
+            if rel != '.':
+                directories.append(rel)
+    directories = sorted(directories)
+
+    if selected is None:
+        return directories
+
+    basenames = {os.path.basename(d.rstrip('/')) for d in directories}
+    unknown = [s for s in selected if s not in directories and s not in basenames]
+    if unknown:
+        print_err('Unknown test directory: %s' % ', '.join(unknown))
+        print_err('Available test directories: %s' % ', '.join(directories))
+        sys.exit(2)
+
+    result = []
+    for s in selected:
+        if s in directories:
+            result.append(s)
+        else:
+            result += [d for d in directories if os.path.basename(d.rstrip('/')) == s]
+
+    return list(dict.fromkeys(result))
+
+# =============================================================================
+# Test runner
+# =============================================================================
+
+def run_directory(shell, name, tests):
+    print_err('Running `%s` (%s) ...' % (name, shell))
+
+    term = TmuxTerminal(f'{TMUX_SESSION_PREFIX}-{name}-{shell}')
 
     term_shell = {
         'bash': BashShell,
@@ -290,124 +312,119 @@ def tests_worker_thread(thread_id, shell, input_queue, result_queue):
         'zsh':  ZshShell
     }[shell](term)
 
-    old_definition_file = None
-
-    while True:
-        try:
-            test = input_queue.get_nowait()
-        except queue.Empty:
-            break
-
-        if old_definition_file != test.definition_file:
-            old_definition_file = test.definition_file
-
-            try:
-                term_shell.stop()
-            except Exception:
-                pass
-            completion_file = '%s/%s.%s' % (COMPLETIONS_OUTDIR, test.definition_file, shell)
-            term_shell.start()
-            term.resize_window(80, 100)
-            term_shell.set_prompt()
-            term_shell.init_completion()
-            term_shell.load_completion(completion_file)
-            time.sleep(1.5)
-
-        output = term.complete(
-            test.send,
-            test.get_tabs(shell),
-            OUTPUT_WAIT,
-            test.get_expected(shell),
-            opts.fast)
-
-        result = {
-            'number': test.number,
-            'shell':  shell,
-            'result': output
-        }
-
-        result_queue.put(result)
+    completion_file = '%s/%s.%s' % (COMPLETIONS_OUTDIR, name, shell)
+    num_failed = 0
 
     try:
-        term_shell.stop()
-    except Exception:
-        pass
+        term_shell.start()
+        term.resize_window(80, 100)
+        term_shell.set_prompt()
+        term_shell.init_completion()
+        term_shell.load_completion(completion_file)
+        time.sleep(1.5)
 
-class Tester():
-    def __init__(self, tests, selected):
-        self.tests = tests
-        self.selected = selected
-        self.result_queue = queue.Queue()
-        self.input_queues = {}
-        self.threads = []
-        self.num_failed = 0
+        for test in tests.tests:
+            result = term.complete(
+                test.send,
+                test.get_tabs(shell),
+                OUTPUT_WAIT,
+                test.get_expected(shell),
+                opts.fast)
 
-    def run(self):
-        for shell in SHELLS:
-            self.input_queues[shell] = queue.Queue()
+            test.set_result(shell, result)
 
-            for test in self.tests.tests:
-                if not self.selected or test.definition_file in self.selected:
-                    self.input_queues[shell].put(test)
-                else:
-                    test.set_result(shell, test.get_expected(shell))
+            if not test.passed(shell):
+                num_failed += 1
+                print_err("Test #%03d (%-4s - %s) failed" % (test.number, shell, test.description))
+            else:
+                print_err("Test #%03d (%-4s - %s) OK" % (test.number, shell, test.description))
+    finally:
+        try:
+            term_shell.stop()
+        except Exception:
+            pass
 
-        for thread_id in range(opts.threads):
-            for shell in SHELLS:
-                thread = threading.Thread(
-                    target=tests_worker_thread,
-                    args=(thread_id, shell, self.input_queues[shell], self.result_queue)
-                )
+    return num_failed
 
-                thread.start()
-                self.threads.append(thread)
+def run_group(directory, tests, threaded):
+    if not tests.tests:
+        return 0
 
-        while self.threads_are_running():
-            self.eat_queue()
-            time.sleep(0.1)
-        self.eat_queue()
+    name = os.path.basename(directory.rstrip('/'))
 
-    def threads_are_running(self):
-        for thread in self.threads:
-            if thread.is_alive():
-                return True
-        return False
+    if not threaded:
+        return sum(run_directory(shell, name, tests) for shell in SHELLS)
 
-    def eat_queue(self):
-        while not self.result_queue.empty():
-            self.process_result(self.result_queue.get())
-
-    def process_result(self, result):
-        test = self.tests.find_test_by_number(result['number'])
-        shell = result['shell']
-        test.set_result(shell, result['result'])
-
-        if not test.passed(shell):
-            self.num_failed += 1
-            print_err("Test #%03d (%-4s - %s) failed" % (test.number, shell, test.description))
-        else:
-            print_err("Test #%03d (%-4s - %s) OK" % (test.number, shell, test.description))
+    with ThreadPoolExecutor(max_workers=len(SHELLS)) as ex:
+        futures = [ex.submit(run_directory, shell, name, tests) for shell in SHELLS]
+        return sum(f.result() for f in futures)
 
 # =============================================================================
 # Main
 # =============================================================================
 
-with open(TESTS_INFILE, 'r') as fh:
-    tests = Tests(list(yaml.safe_load_all(fh)))
+test_directories = get_test_directories(opts.select)
 
-tests.enumerate_tests()
-tests.generate_completion_files()
-tester = Tester(tests, opts.select)
-tester.run()
-tests.write_tests_file(TESTS_OUTFILE)
-if tester.num_failed:
-    print_err(f'{tester.num_failed} tests failed.')
-    print_err(f'Use diff or vimdiff on `{TESTS_INFILE}` and `{TESTS_OUTFILE}` for further details')
-    if opts.threads > 1:
-        print_err('NOTE:')
-        print_err(' A high value for -t|--threads may cause that tests fail.')
-        print_err(' Consider running this script again with `-t 1`.')
+test_groups = []
+for directory in test_directories:
+    with open('%s/%s' % (directory, TESTS_FILENAME), 'r') as fh:
+        test_groups.append((directory, Tests(list(yaml.safe_load_all(fh)))))
+
+os.makedirs(COMPLETIONS_OUTDIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
+
+batch_file = '%s/%s' % (TEMP_DIR, 'batch.txt')
+batch_commands = []
+for directory, tests in test_groups:
+    batch_commands += tests.generate_completion_files(directory)
+
+with open(batch_file, 'w', encoding='utf-8') as fh:
+    print_err("Writing batch file '%s' ..." % batch_file)
+    fh.write('\n'.join(batch_commands))
+
+print_err('Running batch file ...')
+args = [*CRAZY_COMPLETE, '--batch', batch_file]
+subprocess.run(args, check=True)
+print_err('Finished running batch file ...')
+
+if opts.parallel <= 0:
+    resolved_workers = max(1, len(test_groups))
+else:
+    resolved_workers = max(1, opts.parallel)
+
+num_total   = sum(len(tests.tests) * len(SHELLS) for _, tests in test_groups)
+num_failed  = 0
+failed_groups = []
+with ThreadPoolExecutor(max_workers=resolved_workers) as ex:
+    futures = {ex.submit(run_group, directory, tests, opts.threaded): (directory, tests)
+        for directory, tests in test_groups}
+    for fut, group in futures.items():
+        n = fut.result()
+        num_failed += n
+        if n:
+            failed_groups.append(group)
+
+for directory, tests in test_groups:
+    outfile = '%s/%s' % (directory, RESULTS_FILENAME)
+    tests.write_tests_file(outfile)
+
+if num_failed:
+    for directory, tests in failed_groups:
+        base = os.path.join(directory, TESTS_FILENAME)
+        new  = os.path.join(directory, RESULTS_FILENAME)
+        print_err('%s failed:' % base)
+        diff = generate_diff(base, new)
+        if diff:
+            print_err(diff)
+        else:
+            print_err('(tests.yaml and tests.new.yaml are identical)')
+        print_err('')
+    print_err('The following test files failed:')
+    for directory, tests in failed_groups:
+        print_err('%s' % os.path.join(directory, TESTS_FILENAME))
+    print_err('')
+    print_err(f'{num_failed} tests failed.')
     sys.exit(1)
 else:
-    print_err("All tests passed")
+    print_err(f'All {num_total} tests passed.')
     sys.exit(0)

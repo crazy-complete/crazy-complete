@@ -1,0 +1,13 @@
+prog: "crazy-complete-test"
+options:
+  - option_strings: ["--value-list"]
+    help: "Complete a list"
+    complete: ["value_list", {"values": ["foo", "bar", "baz"]}]
+
+  - option_strings: ["--value-list-2"]
+    help: "Complete a list"
+    complete: ["value_list", {"values": {"foo": "Some foo", "bar": "Some bar"}}]
+
+  - option_strings: ["--value-list-dup"]
+    help: "Complete a list (with duplicates)"
+    complete: ["value_list", {"values": ["foo", "bar", "baz"], "duplicates": true}]

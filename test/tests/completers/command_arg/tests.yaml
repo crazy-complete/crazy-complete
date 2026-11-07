@@ -1,0 +1,42 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --command-path"
+send: "crazy-complete-test --command-path my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path my_test_binary
+---
+number: 2
+description: "Check --command-path-append"
+send: "crazy-complete-test --command-path-append my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path-append my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path-append my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path-append my_test_binary
+---
+number: 3
+description: "Check --command-path-prepend"
+send: "crazy-complete-test --command-path-prepend my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path-prepend my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path-prepend my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path-prepend my_test_binary
+---
+number: 4
+description: "Check --command-path-append-prepend"
+send: "crazy-complete-test --command-path-append-prepend my_test_b"
+bash_expected: |
+  > crazy-complete-test --command-path-append-prepend my_test_binary
+fish_expected: |
+  > crazy-complete-test --command-path-append-prepend my_test_binary
+zsh_expected: |
+  > crazy-complete-test --command-path-append-prepend my_test_binary

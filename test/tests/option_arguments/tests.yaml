@@ -1,0 +1,166 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "option_arguments: check -O (without space)"
+send: "crazy-complete-test -O"
+bash_expected: |
+  > crazy-complete-test -O
+  -Oflag  -Omode
+  > crazy-complete-test -O
+fish_expected: |
+  > crazy-complete-test -O
+  -Oflag  -Omode=
+zsh_expected: |
+  > crazy-complete-test -O
+  flag  mode
+---
+number: 2
+description: "option_arguments: check -Omode=strict,"
+send: "crazy-complete-test -Omode=strict,"
+bash_expected: |
+  > crazy-complete-test -Omode=strict,flag
+fish_expected: |
+  > crazy-complete-test -Omode=strict,flag
+zsh_expected: |
+  > crazy-complete-test -Omode=strict,flag,
+---
+number: 3
+description: "option_arguments: check -O (with space)"
+send: "crazy-complete-test -O "
+bash_expected: |
+  > crazy-complete-test -O
+  flag  mode
+  > crazy-complete-test -O
+fish_expected: |
+  > crazy-complete-test -O
+  flag  mode=
+zsh_expected: |
+  > crazy-complete-test -O
+  flag  mode
+---
+number: 4
+description: "option_arguments: check -O mode=strict,"
+send: "crazy-complete-test -O mode=strict,"
+bash_expected: |
+  > crazy-complete-test -O mode=strict,flag
+fish_expected: |
+  > crazy-complete-test -O mode=strict,flag
+zsh_expected: |
+  > crazy-complete-test -O mode=strict,flag,
+---
+number: 5
+description: "option_arguments: check -fO (without space)"
+send: "crazy-complete-test -fO"
+bash_expected: |
+  > crazy-complete-test -fO
+  -fOflag  -fOmode
+  > crazy-complete-test -fO
+fish_expected: |
+  > crazy-complete-test -fO
+  -fOflag  -fOmode=
+zsh_expected: |
+  > crazy-complete-test -fO
+  flag  mode
+---
+number: 6
+description: "option_arguments: check -fOmode=strict,"
+send: "crazy-complete-test -fOmode=strict,"
+bash_expected: |
+  > crazy-complete-test -fOmode=strict,flag
+fish_expected: |
+  > crazy-complete-test -fOmode=strict,flag
+zsh_expected: |
+  > crazy-complete-test -fOmode=strict,flag,
+---
+number: 7
+description: "option_arguments: check -fO (with space)"
+send: "crazy-complete-test -fO "
+bash_expected: |
+  > crazy-complete-test -fO
+  flag  mode
+  > crazy-complete-test -fO
+fish_expected: |
+  > crazy-complete-test -fO
+  flag  mode=
+zsh_expected: |
+  > crazy-complete-test -fO
+  flag  mode
+---
+number: 8
+description: "option_arguments: check -fO mode=strict,"
+send: "crazy-complete-test -fO mode=strict,"
+bash_expected: |
+  > crazy-complete-test -fO mode=strict,flag
+fish_expected: |
+  > crazy-complete-test -fO mode=strict,flag
+zsh_expected: |
+  > crazy-complete-test -fO mode=strict,flag,
+---
+number: 9
+description: "option_arguments: check -option"
+send: "crazy-complete-test -option "
+bash_expected: |
+  > crazy-complete-test -option
+  flag  mode
+  > crazy-complete-test -option
+fish_expected: |
+  > crazy-complete-test -option
+  flag  mode=
+zsh_expected: |
+  > crazy-complete-test -option
+  flag  mode
+---
+number: 10
+description: "option_arguments: check -option mode=strict,"
+send: "crazy-complete-test -option mode=strict,"
+bash_expected: |
+  > crazy-complete-test -option mode=strict,flag
+fish_expected: |
+  > crazy-complete-test -option mode=strict,flag
+zsh_expected: |
+  > crazy-complete-test -option mode=strict,flag,
+---
+number: 11
+description: "option_arguments: check -option=mode=strict,"
+send: "crazy-complete-test -option=mode=strict,"
+bash_expected: |
+  > crazy-complete-test -option=mode=strict,flag
+fish_expected: |
+  > crazy-complete-test -option=mode=strict,flag
+zsh_expected: |
+  > crazy-complete-test -option=mode=strict,flag,
+---
+number: 12
+description: "option_arguments: check --option"
+send: "crazy-complete-test --option "
+bash_expected: |
+  > crazy-complete-test --option
+  flag  mode
+  > crazy-complete-test --option
+fish_expected: |
+  > crazy-complete-test --option
+  flag  mode=
+zsh_expected: |
+  > crazy-complete-test --option
+  flag  mode
+---
+number: 13
+description: "option_arguments: check --option mode=strict,"
+send: "crazy-complete-test --option mode=strict,"
+bash_expected: |
+  > crazy-complete-test --option mode=strict,flag
+fish_expected: |
+  > crazy-complete-test --option mode=strict,flag
+zsh_expected: |
+  > crazy-complete-test --option mode=strict,flag,
+---
+number: 14
+description: "option_arguments: check --option=mode=strict,"
+send: "crazy-complete-test --option=mode=strict,"
+bash_expected: |
+  > crazy-complete-test --option=mode=strict,flag
+fish_expected: |
+  > crazy-complete-test --option=mode=strict,flag
+zsh_expected: |
+  > crazy-complete-test --option=mode=strict,flag,

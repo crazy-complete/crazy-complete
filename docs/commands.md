@@ -17,6 +17,9 @@
 
 | Command                                    | Description                                   |
 | ------------------------------------------ | --------------------------------------------- |
+| [alsa\_card](#alsa_card)                   | Complete ALSA cards                           |
+| [alsa\_device](#alsa_device)               | Complete ALSA devices                         |
+| [charset](#charset)                        | Complete character sets                       |
 | [choices](#choices)                        | Complete from a predefined set of values      |
 | [command](#command)                        | Complete command names                        |
 | [command\_arg](#command_arg)               | Complete command arguments                    |
@@ -36,12 +39,17 @@
 | [hostname](#hostname)                      | Complete hostnames                            |
 | [integer](#integer)                        | Complete integer values                       |
 | [ip\_address](#ip_address)                 | Complete local IP addresses                   |
+| [locale](#locale)                          | Complete locales                              |
+| [login\_shell](#login_shell)               | Complete login shells                         |
 | [mime\_file](#mime_file)                   | Complete files by MIME type                   |
+| [mountpoint](#mountpoint)                  | Complete mount points                         |
+| [net\_interface](#net_interface)           | Complete network interfaces                   |
 | [pid](#pid)                                | Complete process IDs                          |
 | [process](#process)                        | Complete process names                        |
 | [range](#range)                            | Complete sequences of integers                |
 | [service](#service)                        | Complete systemd service names                |
 | [signal](#signal)                          | Complete signal names                         |
+| [timezone](#timezone)                      | Complete timezones                            |
 | [uid](#uid)                                | Complete user IDs                             |
 | [user](#user)                              | Complete user names                           |
 | [value\_list](#value_list)                 | Complete comma-separated lists of values      |
@@ -58,21 +66,6 @@
 | [exec\_internal](#exec_internal)               | Use the shell's internal completion mechanisms                             |
 | [key\_value\_list\_exec](#key_value_list_exec) | Complete dynamically generated comma-separted lists of key=value pairs     |
 | [key\_value\_pair\_exec](#key_value_pair_exec) | Complete dynamically generated a key=value pairs                           |
-
----
-
-### Bonus commands
-
-| Command                          | Description                 |
-| -------------------------------- | --------------------------- |
-| [alsa\_card](#alsa_card)         | Complete ALSA cards         |
-| [alsa\_device](#alsa_device)     | Complete ALSA devices       |
-| [charset](#charset)              | Complete character sets     |
-| [locale](#locale)                | Complete locales            |
-| [login\_shell](#login_shell)     | Complete login shells       |
-| [mountpoint](#mountpoint)        | Complete mount points       |
-| [net\_interface](#net_interface) | Complete network interfaces |
-| [timezone](#timezone)            | Complete timezones          |
 
 ---
 
@@ -158,145 +151,6 @@ options:
 ```
 ~ > example --charset=A<TAB>
 ANSI_X3.110-1983  ANSI_X3.4-1968    ARMSCII-8         ASMO_449
-```
-
----
-
-### locale
-
-> Complete locales
-
-**SYNOPSIS**
-
-```yaml
-['locale']
-```
-
-**EXAMPLE**
-
-```yaml
-prog: 'example'
-options:
-  - option_strings: ['--locale']
-    complete: ['locale']
-```
-
-```
-~ > example --locale=<TAB>
-C  C.UTF-8  de_DE  de_DE@euro  de_DE.iso88591  de_DE.iso885915@euro
-de_DE.UTF-8  deutsch  en_US  en_US.iso88591  en_US.UTF-8  german  POSIX
-```
-
----
-
-### login\_shell
-
-> Complete login shells
-
-**SYNOPSIS**
-
-```yaml
-['login_shell']
-```
-
-**EXAMPLE**
-
-```yaml
-prog: 'example'
-options:
-  - option_strings: ['--login-shell']
-    complete: ['login_shell']
-```
-
-```
-~ > example --login-shell=<TAB>
-/bin/bash   /bin/sh         /usr/bin/fish       /usr/bin/sh
-[...]
-```
-
----
-
-### mountpoint
-
-> Complete mount points
-
-**SYNOPSIS**
-
-```yaml
-['mountpoint']
-```
-
-**EXAMPLE**
-
-```yaml
-prog: 'example'
-options:
-  - option_strings: ['--mountpoint']
-    complete: ['mountpoint']
-```
-
-```
-~ > example --mountpoint=<TAB>
-/  /boot  /home  /proc  /run  /sys  /tmp
-[...]
-```
-
----
-
-### net\_interface
-
-> Complete network interfaces
-
-**SYNOPSIS**
-
-```yaml
-['net_interface']
-```
-
-**EXAMPLE**
-
-```yaml
-prog: 'example'
-options:
-  - option_strings: ['--net-interface']
-    complete: ['net_interface']
-```
-
-```
-~ > example --net-interface=<TAB>
-eno1  enp1s0  lo  wlo1  wlp2s0
-[...]
-```
-
-**SEE ALSO**
-
-- [ip\_address](#ip_address): For completing IP addresses
-
----
-
-### timezone
-
-> Complete timezones
-
-**SYNOPSIS**
-
-```yaml
-['timezone']
-```
-
-**EXAMPLE**
-
-```yaml
-prog: 'example'
-options:
-  - option_strings: ['--timezone']
-    complete: ['timezone']
-```
-
-```
-~ > example --timezone=Europe/B<TAB>
-Belfast     Belgrade    Berlin      Bratislava
-Brussels    Bucharest   Budapest    Busingen
 ```
 
 ---
@@ -1151,6 +1005,60 @@ options:
 
 ---
 
+### locale
+
+> Complete locales
+
+**SYNOPSIS**
+
+```yaml
+['locale']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--locale']
+    complete: ['locale']
+```
+
+```
+~ > example --locale=<TAB>
+C  C.UTF-8  de_DE  de_DE@euro  de_DE.iso88591  de_DE.iso885915@euro
+de_DE.UTF-8  deutsch  en_US  en_US.iso88591  en_US.UTF-8  german  POSIX
+```
+
+---
+
+### login\_shell
+
+> Complete login shells
+
+**SYNOPSIS**
+
+```yaml
+['login_shell']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--login-shell']
+    complete: ['login_shell']
+```
+
+```
+~ > example --login-shell=<TAB>
+/bin/bash   /bin/sh         /usr/bin/fish       /usr/bin/sh
+[...]
+```
+
+---
+
 ### mime\_file
 
 > Complete files by MIME type
@@ -1181,6 +1089,64 @@ options:
 ~ > example --image=<TAB>
 dir1/  dir2/  img.png  img.jpg
 ```
+
+---
+
+### mountpoint
+
+> Complete mount points
+
+**SYNOPSIS**
+
+```yaml
+['mountpoint']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--mountpoint']
+    complete: ['mountpoint']
+```
+
+```
+~ > example --mountpoint=<TAB>
+/  /boot  /home  /proc  /run  /sys  /tmp
+[...]
+```
+
+---
+
+### net\_interface
+
+> Complete network interfaces
+
+**SYNOPSIS**
+
+```yaml
+['net_interface']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--net-interface']
+    complete: ['net_interface']
+```
+
+```
+~ > example --net-interface=<TAB>
+eno1  enp1s0  lo  wlo1  wlp2s0
+[...]
+```
+
+**SEE ALSO**
+
+- [ip\_address](#ip_address): For completing IP addresses
 
 ---
 
@@ -1352,6 +1318,33 @@ HUP     -- Hangup
 ILL     -- Illegal instruction
 INT     -- Terminal interrupt signal
 [...]
+```
+
+---
+
+### timezone
+
+> Complete timezones
+
+**SYNOPSIS**
+
+```yaml
+['timezone']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--timezone']
+    complete: ['timezone']
+```
+
+```
+~ > example --timezone=Europe/B<TAB>
+Belfast     Belgrade    Berlin      Bratislava
+Brussels    Bucharest   Budapest    Busingen
 ```
 
 ---

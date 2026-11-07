@@ -13,7 +13,6 @@ This documentation provides an overview of how to define shell completion for co
   - [Meta Commands](#meta-commands)
   - [Built-in Commands](#built-in-commands)
   - [User-Defined Commands](#user-defined-commands)
-  - [Bonus Commands](#bonus-commands)
 - [Options](#options)
 - [When Conditionals](#when-conditionals)
 - [Capturing Options](#capturing-options)

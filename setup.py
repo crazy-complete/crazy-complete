@@ -7,7 +7,7 @@ setup(
     version='0.3.10',
     author='Benjamin Abendroth',
     author_email='braph93@gmx.de',
-    packages=['crazy_complete'],
+    packages=['crazy_complete', 'crazy_complete.completers', 'crazy_complete.completely'],
     entry_points = {
         "console_scripts": [
             "crazy-complete=crazy_complete.main:main",

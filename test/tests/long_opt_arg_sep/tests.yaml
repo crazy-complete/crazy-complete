@@ -1,0 +1,32 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check long_opt_arg_sep (both)"
+send: "crazy-complete-test --both"
+bash_expected: |
+  > crazy-complete-test --both=
+fish_expected: |
+  > crazy-complete-test --both
+zsh_expected: |
+  > crazy-complete-test --both=
+---
+number: 2
+description: "Check long_opt_arg_sep (equals)"
+send: "crazy-complete-test --equals"
+bash_expected: |
+  > crazy-complete-test --equals=
+fish_expected: |
+  > crazy-complete-test --equals
+zsh_expected: |
+  > crazy-complete-test --equals=
+---
+number: 3
+description: "Check long_opt_arg_sep (space)"
+send: "crazy-complete-test --space"
+bash_expected: |
+  > crazy-complete-test --space
+fish_expected: |
+  > crazy-complete-test --space
+zsh_expected: |
+  > crazy-complete-test --space

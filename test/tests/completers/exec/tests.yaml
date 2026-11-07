@@ -1,0 +1,15 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --exec"
+send: "crazy-complete-test --exec "
+bash_expected: |
+  > crazy-complete-test --exec
+  Item\ 1  Item\ 2
+  > crazy-complete-test --exec Item\
+fish_expected: |
+  > crazy-complete-test --exec Item\
+  Item 1  (Description 1)  Item 2  (Description 2)
+zsh_expected: |
+  > crazy-complete-test --exec Item\

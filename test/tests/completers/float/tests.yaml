@@ -1,0 +1,30 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --float"
+send: "crazy-complete-test --float 1"
+bash_expected: |
+  > crazy-complete-test --float 1
+  1   1h  1m  1s
+  > crazy-complete-test --float 1
+fish_expected: |
+  > crazy-complete-test --float 1
+  1h  (hours)  1m  (minutes)  1s  (seconds)
+zsh_expected: |
+  > crazy-complete-test --float 1
+  s -- seconds  m -- minutes  h -- hours
+---
+number: 2
+description: "Check --float (2)"
+send: "crazy-complete-test --float 1.0"
+bash_expected: |
+  > crazy-complete-test --float 1.0
+  1.0   1.0h  1.0m  1.0s
+  > crazy-complete-test --float 1.0
+fish_expected: |
+  > crazy-complete-test --float 1.0
+  1.0h  (hours)  1.0m  (minutes)  1.0s  (seconds)
+zsh_expected: |
+  > crazy-complete-test --float 1.0
+  s -- seconds  m -- minutes  h -- hours

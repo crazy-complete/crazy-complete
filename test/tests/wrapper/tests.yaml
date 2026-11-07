@@ -1,0 +1,2 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"

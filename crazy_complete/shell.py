@@ -5,6 +5,7 @@
 
 import re
 
+from . import completers
 from . import utils
 
 
@@ -79,6 +80,32 @@ def join_quoted(arguments, string=' '):
     return string.join(quote(arg) for arg in arguments)
 
 
+def _load_plugin(completer, name):
+    '''Try to load `name` from the `completers` package.
+
+    Returns:
+        The generation function for the shell of `completer`,
+        or `None` if no such plugin exists.
+    '''
+
+    shell_name = getattr(completer, 'SHELL', None)
+
+    if shell_name is None:
+        return None
+
+    try:
+        module = completers.load(name)
+    except ImportError:
+        return None
+
+    func = getattr(module, shell_name, None)
+
+    if not callable(func):
+        return None
+
+    return func
+
+
 class ShellCompleter:
     '''Base class for argument completion.'''
 
@@ -87,11 +114,16 @@ class ShellCompleter:
     # pylint: disable=too-many-positional-arguments
 
     def complete(self, ctxt, trace, command, *a):
-        if not hasattr(self, command):
-            utils.warn(f"complete: Falling back from `{command}` to `none`")
-            command = 'none'
+        if hasattr(self, command):
+            return getattr(self, command)(ctxt, trace, *a)
 
-        return getattr(self, command)(ctxt, trace, *a)
+        func = _load_plugin(self, command)
+
+        if func is not None:
+            return func(self, ctxt, trace, *a)
+
+        utils.warn(f"complete: Falling back from `{command}` to `none`")
+        return self.complete(ctxt, trace, 'none', *a)
 
     def complete_from_def(self, ctxt, trace, definition):
         command, *args = definition
@@ -100,75 +132,3 @@ class ShellCompleter:
     def fallback(self, ctxt, trace, from_, to, *a):
         utils.warn(f"ShellCompleter: Falling back from `{from_}` to `{to}`")
         return self.complete(ctxt, trace, to, *a)
-
-    def signal(self, ctxt, trace):
-        signals = {
-            'ABRT':   'Process abort signal',
-            'ALRM':   'Alarm clock',
-            'BUS':    'Access to an undefined portion of a memory object',
-            'CHLD':   'Child process terminated: stopped: or continued',
-            'CONT':   'Continue executing: if stopped',
-            'FPE':    'Erroneous arithmetic operation',
-            'HUP':    'Hangup',
-            'ILL':    'Illegal instruction',
-            'INT':    'Terminal interrupt signal',
-            'KILL':   'Kill (cannot be caught or ignored)',
-            'PIPE':   'Write on a pipe with no one to read it',
-            'QUIT':   'Terminal quit signal',
-            'SEGV':   'Invalid memory reference',
-            'STOP':   'Stop executing (cannot be caught or ignored)',
-            'TERM':   'Termination signal',
-            'TSTP':   'Terminal stop signal',
-            'TTIN':   'Background process attempting read',
-            'TTOU':   'Background process attempting write',
-            'USR1':   'User-defined signal 1',
-            'USR2':   'User-defined signal 2',
-            'POLL':   'Pollable event',
-            'PROF':   'Profiling timer expired',
-            'SYS':    'Bad system call',
-            'TRAP':   'Trace/breakpoint trap',
-            'XFSZ':   'File size limit exceeded',
-            'VTALRM': 'Virtual timer expired',
-            'XCPU':   'CPU time limit exceeded',
-        }
-
-        return self.complete(ctxt, trace, 'choices', signals)
-
-    def exec(self, _ctxt, _trace, _command):
-        raise NotImplementedError
-
-    def list(self, _ctxt, _trace, _command, _opts=None):
-        raise NotImplementedError
-
-    # =========================================================================
-    # Aliases
-    # =========================================================================
-
-    def file_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-
-        return self.list(ctxt, trace, ['file', opts], list_opts)
-
-    def directory_list(self, ctxt, trace, opts=None):
-        list_opts = {
-            'separator': opts.pop('separator', ',') if opts else ',',
-            'duplicates': opts.pop('duplicates', False) if opts else False
-        }
-
-        return self.list(ctxt, trace, ['directory', opts], list_opts)
-
-    # =========================================================================
-    # Bonus
-    # =========================================================================
-
-    def login_shell(self, ctxt, trace):
-        return self.exec(ctxt, trace, "command grep -E '^[^#]' /etc/shells")
-
-    def locale(self, ctxt, trace):
-        return self.exec(ctxt, trace, "command locale -a")
-
-    def charset(self, ctxt, trace):
-        return self.exec(ctxt, trace, "command locale -m")

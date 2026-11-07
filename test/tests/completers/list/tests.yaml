@@ -1,0 +1,100 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --list (1)"
+send: "crazy-complete-test --list "
+bash_expected: |
+  > crazy-complete-test --list
+  one    three  two
+  > crazy-complete-test --list
+fish_expected: |
+  > crazy-complete-test --list
+  one  three  two
+zsh_expected: |
+  > crazy-complete-test --list
+  one    three  two
+---
+number: 2
+description: "Check --list (2)"
+send: "crazy-complete-test --list one,"
+bash_expected: |
+  > crazy-complete-test --list one,
+  one,three  one,two
+  > crazy-complete-test --list one,t
+fish_expected: |
+  > crazy-complete-test --list one,t
+  one,three  one,two
+zsh_expected: |
+  > crazy-complete-test --list one,
+  one    three  two
+---
+number: 3
+description: "Check --colon-list (1)"
+send: "crazy-complete-test --colon-list "
+bash_expected: |
+  > crazy-complete-test --colon-list
+  one    three  two
+  > crazy-complete-test --colon-list
+fish_expected: |
+  > crazy-complete-test --colon-list
+  one  three  two
+zsh_expected: |
+  > crazy-complete-test --colon-list
+  one    three  two
+---
+number: 4
+description: "Check --colon-list (2)"
+send: "crazy-complete-test --colon-list one:"
+bash_expected: |
+  > crazy-complete-test --colon-list one:
+  three  two
+  > crazy-complete-test --colon-list one:t
+fish_expected: |
+  > crazy-complete-test --colon-list one:t
+  one:three  one:two
+zsh_expected: |
+  > crazy-complete-test --colon-list one:
+  one    three  two
+---
+number: 5
+description: "Check --combined-list"
+send: "crazy-complete-test --combined-list "
+bash_expected: |
+  > crazy-complete-test --combined-list
+  1      2      3      one    three  two
+  > crazy-complete-test --combined-list
+fish_expected: |
+  > crazy-complete-test --combined-list
+  1  2  3  one  three  two
+zsh_expected: |
+  > crazy-complete-test --combined-list
+  1      2      3      one    three  two
+---
+number: 6
+description: "Check --duplicate-list (1)"
+send: "crazy-complete-test --duplicate-list "
+bash_expected: |
+  > crazy-complete-test --duplicate-list
+  one    three  two
+  > crazy-complete-test --duplicate-list
+fish_expected: |
+  > crazy-complete-test --duplicate-list
+  one  three  two
+zsh_expected: |
+  > crazy-complete-test --duplicate-list
+  one    three  two
+---
+number: 7
+description: "Check --duplicate-list (2)"
+send: "crazy-complete-test --duplicate-list one,"
+bash_expected: |
+  > crazy-complete-test --duplicate-list one,
+  one,one    one,three  one,two
+  > crazy-complete-test --duplicate-list one,
+fish_expected: |
+  > crazy-complete-test --duplicate-list one,
+  one,one  one,three  one,two
+zsh_expected: |
+  > crazy-complete-test --duplicate-list one,
+  one    three  two

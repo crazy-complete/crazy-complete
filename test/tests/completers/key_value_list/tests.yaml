@@ -1,0 +1,266 @@
+args: ["--input-type=yaml", "--include-file=completers/key_value_list/include.$shell"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "key_value_list: Check -o"
+send: "crazy-complete-test -o "
+bash_expected: |
+  > crazy-complete-test -o
+  animal      exclusive   nocomp      proc        with_sep
+  async       file        number      repeatable
+  > crazy-complete-test -o
+fish_expected: |
+  > crazy-complete-test -o
+  animal=           (select an animal)  number=          (select a number)
+  async               (set async mode)  proc=           (select a process)
+  exclusive  (deactivate some options)  repeatable     (repeatable option)
+  file=                                 with_sep=  (values containing sep)
+  nocomp=               (no completer)
+zsh_expected: |
+  > crazy-complete-test -o
+  animal      -- select an animal
+  async       -- set async mode
+  exclusive   -- deactivate some options
+  nocomp      -- no completer
+  number      -- select a number
+  proc        -- select a process
+  repeatable  -- repeatable option
+  with_sep    -- values containing sep
+  file
+---
+number: 2
+description: "key_value_list: Check -o a"
+send: "crazy-complete-test -o a"
+bash_expected: |
+  > crazy-complete-test -o a
+  animal  async
+  > crazy-complete-test -o a
+fish_expected: |
+  > crazy-complete-test -o a
+  animal=  (select an animal)  async  (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o a
+  animal  -- select an animal
+  async   -- set async mode
+---
+number: 3
+description: "key_value_list: Check -o an"
+send: "crazy-complete-test -o an"
+bash_expected: |
+  > crazy-complete-test -o animal
+fish_expected: |
+  > crazy-complete-test -o animal=
+zsh_expected: |
+  > crazy-complete-test -o animal=
+---
+number: 4
+description: "key_value_list: Check -o animal="
+send: "crazy-complete-test -o animal="
+bash_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+  animal=cat  animal=dog  animal=horse
+zsh_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+---
+number: 5
+description: "key_value_list: Check -o animal,"
+send: "crazy-complete-test -o animal,"
+bash_expected: |
+  > crazy-complete-test -o animal,
+  animal,async       animal,file        animal,number      animal,repeatable
+  animal,exclusive   animal,nocomp      animal,proc        animal,with_sep
+  > crazy-complete-test -o animal,
+fish_expected: |
+  > crazy-complete-test -o animal,
+  animal,async               (set async mode)
+  animal,exclusive  (deactivate some options)
+  animal,file=
+  animal,nocomp=               (no completer)
+  animal,number=            (select a number)
+  animal,proc=             (select a process)
+  animal,repeatable       (repeatable option)
+  animal,with_sep=    (values containing sep)
+zsh_expected: |
+  > crazy-complete-test -o animal,
+  async       -- set async mode
+  exclusive   -- deactivate some options
+  nocomp      -- no completer
+  number      -- select a number
+  proc        -- select a process
+  repeatable  -- repeatable option
+  with_sep    -- values containing sep
+  file
+---
+number: 6
+description: "key_value_list: Check -o animal,n"
+send: "crazy-complete-test -o animal,n"
+bash_expected: |
+  > crazy-complete-test -o animal,n
+  animal,nocomp  animal,number
+  > crazy-complete-test -o animal,n
+fish_expected: |
+  > crazy-complete-test -o animal,n
+  animal,nocomp=  (no completer)  animal,number=  (select a number)
+zsh_expected: |
+  > crazy-complete-test -o animal,n
+  nocomp  -- no completer
+  number  -- select a number
+---
+number: 7
+description: "key_value_list: Check -o number="
+send: "crazy-complete-test -o number="
+bash_expected: |
+  > crazy-complete-test -o number=
+  0  1  2
+  > crazy-complete-test -o number=
+fish_expected: |
+  > crazy-complete-test -o number=
+  number=0  (zero)  number=1  (one)  number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 8
+description: "key_value_list: Check -o 'number="
+send: "crazy-complete-test -o 'number="
+bash_expected: |
+  > crazy-complete-test -o 'number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o 'number=
+fish_expected: |
+  > crazy-complete-test -o 'number=
+  'number=0  (zero)  'number=1  (one)  'number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o 'number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 9
+description: "key_value_list: Check -o \"number="
+send: "crazy-complete-test -o \"number="
+bash_expected: |
+  > crazy-complete-test -o "number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o "number=
+fish_expected: |
+  > crazy-complete-test -o "number=
+  "number=0  (zero)  "number=1  (one)  "number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o "number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 10
+description: "key_value_list: Check -o file=f"
+send: "crazy-complete-test -o file=f"
+bash_expected: |
+  > crazy-complete-test -o file=f
+  file with spaces  file1.TXT         file4.txt.1
+  file0.txt         file3.tXt
+  > crazy-complete-test -o file=file
+fish_expected: |
+  > crazy-complete-test -o file=file
+  file=file with spaces  file=file1.TXT  file=file4.txt.1
+  file=file0.txt         file=file3.tXt
+zsh_expected: |
+  > crazy-complete-test -o file=file
+---
+number: 11
+description: "key_value_list: Check -o with_sep=value="
+comment: "Does not work for Bash yet"
+send: "crazy-complete-test -o with_sep=value="
+bash_expected: |
+  > crazy-complete-test -o with_sep=value=value=foo
+fish_expected: |
+  > crazy-complete-test -o with_sep=value=foo
+zsh_expected: |
+  > crazy-complete-test -o with_sep=value=foo,
+---
+number: 12
+description: "key_value_list: Check -o exclusive,"
+send: "crazy-complete-test -o exclusive,"
+bash_expected: |
+  > crazy-complete-test -o exclusive,
+  exclusive,file        exclusive,repeatable
+  exclusive,proc        exclusive,with_sep
+  > crazy-complete-test -o exclusive,
+fish_expected: |
+  > crazy-complete-test -o exclusive,
+  …xclusive,file=
+  …xclusive,proc=           (select a process)
+  …xclusive,repeatable     (repeatable option)
+  …xclusive,with_sep=  (values containing sep)
+zsh_expected: |
+  > crazy-complete-test -o exclusive,
+  proc        -- select a process
+  repeatable  -- repeatable option
+  with_sep    -- values containing sep
+  file
+---
+number: 13
+description: "key_value_list: Check -o repeatable,"
+send: "crazy-complete-test -o repeatable,"
+bash_expected: |
+  > crazy-complete-test -o repeatable,
+  repeatable,animal      repeatable,file        repeatable,proc
+  repeatable,async       repeatable,nocomp      repeatable,repeatable
+  repeatable,exclusive   repeatable,number      repeatable,with_sep
+  > crazy-complete-test -o repeatable,
+fish_expected: |
+  > crazy-complete-test -o repeatable,
+  …peatable,animal=           (select an animal)
+  …peatable,async               (set async mode)
+  …peatable,exclusive  (deactivate some options)
+  …peatable,file=
+  …peatable,nocomp=               (no completer)
+  …peatable,number=            (select a number)
+  …peatable,proc=             (select a process)
+  …peatable,repeatable       (repeatable option)
+  …peatable,with_sep=    (values containing sep)
+zsh_expected: |
+  > crazy-complete-test -o repeatable,
+  animal      -- select an animal
+  async       -- set async mode
+  exclusive   -- deactivate some options
+  nocomp      -- no completer
+  number      -- select a number
+  proc        -- select a process
+  repeatable  -- repeatable option
+  with_sep    -- values containing sep
+  file
+---
+number: 14
+description: "key_value_list: Check --condition "
+send: "crazy-complete-test --condition "
+bash_expected: |
+  > crazy-complete-test --condition
+  animal      exclusive   nocomp      proc        with_sep
+  async       file        number      repeatable
+  > crazy-complete-test --condition
+fish_expected: |
+  > crazy-complete-test --condition
+  animal=           (select an animal)  number=          (select a number)
+  async               (set async mode)  proc=           (select a process)
+  exclusive  (deactivate some options)  repeatable     (repeatable option)
+  file=                                 with_sep=  (values containing sep)
+  nocomp=               (no completer)
+zsh_expected: |
+  > crazy-complete-test --condition
+  animal      -- select an animal
+  async       -- set async mode
+  exclusive   -- deactivate some options
+  nocomp      -- no completer
+  number      -- select a number
+  proc        -- select a process
+  repeatable  -- repeatable option
+  with_sep    -- values containing sep
+  file

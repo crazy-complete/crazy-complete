@@ -1,108 +1,86 @@
 #!/usr/bin/python3
 
 import os
-import pprint
+import sys
 from collections import defaultdict
 
 import yaml
-from pygments import highlight
-from pygments.lexers import YamlLexer
-from pygments.lexers import MarkdownLexer
-from pygments.formatters import TerminalFormatter
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-COMMANDS_INFILE         = 'commands.yaml'
+from crazy_complete import completers
+
 COMMANDS_OUTFILE        = 'commands.md'
 OPTIONS_INFILE          = 'options.yaml'
 OPTIONS_OUTFILE         = 'options.md'
 DOCUMENTATION_INFILE    = 'documentation.md.in'
 DOCUMENTATION_OUTFILE   = 'documentation.md'
-MANUAL_INFILE           = 'manual.in.py'
-MANUAL_OUTFILE          = '../crazy_complete/manual.py'
 
 OPTIONS                 = []
 COMMANDS                = []
 BY_CATEGORY             = defaultdict(list)
+ALL_MODULES             = {}
 
 def escape_underscore(s):
     return s.replace('_', '\\_')
 
 class Command:
-    def __init__(self, dictionary):
-        self.command = None
-        self.category = None
-        self.synopsis = None
-        self.short = None
-        self.long = None
-        self.notes = []
-        self.definition = None
-        self.output = None
-        self.also = None
-        self.implemented = None
+    def __init__(self, name, module):
+        self.command = name
+        self.category = getattr(module, 'CATEGORY', None)
+        self.synopsis = getattr(module, 'SYNOPSIS', None)
+        self.short = getattr(module, 'SHORT', None)
+        self.long = getattr(module, 'LONG', None)
+        self.notes = getattr(module, 'NOTES', None)
+        self.definition = getattr(module, 'DEFINITION', None)
+        self.output = getattr(module, 'OUTPUT', None)
+        self.also = getattr(module, 'ALSO', None)
+        self.implemented = getattr(module, 'IMPLEMENTED', None)
 
-        for key, value in dictionary.items():
-            if key == 'command':
-                assert isinstance(value, str), key
-                self.command = value
-            elif key == 'synopsis':
-                assert isinstance(value, str), key
-                self.synopsis = value
-            elif key == 'short':
-                assert isinstance(value, str), key
-                self.short = value
-            elif key == 'long':
-                assert isinstance(value, str), key
-                self.long = value
-            elif key == 'definition':
-                assert isinstance(value, str), key
-                self.definition = value
-            elif key == 'category':
-                assert isinstance(value, str), key
-                self.category = value
-            elif key == 'output':
-                assert isinstance(value, str), key
-                self.output = value
-            elif key == 'notes':
-                assert isinstance(value, list), key
-                self.notes = value
-            elif key == 'also':
-                assert isinstance(value, dict), key
-                self.also = value
-            elif key == 'implemented':
-                assert isinstance(value, list), key
-                self.implemented = value
-            else:
-                raise Exception(f"Unknown key: {key}")
-
-        if self.command is None:
-            raise Exception("No command")
-
-        if self.category is None:
+        if not isinstance(self.category, str):
             raise Exception(f"No category: {self.command}")
 
-        if self.category not in ('meta', 'custom', 'basic', 'bonus'):
+        if self.category not in ('meta', 'custom', 'basic'):
             raise Exception(f"No such category: {self.category}")
 
-        if self.short is None:
+        if not isinstance(self.short, str):
             raise Exception(f"No short: {self.command}")
 
         if self.short.endswith('.'):
             raise Exception(f"short ends with '.': {self.command}")
 
-        if self.definition is None:
+        if self.synopsis is None:
+            self.synopsis = f"['{self.command}']"
+
+        if self.notes is None:
+            self.notes = []
+        elif not isinstance(self.notes, list):
+            raise Exception(f"Notes: wrong type: {self.command}")
+        for note in self.notes:
+            if not isinstance(note, str):
+                raise Exception(f"Notes: wrong entry: {self.command}")
+
+        if not isinstance(self.definition, str):
             raise Exception(f"No definition: {self.command}")
 
         yaml.safe_load(self.definition)
 
-        if self.synopsis is None:
-            self.synopsis = f"['{self.command}']"
-
-        if self.output is None:
+        if not isinstance(self.output, str):
             raise Exception(f"No output: {self.command}")
 
         if '<TAB>' not in self.output:
             raise Exception(f"No <TAB> in output: {self.command}")
+
+        if self.also is None:
+            self.also = {}
+        elif not isinstance(self.also, dict):
+            raise Exception(f"Also: wrong type: {self.command}")
+        for also, desc in self.also.items():
+            if not isinstance(also, str) or also not in ALL_MODULES:
+                raise Exception(f"Also: unknown completer {also}: {self.command}")
+            if not isinstance(desc, str):
+                raise Exception(f"Also: wrong description: {self.command}")
 
         if self.implemented:
             for implemented in self.implemented:
@@ -225,7 +203,7 @@ def make_markup_command(command):
 
     if command.long:
         r += ['**PARAMETERS**']
-        r += [command.long]
+        r += [command.long.lstrip('\n')]
 
     notes = list(command.notes)
     if command.implemented:
@@ -251,7 +229,6 @@ def make_markup(by_category):
     r += [make_markup_summary_table('Meta commands', BY_CATEGORY['meta'])]
     r += [make_markup_summary_table('Built-in commands', BY_CATEGORY['basic'])]
     r += [make_markup_summary_table('User-defined commands', BY_CATEGORY['custom'])]
-    r += [make_markup_summary_table('Bonus commands', BY_CATEGORY['bonus'])]
 
     for commands in by_category.values():
         for command in commands:
@@ -301,40 +278,12 @@ def options_markup(options):
     return '\n\n---\n\n'.join(r)
 
 
-def make_python_commands(commands):
-    data = []
-
-    for command in commands:
-        def_colored = highlight(command.definition, YamlLexer(), TerminalFormatter())
-
-        if command.long:
-            long_colored = highlight(command.long, MarkdownLexer(), TerminalFormatter())
-        else:
-            long_colored = None
-
-        data.append({
-            'command':              command.command,
-            'category':             command.category,
-            'short':                command.short,
-            'long':                 command.long,
-            'long_colored':         long_colored,
-            'notes':                command.notes,
-            'implemented':          command.implemented,
-            'definition':           command.definition,
-            'definition_colored':   def_colored,
-            'output':               command.output,
-            'also':                 command.also
-        })
-
-    return 'COMMANDS = ' + pprint.pformat(data)
-
 # =============================================================================
 # Read commands and options
 # =============================================================================
 
-with open(COMMANDS_INFILE, 'r', encoding='utf-8') as fh:
-    for command_def in yaml.safe_load_all(fh):
-        COMMANDS.append(Command(command_def))
+ALL_MODULES = dict(completers.load_all())
+COMMANDS = [Command(name, module) for name, module in ALL_MODULES.items()]
 
 with open(OPTIONS_INFILE, 'r', encoding='utf-8') as fh:
     for option_def in yaml.safe_load_all(fh):
@@ -365,17 +314,4 @@ content = content.replace('%COMMANDS%', commands_markup)
 content = content.replace('%OPTIONS%', options_markup)
 
 with open(DOCUMENTATION_OUTFILE, 'w', encoding='utf-8') as fh:
-    fh.write(content)
-
-# =============================================================================
-# Generate python manual data
-# =============================================================================
-
-with open(MANUAL_INFILE, 'r', encoding='utf-8') as fh:
-    content = fh.read()
-
-commands_python = make_python_commands(COMMANDS)
-content = content.replace('%COMMANDS%', commands_python)
-
-with open(MANUAL_OUTFILE, 'w', encoding='utf-8') as fh:
     fh.write(content)

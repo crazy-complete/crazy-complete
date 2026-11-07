@@ -155,70 +155,12 @@ done
 echo ${#s1}
 ''')
 
-_COMMANDLINE_STRING = ShellFunction('commandline_string', r'''
-local l line break_pos in_quotes
-dequote "$cur" line break_pos in_quotes
-
-local COMP_LINE_OLD="$COMP_LINE"
-local COMP_POINT_OLD=$COMP_POINT
-local COMP_WORDS_OLD=("${COMP_WORDS[@]}")
-local COMP_CWORD_OLD=$COMP_CWORD
-
-COMP_LINE="$line"
-COMP_POINT=${#line}
-COMP_WORDS=()
-parse_line COMP_WORDS "$line"
-COMP_CWORD=$(( ${#COMP_WORDS[@]} - 1 ))
-COMPREPLY=()
-
-#ifdef bash_completions_v_2_12
-_comp_command_offset 0
-#else
-_command_offset 0
-#endif
-compopt -o nospace
-compopt -o noquote
-
-if (( break_pos >= 0 )); then
-  line="${line:break_pos}"
-fi
-
-if (( ${#COMPREPLY[@]} )); then
-  local len=$(get_prefix_suffix_len "$line" "${COMPREPLY[0]}")
-  line="${line:0:len}"
-
-  for i in "${!COMPREPLY[@]}"; do
-    local REPLY="${COMPREPLY[i]}"
-    if (( in_quotes )); then
-      COMPREPLY[i]="$line$REPLY"
-    else
-      COMPREPLY[i]="$(printf '%q' "$line$REPLY")"
-    fi
-  done
-fi
-
-COMP_LINE="$COMP_LINE_OLD"
-COMP_POINT=$COMP_POINT_OLD
-COMP_WORDS=("${COMP_WORDS_OLD[@]}")
-COMP_CWORD=$COMP_CWORD_OLD
-''', ['dequote', 'parse_line', 'get_prefix_suffix_len'])
-
 _EXEC = ShellFunction('exec', r'''
 local item desc special="$COMP_WORDBREAKS\"'><=;|&({:\\\$\`"
 
 while IFS=$'\t' read -r item desc; do
   if [[ "$item" == "$cur"* ]]; then
     [[ "$item" == *[$special]* ]] && item="$(printf '%q' "$item")"
-    COMPREPLY+=("$item")
-  fi
-done < <(eval "$1")
-''')
-
-_EXEC_FAST = ShellFunction('exec_fast', r'''
-local item desc
-
-while IFS=$'\t' read -r item desc; do
-  if [[ "$item" == "$cur"* ]]; then
     COMPREPLY+=("$item")
   fi
 done < <(eval "$1")
@@ -446,155 +388,6 @@ elif array_contains "$key" "${!funcs[@]}"; then
 fi
 ''', ['dequote', 'array_contains', 'values'])
 
-_KEY_VALUE_PAIR_EXEC = ShellFunction('key_value_pair_exec', r'''
-local sep="$1"
-local func="$2"
-
-local strip_chars=''
-[[ "$COMP_WORDBREAKS" == *"$sep"* ]] && strip_chars+="$sep"
-[[ "${cur:0:1}" == '"' ]] && strip_chars=''
-[[ "${cur:0:1}" == "'" ]] && strip_chars=''
-local cur="$cur" break_pos in_quotes
-dequote "$cur" cur break_pos in_quotes
-
-local key="${cur%%"$sep"*}" value="${cur#*"$sep"}" cur_stripped="$cur"
-
-COMPREPLY=()
-
-if [[ "$cur" != *"$sep"* ]]; then
-  exec "$func"
-else
-  cur="$value"
-  exec "$func $key"
-
-  cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
-  if [[ -n "$strip_chars" ]]; then
-      cur_stripped="${cur_stripped##*[$strip_chars]}"
-  fi
-
-  for i in "${!COMPREPLY[@]}"; do
-    COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
-  done
-fi
-''', ['dequote', 'exec'])
-
-_KEY_VALUE_LIST_EXEC = ShellFunction('key_value_list_exec', r'''
-local sep1="$1"
-local sep2="$2"
-local func="$3"
-local -A excludes=()
-local -A takes_arg=()
-local key desc exclude non_repeatable_exclude
-
-while IFS=$'\t' read -r key desc exclude; do
-  local has_arg=false
-
-  if [[ "$key" == *'=' ]]; then
-    key="${key:0:-1}"
-    has_arg=true
-  elif [[ "$key" == *'=?' ]]; then
-    key="${key:0:-2}"
-  fi
-
-  if [[ "$key" == '*'* ]]; then
-    key="${key:1}"
-    non_repeatable_exclude=''
-  else
-    non_repeatable_exclude=" $key"
-  fi
-
-  takes_arg[$key]=$has_arg
-  excludes[$key]="$exclude$non_repeatable_exclude"
-done < <($func)
-
-local strip_chars=''
-[[ "$COMP_WORDBREAKS" == *"$sep1"* ]] && strip_chars+="$sep1"
-[[ "$COMP_WORDBREAKS" == *"$sep2"* ]] && strip_chars+="$sep2"
-[[ "${cur:0:1}" == '"' ]] && strip_chars=''
-[[ "${cur:0:1}" == "'" ]] && strip_chars=''
-local cur="$cur" break_pos in_quotes
-dequote "$cur" cur break_pos in_quotes
-
-if [[ -z "$cur" ]]; then
-  COMPREPLY=("${!excludes[@]}")
-  return
-fi
-
-local pair key value found_key cur_stripped="$cur"
-local -a tmp having_pairs having_keys remaining_keys
-
-IFS="$sep1" read -r -a having_pairs <<< "$cur"
-
-for pair in "${having_pairs[@]}"; do
-  key="${pair%%"$sep2"*}"
-  IFS=' ' read -r -a tmp <<< "${excludes[$key]}"
-  having_keys+=("${tmp[@]}")
-done
-
-for key in "${!excludes[@]}"; do
-  found_key=0
-
-  for having_key in "${having_keys[@]}"; do
-    if [[ "$key" == "$having_key" ]]; then
-      found_key=1
-      break
-    fi
-  done
-
-  if (( ! found_key )); then
-    remaining_keys+=("$key")
-  fi
-done
-
-COMPREPLY=()
-
-if [[ "${cur: -1}" == "$sep1" ]]; then
-  [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
-
-  for key in "${remaining_keys[@]}"; do
-    COMPREPLY+=("$cur_stripped$key")
-  done
-else
-  pair="${cur##*"$sep1"}"
-  if [[ "$pair" == *"$sep2"* ]]; then
-    key="${pair%%"$sep2"*}"
-    value="${pair#*"$sep2"}"
-    cur="$value"
-    exec "$func $key"
-
-    cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
-    if [[ -n "$strip_chars" ]]; then
-        cur_stripped="${cur_stripped##*[$strip_chars]}"
-    fi
-
-    for i in "${!COMPREPLY[@]}"; do
-      COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
-    done
-  else
-    [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
-    cur_stripped="${cur_stripped%"$pair"}"
-
-    for key in "${remaining_keys[@]}"; do
-      if [[ "$key" == "$pair"* ]]; then
-        COMPREPLY+=("$cur_stripped$key")
-      fi
-    done
-  fi
-fi
-''', ['dequote', 'exec'])
-
-_FILTER = ShellFunction('filter', r'''
-local item pattern copy=("${COMPREPLY[@]}")
-COMPREPLY=()
-for item in "${copy[@]}"; do
-  for pattern in "$@"; do
-    [[ "$item" == $pattern ]] && continue 2
-  done
-
-  COMPREPLY+=("$item")
-done
-''')
-
 _PREFIX_COMPREPLY = ShellFunction('prefix_compreply', r'''
 [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
 
@@ -602,18 +395,6 @@ local i prefix="$1"
 for ((i=0; i < ${#COMPREPLY[@]}; ++i)); do
   COMPREPLY[i]="$prefix${COMPREPLY[i]}"
 done
-''')
-
-_HISTORY = ShellFunction('history', r'''
-[[ -f "$HISTFILE" ]] || return
-
-local match
-
-while read -r match; do
-  if [[ "$match" == "$cur"* ]]; then
-    COMPREPLY+=("$(printf '%q' "$match")")
-  fi
-done < <(command grep -E -o -- "$1" "$HISTFILE")
 ''')
 
 _GET_LAST_BREAK_POSITION = ShellFunction('get_last_break_position', r'''
@@ -665,16 +446,6 @@ if (( break_position < 0 )); then
 fi
 ''', ['get_last_break_position', 'strip_prefix_keep_quoting'])
 
-_SUFFIX = ShellFunction('suffix', r'''
-local i suffix="$1" func="$2"
-
-$func
-
-for i in "${!COMPREPLY[@]}"; do
-  COMPREPLY[i]="${COMPREPLY[i]}$suffix"
-done
-''')
-
 _STRIP_PREFIX_KEEP_QUOTING = ShellFunction('strip_prefix_keep_quoting', r'''
 local p="$1" pi=0 plen=${#1}
 local s="$2" si=0 slen=${#2} state=w
@@ -716,125 +487,10 @@ case "$state" in
 esac
 ''')
 
-_MIME_FILE = ShellFunction('mime_file', r'''
-local line file mime i_opt cur_dequoted
-
-if command file -i /dev/null &>/dev/null; then
-  i_opt="-i"
-elif command file -I /dev/null &>/dev/null; then
-  i_opt="-I"
-else
-#ifdef bash_completions_v_2_12
-  _comp_compgen_filedir
-#else
-  _filedir
-#endif
-  return
-fi
-
-local cur_dequoted break_pos in_quotes
-dequote "$cur" cur_dequoted break_pos in_quotes
-
-while read -r line; do
-  mime="${line##*:}"
-
-  if [[ "$mime" == *inode/directory* ]] || command grep -q -E -- "$1" <<< "$mime"; then
-    file="${line%:*}"
-
-    if [[ "$file" == *\\* ]]; then
-      file="$(command perl -pe 's/\\([0-7]{3})/chr(oct($1))/ge' <<< "$file")"
-    fi
-
-    if [[ "$mime" == *inode/directory* ]]; then
-      file="$file/"
-    fi
-
-    if [[ "$file" == "$cur_dequoted"* ]]; then
-      COMPREPLY+=("$(printf '%q' "$file")")
-    fi
-  fi
-done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
-''', ['dequote'])
-
-_FILE_FILTER = ShellFunction('file_filter', '''
-local pattern REPLY COMPREPLY_OLD=("${COMPREPLY[@]}")
-
-COMPREPLY=()
-
-for REPLY in "${COMPREPLY_OLD[@]}"; do
-  for pattern; do
-    [[ "${REPLY##*/}" == $pattern ]] && continue 2
-  done
-
-  COMPREPLY+=("$REPLY")
-done
-''')
-
-_NUMBER = ShellFunction('number', '''
-local number="$(command grep -E -o '^[0-9,.]+' <<< "$cur")" suffix_and_desc
-
-[[ -z "$number" ]] && return
-
-COMPREPLY=("$number")
-
-for suffix_and_desc; do
-  COMPREPLY+=("${number}${suffix_and_desc%%:*}")
-done
-''')
-
-# =============================================================================
-# Bonus
-# =============================================================================
-
-_MOUNTPOINT = ShellFunction('mountpoint', r'''
-local REPLY
-
-COMPREPLY=()
-
-while read -r REPLY; do
-  COMPREPLY+=("$(printf '%q' "$REPLY")")
-done < <(command findmnt -lno TARGET)
-''')
-
-_LOCALES = ShellFunction('''locales''', r'''
-COMPREPLY=($(compgen -W "$(command locale -a)" -- "$cur"))
-''')
-
-_CHARSETS = ShellFunction('''charsets''', r'''
-COMPREPLY=($(compgen -W "$(command locale -m)" -- "$cur"))
-''')
-
-_TIMEZONE_LIST = ShellFunction('timezone_list', r'''
-if ! command timedatectl list-timezones 2>/dev/null; then
-  command find /usr/share/zoneinfo -type f |\
-  command sed 's|/usr/share/zoneinfo/||g'  |\
-  command grep -E -v '^(posix|right)'
-fi''')
-
-_ALSA_LIST_CARDS = ShellFunction('alsa_list_cards', r'''
-local card id cards=()
-while builtin read card; do
-  card="${card#card }"
-  id="${card%%: *}"
-  cards+=("$id")
-done < <(command aplay -l | command grep -Eo '^card [0-9]+: [^,]+')
-
-COMPREPLY=($(compgen -W "${cards[*]}" -- "$cur"))
-''')
-
-_ALSA_LIST_DEVICES = ShellFunction('alsa_list_devices', r'''
-local card id devices=()
-while builtin read card; do
-  card="${card#card }"
-  id="${card%%: *}"
-  devices+=("hw:$id")
-done < <(command aplay -l | command grep -Eo '^card [0-9]+: [^,]+')
-
-COMPREPLY=($(compgen -W "${devices[*]}" -- "$cur"))
-''')
-
 
 class BashHelpers(GeneralHelpers):
+    _functions = {}
+
     '''Class holding helper functions for Bash.'''
 
     def __init__(self, config, function_prefix):
@@ -842,9 +498,7 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_VALUES)
         self.add_function(_DEQUOTE)
         self.add_function(_DEQUOTE_WORDS)
-        self.add_function(_FILTER)
         self.add_function(_PREFIX)
-        self.add_function(_SUFFIX)
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
         self.add_function(_ARRAY_CONTAINS)
         self.add_function(_ARRAY_CONTAINS_NOCASE)
@@ -853,22 +507,8 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_GET_LAST_BREAK_POSITION)
         self.add_function(_PARSE_LINE)
         self.add_function(_GET_PREFIX_SUFFIX_LEN)
-        self.add_function(_COMMANDLINE_STRING)
         self.add_function(_EXEC)
-        self.add_function(_EXEC_FAST)
         self.add_function(_VALUE_LIST)
         self.add_function(_KEY_VALUE_LIST)
         self.add_function(_KEY_VALUE_PAIR)
-        self.add_function(_KEY_VALUE_LIST_EXEC)
-        self.add_function(_KEY_VALUE_PAIR_EXEC)
-        self.add_function(_FILE_FILTER)
         self.add_function(_PREFIX_COMPREPLY)
-        self.add_function(_HISTORY)
-        self.add_function(_NUMBER)
-        self.add_function(_MIME_FILE)
-        self.add_function(_MOUNTPOINT)
-        self.add_function(_LOCALES)
-        self.add_function(_CHARSETS)
-        self.add_function(_TIMEZONE_LIST)
-        self.add_function(_ALSA_LIST_CARDS)
-        self.add_function(_ALSA_LIST_DEVICES)

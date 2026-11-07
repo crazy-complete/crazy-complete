@@ -1,0 +1,77 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --value-list #1"
+send: "crazy-complete-test --value-list "
+bash_expected: |
+  > crazy-complete-test --value-list
+  bar  baz  foo
+  > crazy-complete-test --value-list
+fish_expected: |
+  > crazy-complete-test --value-list
+  bar  (Complete a list)  baz  (Complete a list)  foo  (Complete a list)
+zsh_expected: |
+  > crazy-complete-test --value-list
+  bar  baz  foo
+---
+number: 2
+description: "Check --value-list #2"
+send: "crazy-complete-test --value-list f"
+bash_expected: |
+  > crazy-complete-test --value-list foo
+fish_expected: |
+  > crazy-complete-test --value-list foo
+zsh_expected: |
+  > crazy-complete-test --value-list foo,
+---
+number: 3
+description: "Check --value-list #3"
+send: "crazy-complete-test --value-list foo"
+bash_expected: |
+  > crazy-complete-test --value-list foo,
+fish_expected: |
+  > crazy-complete-test --value-list foo
+zsh_expected: |
+  > crazy-complete-test --value-list foo,
+---
+number: 4
+description: "Check --value-list #4"
+send: "crazy-complete-test --value-list foo,baz,"
+bash_expected: |
+  > crazy-complete-test --value-list foo,baz,bar
+fish_expected: |
+  > crazy-complete-test --value-list foo,baz,bar
+zsh_expected: |
+  > crazy-complete-test --value-list foo,baz,bar,
+---
+number: 5
+description: "Check --value-list-2"
+send: "crazy-complete-test --value-list-2 "
+bash_expected: |
+  > crazy-complete-test --value-list-2
+  bar  foo
+  > crazy-complete-test --value-list-2
+fish_expected: |
+  > crazy-complete-test --value-list-2
+  bar  (Some bar)  foo  (Some foo)
+zsh_expected: |
+  > crazy-complete-test --value-list-2
+  bar  -- Some bar
+  foo  -- Some foo
+---
+number: 6
+description: "Check --value-list-dup"
+send: "crazy-complete-test --value-list-dup foo,"
+bash_expected: |
+  > crazy-complete-test --value-list-dup foo,
+  foo,bar  foo,baz  foo,foo
+  > crazy-complete-test --value-list-dup foo,
+fish_expected: |
+  > crazy-complete-test --value-list-dup foo,
+  foo,bar  (Complete a list (with duplicates))
+  foo,baz  (Complete a list (with duplicates))
+  foo,foo  (Complete a list (with duplicates))
+zsh_expected: |
+  > crazy-complete-test --value-list-dup foo,
+  bar  baz  foo

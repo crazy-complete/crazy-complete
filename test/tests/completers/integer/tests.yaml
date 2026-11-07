@@ -1,0 +1,16 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check --integer"
+send: "crazy-complete-test --integer 1"
+bash_expected: |
+  > crazy-complete-test --integer 1
+  1   1h  1m  1s
+  > crazy-complete-test --integer 1
+fish_expected: |
+  > crazy-complete-test --integer 1
+  1h  (hours)  1m  (minutes)  1s  (seconds)
+zsh_expected: |
+  > crazy-complete-test --integer 1
+  s -- seconds  m -- minutes  h -- hours

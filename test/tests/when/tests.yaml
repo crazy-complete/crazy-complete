@@ -1,0 +1,329 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check multiple-when --complete with --files"
+send: "crazy-complete-test multiple-when --files --complete "
+bash_expected: |
+  > crazy-complete-test multiple-when --files --complete
+  file1  file2  file3
+  > crazy-complete-test multiple-when --files --complete file
+fish_expected: |
+  > crazy-complete-test multiple-when --files --complete file
+  file1  file2  file3
+zsh_expected: |
+  > crazy-complete-test multiple-when --files --complete file
+---
+number: 2
+description: "Check multiple-when --complete with --directories"
+send: "crazy-complete-test multiple-when --directories --complete "
+bash_expected: |
+  > crazy-complete-test multiple-when --directories --complete
+  dir1  dir2  dir3
+  > crazy-complete-test multiple-when --directories --complete dir
+fish_expected: |
+  > crazy-complete-test multiple-when --directories --complete dir
+  dir1  dir2  dir3
+zsh_expected: |
+  > crazy-complete-test multiple-when --directories --complete dir
+---
+number: 3
+description: "Check multiple-when positional with --files"
+send: "crazy-complete-test multiple-when --files "
+bash_expected: |
+  > crazy-complete-test multiple-when --files
+  file1  file2  file3
+  > crazy-complete-test multiple-when --files file
+fish_expected: |
+  > crazy-complete-test multiple-when --files file
+  file1  file2  file3
+zsh_expected: |
+  > crazy-complete-test multiple-when --files file
+---
+number: 4
+description: "Check multiple-when positional with --directories"
+send: "crazy-complete-test multiple-when --directories "
+bash_expected: |
+  > crazy-complete-test multiple-when --directories
+  dir1  dir2  dir3
+  > crazy-complete-test multiple-when --directories dir
+fish_expected: |
+  > crazy-complete-test multiple-when --directories dir
+  dir1  dir2  dir3
+zsh_expected: |
+  > crazy-complete-test multiple-when --directories dir
+---
+number: 5
+description: "Check positional_count (1)"
+send: "crazy-complete-test positionals --"
+bash_expected: |
+  > crazy-complete-test positionals --
+fish_expected: |
+  > crazy-complete-test positionals --
+zsh_expected: |
+  > crazy-complete-test positionals --
+---
+number: 6
+description: "Check positional_count (2)"
+send: "crazy-complete-test positionals arg --"
+bash_expected: |
+  > crazy-complete-test positionals arg --if-positional-count
+fish_expected: |
+  > crazy-complete-test positionals arg --if-positional-count
+zsh_expected: |
+  > crazy-complete-test positionals arg --if-positional-count
+---
+number: 7
+description: "Check positional_contains"
+send: "crazy-complete-test positionals foo --"
+bash_expected: |
+  > crazy-complete-test positionals foo --
+  --if-positional-contains         --if-positional-count
+  --if-positional-contains-nocase
+  > crazy-complete-test positionals foo --if-positional-co
+fish_expected: |
+  > crazy-complete-test positionals foo --if-positional-co
+  …tional-contains  …tional-contains-nocase  …tional-count
+zsh_expected: |
+  > crazy-complete-test positionals foo --if-positional-co
+---
+number: 8
+description: "Check with no options"
+send: "crazy-complete-test --"
+bash_expected: |
+  > crazy-complete-test --
+  --if-not-1           --option-1
+  --if-not-1-or-not-2  --option-2
+  > crazy-complete-test --
+fish_expected: |
+  > crazy-complete-test --
+  --if-not-1  --if-not-1-or-not-2  --option-1  --option-2
+zsh_expected: |
+  > crazy-complete-test --
+  --if-not-1           --option-1
+  --if-not-1-or-not-2  --option-2
+---
+number: 9
+description: "Check with no --option-1"
+send: "crazy-complete-test --option-1 --"
+bash_expected: |
+  > crazy-complete-test --option-1 --
+  --if-1-or-2  --option-2
+  > crazy-complete-test --option-1 --
+fish_expected: |
+  > crazy-complete-test --option-1 --
+  --if-1-or-2  --option-2
+zsh_expected: |
+  > crazy-complete-test --option-1 --
+  --if-1-or-2  --option-2
+---
+number: 10
+description: "Check with no --option-2"
+send: "crazy-complete-test --option-2 --"
+bash_expected: |
+  > crazy-complete-test --option-2 --
+  --if-1-or-2  --if-not-1   --option-1
+  > crazy-complete-test --option-2 --
+fish_expected: |
+  > crazy-complete-test --option-2 --
+  --if-1-or-2  --if-not-1  --option-1
+zsh_expected: |
+  > crazy-complete-test --option-2 --
+  --if-1-or-2  --if-not-1   --option-1
+---
+number: 11
+description: "Check with no --option-1 and --option-2"
+send: "crazy-complete-test --option-1 --option-2 --"
+bash_expected: |
+  > crazy-complete-test --option-1 --option-2 --
+  --if-1-and-2  --if-1-or-2
+  > crazy-complete-test --option-1 --option-2 --if-1-
+fish_expected: |
+  > crazy-complete-test --option-1 --option-2 --if-1-
+  --if-1-and-2  --if-1-or-2
+zsh_expected: |
+  > crazy-complete-test --option-1 --option-2 --if-1--2
+---
+number: 12
+description: "Check special-values without options"
+send: "crazy-complete-test special-values --"
+bash_expected: |
+  > crazy-complete-test special-values --arg=
+fish_expected: |
+  > crazy-complete-test special-values --arg
+zsh_expected: |
+  > crazy-complete-test special-values --arg=
+---
+number: 13
+description: "Check special-values with --arg='foo bar'"
+send: "crazy-complete-test special-values --arg='foo bar' --"
+bash_expected: |
+  > crazy-complete-test special-values --arg='foo bar' --if-arg-is-foo-bar
+fish_expected: |
+  > crazy-complete-test special-values --arg='foo bar' --if-arg-is-foo-bar
+zsh_expected: |
+  > crazy-complete-test special-values --arg='foo bar' --if-arg-is-foo-bar
+---
+number: 14
+description: "Check special-values with --arg='\"'"
+send: "crazy-complete-test special-values --arg='\"' --"
+bash_expected: |
+  > crazy-complete-test special-values --arg='"' --if-arg-is-double-quote
+fish_expected: |
+  > crazy-complete-test special-values --arg='"' --if-arg-is-double-quote
+zsh_expected: |
+  > crazy-complete-test special-values --arg='"' --if-arg-is-double-quote
+---
+number: 15
+description: "Check special-values with --arg=\"'\""
+send: "crazy-complete-test special-values --arg=\"'\" --"
+bash_expected: |
+  > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote
+fish_expected: |
+  > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote
+zsh_expected: |
+  > crazy-complete-test special-values --arg="'" --if-arg-is-single-quote
+---
+number: 16
+description: "when: advanced: check --"
+send: "crazy-complete-test advanced --"
+bash_expected: |
+  > crazy-complete-test advanced --arg=
+fish_expected: |
+  > crazy-complete-test advanced --arg
+zsh_expected: |
+  > crazy-complete-test advanced --arg=
+---
+number: 17
+description: "when: advanced: check --arg FOO"
+send: "crazy-complete-test advanced --arg FOO --"
+bash_expected: |
+  > crazy-complete-test advanced --arg FOO --if-arg-is-foo-or-bar-nocase
+fish_expected: |
+  > crazy-complete-test advanced --arg FOO --if-arg-is-foo-or-bar-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg FOO --if-arg-is-foo-or-bar-nocase
+---
+number: 18
+description: "when: advanced: check --arg BAR"
+send: "crazy-complete-test advanced --arg BAR --"
+bash_expected: |
+  > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
+fish_expected: |
+  > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg BAR --if-arg-is-foo-or-bar-nocase
+---
+number: 19
+description: "when: advanced: check --arg regex"
+send: "crazy-complete-test advanced --arg regex --"
+bash_expected: |
+  > crazy-complete-test advanced --arg regex --
+  --if-arg-is-regex         --if-arg-is-regex-nocase
+  > crazy-complete-test advanced --arg regex --if-arg-is-regex
+fish_expected: |
+  > crazy-complete-test advanced --arg regex --if-arg-is-regex
+  …-is-regex  …-is-regex-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg regex --if-arg-is-regex
+---
+number: 20
+description: "when: advanced: check --arg REGEX"
+send: "crazy-complete-test advanced --arg REGEX --"
+bash_expected: |
+  > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase
+fish_expected: |
+  > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase
+zsh_expected: |
+  > crazy-complete-test advanced --arg REGEX --if-arg-is-regex-nocase
+---
+number: 21
+description: "when: any: check --arg foo"
+send: "crazy-complete-test any --arg foo --"
+bash_expected: |
+  > crazy-complete-test any --arg foo --
+  --if-any-arg-is-foo  --if-arg-is-foo
+  > crazy-complete-test any --arg foo --if-a
+fish_expected: |
+  > crazy-complete-test any --arg foo --if-a
+  --if-any-arg-is-foo  --if-arg-is-foo
+zsh_expected: |
+  > crazy-complete-test any --arg foo --if-a
+---
+number: 22
+description: "when: any: check --arg foo --arg override"
+send: "crazy-complete-test any --arg foo --arg override --"
+bash_expected: |
+  > crazy-complete-test any --arg foo --arg override --if-any-arg-is-foo
+fish_expected: |
+  > crazy-complete-test any --arg foo --arg override --if-any-arg-is-foo
+zsh_expected: |
+  > crazy-complete-test any --arg foo --arg override --if-any-arg-is-foo
+---
+number: 23
+description: "when: any: check --arg regex"
+send: "crazy-complete-test any --arg regex --"
+bash_expected: |
+  > crazy-complete-test any --arg regex --
+  --if-any-arg-is-regex  --if-arg-is-regex
+  > crazy-complete-test any --arg regex --if-a
+fish_expected: |
+  > crazy-complete-test any --arg regex --if-a
+  --if-any-arg-is-regex  --if-arg-is-regex
+zsh_expected: |
+  > crazy-complete-test any --arg regex --if-a
+---
+number: 24
+description: "when: any: check --arg regex --arg override"
+send: "crazy-complete-test any --arg regex --arg override --"
+bash_expected: |
+  > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex
+fish_expected: |
+  > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex
+zsh_expected: |
+  > crazy-complete-test any --arg regex --arg override --if-any-arg-is-regex
+---
+number: 25
+description: "Check positional_contains (ignoring case)"
+send: "crazy-complete-test positionals FOO --"
+bash_expected: |
+  > crazy-complete-test positionals FOO --
+  --if-positional-contains-nocase  --if-positional-count
+  > crazy-complete-test positionals FOO --if-positional-co
+fish_expected: |
+  > crazy-complete-test positionals FOO --if-positional-co
+  …tional-contains-nocase  …tional-count
+zsh_expected: |
+  > crazy-complete-test positionals FOO --if-positional-co
+---
+number: 26
+description: "Check positional_match"
+send: "crazy-complete-test positionals regex --"
+bash_expected: |
+  > crazy-complete-test positionals regex --
+  --if-positional-count         --if-positional-regex-nocase
+  --if-positional-regex
+  > crazy-complete-test positionals regex --if-positional-
+fish_expected: |
+  > crazy-complete-test positionals regex --if-positional-
+  …sitional-count  …sitional-regex  …sitional-regex-nocase
+zsh_tabs: 2
+zsh_expected: |
+  > crazy-complete-test positionals regex --if-positional-
+  --if-positional-count         --if-positional-regex-nocase
+  --if-positional-regex
+---
+number: 27
+description: "Check positional_match (ignoring case)"
+send: "crazy-complete-test positionals REGEX --"
+bash_expected: |
+  > crazy-complete-test positionals REGEX --
+  --if-positional-count         --if-positional-regex-nocase
+  > crazy-complete-test positionals REGEX --if-positional-
+fish_expected: |
+  > crazy-complete-test positionals REGEX --if-positional-
+  …sitional-count  …sitional-regex-nocase
+zsh_tabs: 2
+zsh_expected: |
+  > crazy-complete-test positionals REGEX --if-positional-
+  --if-positional-count         --if-positional-regex-nocase

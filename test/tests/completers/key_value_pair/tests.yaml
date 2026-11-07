@@ -1,0 +1,161 @@
+args: ["--input-type=yaml", "--include-file=completers/key_value_pair/include.$shell"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "key_value_pair: Check -o"
+send: "crazy-complete-test -o "
+bash_expected: |
+  > crazy-complete-test -o
+  animal    async     file      nocomp    number    proc      with_sep
+  > crazy-complete-test -o
+fish_expected: |
+  > crazy-complete-test -o
+  animal=  (select an animal)  number=          (select a number)
+  async      (set async mode)  proc=           (select a process)
+  file=                        with_sep=  (values containing sep)
+  nocomp=      (no completer)
+zsh_expected: |
+  > crazy-complete-test -o
+  animal    -- select an animal
+  async     -- set async mode
+  nocomp    -- no completer
+  number    -- select a number
+  proc      -- select a process
+  with_sep  -- values containing sep
+  file
+---
+number: 2
+description: "key_value_pair: Check -o a"
+send: "crazy-complete-test -o a"
+bash_expected: |
+  > crazy-complete-test -o a
+  animal  async
+  > crazy-complete-test -o a
+fish_expected: |
+  > crazy-complete-test -o a
+  animal=  (select an animal)  async  (set async mode)
+zsh_expected: |
+  > crazy-complete-test -o a
+  animal  -- select an animal
+  async   -- set async mode
+---
+number: 3
+description: "key_value_pair: Check -o an"
+send: "crazy-complete-test -o an"
+bash_expected: |
+  > crazy-complete-test -o animal
+fish_expected: |
+  > crazy-complete-test -o animal=
+zsh_expected: |
+  > crazy-complete-test -o animal=
+---
+number: 4
+description: "key_value_pair: Check -o animal="
+send: "crazy-complete-test -o animal="
+bash_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+  > crazy-complete-test -o animal=
+fish_expected: |
+  > crazy-complete-test -o animal=
+  animal=cat  animal=dog  animal=horse
+zsh_expected: |
+  > crazy-complete-test -o animal=
+  cat    dog    horse
+---
+number: 5
+description: "key_value_pair: Check -o number="
+send: "crazy-complete-test -o number="
+bash_expected: |
+  > crazy-complete-test -o number=
+  0  1  2
+  > crazy-complete-test -o number=
+fish_expected: |
+  > crazy-complete-test -o number=
+  number=0  (zero)  number=1  (one)  number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 6
+description: "key_value_pair: Check -o 'number="
+send: "crazy-complete-test -o 'number="
+bash_expected: |
+  > crazy-complete-test -o 'number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o 'number=
+fish_expected: |
+  > crazy-complete-test -o 'number=
+  'number=0  (zero)  'number=1  (one)  'number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o 'number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 7
+description: "key_value_pair: Check -o \"number="
+send: "crazy-complete-test -o \"number="
+bash_expected: |
+  > crazy-complete-test -o "number=
+  number=0  number=1  number=2
+  > crazy-complete-test -o "number=
+fish_expected: |
+  > crazy-complete-test -o "number=
+  "number=0  (zero)  "number=1  (one)  "number=2  (two)
+zsh_expected: |
+  > crazy-complete-test -o "number=
+  0  -- zero
+  1  -- one
+  2  -- two
+---
+number: 8
+description: "key_value_pair: Check -o file=f"
+send: "crazy-complete-test -o file=f"
+bash_expected: |
+  > crazy-complete-test -o file=f
+  file with spaces  file1.TXT         file4.txt.1
+  file0.txt         file3.tXt
+  > crazy-complete-test -o file=file
+fish_expected: |
+  > crazy-complete-test -o file=file
+  file=file with spaces  file=file1.TXT  file=file4.txt.1
+  file=file0.txt         file=file3.tXt
+zsh_expected: |
+  > crazy-complete-test -o file=file
+---
+number: 9
+description: "key_value_pair: Check -o with_sep=value="
+comment: "Does not work for Bash yet"
+send: "crazy-complete-test -o with_sep=value="
+bash_expected: |
+  > crazy-complete-test -o with_sep=value=value=foo
+fish_expected: |
+  > crazy-complete-test -o with_sep=value=foo
+zsh_expected: |
+  > crazy-complete-test -o with_sep=value=foo
+---
+number: 10
+description: "key_value_pair: Check --condition "
+send: "crazy-complete-test --condition "
+bash_expected: |
+  > crazy-complete-test --condition
+  animal    async     file      nocomp    number    proc      with_sep
+  > crazy-complete-test --condition
+fish_expected: |
+  > crazy-complete-test --condition
+  animal=  (select an animal)  nocomp=             (no completer)
+  async      (set async mode)  number=          (select a number)
+  disabled  (disabled option)  proc=           (select a process)
+  file=                        with_sep=  (values containing sep)
+zsh_expected: |
+  > crazy-complete-test --condition
+  animal    -- select an animal
+  async     -- set async mode
+  nocomp    -- no completer
+  number    -- select a number
+  proc      -- select a process
+  with_sep  -- values containing sep
+  file

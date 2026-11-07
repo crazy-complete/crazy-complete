@@ -1,0 +1,32 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check -A"
+send: "crazy-complete-test -A -"
+bash_expected: |
+  > crazy-complete-test -A -C
+fish_expected: |
+  > crazy-complete-test -A -C
+zsh_expected: |
+  > crazy-complete-test -A -C
+---
+number: 2
+description: "Check -B"
+send: "crazy-complete-test -B -"
+bash_expected: |
+  > crazy-complete-test -B -
+fish_expected: |
+  > crazy-complete-test -B -
+zsh_expected: |
+  > crazy-complete-test -B -
+---
+number: 3
+description: "Check -C"
+send: "crazy-complete-test -C -"
+bash_expected: |
+  > crazy-complete-test -C -A
+fish_expected: |
+  > crazy-complete-test -C -A
+zsh_expected: |
+  > crazy-complete-test -C -A

@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 export PYTHONPATH='../..'
 CRAZY_COMPLETE='python3 -m crazy_complete.main'
-TEST_FILE=../tests/crazy-complete-test
+TEST_FILE=../tests/main/crazy-complete-test
 
 set -x
 

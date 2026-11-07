@@ -24,7 +24,7 @@ def _is_not_command_arg(positional):
 
 def _generate_subcommand_positional(generator):
     cmds = generator.subcommands.get_choices().keys()
-    complete = generator.completer.choices(generator.ctxt, [], cmds).get_code()
+    complete = generator.completer.complete(generator.ctxt, [], 'choices', cmds).get_code()
     return '(( ${#POSITIONALS[@]} == %d )) && %s' % (
         generator.subcommands.get_positional_num(),
         _make_block(complete))

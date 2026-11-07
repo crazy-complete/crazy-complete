@@ -382,36 +382,6 @@ local args=()
 builtin compadd "${args[@]}" "$@"
 ''')
 
-_FILTER = ShellFunction('filter', r'''
-local _COMPADD_WRAPPER_FILTER="$1" func="$2"
-{
-  function compadd() { compadd_wrapper "$@"; }
-  $func
-} always {
-  unfunction compadd 2>/dev/null
-}
-''', ['compadd_wrapper'])
-
-_PREFIX = ShellFunction('prefix', r'''
-if [[ "$PREFIX" == "$1"* ]]; then
-  PREFIX="${PREFIX#"$1"}"
-  IPREFIX="$IPREFIX$1"
-  $2
-else
-  compadd -S '' -- "$1"
-fi
-''')
-
-_SUFFIX = ShellFunction('suffix', r'''
-local _COMPADD_WRAPPER_SUFFIX="$1" func="$2"
-{
-  function compadd() { compadd_wrapper "$@"; }
-  $func
-} always {
-  unfunction compadd 2>/dev/null
-}
-''', ['compadd_wrapper'])
-
 _EXEC = ShellFunction('exec', r'''
 local item='' desc='' describe=()
 
@@ -425,163 +395,15 @@ done < <(eval "$1")
 _describe '' describe
 ''')
 
-_KEY_VALUE_PAIR_EXEC = ShellFunction('key_value_pair_exec', r'''
-local sep="$1"
-local func="$2"
-local key='' desc=''
-local -a args=()
-
-while IFS=$'\t' read -r key desc; do
-  desc="${desc//\\/\\\\}"
-  desc="${desc//:/\\:}"
-  desc="${desc//\[/\\[}"
-  desc="${desc//\]/\\]}"
-
-  if [[ "${key[-1]}" == '=' ]]; then
-    key="${key:0:-1}"
-    args+=("${key}[$desc]:::{exec '$func $key'}")
-  else
-    args+=("${key}[$desc]")
-  fi
-done < <(eval "$func")
-
-_values -S "$sep" '' "${args[@]}"
-''', ['exec'])
-
-_KEY_VALUE_LIST_EXEC = ShellFunction('key_value_list_exec', r'''
-local sep1="$1"
-local sep2="$2"
-local func="$3"
-local key='' desc='' excludes=''
-local -a args=()
-
-while IFS=$'\t' read -r key desc excludes; do
-  desc="${desc//\\/\\\\}"
-  desc="${desc//:/\\:}"
-  desc="${desc//\[/\\[}"
-  desc="${desc//\]/\\]}"
-
-  [[ -n "$excludes" ]] && excludes="($excludes)"
-
-  if [[ "${key: -1:1}" == '=' ]]; then
-    key="${key:0:-1}"
-    args+=("${excludes}${key}[$desc]: :{exec '$func $key'}")
-  elif [[ "${key: -2:2}" == '=?' ]]; then
-    key="${key:0:-2}"
-    args+=("${excludes}${key}[$desc]:: :{exec '$func $key'}")
-  else
-    args+=("${excludes}${key}[$desc]")
-  fi
-done < <(eval "$func")
-
-_values -s "$sep1" -S "$sep2" '' "${args[@]}"
-''', ['exec'])
-
-_HISTORY = ShellFunction('history', r'''
-[[ -f "$HISTFILE" ]] || return
-
-local match=''
-
-command grep -E -o -- "$1" "$HISTFILE" | while read -r match; do
-  compadd -- "$match"
-done
-''')
-
-_MIME_FILE = ShellFunction('mime_file', r'''
-local line='' file='' mime='' i_opt=''
-
-if command file -i /dev/null &>/dev/null; then
-  i_opt="-i"
-elif command file -I /dev/null &>/dev/null; then
-  i_opt="-I"
-else
-  compadd -- "$PREFIX"*
-  return
-fi
-
-command file -L $i_opt -- "$PREFIX"* 2>/dev/null | while read -r line; do
-  mime="${line##*:}"
-
-  if [[ "$mime" == *inode/directory* ]] || command grep -q -E -- "$1" <<< "$mime"; then
-    file="${line%:*}"
-
-    if [[ "$file" == *\\* ]]; then
-      file="$(command perl -pe 's/\\([0-7]{3})/chr(oct($1))/ge' <<< "$file")"
-    fi
-
-    if [[ "$mime" == *inode/directory* ]]; then
-      compadd -- "$file/"
-    else
-      compadd -- "$file"
-    fi
-  fi
-done
-''')
-
-_UID_LIST = ShellFunction('uid_list', r'''
-local items=($(command getent passwd | command awk -F: '{printf "%s:%s\n", $3, $1}'))
-_describe 'users' items
-''')
-
-_GID_LIST = ShellFunction('gid_list', r'''
-local items=($(command getent group | command awk -F: '{printf "%s:%s\n", $3, $1}'))
-_describe 'groups' items
-''')
-
-_CHARSET_LIST = ShellFunction('charset_list', r'''
-local items=($(command locale -m))
-_describe 'charsets' items
-''')
-
 _PATH_FILES_RELATIVE = ShellFunction('path_files_relative', r'''
 local DIR="$1"; shift
 _path_files -W "$PWD/$DIR" "$@"
 ''')
 
-# =============================================================================
-# Bonus
-# =============================================================================
-
-_MOUNTPOINT = ShellFunction('mountpoint', r'''
-local item=''
-
-command findmnt -lno TARGET | while read -r item; do
-  compadd -- "$item"
-done
-''')
-
-_ALSA_COMPLETE_CARDS = ShellFunction('alsa_complete_cards', r'''
-local card='' cards=()
-command aplay -l \
-  | command grep -Eo '^card [0-9]+: [^,]+' \
-  | command uniq \
-  | while builtin read card; do
-  card="${card#card }"
-  local id="${card%%: *}"
-  local name="${card#*: }"
-  cards+=("$id:$name")
-done
-
-_describe 'ALSA card' cards
-''')
-
-_ALSA_COMPLETE_DEVICES = ShellFunction('alsa_complete_devices', r'''
-local card='' id='' name='' devices=()
-command aplay -l \
-  | command grep -Eo '^card [0-9]+: [^,]+' \
-  | command uniq \
-  | while builtin read card; do
-  card="${card#card }"
-  id="${card%%: *}"
-  name="${card#*: }"
-  devices+=("hw\\:$id:$name")
-done
-
-_describe 'ALSA device' devices
-''')
-
 
 class ZshHelpers(GeneralHelpers):
+    _functions = {}
+
     '''Class holding helper functions for Zsh.'''
 
     def __init__(self, config, function_prefix):
@@ -590,18 +412,5 @@ class ZshHelpers(GeneralHelpers):
         self.add_function(_QUERY)
         self.add_function(_OPTION_MATCH)
         self.add_function(_EXEC)
-        self.add_function(_KEY_VALUE_PAIR_EXEC)
-        self.add_function(_KEY_VALUE_LIST_EXEC)
         self.add_function(_COMPADD_WRAPPER)
-        self.add_function(_FILTER)
-        self.add_function(_PREFIX)
-        self.add_function(_SUFFIX)
-        self.add_function(_HISTORY)
         self.add_function(_PATH_FILES_RELATIVE)
-        self.add_function(_MIME_FILE)
-        self.add_function(_UID_LIST)
-        self.add_function(_GID_LIST)
-        self.add_function(_CHARSET_LIST)
-        self.add_function(_MOUNTPOINT)
-        self.add_function(_ALSA_COMPLETE_CARDS)
-        self.add_function(_ALSA_COMPLETE_DEVICES)
