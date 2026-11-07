@@ -276,6 +276,13 @@
 37_03-suffix-too-many-args               | foo: -o: suffix: Too many arguments
 37_04-suffix-no-command                  | foo: -o: suffix: Missing required argument: command
 37_05-suffix-command-wrong-type          | foo: -o: suffix: command: Invalid type. Expected: list
+38_00-color-missing-arg                  | No error
+38_01-color-empty-list                   | foo: -o: color: types: List cannot be empty
+38_02-color-arg-wrong-type               | foo: -o: color: types: Invalid type. Expected: list
+38_03-color-too-many-args                | foo: -o: color: Too many arguments
+38_04-color-list-item-wrong-type         | foo: -o: color: types[0]: Invalid type. Expected: string
+38_05-color-list-item-empty              | foo: -o: color: types[0]: String cannot be empty
+38_06-color-invalid-value                | foo: -o: color: types[0]: Invalid value. Expected: names, xterm256, ansi_fg, ansi_fg+bright, ansi_bg, ansi_bg+bright, hex
 ======= Directory "05-misc" =======
 00-list                                  | Parameter `<document>` has an invalid type. Expected types: dict. Received: ['foo', 'bar'] (list)
 01-multiple-repeatable-positionals       | foo: Too many repeatable positionals

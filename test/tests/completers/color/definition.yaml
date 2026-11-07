@@ -1,0 +1,29 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ["--color-names"]
+    complete: ["color"]
+
+  - option_strings: ["--fg"]
+    complete: ["color", ["ansi_fg"]]
+
+  - option_strings: ["--fg-bright"]
+    complete: ["color", ["ansi_fg+bright"]]
+
+  - option_strings: ["--bg"]
+    complete: ["color", ["ansi_bg"]]
+
+  - option_strings: ["--bg-bright"]
+    complete: ["color", ["ansi_bg+bright"]]
+
+  - option_strings: ["--color-xterm256"]
+    complete: ["color", ["xterm256"]]
+
+  - option_strings: ["--hex"]
+    complete: ["color", ["hex"]]
+
+  - option_strings: ["--combo"]
+    complete: ["color", ["names", "ansi_fg"]]
+
+positionals:
+  - number: 1
+    complete: ["color", ["ansi_bg"]]

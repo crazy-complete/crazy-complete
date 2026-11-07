@@ -183,6 +183,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [alsa\_device](#alsa_device)               | Complete ALSA devices                         |
 | [charset](#charset)                        | Complete character sets                       |
 | [choices](#choices)                        | Complete from a predefined set of values      |
+| [color](#color)                            | Complete color names and color codes          |
 | [command](#command)                        | Complete command names                        |
 | [command\_arg](#command_arg)               | Complete command arguments                    |
 | [commandline\_string](#commandline_string) | Complete command lines as strings             |
@@ -365,6 +366,89 @@ Item 1  (Description 1)  Item 2  (Description 2)
 ~ > example --choices-keep-order=<TAB>
 zebra    cat    monkey
 ```
+
+---
+
+### color
+
+> Complete color names and color codes
+
+**SYNOPSIS**
+
+```yaml
+['color']
+
+['color', <TYPES>]
+```
+
+**PARAMETERS**
+
+`TYPES`:
+  A list with one or more of the following:
+
+  - `names`:  xterm color names
+  - `xterm256`:  xterm 256-color codes (0-255)
+  - `ansi_fg`: ANSI foreground color codes
+  - `ansi_bg`: ANSI background color codes
+  - `hex`:    hex color codes
+
+  `ansi_fg` and `ansi_bg` may append the suffix `+bright`
+  to also complete the bright colors.
+
+  If `TYPES` is omitted, `names` is used.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--color-names']
+    complete: ['color']
+
+  - option_strings: ['--color-xterm256']
+    complete: ['color', ['xterm256']]
+
+  - option_strings: ['--color-fg']
+    complete: ['color', ['ansi_fg+bright']]
+
+  - option_strings: ['--color-bg']
+    complete: ['color', ['ansi_bg']]
+
+  - option_strings: ['--color-hex']
+    complete: ['color', ['hex']]
+```
+
+```
+~ > example --color-names=<TAB>
+Aqua   Fuchsia  Lime    Olive   Silver  Yellow
+Black  Green    Maroon  Purple  Teal
+Blue   Grey     Navy    Red     White
+
+~ > example --color-xterm256=<TAB>
+0     (Black (SYSTEM))  43              (Cyan3)  86       (Aquamarine1)
+1    (Maroon (SYSTEM))  44      (DarkTurquoise)  87    (DarkSlateGray2)
+[...]
+
+~ > example --color-fg=<TAB>
+30   (Black)  34     (Blue)  90   (Bright Black)  94     (Bright Blue)
+31     (Red)  35  (Magenta)  91     (Bright Red)  95  (Bright Magenta)
+32   (Green)  36     (Cyan)  92   (Bright Green)  96     (Bright Cyan)
+33  (Yellow)  37    (White)  93  (Bright Yellow)  97    (Bright White)
+
+~ > example --color-bg=<TAB>
+40  (Black)  42   (Green)  44     (Blue)  46   (Cyan)
+41    (Red)  43  (Yellow)  45  (Magenta)  47  (White)
+
+~ > example --color-hex=<TAB>
+#000000     (Black (SYSTEM))  #5f87d7       (SteelBlue3)
+#0000af              (Blue3)  #5f87ff   (CornflowerBlue)
+[...]
+```
+
+**SEE ALSO**
+
+- [choices](#choices): For completing from a custom set of values
 
 ---
 

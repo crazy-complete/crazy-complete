@@ -11,6 +11,9 @@ src/
 python-crazy-complete-*.pkg.*
 python-crazy-complete/
 
+# docs
+docs/options.md
+
 # directory 'test'
 test/tests/output/
 test/tests/tmp/

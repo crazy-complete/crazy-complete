@@ -1,0 +1,193 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check color default (names)"
+send: "crazy-complete-test --color-names "
+bash_expected: |
+  > crazy-complete-test --color-names
+  Aqua     Blue     Green    Lime     Navy     Purple   Silver   White
+  Black    Fuchsia  Grey     Maroon   Olive    Red      Teal     Yellow
+  > crazy-complete-test --color-names
+fish_expected: |
+  > crazy-complete-test --color-names
+  Aqua   Fuchsia  Lime    Olive   Silver  Yellow
+  Black  Green    Maroon  Purple  Teal
+  Blue   Grey     Navy    Red     White
+zsh_expected: |
+  > crazy-complete-test --color-names
+  Aqua     Blue     Green    Lime     Navy     Purple   Silver   White
+  Black    Fuchsia  Grey     Maroon   Olive    Red      Teal     Yellow
+---
+number: 2
+description: "Check color ansi_fg"
+send: "crazy-complete-test --fg "
+bash_expected: |
+  > crazy-complete-test --fg
+  30  31  32  33  34  35  36  37
+  > crazy-complete-test --fg 3
+fish_expected: |
+  > crazy-complete-test --fg 3
+  30  (Black)  32   (Green)  34     (Blue)  36   (Cyan)
+  31    (Red)  33  (Yellow)  35  (Magenta)  37  (White)
+zsh_expected: |
+  > crazy-complete-test --fg 3
+---
+number: 3
+description: "Check color ansi_fg+bright"
+send: "crazy-complete-test --fg-bright "
+require_order: true
+bash_expected: |
+  > crazy-complete-test --fg-bright
+  30  31  32  33  34  35  36  37  90  91  92  93  94  95  96  97
+  > crazy-complete-test --fg-bright
+fish_expected: |
+  > crazy-complete-test --fg-bright
+  30   (Black)  34     (Blue)  90   (Bright Black)  94     (Bright Blue)
+  31     (Red)  35  (Magenta)  91     (Bright Red)  95  (Bright Magenta)
+  32   (Green)  36     (Cyan)  92   (Bright Green)  96     (Bright Cyan)
+  33  (Yellow)  37    (White)  93  (Bright Yellow)  97    (Bright White)
+zsh_expected: |
+  > crazy-complete-test --fg-bright
+  30  -- Black
+  31  -- Red
+  32  -- Green
+  33  -- Yellow
+  34  -- Blue
+  35  -- Magenta
+  36  -- Cyan
+  37  -- White
+  90  -- Bright Black
+  91  -- Bright Red
+  92  -- Bright Green
+  93  -- Bright Yellow
+  94  -- Bright Blue
+  95  -- Bright Magenta
+  96  -- Bright Cyan
+  97  -- Bright White
+---
+number: 4
+description: "Check color ansi_bg"
+send: "crazy-complete-test --bg "
+bash_expected: |
+  > crazy-complete-test --bg
+  40  41  42  43  44  45  46  47
+  > crazy-complete-test --bg 4
+fish_expected: |
+  > crazy-complete-test --bg 4
+  40  (Black)  42   (Green)  44     (Blue)  46   (Cyan)
+  41    (Red)  43  (Yellow)  45  (Magenta)  47  (White)
+zsh_expected: |
+  > crazy-complete-test --bg 4
+---
+number: 5
+description: "Check color ansi_bg+bright"
+send: "crazy-complete-test --bg-bright "
+require_order: true
+bash_expected: |
+  > crazy-complete-test --bg-bright
+  100  102  104  106  40   42   44   46
+  101  103  105  107  41   43   45   47
+  > crazy-complete-test --bg-bright
+fish_expected: |
+  > crazy-complete-test --bg-bright
+  40   (Black)  44     (Blue)  100   (Bright Black)  104     (Bright Blue)
+  41     (Red)  45  (Magenta)  101     (Bright Red)  105  (Bright Magenta)
+  42   (Green)  46     (Cyan)  102   (Bright Green)  106     (Bright Cyan)
+  43  (Yellow)  47    (White)  103  (Bright Yellow)  107   (Bright White)
+zsh_expected: |
+  > crazy-complete-test --bg-bright
+  100  -- Bright Black
+  101  -- Bright Red
+  102  -- Bright Green
+  103  -- Bright Yellow
+  104  -- Bright Blue
+  105  -- Bright Magenta
+  106  -- Bright Cyan
+  107  -- Bright White
+  40   -- Black
+  41   -- Red
+  42   -- Green
+  43   -- Yellow
+  44   -- Blue
+  45   -- Magenta
+  46   -- Cyan
+  47   -- White
+---
+number: 6
+description: "Check color xterm256 (prefix 25)"
+send: "crazy-complete-test --color-xterm256 25"
+bash_expected: |
+  > crazy-complete-test --color-xterm256 25
+  25   250  251  252  253  254  255
+  > crazy-complete-test --color-xterm256 25
+fish_expected: |
+  > crazy-complete-test --color-xterm256 25
+  25  (DeepSkyBlue4)  251  (Grey78)  253  (Grey85)  255  (Grey93)
+  250       (Grey74)  252  (Grey82)  254  (Grey89)
+zsh_expected: |
+  > crazy-complete-test --color-xterm256 25
+  25   -- DeepSkyBlue4
+  250  -- Grey74
+  251  -- Grey78
+  252  -- Grey82
+  253  -- Grey85
+  254  -- Grey89
+  255  -- Grey93
+---
+number: 7
+description: "Check color hex (prefix #5f0)"
+send: "crazy-complete-test --hex=#5f0"
+bash_expected: |
+  > crazy-complete-test --hex=#5f0
+  \#5f0000  \#5f005f  \#5f0087  \#5f00af  \#5f00d7  \#5f00ff
+  > crazy-complete-test --hex=\#5f00
+fish_expected: |
+  > crazy-complete-test --hex=#5f00
+  …hex=#5f0000  (DarkRed)  …hex=#5f00d7     (Purple3)  …hex=#5f005f  (DeepPink4)
+  …hex=#5f00af  (Purple4)  …hex=#5f00ff  (BlueViolet)  …hex=#5f0087    (Purple4)
+zsh_expected: |
+  > crazy-complete-test --hex=\#5f00
+---
+number: 8
+description: "Check color combination names+ansi_fg"
+send: "crazy-complete-test --combo "
+require_order: true
+bash_expected: |
+  > crazy-complete-test --combo
+  30       33       36       Black    Green    Maroon   Purple   Teal
+  31       34       37       Blue     Grey     Navy     Red      White
+  32       35       Aqua     Fuchsia  Lime     Olive    Silver   Yellow
+  > crazy-complete-test --combo
+fish_expected: |
+  > crazy-complete-test --combo
+  30   (Black)  34     (Blue)  Aqua     Green   Navy    Silver
+  31     (Red)  35  (Magenta)  Black    Grey    Olive   Teal
+  32   (Green)  36     (Cyan)  Blue     Lime    Purple  White
+  33  (Yellow)  37    (White)  Fuchsia  Maroon  Red     Yellow
+zsh_expected: |
+  > crazy-complete-test --combo
+  30       -- Black
+  31       -- Red
+  32       -- Green
+  33       -- Yellow
+  34       -- Blue
+  35       -- Magenta
+  36       -- Cyan
+  37       -- White
+  Aqua     Blue     Green    Lime     Navy     Purple   Silver   White
+  Black    Fuchsia  Grey     Maroon   Olive    Red      Teal     Yellow
+---
+number: 9
+description: "Check color positional (ansi_bg)"
+send: "crazy-complete-test "
+bash_expected: |
+  > crazy-complete-test
+  40  41  42  43  44  45  46  47
+  > crazy-complete-test 4
+fish_expected: |
+  > crazy-complete-test 4
+  40  (Black)  42   (Green)  44     (Blue)  46   (Cyan)
+  41    (Red)  43  (Yellow)  45  (Magenta)  47  (White)
+zsh_expected: |
+  > crazy-complete-test 4

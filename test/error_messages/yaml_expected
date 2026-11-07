@@ -276,6 +276,13 @@
 37_03-suffix-too-many-args               | line 4, column 15: foo: -o: suffix: Too many arguments
 37_04-suffix-no-command                  | line 4, column 31: foo: -o: suffix: Missing required argument: command
 37_05-suffix-command-wrong-type          | line 4, column 31: foo: -o: suffix: command: Invalid type. Expected: list
+38_00-color-missing-arg                  | No error
+38_01-color-empty-list                   | line 4, column 25: foo: -o: color: types: List cannot be empty
+38_02-color-arg-wrong-type               | line 4, column 25: foo: -o: color: types: Invalid type. Expected: list
+38_03-color-too-many-args                | line 4, column 15: foo: -o: color: Too many arguments
+38_04-color-list-item-wrong-type         | line 4, column 26: foo: -o: color: types[0]: Invalid type. Expected: string
+38_05-color-list-item-empty              | line 4, column 26: foo: -o: color: types[0]: String cannot be empty
+38_06-color-invalid-value                | line 4, column 26: foo: -o: color: types[0]: Invalid value. Expected: names, xterm256, ansi_fg, ansi_fg+bright, ansi_bg, ansi_bg+bright, hex
 ======= Directory "05-misc" =======
 00-list                                  | line 1, column 1: Invalid type. Expected: dictionary
 01-multiple-repeatable-positionals       | line 6, column 5: foo: Too many repeatable positionals
