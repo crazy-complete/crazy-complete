@@ -297,6 +297,15 @@
 40_02-http-arg-empty                     | foo: -o: http: type: String cannot be empty
 40_03-http-arg-unknown                   | foo: -o: http: 'bogus': Invalid value. Expected: `method`, `code`, `header`, `request_header`, `response_header`
 40_04-http-too-many-args                 | foo: -o: http: Too many arguments
+41_00-net-port-missing-value             | foo: -o: net_port: Missing required argument: value
+41_01-net-port-missing-description       | foo: -o: net_port: Missing required argument: description
+41_02-net-port-value-unknown-placeholder | foo: -o: net_port: value: Invalid value. Expected: `${name}`, `${port}`, `${alias}`, `${description}`
+41_03-net-port-description-unknown-placeholder | foo: -o: net_port: description: Invalid value. Expected: `${name}`, `${port}`, `${alias}`, `${description}`
+41_04-net-port-value-empty               | foo: -o: net_port: value: String cannot be empty
+41_05-net-port-description-empty         | foo: -o: net_port: description: String cannot be empty
+41_06-net-port-value-wrong-type          | foo: -o: net_port: value: Invalid type. Expected: string
+41_07-net-port-description-wrong-type    | foo: -o: net_port: description: Invalid type. Expected: string
+41_08-net-port-too-many-args             | foo: -o: net_port: Too many arguments
 ======= Directory "05-misc" =======
 00-list                                  | Parameter `<document>` has an invalid type. Expected types: dict. Received: ['foo', 'bar'] (list)
 01-multiple-repeatable-positionals       | foo: Too many repeatable positionals

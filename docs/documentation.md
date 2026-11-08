@@ -209,6 +209,7 @@ help: "<SUBCOMMAND DESCRIPTION>"
 | [mime\_file](#mime_file)                   | Complete files by MIME type                                 |
 | [mountpoint](#mountpoint)                  | Complete mount points                                       |
 | [net\_interface](#net_interface)           | Complete network interfaces                                 |
+| [net\_port](#net_port)                     | Complete network services                                   |
 | [pid](#pid)                                | Complete process IDs                                        |
 | [process](#process)                        | Complete process names                                      |
 | [range](#range)                            | Complete sequences of integers                              |
@@ -1555,6 +1556,71 @@ eno1  enp1s0  lo  wlo1  wlp2s0
 **SEE ALSO**
 
 - [ip\_address](#ip_address): For completing IP addresses
+
+---
+
+### net\_port
+
+> Complete network services
+
+**SYNOPSIS**
+
+```yaml
+['net_port', <VALUE>, <DESCRIPTION>]
+```
+
+**PARAMETERS**
+
+Completes the network services as they appear in `/etc/services`.
+
+`VALUE`:
+  Format string expanding to the completed value.
+
+`DESCRIPTION`:
+  Format string expanding to the description shown during completion.
+
+Format strings may contain the following placeholders:
+
+  - `${name}`: Service name
+  - `${port}`: Service port
+  - `${alias}`: Service alias
+  - `${description}`: Service description
+
+A literal dollar sign is written as `$$`.
+
+If several services expand to the same value, their descriptions are
+joined with a comma.
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--service']
+    complete: ['net_port', '${name}', '${port} - ${description}']
+
+  - option_strings: ['--port']
+    complete: ['net_port', '${port}', '${name}']
+```
+
+```
+~ > example --service=<TAB>
+ssh       (22 - SSH Remote Login Protocol)
+http      (80 - WorldWideWeb HTTP)
+kerberos  (88 - Kerberos v5)
+[...]
+
+~ > example --port=<TAB>
+21  (ftp, fsp)
+22  (ssh)
+25  (smtp)
+[...]
+```
+
+**SEE ALSO**
+
+- [choices](#choices): For completing from a custom set of values
 
 ---
 

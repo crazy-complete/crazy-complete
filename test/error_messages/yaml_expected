@@ -297,6 +297,15 @@
 40_02-http-arg-empty                     | line 4, column 24: foo: -o: http: type: String cannot be empty
 40_03-http-arg-unknown                   | line 4, column 24: foo: -o: http: 'bogus': Invalid value. Expected: `method`, `code`, `header`, `request_header`, `response_header`
 40_04-http-too-many-args                 | line 4, column 15: foo: -o: http: Too many arguments
+41_00-net-port-missing-value             | line 4, column 15: foo: -o: net_port: Missing required argument: value
+41_01-net-port-missing-description       | line 4, column 15: foo: -o: net_port: Missing required argument: description
+41_02-net-port-value-unknown-placeholder | line 4, column 28: foo: -o: net_port: value: Invalid value. Expected: `${name}`, `${port}`, `${alias}`, `${description}`
+41_03-net-port-description-unknown-placeholder | line 4, column 39: foo: -o: net_port: description: Invalid value. Expected: `${name}`, `${port}`, `${alias}`, `${description}`
+41_04-net-port-value-empty               | line 4, column 28: foo: -o: net_port: value: String cannot be empty
+41_05-net-port-description-empty         | line 4, column 39: foo: -o: net_port: description: String cannot be empty
+41_06-net-port-value-wrong-type          | line 4, column 28: foo: -o: net_port: value: Invalid type. Expected: string
+41_07-net-port-description-wrong-type    | line 4, column 39: foo: -o: net_port: description: Invalid type. Expected: string
+41_08-net-port-too-many-args             | line 4, column 15: foo: -o: net_port: Too many arguments
 ======= Directory "05-misc" =======
 00-list                                  | line 1, column 1: Invalid type. Expected: dictionary
 01-multiple-repeatable-positionals       | line 6, column 5: foo: Too many repeatable positionals

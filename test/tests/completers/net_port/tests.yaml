@@ -1,0 +1,64 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check service (prefix 'k')"
+send: "crazy-complete-test --service k"
+bash_expected: |
+  > crazy-complete-test --service k
+  kamanda          kerberos-master  klogin           kshell
+  kerberos         kerberos4        kpasswd
+  kerberos-adm     kermit           krb-prop
+  > crazy-complete-test --service k
+fish_expected: |
+  > crazy-complete-test --service k
+  kamanda  (10081 - amanda backup services (Kerberos))
+  kerberos                          (88 - Kerberos v5)
+  kerberos4                  (750 - Kerberos (server))
+  kerberos-adm          (749 - Kerberos 'kadmin' (v5))
+  kerberos-master      (751 - Kerberos authentication)
+  kermit
+  klogin              (543 - Kerberized 'rlogin' (v5))
+  kpasswd
+  krb-prop          (754 - Kerberos slave propagation)
+  kshell                 (544 - Kerberized 'rsh' (v5))
+zsh_expected: |
+  > crazy-complete-test --service k
+  kamanda          -- 10081 - amanda backup services (Kerberos)
+  kerberos         -- 88 - Kerberos v5
+  kerberos-adm     -- 749 - Kerberos 'kadmin' (v5)
+  kerberos-master  -- 751 - Kerberos authentication
+  kerberos4        -- 750 - Kerberos (server)
+  klogin           -- 543 - Kerberized 'rlogin' (v5)
+  krb-prop         -- 754 - Kerberos slave propagation
+  kshell           -- 544 - Kerberized 'rsh' (v5)
+  kermit   kpasswd
+---
+number: 2
+description: "Check port view (prefix '9')"
+send: "crazy-complete-test --port 9"
+bash_expected: |
+  > crazy-complete-test --port 9
+  9     9098  9101  9102  9103  9418  9667  9673  989   990   992   993   995
+  > crazy-complete-test --port 9
+fish_expected: |
+  > crazy-complete-test --port 9
+  9      (discard)  993        (imaps)  9102  (bacula-fd)  9673  (zope)
+  989  (ftps-data)  995        (pop3s)  9103  (bacula-sd)
+  990       (ftps)  9098      (xinetd)  9418        (git)
+  992    (telnets)  9101  (bacula-dir)  9667      (xmms2)
+zsh_expected: |
+  > crazy-complete-test --port 9
+  9     -- discard
+  9098  -- xinetd
+  9101  -- bacula-dir
+  9102  -- bacula-fd
+  9103  -- bacula-sd
+  9418  -- git
+  9667  -- xmms2
+  9673  -- zope
+  989   -- ftps-data
+  990   -- ftps
+  992   -- telnets
+  993   -- imaps
+  995   -- pop3s
