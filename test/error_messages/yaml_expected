@@ -292,6 +292,11 @@
 39_06-ip-protocol-value-wrong-type       | line 4, column 31: foo: -o: ip_protocol: value: Invalid type. Expected: string
 39_07-ip-protocol-description-wrong-type | line 4, column 42: foo: -o: ip_protocol: description: Invalid type. Expected: string
 39_08-ip-protocol-too-many-args          | line 4, column 15: foo: -o: ip_protocol: Too many arguments
+40_00-http-missing-arg                   | line 4, column 15: foo: -o: http: Missing required argument: type
+40_01-http-arg-wrong-type                | line 4, column 24: foo: -o: http: type: Invalid type. Expected: string
+40_02-http-arg-empty                     | line 4, column 24: foo: -o: http: type: String cannot be empty
+40_03-http-arg-unknown                   | line 4, column 24: foo: -o: http: 'bogus': Invalid value. Expected: `method`, `code`, `header`, `request_header`, `response_header`
+40_04-http-too-many-args                 | line 4, column 15: foo: -o: http: Too many arguments
 ======= Directory "05-misc" =======
 00-list                                  | line 1, column 1: Invalid type. Expected: dictionary
 01-multiple-repeatable-positionals       | line 6, column 5: foo: Too many repeatable positionals

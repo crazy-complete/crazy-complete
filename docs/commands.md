@@ -15,47 +15,48 @@
 
 ### Built-in commands
 
-| Command                                    | Description                                   |
-| ------------------------------------------ | --------------------------------------------- |
-| [alsa\_card](#alsa_card)                   | Complete ALSA cards                           |
-| [alsa\_device](#alsa_device)               | Complete ALSA devices                         |
-| [charset](#charset)                        | Complete character sets                       |
-| [choices](#choices)                        | Complete from a predefined set of values      |
-| [color](#color)                            | Complete color names and color codes          |
-| [command](#command)                        | Complete command names                        |
-| [command\_arg](#command_arg)               | Complete command arguments                    |
-| [commandline\_string](#commandline_string) | Complete command lines as strings             |
-| [date](#date)                              | Complete date strings                         |
-| [date\_format](#date_format)               | Complete date format strings                  |
-| [directory](#directory)                    | Complete directory names                      |
-| [directory\_list](#directory_list)         | Complete comma-separated lists of directories |
-| [environment](#environment)                | Complete environment variable names           |
-| [file](#file)                              | Complete file names                           |
-| [file\_list](#file_list)                   | Complete comma-separated lists of files       |
-| [filesystem\_type](#filesystem_type)       | Complete filesystem types                     |
-| [float](#float)                            | Complete floating-point values                |
-| [gid](#gid)                                | Complete group IDs                            |
-| [group](#group)                            | Complete group names                          |
-| [history](#history)                        | Complete based on a shell's history           |
-| [hostname](#hostname)                      | Complete hostnames                            |
-| [integer](#integer)                        | Complete integer values                       |
-| [ip\_address](#ip_address)                 | Complete local IP addresses                   |
-| [ip\_protocol](#ip_protocol)               | Complete IP protocols                         |
-| [locale](#locale)                          | Complete locales                              |
-| [login\_shell](#login_shell)               | Complete login shells                         |
-| [mime\_file](#mime_file)                   | Complete files by MIME type                   |
-| [mountpoint](#mountpoint)                  | Complete mount points                         |
-| [net\_interface](#net_interface)           | Complete network interfaces                   |
-| [pid](#pid)                                | Complete process IDs                          |
-| [process](#process)                        | Complete process names                        |
-| [range](#range)                            | Complete sequences of integers                |
-| [service](#service)                        | Complete systemd service names                |
-| [signal](#signal)                          | Complete signal names                         |
-| [timezone](#timezone)                      | Complete timezones                            |
-| [uid](#uid)                                | Complete user IDs                             |
-| [user](#user)                              | Complete user names                           |
-| [value\_list](#value_list)                 | Complete comma-separated lists of values      |
-| [variable](#variable)                      | Complete shell variable names                 |
+| Command                                    | Description                                                 |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| [alsa\_card](#alsa_card)                   | Complete ALSA cards                                         |
+| [alsa\_device](#alsa_device)               | Complete ALSA devices                                       |
+| [charset](#charset)                        | Complete character sets                                     |
+| [choices](#choices)                        | Complete from a predefined set of values                    |
+| [color](#color)                            | Complete color names and color codes                        |
+| [command](#command)                        | Complete command names                                      |
+| [command\_arg](#command_arg)               | Complete command arguments                                  |
+| [commandline\_string](#commandline_string) | Complete command lines as strings                           |
+| [date](#date)                              | Complete date strings                                       |
+| [date\_format](#date_format)               | Complete date format strings                                |
+| [directory](#directory)                    | Complete directory names                                    |
+| [directory\_list](#directory_list)         | Complete comma-separated lists of directories               |
+| [environment](#environment)                | Complete environment variable names                         |
+| [file](#file)                              | Complete file names                                         |
+| [file\_list](#file_list)                   | Complete comma-separated lists of files                     |
+| [filesystem\_type](#filesystem_type)       | Complete filesystem types                                   |
+| [float](#float)                            | Complete floating-point values                              |
+| [gid](#gid)                                | Complete group IDs                                          |
+| [group](#group)                            | Complete group names                                        |
+| [history](#history)                        | Complete based on a shell's history                         |
+| [hostname](#hostname)                      | Complete hostnames                                          |
+| [http](#http)                              | Complete HTTP methods, status codes, and header field names |
+| [integer](#integer)                        | Complete integer values                                     |
+| [ip\_address](#ip_address)                 | Complete local IP addresses                                 |
+| [ip\_protocol](#ip_protocol)               | Complete IP protocols                                       |
+| [locale](#locale)                          | Complete locales                                            |
+| [login\_shell](#login_shell)               | Complete login shells                                       |
+| [mime\_file](#mime_file)                   | Complete files by MIME type                                 |
+| [mountpoint](#mountpoint)                  | Complete mount points                                       |
+| [net\_interface](#net_interface)           | Complete network interfaces                                 |
+| [pid](#pid)                                | Complete process IDs                                        |
+| [process](#process)                        | Complete process names                                      |
+| [range](#range)                            | Complete sequences of integers                              |
+| [service](#service)                        | Complete systemd service names                              |
+| [signal](#signal)                          | Complete signal names                                       |
+| [timezone](#timezone)                      | Complete timezones                                          |
+| [uid](#uid)                                | Complete user IDs                                           |
+| [user](#user)                              | Complete user names                                         |
+| [value\_list](#value_list)                 | Complete comma-separated lists of values                    |
+| [variable](#variable)                      | Complete shell variable names                               |
 
 ---
 
@@ -982,6 +983,92 @@ localhost
 
 ---
 
+### http
+
+> Complete HTTP methods, status codes, and header field names
+
+**SYNOPSIS**
+
+```yaml
+['http', <TYPE>]
+```
+
+**PARAMETERS**
+
+`TYPE`:
+  One of the following values:
+
+    - `method`: HTTP methods
+    - `code`: HTTP status codes
+    - `header`: all standard HTTP header field names
+    - `request_header`: header field names the client sends in a request
+    - `response_header`: header field names the server sends in a response
+
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--method']
+    complete: ['http', 'method']
+
+  - option_strings: ['--status']
+    complete: ['http', 'code']
+
+  - option_strings: ['--header']
+    complete: ['http', 'header']
+
+  - option_strings: ['--request-header']
+    complete: ['http', 'request_header']
+
+  - option_strings: ['--response-header']
+    complete: ['http', 'response_header']
+```
+
+```
+~ > example --method=<TAB>
+ACL              OPTIONS
+BASELINE-CONTROL ORDERPATCH
+BIND             PATCH
+CHECKIN          POST
+CHECKOUT         PRI
+CONNECT          PROPFIND
+COPY             PROPPATCH
+[...]
+
+~ > example --status=<TAB>
+200  (OK)                   302  (Found)
+201  (Created)              304  (Not Modified)
+204  (No Content)           404  (Not Found)
+301  (Moved Permanently)    500  (Internal Server Error)
+[...]
+
+~ > example --request-header=<TAB>
+Accept          (Media-type preferences for the response)
+Host            (Target host of the request (required, HTTP/1.1))
+Range           (Request a byte range of the representation)
+User-Agent      (Client application, OS and browser info)
+If-None-Match   (Apply only if no entity tag matches)
+Content-Length  (Size of the payload in octets)
+[...]
+
+~ > example --response-header=<TAB>
+Cache-Control  (Caching directives (no-cache, no-store, max-age, ...))
+Content-Type   (Media type of the payload)
+ETag           (Opaque validator for the response version)
+Location       (Target URI of a redirect response)
+Vary           (Request fields that must key cached responses)
+Set-Cookie     (Set an HTTP cookie on the client (RFC 6265))
+[...]
+```
+
+**SEE ALSO**
+
+- [choices](#choices): For completing from a custom set of values
+
+---
+
 ### integer
 
 > Complete integer values
@@ -1119,8 +1206,8 @@ Format strings may contain the following placeholders:
 
 A literal dollar sign is written as `$$`.
 
-  If several protocols expand to the same value, their descriptions are
-  joined with a comma.
+If several protocols expand to the same value, their descriptions are
+joined with a comma.
 
 
 **EXAMPLE**
@@ -1143,7 +1230,7 @@ options:
 ip      (internet protocol, pseudo protocol number)
 hopopt  (IPv6 Hop-by-Hop Option [RFC1883])
 icmp    (internet control message protocol)
-[ ... ]
+[...]
 
 ~ > example --protocol-number=<TAB>
 0  (ip, hopopt)  29     (iso-tp4)  58   (ipv6-icmp)

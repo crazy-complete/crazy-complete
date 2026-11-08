@@ -1,0 +1,16 @@
+prog: crazy-complete-test
+options:
+  - option_strings: ["--method"]
+    complete: ["http", "method"]
+
+  - option_strings: ["--code"]
+    complete: ["http", "code"]
+
+  - option_strings: ["--header"]
+    complete: ["http", "header"]
+
+  - option_strings: ["--request-header"]
+    complete: ["http", "request_header"]
+
+  - option_strings: ["--response-header"]
+    complete: ["http", "response_header"]

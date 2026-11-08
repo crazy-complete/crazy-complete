@@ -292,6 +292,11 @@
 39_06-ip-protocol-value-wrong-type       | foo: -o: ip_protocol: value: Invalid type. Expected: string
 39_07-ip-protocol-description-wrong-type | foo: -o: ip_protocol: description: Invalid type. Expected: string
 39_08-ip-protocol-too-many-args          | foo: -o: ip_protocol: Too many arguments
+40_00-http-missing-arg                   | foo: -o: http: Missing required argument: type
+40_01-http-arg-wrong-type                | foo: -o: http: type: Invalid type. Expected: string
+40_02-http-arg-empty                     | foo: -o: http: type: String cannot be empty
+40_03-http-arg-unknown                   | foo: -o: http: 'bogus': Invalid value. Expected: `method`, `code`, `header`, `request_header`, `response_header`
+40_04-http-too-many-args                 | foo: -o: http: Too many arguments
 ======= Directory "05-misc" =======
 00-list                                  | Parameter `<document>` has an invalid type. Expected types: dict. Received: ['foo', 'bar'] (list)
 01-multiple-repeatable-positionals       | foo: Too many repeatable positionals

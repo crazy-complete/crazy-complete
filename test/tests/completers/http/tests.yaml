@@ -1,0 +1,102 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "Check http (method)"
+send: "crazy-complete-test --method P"
+bash_expected: |
+  > crazy-complete-test --method P
+  PATCH      POST       PRI        PROPFIND   PROPPATCH  PUT
+  > crazy-complete-test --method P
+fish_expected: |
+  > crazy-complete-test --method P
+  PATCH  POST  PRI  PROPFIND  PROPPATCH  PUT
+zsh_expected: |
+  > crazy-complete-test --method P
+  PATCH  PROPFIND  PROPPATCH  POST  PRI  PUT
+---
+number: 2
+description: "Check http (code)"
+send: "crazy-complete-test --code 40"
+bash_expected: |
+  > crazy-complete-test --code 40
+  400  401  402  403  404  405  406  407  408  409
+  > crazy-complete-test --code 40
+fish_expected: |
+  > crazy-complete-test --code 40
+  400       (Bad Request)  405             (Method Not Allowed)
+  401      (Unauthorized)  406                 (Not Acceptable)
+  402  (Payment Required)  407  (Proxy Authentication Required)
+  403         (Forbidden)  408                (Request Timeout)
+  404         (Not Found)  409                       (Conflict)
+zsh_expected: |
+  > crazy-complete-test --code 40
+  400  -- Bad Request
+  401  -- Unauthorized
+  402  -- Payment Required
+  403  -- Forbidden
+  404  -- Not Found
+  405  -- Method Not Allowed
+  406  -- Not Acceptable
+  407  -- Proxy Authentication Required
+  408  -- Request Timeout
+  409  -- Conflict
+---
+number: 3
+description: "Check http (header)"
+send: "crazy-complete-test --header R"
+bash_expected: |
+  > crazy-complete-test --header R
+  Range        Referer      Retry-After
+  > crazy-complete-test --header R
+fish_expected: |
+  > crazy-complete-test --header R
+  Range    (Request a byte range of the representation)
+  Referer           (Address of the referring document)
+  Retry-After  (When the client should retry (429/503))
+zsh_expected: |
+  > crazy-complete-test --header R
+  Range        -- Request a byte range of the representation
+  Referer      -- Address of the referring document
+  Retry-After  -- When the client should retry (429/503)
+---
+number: 4
+description: "Check http (request_header)"
+send: "crazy-complete-test --request-header S"
+bash_expected: |
+  > crazy-complete-test --request-header S
+  Sec-CH-UA       Sec-Fetch-Mode  Sec-Fetch-User
+  Sec-Fetch-Dest  Sec-Fetch-Site
+  > crazy-complete-test --request-header Sec-
+fish_expected: |
+  > crazy-complete-test --request-header Sec-
+  Sec-CH-UA      (Client hint: user-agent brand/version)
+  Sec-Fetch-Dest     (Client hint: destination category)
+  Sec-Fetch-Mode               (Client hint: fetch mode)
+  Sec-Fetch-Site      (Client hint: origin relationship)
+  Sec-Fetch-User  (Client hint: user activation present)
+zsh_tabs: 2
+zsh_expected: |
+  > crazy-complete-test --request-header Sec-
+  Sec-CH-UA       -- Client hint: user-agent brand/version
+  Sec-Fetch-Dest  -- Client hint: destination category
+  Sec-Fetch-Mode  -- Client hint: fetch mode
+  Sec-Fetch-Site  -- Client hint: origin relationship
+  Sec-Fetch-User  -- Client hint: user activation present
+---
+number: 5
+description: "Check http (response_header)"
+send: "crazy-complete-test --response-header S"
+bash_expected: |
+  > crazy-complete-test --response-header S
+  Server      Set-Cookie
+  > crazy-complete-test --response-header Se
+fish_expected: |
+  > crazy-complete-test --response-header Se
+  Server                   (Server software identification)
+  Set-Cookie  (Set an HTTP cookie on the client (RFC 6265))
+zsh_tabs: 2
+zsh_expected: |
+  > crazy-complete-test --response-header Se
+  Server      -- Server software identification
+  Set-Cookie  -- Set an HTTP cookie on the client (RFC 6265)
