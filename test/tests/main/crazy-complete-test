@@ -73,6 +73,15 @@ cmdp.add_argument('--ip-v4-all',        help='Complete an ipv4 address').complet
 cmdp.add_argument('--ip-v6-all',        help='Complete an ipv6 address').complete('ip_address', 'ipv6+')
 cmdp.add_argument('--integer',          help='Complete an integer').complete('integer', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}})
 cmdp.add_argument('--float',            help='Complete a float').complete('float', {'suffixes': {'s': 'seconds', 'm': 'minutes', 'h': 'hours'}})
+cmdp.add_argument('--jobs',             help='Complete a job').complete('jobs')
+cmdp.add_argument('--language',         help='Complete a language').complete('language')
+cmdp.add_argument('--net-bssid',        help='Complete a BSSID').complete('net_bssid')
+cmdp.add_argument('--net-ssid',         help='Complete an SSID').complete('net_ssid')
+cmdp.add_argument('--terminal',         help='Complete a terminal').complete('terminal')
+cmdp.add_argument('--partition-label',  help='Complete a partition label').complete('partition_label')
+cmdp.add_argument('--partition-uuid',   help='Complete a partition UUID').complete('partition_uuid')
+cmdp.add_argument('--filesystem-label', help='Complete a filesystem label').complete('filesystem_label')
+cmdp.add_argument('--filesystem-uuid',  help='Complete a filesystem UUID').complete('filesystem_uuid')
 
 # =============================================================================
 # Command 'when'

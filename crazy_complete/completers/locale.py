@@ -12,6 +12,10 @@ CATEGORY = 'basic'
 
 SHORT = 'Complete locales'
 
+ALSO = {
+    'language': 'For completing languages',
+}
+
 DEFINITION = r'''
 prog: 'example'
 options:

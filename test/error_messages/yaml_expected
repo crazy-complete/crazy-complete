@@ -306,6 +306,15 @@
 41_06-net-port-value-wrong-type          | line 4, column 28: foo: -o: net_port: value: Invalid type. Expected: string
 41_07-net-port-description-wrong-type    | line 4, column 39: foo: -o: net_port: description: Invalid type. Expected: string
 41_08-net-port-too-many-args             | line 4, column 15: foo: -o: net_port: Too many arguments
+42_00-jobs-too-many-args                 | line 4, column 15: foo: -o: jobs: Too many arguments
+43_00-language-too-many-args             | line 4, column 15: foo: -o: language: Too many arguments
+44_00-net-bssid-too-many-args            | line 4, column 15: foo: -o: net_bssid: Too many arguments
+45_00-net-ssid-too-many-args             | line 4, column 15: foo: -o: net_ssid: Too many arguments
+46_00-terminal-too-many-args             | line 4, column 15: foo: -o: terminal: Too many arguments
+47_00-partition-label-too-many-args      | line 4, column 15: foo: -o: partition_label: Too many arguments
+48_00-partition-uuid-too-many-args       | line 4, column 15: foo: -o: partition_uuid: Too many arguments
+49_00-filesystem-label-too-many-args     | line 4, column 15: foo: -o: filesystem_label: Too many arguments
+50_00-filesystem-uuid-too-many-args      | line 4, column 15: foo: -o: filesystem_uuid: Too many arguments
 ======= Directory "05-misc" =======
 00-list                                  | line 1, column 1: Invalid type. Expected: dictionary
 01-multiple-repeatable-positionals       | line 6, column 5: foo: Too many repeatable positionals

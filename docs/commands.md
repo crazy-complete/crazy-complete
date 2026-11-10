@@ -32,7 +32,9 @@
 | [environment](#environment)                | Complete environment variable names                         |
 | [file](#file)                              | Complete file names                                         |
 | [file\_list](#file_list)                   | Complete comma-separated lists of files                     |
+| [filesystem\_label](#filesystem_label)     | Complete labels of block device filesystems                 |
 | [filesystem\_type](#filesystem_type)       | Complete filesystem types                                   |
+| [filesystem\_uuid](#filesystem_uuid)       | Complete UUIDs of block device filesystems                  |
 | [float](#float)                            | Complete floating-point values                              |
 | [gid](#gid)                                | Complete group IDs                                          |
 | [group](#group)                            | Complete group names                                        |
@@ -42,17 +44,24 @@
 | [integer](#integer)                        | Complete integer values                                     |
 | [ip\_address](#ip_address)                 | Complete local IP addresses                                 |
 | [ip\_protocol](#ip_protocol)               | Complete IP protocols                                       |
+| [jobs](#jobs)                              | Complete the current shell's jobs                           |
+| [language](#language)                      | Complete languages                                          |
 | [locale](#locale)                          | Complete locales                                            |
 | [login\_shell](#login_shell)               | Complete login shells                                       |
 | [mime\_file](#mime_file)                   | Complete files by MIME type                                 |
 | [mountpoint](#mountpoint)                  | Complete mount points                                       |
+| [net\_bssid](#net_bssid)                   | Complete BSSIDs of visible Wi-Fi networks                   |
 | [net\_interface](#net_interface)           | Complete network interfaces                                 |
 | [net\_port](#net_port)                     | Complete network services                                   |
+| [net\_ssid](#net_ssid)                     | Complete SSIDs of visible Wi-Fi networks                    |
+| [partition\_label](#partition_label)       | Complete labels of block device partitions                  |
+| [partition\_uuid](#partition_uuid)         | Complete UUIDs of block device partitions                   |
 | [pid](#pid)                                | Complete process IDs                                        |
 | [process](#process)                        | Complete process names                                      |
 | [range](#range)                            | Complete sequences of integers                              |
 | [service](#service)                        | Complete systemd service names                              |
 | [signal](#signal)                          | Complete signal names                                       |
+| [terminal](#terminal)                      | Complete terminals that are in use                          |
 | [timezone](#timezone)                      | Complete timezones                                          |
 | [uid](#uid)                                | Complete user IDs                                           |
 | [user](#user)                              | Complete user names                                         |
@@ -774,6 +783,42 @@ file3  file4
 
 ---
 
+### filesystem\_label
+
+> Complete labels of block device filesystems
+
+**SYNOPSIS**
+
+```yaml
+['filesystem_label']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--filesystem-label']
+    complete: ['filesystem_label']
+```
+
+```
+~ > example --filesystem-label=<TAB>
+MyData    (nvme0n1p2)
+Recovery  (nvme0n1p4)
+root      (nvme0n1p1)
+```
+
+**SEE ALSO**
+
+- [filesystem\_uuid](#filesystem_uuid): For completing filesystem UUIDs
+
+- [partition\_label](#partition_label): For completing partition labels
+
+- [partition\_uuid](#partition_uuid): For completing partition UUIDs
+
+---
+
 ### filesystem\_type
 
 > Complete filesystem types
@@ -799,6 +844,42 @@ adfs     autofs   bdev      bfs     binder     binfmt_misc  bpf
 cgroup   cgroup2  configfs  cramfs  debugfs    devpts       devtmpfs
 [...]
 ```
+
+---
+
+### filesystem\_uuid
+
+> Complete UUIDs of block device filesystems
+
+**SYNOPSIS**
+
+```yaml
+['filesystem_uuid']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--filesystem-uuid']
+    complete: ['filesystem_uuid']
+```
+
+```
+~ > example --filesystem-uuid=<TAB>
+3C14-D029         (nvme0n1p1)
+E4B21F0A          (nvme0n1p2)
+a1b2c3d4e5f60718  (nvme0n1p4)
+```
+
+**SEE ALSO**
+
+- [filesystem\_label](#filesystem_label): For completing filesystem labels
+
+- [partition\_label](#partition_label): For completing partition labels
+
+- [partition\_uuid](#partition_uuid): For completing partition UUIDs
 
 ---
 
@@ -1252,6 +1333,63 @@ ddp                     (37 - Datagram Delivery Protocol)
 
 ---
 
+### jobs
+
+> Complete the current shell's jobs
+
+**SYNOPSIS**
+
+```yaml
+['jobs']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--job']
+    complete: ['jobs']
+```
+
+```
+~ > example --job=<TAB>
+%1  %2  %3
+```
+
+---
+
+### language
+
+> Complete languages
+
+**SYNOPSIS**
+
+```yaml
+['language']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--language']
+    complete: ['language']
+```
+
+```
+~ > example --language=<TAB>
+aa (Afar)  ab (Abkhazian)  ae (Avestan)  af (Afrikaans)
+[...]
+```
+
+**SEE ALSO**
+
+- [locale](#locale): For completing locales
+
+---
+
 ### locale
 
 > Complete locales
@@ -1276,6 +1414,10 @@ options:
 C  C.UTF-8  de_DE  de_DE@euro  de_DE.iso88591  de_DE.iso885915@euro
 de_DE.UTF-8  deutsch  en_US  en_US.iso88591  en_US.UTF-8  german  POSIX
 ```
+
+**SEE ALSO**
+
+- [language](#language): For completing languages
 
 ---
 
@@ -1363,6 +1505,37 @@ options:
 /  /boot  /home  /proc  /run  /sys  /tmp
 [...]
 ```
+
+---
+
+### net\_bssid
+
+> Complete BSSIDs of visible Wi-Fi networks
+
+**SYNOPSIS**
+
+```yaml
+['net_bssid']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--bssid']
+    complete: ['net_bssid']
+```
+
+```
+~ > example --bssid=<TAB>
+C0:5C:47:57:7B:04  (Siddhartha)
+CE:9A:04:A7:79:31  (WLAN)
+```
+
+**SEE ALSO**
+
+- [net\_ssid](#net_ssid): For completing SSIDs
 
 ---
 
@@ -1459,6 +1632,107 @@ kerberos  (88 - Kerberos v5)
 **SEE ALSO**
 
 - [choices](#choices): For completing from a custom set of values
+
+---
+
+### net\_ssid
+
+> Complete SSIDs of visible Wi-Fi networks
+
+**SYNOPSIS**
+
+```yaml
+['net_ssid']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--ssid']
+    complete: ['net_ssid']
+```
+
+```
+~ > example --ssid=<TAB>
+Siddhartha  (C0:5C:47:57:7B:04)
+WLAN        (CE:9A:04:A7:79:31)
+```
+
+**SEE ALSO**
+
+- [net\_bssid](#net_bssid): For completing BSSIDs
+
+---
+
+### partition\_label
+
+> Complete labels of block device partitions
+
+**SYNOPSIS**
+
+```yaml
+['partition_label']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--partition-label']
+    complete: ['partition_label']
+```
+
+```
+~ > example --partition-label=<TAB>
+MyData    (nvme0n1p2)
+Recovery  (nvme0n1p4)
+```
+
+**SEE ALSO**
+
+- [partition\_uuid](#partition_uuid): For completing partition UUIDs
+
+- [filesystem\_label](#filesystem_label): For completing filesystem labels
+
+- [filesystem\_uuid](#filesystem_uuid): For completing filesystem UUIDs
+
+---
+
+### partition\_uuid
+
+> Complete UUIDs of block device partitions
+
+**SYNOPSIS**
+
+```yaml
+['partition_uuid']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--partition-uuid']
+    complete: ['partition_uuid']
+```
+
+```
+~ > example --partition-uuid=<TAB>
+3C14-D029  (nvme0n1p1)
+E4B21F0A   (nvme0n1p2)
+```
+
+**SEE ALSO**
+
+- [partition\_label](#partition_label): For completing partition labels
+
+- [filesystem\_label](#filesystem_label): For completing filesystem labels
+
+- [filesystem\_uuid](#filesystem_uuid): For completing filesystem UUIDs
 
 ---
 
@@ -1630,6 +1904,34 @@ HUP     -- Hangup
 ILL     -- Illegal instruction
 INT     -- Terminal interrupt signal
 [...]
+```
+
+---
+
+### terminal
+
+> Complete terminals that are in use
+
+**SYNOPSIS**
+
+```yaml
+['terminal']
+```
+
+**EXAMPLE**
+
+```yaml
+prog: 'example'
+options:
+  - option_strings: ['--terminal']
+    complete: ['terminal']
+```
+
+```
+~ > example --terminal=<TAB>
+pts/0  (user)
+pts/7  (root)
+tty1   (root)
 ```
 
 ---
