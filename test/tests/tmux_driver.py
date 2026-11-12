@@ -45,11 +45,20 @@ class TmuxTerminal(TerminalBase):
     def resize_window(self, x, y):
         self._run(['resize-window', '-t', self.session, '-x', str(x), '-y', str(y)])
 
+    @staticmethod
+    def _escape_trailing_semicolon(line):
+        # A trailing ';' in the send-keys argument does not reach the shell
+        # (observed with tmux 3.5a); escaping it as '\;' does.
+        # Semi-colons mid-argument pass through fine and are left alone.
+        if line.endswith(';'):
+            line = line[:-1] + '\\;'
+        return line
+
     def send(self, line):
-        self._run(['send-keys', '-t', self.session, line])
+        self._run(['send-keys', '-t', self.session, self._escape_trailing_semicolon(line)])
 
     def send_line(self, line):
-        self._run(['send-keys', '-t', self.session, f'{line}\n'])
+        self._run(['send-keys', '-t', self.session, f'{self._escape_trailing_semicolon(line)}\n'])
 
     def send_tab(self):
         self._run(['send-keys', '-t', self.session, 'Tab'])
