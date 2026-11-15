@@ -403,21 +403,6 @@ done
 echo $pos
 ''')
 
-_PREFIX = ShellFunction('prefix', r'''
-local prefix="$1" func="$2"
-
-if [[ "$cur" == "$prefix"* ]]; then
-  local cur="${cur#$prefix}"
-  $func
-  for i in "${!COMPREPLY[@]}"; do
-    COMPREPLY[i]="$prefix${COMPREPLY[i]}"
-  done
-else
-  COMPREPLY=($(compgen -W "$prefix" -- "$cur"))
-  compopt -o nospace
-fi
-''')
-
 _STRIP_PREFIX_KEEP_QUOTING = ShellFunction('strip_prefix_keep_quoting', r'''
 local p="$1" pi=0 plen=${#1}
 local s="$2" si=0 slen=${#2} state=w
@@ -471,7 +456,6 @@ class BashHelpers(GeneralHelpers):
         self.add_function(_SQ_QUOTE)
         self.add_function(_DQ_QUOTE)
         self.add_function(_DEQUOTE_WORDS)
-        self.add_function(_PREFIX)
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)
         self.add_function(_ARRAY_CONTAINS)
         self.add_function(_ARRAY_CONTAINS_NOCASE)

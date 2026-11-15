@@ -9,6 +9,7 @@ from ..zsh_complete import ZshComplFunc
 from ..scheme_validator import check_type, check_complete
 from ..helpers import ShellFunction
 from ..helpers import FishFunction
+from ..bash_helpers import BashHelpers
 from ..fish_helpers import FishHelpers
 from ..zsh_helpers import ZshHelpers
 
@@ -43,6 +44,21 @@ OUTPUT = r'''
 ~ > example --prefix=input:file1.txt
 '''
 
+_PREFIX_BASH = ShellFunction('prefix', r'''
+local prefix="$1" func="$2"
+
+if [[ "$cur" == "$prefix"* ]]; then
+  local cur="${cur#"$prefix"}"
+  $func
+  for i in "${!COMPREPLY[@]}"; do
+    COMPREPLY[i]="$prefix${COMPREPLY[i]}"
+  done
+else
+  COMPREPLY=($(compgen -W "$prefix" -- "$cur"))
+  compopt -o nospace
+fi
+''')
+
 _PREFIX_FISH = FishFunction('prefix', r'''
 set -l comp (get_completing_arg)
 set -l prefix_escaped (string escape --style=regex -- $argv[1])
@@ -67,6 +83,7 @@ fi
 
 FishHelpers.add_function(_PREFIX_FISH)
 ZshHelpers.add_function(_PREFIX_ZSH)
+BashHelpers.add_function(_PREFIX_BASH)
 
 
 def validate(ctxt, arguments):
