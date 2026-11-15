@@ -17,7 +17,7 @@ import importlib
 from pathlib import Path
 
 
-_NAME_PATTERN = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
+_NAME_PATTERN = re.compile(r'^[A-Za-z][A-Za-z0-9_]*$')
 
 
 def load(name):
