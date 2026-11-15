@@ -20,10 +20,11 @@ description: "Check --file"
 send: "crazy-complete-test --file "
 bash_expected: |
   > crazy-complete-test --file
-  README.md         file with spaces  file4.txt.1       source.c++
-  archive.tar.gz    file0.txt         image0.jpg
-  bin               file1.TXT         image1.JPG
-  directory         file3.tXt         image2.jPg
+  README.md           file1.TXT           image1.JPG
+  archive.tar.gz      file3.tXt           image2.jPg
+  bin                 file4.txt.1         source.c++
+  directory           file\ with\ spaces
+  file0.txt           image0.jpg
   > crazy-complete-test --file
 fish_expected: |
   > crazy-complete-test --file
@@ -115,10 +116,11 @@ description: "Check --file-relative"
 send: "crazy-complete-test --file-relative "
 bash_expected: |
   > crazy-complete-test --file-relative
-  README.md         file with spaces  file4.txt.1       source.c++
-  archive.tar.gz    file0.txt         image0.jpg
-  bin               file1.TXT         image1.JPG
-  directory         file3.tXt         image2.jPg
+  README.md           file1.TXT           image1.JPG
+  archive.tar.gz      file3.tXt           image2.jPg
+  bin                 file4.txt.1         source.c++
+  directory           file\ with\ spaces
+  file0.txt           image0.jpg
   > crazy-complete-test --file-relative
 fish_expected: |
   > crazy-complete-test --file-relative
@@ -137,9 +139,9 @@ description: "Check --file-ignore-txt-cpp"
 send: "crazy-complete-test --file-ignore-txt-cpp "
 bash_expected: |
   > crazy-complete-test --file-ignore-txt-cpp
-  README.md         directory         image0.jpg
-  archive.tar.gz    file with spaces  image1.JPG
-  bin               file4.txt.1       image2.jPg
+  README.md           directory           image0.jpg
+  archive.tar.gz      file4.txt.1         image1.JPG
+  bin                 file\ with\ spaces  image2.jPg
   > crazy-complete-test --file-ignore-txt-cpp
 fish_expected: |
   > crazy-complete-test --file-ignore-txt-cpp
@@ -156,9 +158,9 @@ description: "Check --file-ignore-txt-cpp-2"
 send: "crazy-complete-test --file-ignore-txt-cpp-2 "
 bash_expected: |
   > crazy-complete-test --file-ignore-txt-cpp-2
-  README.md         directory         image0.jpg
-  archive.tar.gz    file with spaces  image1.JPG
-  bin               file4.txt.1       image2.jPg
+  README.md           directory           image0.jpg
+  archive.tar.gz      file4.txt.1         image1.JPG
+  bin                 file\ with\ spaces  image2.jPg
   > crazy-complete-test --file-ignore-txt-cpp-2
 fish_expected: |
   > crazy-complete-test --file-ignore-txt-cpp-2

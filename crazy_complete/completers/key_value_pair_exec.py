@@ -99,36 +99,23 @@ bar     -- a bar value
 '''
 
 _KEY_VALUE_PAIR_EXEC_BASH = ShellFunction('key_value_pair_exec', r'''
-local sep="$1"
-local func="$2"
-
-local strip_chars=''
-[[ "$COMP_WORDBREAKS" == *"$sep"* ]] && strip_chars+="$sep"
-[[ "${cur:0:1}" == '"' ]] && strip_chars=''
-[[ "${cur:0:1}" == "'" ]] && strip_chars=''
-local cur="$cur" break_pos in_quotes
-dequote "$cur" cur break_pos in_quotes
-
-local key="${cur%%"$sep"*}" value="${cur#*"$sep"}" cur_stripped="$cur"
+local sep="$1" func="$2"
+local key="${cur%%"$sep"*}" value="${cur#*"$sep"}"
 
 COMPREPLY=()
 
 if [[ "$cur" != *"$sep"* ]]; then
   exec "$func"
 else
-  cur="$value"
+  local oldcur="${cur:0:$(( ${#cur} - ${#value} ))}"
+  local cur="$value"
   exec "$func $key"
 
-  cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
-  if [[ -n "$strip_chars" ]]; then
-      cur_stripped="${cur_stripped##*[$strip_chars]}"
-  fi
-
   for i in "${!COMPREPLY[@]}"; do
-    COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
+    COMPREPLY[i]="$oldcur${COMPREPLY[i]}"
   done
 fi
-''', ['dequote', 'exec'])
+''', ['exec'])
 
 _KEY_VALUE_PAIR_EXEC_FISH = FishFunction('key_value_pair_exec', r'''
 set -l sep $argv[1]

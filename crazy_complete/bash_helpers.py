@@ -14,11 +14,10 @@ local word append=0
 (( append )) || COMPREPLY=()
 
 for word; do
-  if [[ "$word" == "$cur"* ]]; then
-    COMPREPLY+=("$(printf '%q' "$word")")
-  fi
+  [[ "$word" == "$cur"* ]] && COMPREPLY+=("$word")
 done
 ''')
+
 
 _DEQUOTE = ShellFunction('dequote', r'''
 local in="$1" len=${#1} i=0 result='' ___break_pos=-1 ___in_quotes=0
@@ -32,7 +31,7 @@ for ((; i < len; ++i)); do
         result+="${in:i:1}"
       done;;
     '"')
-      ___in_quotes=1
+      ___in_quotes=2
       for ((++i; i < len; ++i)); do
         [[ "${in:i:1}" == '"' ]] && { ___in_quotes=0; break; }
 
@@ -58,6 +57,24 @@ local -n ___IN_QUOTES=$4
 ___RESULT="$result"
 ___BREAK_POS=$___break_pos
 ___IN_QUOTES=$___in_quotes
+''')
+
+_SQ_QUOTE = ShellFunction('sq_quote', r'''
+local s="$1"
+local q="'" e="'\\''"
+printf '%s' "${s//"$q"/$e}"
+''')
+
+_DQ_QUOTE = ShellFunction('dq_quote', r'''
+local s="$1"
+local s_bt='`' r_bt='\`'
+local s_dl='$' r_dl='\$'
+local s_dq='"' r_dq='\"'
+s="${s//\\/\\\\}"
+s="${s//"$s_bt"/$r_bt}"
+s="${s//"$s_dl"/$r_dl}"
+s="${s//"$s_dq"/$r_dq}"
+printf '%s' "$s"
 ''')
 
 _DEQUOTE_WORDS = ShellFunction('dequote_words', r'''
@@ -156,13 +173,10 @@ echo ${#s1}
 ''')
 
 _EXEC = ShellFunction('exec', r'''
-local item desc special="$COMP_WORDBREAKS\"'><=;|&({:\\\$\`"
+local item desc
 
 while IFS=$'\t' read -r item desc; do
-  if [[ "$item" == "$cur"* ]]; then
-    [[ "$item" == *[$special]* ]] && item="$(printf '%q' "$item")"
-    COMPREPLY+=("$item")
-  fi
+  [[ "$item" == "$cur"* ]] && COMPREPLY+=("$item")
 done < <(eval "$1")
 ''')
 
@@ -206,17 +220,14 @@ local separator="$1"; shift
 
 compopt -o nospace
 
-local cur_unquoted break_pos in_quotes
-dequote "$cur" cur_unquoted break_pos in_quotes
-
-if [[ -z "$cur_unquoted" ]]; then
+if [[ -z "$cur" ]]; then
   COMPREPLY=("$@")
   return
 fi
 
 local value having_value having_values=() remaining_values=()
 
-IFS="$separator" read -r -a having_values <<< "$cur_unquoted"
+IFS="$separator" read -r -a having_values <<< "$cur"
 
 #ifdef duplicates
 if (( duplicates )); then
@@ -236,32 +247,29 @@ for value; do
 done
 #endif
 
+local oldcur="$cur"
+
 COMPREPLY=()
 
-local cur_stripped="$cur_unquoted"
-if (( break_pos > -1 )); then
-  cur_stripped="${cur_stripped:break_pos}"
-fi
-
-if [[ "${cur_unquoted: -1}" == "$separator" ]]; then
+if [[ "${cur: -1}" == "$separator" ]]; then
   for value in "${remaining_values[@]}"; do
-    COMPREPLY+=("$cur_stripped$value")
+    COMPREPLY+=("$oldcur$value")
   done
 elif (( ${#remaining_values[@]} )); then
   if array_contains "${having_values[-1]}" "$@"; then
-    COMPREPLY+=("$cur_stripped$separator")
+    COMPREPLY+=("$oldcur$separator")
   elif (( ${#having_values[@]} )); then
     local cur_last_value=${having_values[-1]}
-    cur_stripped="${cur_stripped%"$cur_last_value"}"
+    oldcur="${oldcur%"$cur_last_value"}"
 
     for value in "${remaining_values[@]}"; do
       if [[ "$value" == "$cur_last_value"* ]]; then
-        COMPREPLY+=("$cur_stripped$value")
+        COMPREPLY+=("$oldcur$value")
       fi
     done
   fi
 fi
-''', ['dequote', 'array_contains'])
+''', ['array_contains'])
 
 _KEY_VALUE_LIST = ShellFunction('key_value_list', r'''
 local sep1="$1"; shift
@@ -275,27 +283,21 @@ for ((i=1; i <= $#; i += 3)); do
   excludes["${@:i:1}"]="${@:i + 2:1}"
 done
 
-local strip_chars=''
-[[ "$COMP_WORDBREAKS" == *"$sep1"* ]] && strip_chars+="$sep1"
-[[ "$COMP_WORDBREAKS" == *"$sep2"* ]] && strip_chars+="$sep2"
-[[ "${cur:0:1}" == '"' ]] && strip_chars=''
-[[ "${cur:0:1}" == "'" ]] && strip_chars=''
-local cur="$cur" break_pos in_quotes
-dequote "$cur" cur break_pos in_quotes
+local cur="$cur"
 
 if [[ -z "$cur" ]]; then
   COMPREPLY=("${!funcs[@]}")
   return
 fi
 
-local pair key value found_key cur_stripped="$cur"
-local -a tmp having_pairs having_keys remaining_keys
+local pair key value found_key prefix v
+local -a tmp having_pairs having_keys remaining_keys raw
 
 IFS="$sep1" read -r -a having_pairs <<< "$cur"
 
 for pair in "${having_pairs[@]}"; do
   key="${pair%%"$sep2"*}"
-  IFS=' ' read -r -a tmp <<< "${excludes[$key]}"
+  IFS=' ' read -r -a tmp <<< "${excludes[$key]-}"
   having_keys+=("${tmp[@]}")
 done
 
@@ -316,40 +318,27 @@ done
 
 COMPREPLY=()
 
-if [[ "${cur: -1}" == "$sep1" ]]; then
-  [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
+pair="${cur##*"$sep1"}"
+prefix="${cur%"$pair"}"
 
-  for key in "${remaining_keys[@]}"; do
-    COMPREPLY+=("$cur_stripped$key")
+if [[ "$pair" == *"$sep2"* ]]; then
+  key="${pair%%"$sep2"*}"
+  value="${pair#*"$sep2"}"
+  cur="$value"
+  ${funcs[$key]}
+  local result=()
+  for v in "${COMPREPLY[@]}"; do
+    result+=("$prefix$key$sep2$v")
   done
+  COMPREPLY=("${result[@]}")
 else
-  pair="${cur##*"$sep1"}"
-  if [[ "$pair" == *"$sep2"* ]]; then
-    key="${pair%%"$sep2"*}"
-    value="${pair#*"$sep2"}"
-    cur="$value"
-    ${funcs[$key]}
-
-    cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
-    if [[ -n "$strip_chars" ]]; then
-        cur_stripped="${cur_stripped##*[$strip_chars]}"
+  for key in "${remaining_keys[@]}"; do
+    if [[ "$key" == "$pair"* ]]; then
+      COMPREPLY+=("$prefix$key")
     fi
-
-    for i in "${!COMPREPLY[@]}"; do
-      COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
-    done
-  else
-    [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
-    cur_stripped="${cur_stripped%"$pair"}"
-
-    for key in "${remaining_keys[@]}"; do
-      if [[ "$key" == "$pair"* ]]; then
-        COMPREPLY+=("$cur_stripped$key")
-      fi
-    done
-  fi
+  done
 fi
-''', ['dequote'])
+''')
 
 _KEY_VALUE_PAIR = ShellFunction('key_value_pair', r'''
 local sep="$1"; shift
@@ -360,33 +349,23 @@ for ((i=1; i <= $#; i += 2)); do
   funcs["${@:i:1}"]="${@:i + 1:1}"
 done
 
-local strip_chars=''
-[[ "$COMP_WORDBREAKS" == *"$sep"* ]] && strip_chars+="$sep"
-[[ "${cur:0:1}" == '"' ]] && strip_chars=''
-[[ "${cur:0:1}" == "'" ]] && strip_chars=''
-local cur="$cur" break_pos in_quotes
-dequote "$cur" cur break_pos in_quotes
-
-local key="${cur%%"$sep"*}" value="${cur#*"$sep"}" cur_stripped="$cur"
-
-COMPREPLY=()
-
 if [[ "$cur" != *"$sep"* ]]; then
-  values "${!funcs[@]}"
-elif array_contains "$key" "${!funcs[@]}"; then
-  cur="$value"
+  _crazy-complete-test__values "${!funcs[@]}"
+  return
+fi
+
+local key="${cur%%"$sep"*}" value="${cur#*"$sep"}"
+
+if _crazy-complete-test__array_contains "$key" "${!funcs[@]}"; then
+  local oldcur="$cur"
+  local cur="$value"
   ${funcs[$key]}
 
-  cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
-  if [[ -n "$strip_chars" ]]; then
-      cur_stripped="${cur_stripped##*[$strip_chars]}"
-  fi
-
   for i in "${!COMPREPLY[@]}"; do
-    COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
+    COMPREPLY[i]="${oldcur%%"$value"}${COMPREPLY[i]}"
   done
 fi
-''', ['dequote', 'array_contains', 'values'])
+''', ['array_contains', 'values'])
 
 _PREFIX_COMPREPLY = ShellFunction('prefix_compreply', r'''
 [[ "$cur" == *[$COMP_WORDBREAKS]* ]] && return
@@ -426,25 +405,18 @@ echo $pos
 
 _PREFIX = ShellFunction('prefix', r'''
 local prefix="$1" func="$2"
-local stripped="$(strip_prefix_keep_quoting "$prefix" "$cur")"
 
-if [[ "$stripped" == "$cur" ]]; then
-  COMPREPLY=($(compgen -W "$1" -- "$cur"))
-  compopt -o nospace
-  return
-fi
-
-local break_position=$(get_last_break_position "$cur")
-
-local cur_old="$cur" cur="$stripped"
-$func
-
-if (( break_position < 0 )); then
+if [[ "$cur" == "$prefix"* ]]; then
+  local cur="${cur#$prefix}"
+  $func
   for i in "${!COMPREPLY[@]}"; do
     COMPREPLY[i]="$prefix${COMPREPLY[i]}"
   done
+else
+  COMPREPLY=($(compgen -W "$prefix" -- "$cur"))
+  compopt -o nospace
 fi
-''', ['get_last_break_position', 'strip_prefix_keep_quoting'])
+''')
 
 _STRIP_PREFIX_KEEP_QUOTING = ShellFunction('strip_prefix_keep_quoting', r'''
 local p="$1" pi=0 plen=${#1}
@@ -487,7 +459,6 @@ case "$state" in
 esac
 ''')
 
-
 class BashHelpers(GeneralHelpers):
     _functions = {}
 
@@ -497,6 +468,8 @@ class BashHelpers(GeneralHelpers):
         super().__init__(config, function_prefix, ShellFunction)
         self.add_function(_VALUES)
         self.add_function(_DEQUOTE)
+        self.add_function(_SQ_QUOTE)
+        self.add_function(_DQ_QUOTE)
         self.add_function(_DEQUOTE_WORDS)
         self.add_function(_PREFIX)
         self.add_function(_STRIP_PREFIX_KEEP_QUOTING)

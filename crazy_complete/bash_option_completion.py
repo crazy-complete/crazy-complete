@@ -103,9 +103,10 @@ class MasterCompletionFunction(MasterCompletionFunctionBase):
         if self.code:
             r  = '%s() {\n' % funcname
             if self.optionals:
-                r += '  local opt="$1" cur="$2" mode="$3"\n\n'
+                r += '  local opt="$1" cur="$2" mode="$3"\n'
             else:
-                r += '  local opt="$1" cur="$2"\n\n'
+                r += '  local opt="$1" cur="$2"\n'
+            r += '  _CC_CUR_PREFIX_OPTION="$1"\n\n'
             r += '%s\n\n' % indent('\n\n'.join(self.code), 2)
             r += '  return 1\n'
             r += '}'
@@ -162,9 +163,10 @@ class MasterCompletionFunctionNoWhen(MasterCompletionFunctionBase):
         if self.code:
             r  = '%s() {\n' % funcname
             if self.optionals:
-                r += '  local opt="$1" cur="$2" mode="$3" ret=0\n\n'
+                r += '  local opt="$1" cur="$2" mode="$3" ret=0\n'
             else:
-                r += '  local opt="$1" cur="$2" ret=0\n\n'
+                r += '  local opt="$1" cur="$2" ret=0\n'
+            r += '  _CC_CUR_PREFIX_OPTION="$1"\n\n'
             r += '%s\n\n' % indent('\n\n'.join(self.code), 2)
             r += '  return $ret\n'
             r += '}'

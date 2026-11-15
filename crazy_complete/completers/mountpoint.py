@@ -28,12 +28,11 @@ OUTPUT = r'''
 '''
 
 _MOUNTPOINT_BASH = ShellFunction('mountpoint', r'''
-local REPLY
-
 COMPREPLY=()
 
-while read -r REPLY; do
-  COMPREPLY+=("$(printf '%q' "$REPLY")")
+local item
+while read -r item; do
+  [[ "$item" == "$cur"* ]] && COMPREPLY+=("$item")
 done < <(command findmnt -lno TARGET)
 ''')
 

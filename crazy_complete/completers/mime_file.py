@@ -40,7 +40,7 @@ dir1/  dir2/  img.png  img.jpg
 '''
 
 _MIME_FILE_BASH = ShellFunction('mime_file', r'''
-local line file mime i_opt cur_dequoted
+local line file mime i_opt
 
 if command file -i /dev/null &>/dev/null; then
   i_opt="-i"
@@ -54,9 +54,6 @@ else
 #endif
   return
 fi
-
-local cur_dequoted break_pos in_quotes
-dequote "$cur" cur_dequoted break_pos in_quotes
 
 while read -r line; do
   mime="${line##*:}"
@@ -72,12 +69,12 @@ while read -r line; do
       file="$file/"
     fi
 
-    if [[ "$file" == "$cur_dequoted"* ]]; then
-      COMPREPLY+=("$(printf '%q' "$file")")
+    if [[ "$file" == "$cur"* ]]; then
+      COMPREPLY+=("$file")
     fi
   fi
-done < <(command file -L $i_opt -- "$cur_dequoted"* 2>/dev/null)
-''', ['dequote'])
+done < <(command file -L $i_opt -- "$cur"* 2>/dev/null)
+''')
 
 _MIME_FILE_FISH = FishFunction('mime_file', r'''
 set -l i_opt

@@ -1,0 +1,599 @@
+args: ["--input-type=yaml"]
+definition_file: "definition.yaml"
+---
+number: 1
+description: "choices: value with space (empty)"
+send: "crazy-complete-test --ch-space "
+bash_expected: |
+  > crazy-complete-test --ch-space
+  one\ two     plain        three\ four
+  > crazy-complete-test --ch-space
+fish_expected: |
+  > crazy-complete-test --ch-space
+  one two  plain  three four
+zsh_expected: |
+  > crazy-complete-test --ch-space
+  one\ two     plain        three\ four
+---
+number: 2
+description: "choices: value with space (partial)"
+send: "crazy-complete-test --ch-space one"
+bash_expected: |
+  > crazy-complete-test --ch-space one\ two
+fish_expected: |
+  > crazy-complete-test --ch-space one\ two
+zsh_expected: |
+  > crazy-complete-test --ch-space one\ two
+---
+number: 3
+description: "choices: value with space inside double quotes (partial)"
+send: "crazy-complete-test --ch-space \"one"
+bash_expected: |
+  > crazy-complete-test --ch-space "one two"
+fish_expected: |
+  > crazy-complete-test --ch-space "one two"
+zsh_expected: |
+  > crazy-complete-test --ch-space "one two"
+---
+number: 4
+description: "choices: colon in value (empty)"
+send: "crazy-complete-test --ch-colon "
+bash_expected: |
+  > crazy-complete-test --ch-colon
+  a:b    c:d:e  plain
+  > crazy-complete-test --ch-colon
+fish_expected: |
+  > crazy-complete-test --ch-colon
+  a:b  c:d:e  plain
+zsh_expected: |
+  > crazy-complete-test --ch-colon
+  a:b    c:d:e  plain
+---
+number: 5
+description: "choices: colon in value (partial before colon)"
+send: "crazy-complete-test --ch-colon a"
+bash_expected: |
+  > crazy-complete-test --ch-colon a:b
+fish_expected: |
+  > crazy-complete-test --ch-colon a:b
+zsh_expected: |
+  > crazy-complete-test --ch-colon a:b
+---
+number: 6
+description: "choices: colon in value (partial after colon)"
+send: "crazy-complete-test --ch-colon a:"
+bash_expected: |
+  > crazy-complete-test --ch-colon a:b
+fish_expected: |
+  > crazy-complete-test --ch-colon a:b
+zsh_expected: |
+  > crazy-complete-test --ch-colon a:b
+---
+number: 7
+description: "choices: colon in value (double quoted)"
+send: "crazy-complete-test --ch-colon \"a:"
+bash_expected: |
+  > crazy-complete-test --ch-colon "a:b"
+fish_expected: |
+  > crazy-complete-test --ch-colon "a:b"
+zsh_expected: |
+  > crazy-complete-test --ch-colon "a:b"
+---
+number: 8
+description: "choices: semicolon in value (empty)"
+send: "crazy-complete-test --ch-semicolon "
+bash_expected: |
+  > crazy-complete-test --ch-semicolon
+  plain        semi\;colon
+  > crazy-complete-test --ch-semicolon
+fish_expected: |
+  > crazy-complete-test --ch-semicolon
+  plain  semi;colon
+zsh_expected: |
+  > crazy-complete-test --ch-semicolon
+  plain        semi\;colon
+---
+number: 9
+description: "choices: semicolon in value (single quoted)"
+send: "crazy-complete-test --ch-semicolon 'semi;"
+bash_expected: |
+  > crazy-complete-test --ch-semicolon 'semi;colon'
+fish_expected: |
+  > crazy-complete-test --ch-semicolon 'semi;colon'
+zsh_expected: |
+  > crazy-complete-test --ch-semicolon 'semi;colon'
+---
+number: 10
+description: "choices: at-sign in value (after @)"
+send: "crazy-complete-test --ch-at a@"
+bash_expected: |
+  > crazy-complete-test --ch-at a@b
+fish_expected: |
+  > crazy-complete-test --ch-at a@b
+zsh_expected: |
+  > crazy-complete-test --ch-at a@b
+---
+number: 11
+description: "choices: quote chars in value (empty)"
+send: "crazy-complete-test --ch-quote "
+bash_expected: |
+  > crazy-complete-test --ch-quote
+  plain           with\"double\"  with\'quote\'
+  > crazy-complete-test --ch-quote
+fish_expected: |
+  > crazy-complete-test --ch-quote
+  plain  with"double"  with'quote'
+zsh_expected: |
+  > crazy-complete-test --ch-quote
+  plain           with\"double\"  with\'quote\'
+---
+number: 12
+description: "choices: quote chars in value (single-quoted partial)"
+send: "crazy-complete-test --ch-quote 'with"
+bash_expected: |
+  > crazy-complete-test --ch-quote 'with
+  with"double"       with'\''quote'\''
+  > crazy-complete-test --ch-quote 'with
+fish_expected: |
+  > crazy-complete-test --ch-quote 'with
+  'with"double"  'with'quote'
+zsh_expected: |
+  > crazy-complete-test --ch-quote 'with
+  with"double"       with'\''quote'\''
+---
+number: 13
+description: "choices: dollar in value (empty)"
+send: "crazy-complete-test --ch-dollar "
+bash_expected: |
+  > crazy-complete-test --ch-dollar
+  dollar\$x  plain
+  > crazy-complete-test --ch-dollar
+fish_expected: |
+  > crazy-complete-test --ch-dollar
+  dollar$x  plain
+zsh_expected: |
+  > crazy-complete-test --ch-dollar
+  dollar\$x  plain
+---
+number: 14
+description: "choices: backtick in value (partial)"
+send: "crazy-complete-test --ch-backtick back"
+bash_expected: |
+  > crazy-complete-test --ch-backtick back\`tick\`
+fish_expected: |
+  > crazy-complete-test --ch-backtick back\\`tick\\`
+zsh_expected: |
+  > crazy-complete-test --ch-backtick back\`tick\`
+---
+number: 15
+description: "choices: glob chars in value (empty)"
+send: "crazy-complete-test --ch-glob "
+bash_expected: |
+  > crazy-complete-test --ch-glob
+  a\*foo  bar\?   baz1
+  > crazy-complete-test --ch-glob
+fish_expected: |
+  > crazy-complete-test --ch-glob
+  a*foo  bar?  baz1
+zsh_expected: |
+  > crazy-complete-test --ch-glob
+  a\*foo  bar\?   baz1
+---
+number: 16
+description: "choices: glob chars in value (literal star prefix)"
+send: "crazy-complete-test --ch-glob a*"
+bash_expected: |
+  > crazy-complete-test --ch-glob a\*foo
+fish_expected: |
+  > crazy-complete-test --ch-glob a*
+zsh_expected: |
+  > crazy-complete-test --ch-glob a\*foo
+---
+number: 17
+description: "choices: slash/dot values (empty)"
+send: "crazy-complete-test --ch-slashdot "
+bash_expected: |
+  > crazy-complete-test --ch-slashdot
+  ..         .rel       /abs/path  plain
+  > crazy-complete-test --ch-slashdot
+fish_expected: |
+  > crazy-complete-test --ch-slashdot
+  ..  .rel  /abs/path  plain
+zsh_expected: |
+  > crazy-complete-test --ch-slashdot
+  ..         .rel       /abs/path  plain
+---
+number: 18
+description: "choices: slash/dot values (slash prefix)"
+send: "crazy-complete-test --ch-slashdot /"
+bash_expected: |
+  > crazy-complete-test --ch-slashdot /abs/path
+fish_expected: |
+  > crazy-complete-test --ch-slashdot /abs/path
+zsh_expected: |
+  > crazy-complete-test --ch-slashdot /abs/path
+---
+number: 19
+description: "choices: combined specials (empty)"
+send: "crazy-complete-test --ch-combo "
+bash_expected: |
+  > crazy-complete-test --ch-combo
+  a\ b\'c\"d\*e\?f  plain
+  > crazy-complete-test --ch-combo
+fish_expected: |
+  > crazy-complete-test --ch-combo
+  a b'c"d*e?f  plain
+zsh_expected: |
+  > crazy-complete-test --ch-combo
+  a\ b\'c\"d\*e\?f  plain
+---
+number: 20
+description: "choices: positional (empty)"
+send: "crazy-complete-test "
+bash_expected: |
+  > crazy-complete-test
+  --long    a:b       c\*d      one\ two  plain
+  > crazy-complete-test
+fish_expected: |
+  > crazy-complete-test
+  a:b  c*d  one two  plain  --long
+zsh_expected: |
+  > crazy-complete-test
+  --long    a:b       c\*d      one\ two  plain
+---
+number: 21
+description: "choices: positional: colon in value (after colon)"
+send: "crazy-complete-test a:"
+bash_expected: |
+  > crazy-complete-test a:b
+fish_expected: |
+  > crazy-complete-test a:b
+zsh_expected: |
+  > crazy-complete-test a:b
+---
+number: 22
+description: "list: default comma separator (empty)"
+send: "crazy-complete-test --list-comma "
+bash_expected: |
+  > crazy-complete-test --list-comma
+  one    three  two
+  > crazy-complete-test --list-comma
+fish_expected: |
+  > crazy-complete-test --list-comma
+  one  three  two
+zsh_expected: |
+  > crazy-complete-test --list-comma
+  one    three  two
+---
+number: 23
+description: "list: default comma separator (next item after comma)"
+comment: "List de-duplication does not work in ZSH"
+send: "crazy-complete-test --list-comma one,"
+bash_expected: |
+  > crazy-complete-test --list-comma one,
+  one,three  one,two
+  > crazy-complete-test --list-comma one,t
+fish_expected: |
+  > crazy-complete-test --list-comma one,t
+  one,three  one,two
+zsh_expected: |
+  > crazy-complete-test --list-comma one,
+  one    three  two
+---
+number: 24
+description: "list: colon separator (empty)"
+send: "crazy-complete-test --list-colon "
+bash_expected: |
+  > crazy-complete-test --list-colon
+  one    three  two
+  > crazy-complete-test --list-colon
+fish_expected: |
+  > crazy-complete-test --list-colon
+  one  three  two
+zsh_expected: |
+  > crazy-complete-test --list-colon
+  one    three  two
+---
+number: 25
+description: "list: colon separator (next item after colon)"
+comment: "List de-duplication does not work in ZSH"
+send: "crazy-complete-test --list-colon one:"
+bash_expected: |
+  > crazy-complete-test --list-colon one:
+  three  two
+  > crazy-complete-test --list-colon one:t
+fish_expected: |
+  > crazy-complete-test --list-colon one:t
+  one:three  one:two
+zsh_expected: |
+  > crazy-complete-test --list-colon one:
+  one    three  two
+---
+number: 26
+description: "list: colon separator (quoted 'one:')"
+comment: "List de-duplication does not work in ZSH"
+send: "crazy-complete-test --list-colon \"one:"
+bash_expected: |
+  > crazy-complete-test --list-colon "one:
+  one:three  one:two
+  > crazy-complete-test --list-colon "one:t
+fish_expected: |
+  > crazy-complete-test --list-colon "one:t
+  "one:three  "one:two
+zsh_expected: |
+  > crazy-complete-test --list-colon "one:
+  one    three  two
+---
+number: 27
+description: "list: equal separator (next item)"
+comment: "List de-duplication does not work in ZSH"
+send: "crazy-complete-test --list-eq one="
+bash_expected: |
+  > crazy-complete-test --list-eq one=
+  three  two
+  > crazy-complete-test --list-eq one=t
+fish_expected: |
+  > crazy-complete-test --list-eq one=t
+  one=three  one=two
+zsh_expected: |
+  > crazy-complete-test --list-eq one=
+  one    three  two
+---
+number: 28
+description: "list: dot separator (next item)"
+comment: "List de-duplication does not work in ZSH"
+send: "crazy-complete-test --list-dot one."
+bash_expected: |
+  > crazy-complete-test --list-dot one.
+  one.three  one.two
+  > crazy-complete-test --list-dot one.t
+fish_expected: |
+  > crazy-complete-test --list-dot one.t
+  one.three  one.two
+zsh_expected: |
+  > crazy-complete-test --list-dot one.
+  one    three  two
+---
+number: 29
+description: "list: semi-colon separator (next item, single quoted)"
+comment: "List de-duplication does not work in ZSH"
+send: "crazy-complete-test --list-semi 'one;"
+bash_expected: |
+  > crazy-complete-test --list-semi 'one;
+  one;three  one;two
+  > crazy-complete-test --list-semi 'one;t
+fish_expected: |
+  > crazy-complete-test --list-semi 'one;t
+  'one;three  'one;two
+zsh_expected: |
+  > crazy-complete-test --list-semi 'one;
+---
+number: 30
+description: "list: comma separator: values with spaces (empty)"
+send: "crazy-complete-test --list-space "
+bash_expected: |
+  > crazy-complete-test --list-space
+  one\ two     three\ four
+  > crazy-complete-test --list-space
+fish_expected: |
+  > crazy-complete-test --list-space
+  one two  three four
+zsh_expected: |
+  > crazy-complete-test --list-space
+  one two     three four
+---
+number: 31
+description: "list: comma separator: values with spaces (next item, double quoted)"
+send: "crazy-complete-test --list-space \"one two,"
+bash_expected: |
+  > crazy-complete-test --list-space "one two,three four"
+fish_expected: |
+  > crazy-complete-test --list-space "one two,three four"
+zsh_expected: |
+  > crazy-complete-test --list-space "one two,
+  one two     three four
+---
+number: 32
+description: "list: comma separator: separator inside value (empty)"
+send: "crazy-complete-test --list-sepinvalue "
+bash_expected: |
+  > crazy-complete-test --list-sepinvalue
+  a,b  c
+  > crazy-complete-test --list-sepinvalue
+fish_expected: |
+  > crazy-complete-test --list-sepinvalue
+  a,b  c
+zsh_expected: |
+  > crazy-complete-test --list-sepinvalue
+  a,b  c
+---
+number: 33
+description: "key_value_list: default (empty)"
+send: "crazy-complete-test --kvl-comma-eq "
+bash_expected: |
+  > crazy-complete-test --kvl-comma-eq
+  alpha  beta   gamma
+  > crazy-complete-test --kvl-comma-eq
+fish_expected: |
+  > crazy-complete-test --kvl-comma-eq
+  alpha=  (desc)  beta=  gamma=
+zsh_expected: |
+  > crazy-complete-test --kvl-comma-eq
+  alpha  -- desc
+  beta   gamma
+---
+number: 34
+description: "key_value_list: default (value after '=')"
+send: "crazy-complete-test --kvl-comma-eq alpha="
+bash_expected: |
+  > crazy-complete-test --kvl-comma-eq alpha=
+  one\ two     three\ four
+  > crazy-complete-test --kvl-comma-eq alpha=
+fish_expected: |
+  > crazy-complete-test --kvl-comma-eq alpha=
+  alpha=one two  alpha=three four
+zsh_expected: |
+  > crazy-complete-test --kvl-comma-eq alpha=
+  one\ two     three\ four
+---
+number: 35
+description: "key_value_list: default: (second key)"
+send: "crazy-complete-test --kvl-comma-eq alpha=x,be"
+bash_expected: |
+  > crazy-complete-test --kvl-comma-eq alpha=x,beta
+fish_expected: |
+  > crazy-complete-test --kvl-comma-eq alpha=x,beta=
+zsh_expected: |
+  > crazy-complete-test --kvl-comma-eq alpha=x,beta=
+---
+number: 36
+description: "key_value_list: comma-colon: value with colon"
+send: "crazy-complete-test --kvl-comma-colon alpha:"
+bash_expected: |
+  > crazy-complete-test --kvl-comma-colon alpha:
+  one\ two     three\ four
+  > crazy-complete-test --kvl-comma-colon alpha:
+fish_expected: |
+  > crazy-complete-test --kvl-comma-colon alpha:
+  alpha:one two  alpha:three four
+zsh_expected: |
+  > crazy-complete-test --kvl-comma-colon alpha:
+  one\ two     three\ four
+---
+number: 37
+description: "key_value_list: colon-equal: second key after item separator"
+send: "crazy-complete-test --kvl-colon-eq alpha:"
+bash_expected: |
+  > crazy-complete-test --kvl-colon-eq alpha:beta
+fish_expected: |
+  > crazy-complete-test --kvl-colon-eq alpha:beta=
+zsh_expected: |
+  > crazy-complete-test --kvl-colon-eq alpha:beta=
+---
+number: 38
+description: "key_value_list: semi-equal: value after key-value separator"
+send: "crazy-complete-test --kvl-semi-eq alpha="
+bash_expected: |
+  > crazy-complete-test --kvl-semi-eq alpha=
+  one  two
+  > crazy-complete-test --kvl-semi-eq alpha=
+fish_expected: |
+  > crazy-complete-test --kvl-semi-eq alpha=
+  alpha=one  alpha=two
+zsh_expected: |
+  > crazy-complete-test --kvl-semi-eq alpha=
+  one  two
+---
+number: 39
+description: "key_value_list: default: glob chars in value (after key-value separator)"
+send: "crazy-complete-test --kvl-glob glob="
+bash_expected: |
+  > crazy-complete-test --kvl-glob glob=
+  a\*b    c\[d\]
+  > crazy-complete-test --kvl-glob glob=
+fish_expected: |
+  > crazy-complete-test --kvl-glob glob=
+  glob=a*b  glob=c[d]
+zsh_expected: |
+  > crazy-complete-test --kvl-glob glob=
+  a\*b    c\[d\]
+---
+number: 40
+description: "key_value_list: default: quotes in value (after key-value separator)"
+send: "crazy-complete-test --kvl-quote quote="
+bash_expected: |
+  > crazy-complete-test --kvl-quote quote=
+  plain  x\'y   z\"w
+  > crazy-complete-test --kvl-quote quote=
+fish_expected: |
+  > crazy-complete-test --kvl-quote quote=
+  quote=plain  quote=x'y  quote=z"w
+zsh_expected: |
+  > crazy-complete-test --kvl-quote quote=
+  plain  x\'y   z\"w
+---
+number: 41
+description: "key_value_pair: default: value after separator"
+send: "crazy-complete-test --kvp-eq k1="
+bash_expected: |
+  > crazy-complete-test --kvp-eq k1=
+  one\ two     three\ four
+  > crazy-complete-test --kvp-eq k1=
+fish_expected: |
+  > crazy-complete-test --kvp-eq k1=
+  k1=one two  k1=three four
+zsh_expected: |
+  > crazy-complete-test --kvp-eq k1=
+  one\ two     three\ four
+---
+number: 42
+description: "key_value_pair: default: colon in value (partial)"
+send: "crazy-complete-test --kvp-eq k2=a"
+bash_expected: |
+  > crazy-complete-test --kvp-eq k2=a:b
+fish_expected: |
+  > crazy-complete-test --kvp-eq k2=a:b
+zsh_expected: |
+  > crazy-complete-test --kvp-eq k2=a:b
+---
+number: 43
+description: "key_value_pair: colon separator: value after separator"
+send: "crazy-complete-test --kvp-colon k2:"
+bash_expected: |
+  > crazy-complete-test --kvp-colon k2:
+  a:b   c\;d
+  > crazy-complete-test --kvp-colon k2:
+fish_expected: |
+  > crazy-complete-test --kvp-colon k2:
+  k2:a:b  k2:c;d
+zsh_expected: |
+  > crazy-complete-test --kvp-colon k2:
+  a:b   c\;d
+---
+number: 44
+description: "key_value_pair: semi-colon separator: value after separator (quoted)"
+send: "crazy-complete-test --kvp-semi 'k1;"
+bash_expected: |
+  > crazy-complete-test --kvp-semi 'k1;
+  k1;a;b  k1;c
+  > crazy-complete-test --kvp-semi 'k1;
+fish_expected: |
+  > crazy-complete-test --kvp-semi 'k1;
+  'k1;a;b  'k1;c
+zsh_expected: |
+  > crazy-complete-test --kvp-semi 'k1;
+  a;b  c
+---
+number: 45
+description: "key_value_pair: default: glob chars in value (partial)"
+send: "crazy-complete-test --kvp-glob kg=a"
+bash_expected: |
+  > crazy-complete-test --kvp-glob kg=a\*b
+fish_expected: |
+  > crazy-complete-test --kvp-glob kg=a\*b
+zsh_expected: |
+  > crazy-complete-test --kvp-glob kg=a\*b
+---
+number: 46
+description: "list of key-value pairs: empty"
+send: "crazy-complete-test --list-of-kvp "
+bash_expected: |
+  > crazy-complete-test --list-of-kvp pair
+fish_expected: |
+  > crazy-complete-test --list-of-kvp pair=
+zsh_expected: |
+  > crazy-complete-test --list-of-kvp pair=
+---
+number: 47
+description: "list of key-value pairs: value after key-value separator"
+send: "crazy-complete-test --list-of-kvp pair="
+bash_expected: |
+  > crazy-complete-test --list-of-kvp pair=
+  one  two
+  > crazy-complete-test --list-of-kvp pair=
+fish_expected: |
+  > crazy-complete-test --list-of-kvp pair=
+  pair=one  pair=two
+zsh_expected: |
+  > crazy-complete-test --list-of-kvp pair=
+  one  two

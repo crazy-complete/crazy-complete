@@ -164,8 +164,8 @@ description: "key_value_list: Check -o file=f"
 send: "crazy-complete-test -o file=f"
 bash_expected: |
   > crazy-complete-test -o file=f
-  file with spaces  file1.TXT         file4.txt.1
-  file0.txt         file3.tXt
+  file0.txt           file3.tXt           file\ with\ spaces
+  file1.TXT           file4.txt.1
   > crazy-complete-test -o file=file
 fish_expected: |
   > crazy-complete-test -o file=file
@@ -176,10 +176,9 @@ zsh_expected: |
 ---
 number: 11
 description: "key_value_list: Check -o with_sep=value="
-comment: "Does not work for Bash yet"
 send: "crazy-complete-test -o with_sep=value="
 bash_expected: |
-  > crazy-complete-test -o with_sep=value=value=foo
+  > crazy-complete-test -o with_sep=value=foo
 fish_expected: |
   > crazy-complete-test -o with_sep=value=foo
 zsh_expected: |

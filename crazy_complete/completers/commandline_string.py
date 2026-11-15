@@ -33,8 +33,7 @@ base32    base64    basename  basenc    bash      bashbug
 '''
 
 _COMMANDLINE_STRING_BASH = ShellFunction('commandline_string', r'''
-local l line break_pos in_quotes
-dequote "$cur" line break_pos in_quotes
+local line="$cur"
 
 local COMP_LINE_OLD="$COMP_LINE"
 local COMP_POINT_OLD=$COMP_POINT
@@ -56,21 +55,12 @@ _command_offset 0
 compopt -o nospace
 compopt -o noquote
 
-if (( break_pos >= 0 )); then
-  line="${line:break_pos}"
-fi
-
 if (( ${#COMPREPLY[@]} )); then
   local len=$(get_prefix_suffix_len "$line" "${COMPREPLY[0]}")
   line="${line:0:len}"
 
   for i in "${!COMPREPLY[@]}"; do
-    local REPLY="${COMPREPLY[i]}"
-    if (( in_quotes )); then
-      COMPREPLY[i]="$line$REPLY"
-    else
-      COMPREPLY[i]="$(printf '%q' "$line$REPLY")"
-    fi
+    COMPREPLY[i]="$line${COMPREPLY[i]}"
   done
 fi
 
@@ -78,7 +68,7 @@ COMP_LINE="$COMP_LINE_OLD"
 COMP_POINT=$COMP_POINT_OLD
 COMP_WORDS=("${COMP_WORDS_OLD[@]}")
 COMP_CWORD=$COMP_CWORD_OLD
-''', ['dequote', 'parse_line', 'get_prefix_suffix_len'])
+''', ['parse_line', 'get_prefix_suffix_len'])
 
 _COMMANDLINE_STRING_FISH = FishFunction('commandline_string', r'''
 set -l line

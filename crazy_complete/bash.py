@@ -10,6 +10,7 @@ from . import shell
 from . import algo
 from . import utils
 from . import helpers
+from . import bash_finalize
 from . import bash_helpers
 from . import bash_complete
 from . import bash_parser
@@ -141,6 +142,10 @@ class BashCompletionGenerator:
             # The root parser makes those variables local and sets up the completion.
             r  = 'local cur prev words cword split words_dequoted\n'
             r += '%s -n =: || return\n' % bash_versions.init_completion(self.ctxt)
+            r += '_CC_CUR="$cur"\n'
+            r += 'local _cc_break _cc_inq\n'
+            r += '%s "$cur" cur _cc_break _cc_inq\n' % self.ctxt.helpers.use_function('dequote')
+            r += 'compopt -o noquote\n'
             r += self.ctxt.helpers.use_function('dequote_words')
             code['init_completion'] = r
 
@@ -212,6 +217,7 @@ def generate_completion(commandline, config=None):
     result = generation.visit_commandlines(BashCompletionGenerator, ctxt, commandline)
 
     completion_func, wrapper_code = _generate_wrapper(ctxt, commandline)
+    finalize_func, finalize_code = bash_finalize.generate_finalizer(ctxt, commandline, completion_func)
 
     output = Output(config, helpers)
     output.add_generation_notice()
@@ -220,8 +226,9 @@ def generate_completion(commandline, config=None):
     output.add_helper_functions_code()
     output.extend(generator.result for generator in result)
     output.add(wrapper_code)
+    output.add(finalize_code)
     output.add('complete -F %s %s' % (
-        completion_func, ' '.join([commandline.prog] + commandline.aliases)
+        finalize_func, ' '.join([commandline.prog] + commandline.aliases)
     ))
     output.add_vim_modeline('sh')
 

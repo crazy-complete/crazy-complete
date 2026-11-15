@@ -40,14 +40,13 @@ foo@bar  mymail@myprovider
 '''
 
 _HISTORY_BASH = ShellFunction('history', r'''
+COMPREPLY=()
+
 [[ -f "$HISTFILE" ]] || return
 
 local match
-
 while read -r match; do
-  if [[ "$match" == "$cur"* ]]; then
-    COMPREPLY+=("$(printf '%q' "$match")")
-  fi
+  [[ "$match" == "$cur"* ]] && COMPREPLY+=("$match")
 done < <(command grep -E -o -- "$1" "$HISTFILE")
 ''')
 

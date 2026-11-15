@@ -147,20 +147,13 @@ while IFS=$'\t' read -r key desc exclude; do
   excludes[$key]="$exclude$non_repeatable_exclude"
 done < <($func)
 
-local strip_chars=''
-[[ "$COMP_WORDBREAKS" == *"$sep1"* ]] && strip_chars+="$sep1"
-[[ "$COMP_WORDBREAKS" == *"$sep2"* ]] && strip_chars+="$sep2"
-[[ "${cur:0:1}" == '"' ]] && strip_chars=''
-[[ "${cur:0:1}" == "'" ]] && strip_chars=''
-local cur="$cur" break_pos in_quotes
-dequote "$cur" cur break_pos in_quotes
-
 if [[ -z "$cur" ]]; then
   COMPREPLY=("${!excludes[@]}")
   return
 fi
 
-local pair key value found_key cur_stripped="$cur"
+local cur="$cur"
+local pair key value found_key oldcur="$cur"
 local -a tmp having_pairs having_keys remaining_keys
 
 IFS="$sep1" read -r -a having_pairs <<< "$cur"
@@ -189,10 +182,8 @@ done
 COMPREPLY=()
 
 if [[ "${cur: -1}" == "$sep1" ]]; then
-  [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
-
   for key in "${remaining_keys[@]}"; do
-    COMPREPLY+=("$cur_stripped$key")
+    COMPREPLY+=("$oldcur$key")
   done
 else
   pair="${cur##*"$sep1"}"
@@ -202,26 +193,22 @@ else
     cur="$value"
     exec "$func $key"
 
-    cur_stripped="${cur_stripped:0:$(( ${#cur_stripped} - ${#value} ))}"
-    if [[ -n "$strip_chars" ]]; then
-        cur_stripped="${cur_stripped##*[$strip_chars]}"
-    fi
+    oldcur="${oldcur:0:$(( ${#oldcur} - ${#value} ))}"
 
     for i in "${!COMPREPLY[@]}"; do
-      COMPREPLY[i]="$cur_stripped${COMPREPLY[i]}"
+      COMPREPLY[i]="$oldcur${COMPREPLY[i]}"
     done
   else
-    [[ -n "$strip_chars" ]] && cur_stripped="${cur_stripped##*[$strip_chars]}"
-    cur_stripped="${cur_stripped%"$pair"}"
+    oldcur="${oldcur%"$pair"}"
 
     for key in "${remaining_keys[@]}"; do
       if [[ "$key" == "$pair"* ]]; then
-        COMPREPLY+=("$cur_stripped$key")
+        COMPREPLY+=("$oldcur$key")
       fi
     done
   fi
 fi
-''', ['dequote', 'exec'])
+''', ['exec'])
 
 _KEY_VALUE_LIST_EXEC_FISH = FishFunction('key_value_list_exec', r'''
 set -l sep1 $argv[1]
