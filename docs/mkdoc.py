@@ -283,7 +283,10 @@ def options_markup(options):
 # =============================================================================
 
 ALL_MODULES = dict(completers.load_all())
-COMMANDS = [Command(name, module) for name, module in ALL_MODULES.items()]
+COMMANDS = [
+    Command(name, module) for name, module in ALL_MODULES.items()
+    if not getattr(module, 'HIDDEN', False)
+]
 
 with open(OPTIONS_INFILE, 'r', encoding='utf-8') as fh:
     for option_def in yaml.safe_load_all(fh):

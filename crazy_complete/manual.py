@@ -139,5 +139,9 @@ def print_help_topic(topic, use_colors):
     except CrazyError:
         print('Topic not found')
         print('')
+        available = [
+            name for name, module in completers.load_all().items()
+            if not getattr(module, 'HIDDEN', False)
+        ]
         print('Available completers:')
-        print(indent(join_with_wrap(' ', '\n', 40, list(completers.load_all())), 4))
+        print(indent(join_with_wrap(' ', '\n', 40, available), 4))

@@ -12,6 +12,8 @@ from ..bash_helpers import BashHelpers
 
 CATEGORY = 'custom'
 
+HIDDEN = True
+
 SYNOPSIS = r'''
 ['exec_fast', <COMMAND>]
 '''
@@ -26,6 +28,7 @@ Completion items must not contain whitespace or special shell characters.
 '''
 
 NOTES = [
+    'This completer is deprecated',
     'Functions can be put inside a file and included with `--include-file`',
 ]
 
@@ -42,18 +45,6 @@ OUTPUT = r'''
 2  -- one
 '''
 
-_EXEC_FAST_BASH = ShellFunction('exec_fast', r'''
-local item desc
-
-while IFS=$'\t' read -r item desc; do
-  if [[ "$item" == "$cur"* ]]; then
-    COMPREPLY+=("$item")
-  fi
-done < <(eval "$1")
-''')
-
-BashHelpers.add_function(_EXEC_FAST_BASH)
-
 
 def validate(ctxt, arguments):
     '''Validate YAML for exec_fast completer'''
@@ -62,7 +53,7 @@ def validate(ctxt, arguments):
 
 def bash(_completer, ctxt, _trace, command):
     '''Implement exec_fast for bash'''
-    func = ctxt.helpers.use_function('exec_fast')
+    func = ctxt.helpers.use_function('exec')
     return BashCompletionFunc(ctxt, [func, command])
 
 

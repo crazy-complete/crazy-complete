@@ -30,7 +30,6 @@ Each line represents one completion candidate. The item and its description are 
 '''
 
 ALSO = {
-    'exec_fast': 'Faster implementation of exec',
     'exec_internal': "Use the shell's internal completion mechanisms",
 }
 

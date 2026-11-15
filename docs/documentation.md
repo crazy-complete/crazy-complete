@@ -234,13 +234,12 @@ help: "<SUBCOMMAND DESCRIPTION>"
 
 ### User-defined commands
 
-| Command                                        | Description                                                                |
-| ---------------------------------------------- | -------------------------------------------------------------------------- |
-| [exec](#exec)                                  | Complete values from the output of a command or function                   |
-| [exec\_fast](#exec_fast)                       | Complete values from the output of a command or function (fast and unsafe) |
-| [exec\_internal](#exec_internal)               | Use the shell's internal completion mechanisms                             |
-| [key\_value\_list\_exec](#key_value_list_exec) | Complete dynamically generated comma-separted lists of key=value pairs     |
-| [key\_value\_pair\_exec](#key_value_pair_exec) | Complete dynamically generated a key=value pairs                           |
+| Command                                        | Description                                                            |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| [exec](#exec)                                  | Complete values from the output of a command or function               |
+| [exec\_internal](#exec_internal)               | Use the shell's internal completion mechanisms                         |
+| [key\_value\_list\_exec](#key_value_list_exec) | Complete dynamically generated comma-separted lists of key=value pairs |
+| [key\_value\_pair\_exec](#key_value_pair_exec) | Complete dynamically generated a key=value pairs                       |
 
 ---
 
@@ -2761,48 +2760,7 @@ Item 1  (Description 1)  Item 2  (Description 2)
 
 **SEE ALSO**
 
-- [exec\_fast](#exec_fast): Faster implementation of exec
-
 - [exec\_internal](#exec_internal): Use the shell's internal completion mechanisms
-
----
-
-### exec\_fast
-
-> Complete values from the output of a command or function (fast and unsafe)
-
-**SYNOPSIS**
-
-```yaml
-['exec_fast', <COMMAND>]
-```
-
-**PARAMETERS**
-
-Faster version of `exec` for handling large amounts of data.
-
-Unlike `exec`, this implementation does not safely handle arbitrary output.
-Completion items must not contain whitespace or special shell characters.
-
-
-**NOTES**
-
-- Functions can be put inside a file and included with `--include-file`
-
-**EXAMPLE**
-
-```yaml
-prog: 'example'
-options:
-  - option_strings: ['--exec-fast']
-    complete: ['exec_fast', "printf '%s\\t%s\\n' 1 one 2 two"]
-```
-
-```
-~ > example --exec-fast=<TAB>
-1  -- one
-2  -- one
-```
 
 ---
 
